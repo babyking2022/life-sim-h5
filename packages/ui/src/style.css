@@ -2755,3 +2755,550 @@ blockquote {
     grid-column: 1 / -1;
   }
 }
+
+/* ==================================================================
+   H5 Life-Sim MVP v2 — portrait, scene-first game surface
+   ------------------------------------------------------------------
+   This intentionally overrides the technical P3E diagnostics layout
+   without deleting the older styles used by fixture previews.
+   ================================================================== */
+
+.p3e-shell.p3e-game-shell,
+.p3e-game-shell {
+  --game-ink: #342719;
+  --game-muted: #705f48;
+  --game-paper: #fff6dc;
+  --game-paper-edge: #8b6b3d;
+  --game-green: #287a51;
+  --game-green-dark: #185439;
+  --game-orange: #f58b13;
+  --game-orange-dark: #a84b05;
+  width: min(100%, 455px);
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: max(8px, env(safe-area-inset-top)) 8px max(8px, env(safe-area-inset-bottom));
+  overflow-x: hidden;
+  color: var(--game-ink);
+  background:
+    linear-gradient(180deg, rgba(74, 178, 225, 0.28), rgba(236, 216, 154, 0.5)),
+    #a8dcec;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", system-ui, sans-serif;
+  isolation: isolate;
+}
+
+.p3e-game-shell *,
+.p3e-game-shell *::before,
+.p3e-game-shell *::after {
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.p3e-game-shell button,
+.p3e-game-shell summary {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.p3e-game-shell .p3e-header {
+  margin: 0 0 6px;
+}
+
+.p3e-game-shell .p3e-header h1 {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.p3e-game-shell .p3e-status,
+.p3e-game-shell .p3e-mvp-notice {
+  margin: 0;
+  border: 0;
+  padding: 3px 8px;
+  border-radius: 6px;
+  color: #60461f;
+  background: rgba(255, 247, 220, 0.92);
+  font-size: 0.68rem;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.p3e-game-shell .p3e-alert {
+  position: relative;
+  z-index: 20;
+  margin: 5px 0;
+}
+
+.p3e-hud {
+  position: relative;
+  z-index: 5;
+  display: grid;
+  grid-template-columns: 1.05fr 1fr 1fr auto;
+  align-items: stretch;
+  gap: 0;
+  min-height: 58px;
+  margin-bottom: 7px;
+  border: 3px solid #664d2f;
+  border-radius: 13px 13px 10px 10px;
+  padding: 5px;
+  background: linear-gradient(180deg, #fff9e7, #f4dfb4);
+  box-shadow: 0 4px 0 rgba(73, 48, 23, 0.35), inset 0 0 0 2px rgba(255, 255, 255, 0.72);
+}
+
+.p3e-hud-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1px;
+  padding: 2px 7px;
+  border-right: 1px solid rgba(107, 78, 39, 0.25);
+  font-variant-numeric: tabular-nums;
+}
+
+.p3e-hud-item:last-of-type {
+  border-right: 0;
+}
+
+.p3e-hud-item span,
+.p3e-hud-item small {
+  color: var(--game-muted);
+  font-size: 0.63rem;
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+.p3e-hud-item strong {
+  overflow: hidden;
+  font-size: clamp(0.8rem, 3.4vw, 1rem);
+  line-height: 1.12;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.p3e-hud button,
+.p3e-hud .p3e-menu-button {
+  align-self: center;
+  min-width: 44px;
+  min-height: 44px;
+  border: 2px solid #4d5b67;
+  border-radius: 9px;
+  padding: 0;
+  color: #fff;
+  background: linear-gradient(#60798d, #394e61);
+  font: inherit;
+  font-weight: 900;
+}
+
+.p3e-game-shell .p3e-content {
+  display: block;
+}
+
+.p3e-game-shell .p3e-life {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.p3e-scene {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: clamp(300px, 57dvh, 535px);
+  overflow: hidden;
+  border: 3px solid #5c583e;
+  border-radius: 15px;
+  padding: 10px;
+  background-color: #8ed1ed;
+  background-image:
+    linear-gradient(180deg, rgba(107, 205, 244, 0.08) 0%, rgba(255, 244, 187, 0.05) 52%, rgba(43, 70, 31, 0.24) 100%),
+    url("../../../assets/generated/life-sim-village-mvp.webp"),
+    linear-gradient(180deg, #72c9ef 0 42%, #87ba68 42% 70%, #d6ae61 70%);
+  background-position: center, center, center;
+  background-size: cover, cover, cover;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.38), 0 3px 0 rgba(54, 48, 29, 0.22);
+}
+
+.p3e-scene::after {
+  content: "";
+  position: absolute;
+  inset: 45% 0 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent, rgba(27, 34, 20, 0.2));
+}
+
+.p3e-character-stage {
+  position: relative;
+  z-index: 1;
+  align-self: flex-end;
+  max-width: 52%;
+  margin: 0 4px 6px auto;
+  border: 2px solid rgba(74, 52, 29, 0.7);
+  border-radius: 999px;
+  padding: 7px 11px;
+  color: #fff8de;
+  background: rgba(49, 49, 32, 0.78);
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-align: center;
+  text-shadow: 0 1px 1px #1e1a12;
+}
+
+.p3e-scene-copy {
+  position: relative;
+  z-index: 2;
+  width: min(84%, 325px);
+  max-height: min(48dvh, 410px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+.p3e-story-card,
+.p3e-game-shell .p3e-pending,
+.p3e-game-shell .p3e-card.p3e-death {
+  border: 3px solid var(--game-paper-edge);
+  border-radius: 12px;
+  padding: 0;
+  color: var(--game-ink);
+  background:
+    repeating-linear-gradient(0deg, transparent 0 27px, rgba(122, 87, 43, 0.1) 27px 28px),
+    var(--game-paper);
+  box-shadow: 0 4px 0 rgba(76, 49, 22, 0.35), inset 0 0 0 2px rgba(255, 255, 255, 0.54);
+}
+
+.p3e-story-card > h2,
+.p3e-game-shell .p3e-pending > h2,
+.p3e-game-shell .p3e-death > h2 {
+  margin: 0;
+  border-radius: 7px 7px 0 0;
+  padding: 9px 12px;
+  color: #fff;
+  background: linear-gradient(180deg, #3c946a, #26714f);
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+}
+
+.p3e-story-card > :not(h2),
+.p3e-game-shell .p3e-pending > :not(h2),
+.p3e-game-shell .p3e-death > :not(h2) {
+  margin-right: 9px;
+  margin-left: 9px;
+}
+
+.p3e-story-card p {
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+.p3e-choice-list,
+.p3e-game-shell .p3e-options {
+  display: grid;
+  gap: 6px;
+  padding: 7px 0 10px;
+}
+
+.p3e-choice-list .p3e-option,
+.p3e-game-shell .p3e-option {
+  min-height: 52px;
+  border: 2px solid #6d8d6a;
+  border-radius: 9px;
+  padding: 8px 34px 8px 11px;
+  color: #352a1d;
+  background: rgba(255, 252, 234, 0.96);
+  box-shadow: 0 2px 0 rgba(66, 52, 34, 0.2);
+  font-size: 0.84rem;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.p3e-choice-list .p3e-option::after,
+.p3e-game-shell .p3e-option::after {
+  content: "›";
+  float: right;
+  margin-right: -22px;
+  font-size: 1.45rem;
+  line-height: 1;
+}
+
+.p3e-stat-dock {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+  border: 3px solid #6d5333;
+  border-radius: 11px;
+  padding: 5px;
+  background: linear-gradient(#fff9e9, #ecd8ad);
+  box-shadow: 0 3px 0 rgba(76, 51, 26, 0.3);
+}
+
+.p3e-stat-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 2px 4px;
+  min-height: 44px;
+  border-right: 1px solid rgba(88, 64, 34, 0.23);
+  padding: 3px 4px;
+  font-size: clamp(0.62rem, 2.7vw, 0.75rem);
+  font-weight: 800;
+}
+
+.p3e-stat-item:last-child {
+  border-right: 0;
+}
+
+.p3e-stat-item progress,
+.p3e-stat-item .p3e-stat-bar {
+  grid-column: 1 / -1;
+  width: 100%;
+  height: 8px;
+  overflow: hidden;
+  border: 1px solid #70522f;
+  border-radius: 999px;
+  background: #d8c9a9;
+  accent-color: #3dbd78;
+}
+
+.p3e-time-controls {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  overflow-x: auto;
+  padding: 2px 0;
+  scrollbar-width: none;
+}
+
+.p3e-time-controls::-webkit-scrollbar {
+  display: none;
+}
+
+.p3e-time-controls button {
+  flex: 0 0 auto;
+  min-width: 44px;
+  min-height: 44px;
+  border: 2px solid #665033;
+  border-radius: 9px;
+  padding: 4px 8px;
+  color: #42301d;
+  background: linear-gradient(#fff7dc, #e7c992);
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 900;
+}
+
+.p3e-time-controls button[aria-pressed="true"],
+.p3e-time-controls button.is-active {
+  color: #fff;
+  background: linear-gradient(#3c946a, #246548);
+}
+
+.p3e-game-shell .p3e-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
+}
+
+.p3e-game-shell .p3e-primary[data-action="advance"],
+.p3e-game-shell .p3e-primary.p3e-next,
+.p3e-game-shell [data-action="next-decision"] {
+  min-height: 58px;
+  border: 3px solid var(--game-orange-dark);
+  border-radius: 12px;
+  padding: 8px 16px;
+  color: #fffdf0;
+  background: linear-gradient(180deg, #ffac25, var(--game-orange));
+  box-shadow: 0 4px 0 #743c09, inset 0 2px 0 rgba(255, 255, 255, 0.45);
+  font-size: 1.12rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-shadow: 0 2px 0 rgba(111, 50, 5, 0.7);
+}
+
+.p3e-game-shell .p3e-primary[data-action="advance"]:active,
+.p3e-game-shell .p3e-primary.p3e-next:active,
+.p3e-game-shell [data-action="next-decision"]:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #743c09;
+}
+
+.p3e-game-shell .p3e-tabs {
+  position: sticky;
+  z-index: 12;
+  bottom: max(0px, env(safe-area-inset-bottom));
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 5px;
+  order: 99;
+  margin: 7px 0 0;
+  border: 3px solid #5e442a;
+  border-radius: 11px;
+  padding: 5px;
+  background: rgba(67, 52, 39, 0.94);
+  box-shadow: 0 -2px 12px rgba(47, 32, 18, 0.22);
+  backdrop-filter: blur(8px);
+}
+
+.p3e-game-shell .p3e-tab {
+  min-height: 52px;
+  border: 2px solid #263f55;
+  border-radius: 8px;
+  padding: 5px 2px;
+  color: #f7f0dc;
+  background: linear-gradient(#536b7c, #314658);
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.p3e-game-shell .p3e-tab[aria-current="page"] {
+  border-color: #a56b1d;
+  color: #4a2f13;
+  background: linear-gradient(#fff0b9, #eecb67);
+}
+
+.p3e-tools {
+  margin: 5px 0;
+  border: 1px solid rgba(83, 62, 35, 0.35);
+  border-radius: 9px;
+  background: rgba(255, 249, 226, 0.9);
+}
+
+.p3e-tools summary {
+  min-height: 44px;
+  padding: 11px 12px;
+  color: #594329;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.p3e-tools .p3e-persistence,
+.p3e-tools .p3e-meta {
+  padding: 0 10px 10px;
+}
+
+.p3e-tools .p3e-primary {
+  min-height: 44px;
+  margin-top: 5px;
+  background: #426578;
+  border-color: #304d60;
+  font-size: 0.78rem;
+}
+
+.p3e-game-shell .p3e-placeholder {
+  min-height: 55dvh;
+  border: 3px solid #7d6038;
+  border-radius: 13px;
+  background: rgba(255, 247, 220, 0.94);
+}
+
+.p3e-game-shell button:focus-visible,
+.p3e-game-shell summary:focus-visible {
+  outline: 3px solid #ffe24a;
+  outline-offset: 2px;
+}
+
+/* Compact single-row HUD for the actual portrait game width. */
+@media (max-width: 480px) {
+  .p3e-game-shell .p3e-hud {
+    grid-template-columns:
+      minmax(47px, 0.72fr)
+      minmax(48px, 0.76fr)
+      minmax(37px, 0.55fr)
+      minmax(61px, 1fr)
+      minmax(61px, 1fr)
+      44px;
+    gap: 0;
+    padding: 4px;
+  }
+
+  .p3e-game-shell .p3e-game-title {
+    align-self: center;
+    margin: 0;
+    padding: 0 4px;
+    overflow: hidden;
+    color: #49331c;
+    font-size: clamp(0.7rem, 2.9vw, 0.82rem);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    text-align: center;
+    text-overflow: clip;
+    white-space: nowrap;
+  }
+
+  .p3e-game-shell .p3e-hud-item {
+    padding-right: 4px;
+    padding-left: 4px;
+  }
+
+  .p3e-game-shell .p3e-hud-item span,
+  .p3e-game-shell .p3e-hud-item small {
+    font-size: clamp(0.52rem, 2.15vw, 0.62rem);
+  }
+
+  .p3e-game-shell .p3e-hud-item strong {
+    font-size: clamp(0.68rem, 2.75vw, 0.88rem);
+  }
+}
+
+@media (max-width: 379px), (max-height: 700px) {
+  .p3e-shell.p3e-game-shell,
+  .p3e-game-shell {
+    padding-right: 5px;
+    padding-left: 5px;
+  }
+
+  .p3e-hud {
+    min-height: 52px;
+  }
+
+  .p3e-hud-item {
+    padding-right: 4px;
+    padding-left: 4px;
+  }
+
+  .p3e-scene {
+    min-height: 270px;
+  }
+
+  .p3e-scene-copy {
+    width: min(90%, 315px);
+    max-height: 330px;
+  }
+
+  .p3e-stat-dock {
+    padding: 3px;
+  }
+
+  .p3e-game-shell .p3e-tab {
+    min-height: 48px;
+  }
+}
+
+@media (min-width: 456px) {
+  .p3e-shell.p3e-game-shell,
+  .p3e-game-shell {
+    min-height: calc(100dvh - 24px);
+    margin-top: 12px;
+    margin-bottom: 12px;
+    border: 1px solid rgba(74, 54, 31, 0.3);
+    border-radius: 18px;
+    box-shadow: 0 18px 50px rgba(41, 48, 37, 0.22);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .p3e-game-shell *,
+  .p3e-game-shell *::before,
+  .p3e-game-shell *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

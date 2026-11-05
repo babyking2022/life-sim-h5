@@ -257,7 +257,10 @@ async function main() {
   check("default_uses_real_session", (await phaseOf(page)) === "life");
 
   // 2. age 0 / life
-  check("age0_life_initial", bodyText.includes("年齡 0") && (await phaseOf(page)) === "life");
+  check(
+    "age0_life_initial",
+    (bodyText.includes("年齡 0") || bodyText.includes("0 歲")) && (await phaseOf(page)) === "life"
+  );
 
   // 3. controls 跟 phase
   const advance = page.locator('[data-action="advance"]');
@@ -303,7 +306,8 @@ async function main() {
   check("run_to_death", finalPhase === "death", `phase=${finalPhase}`);
   check(
     "death_shows_real_outcome",
-    deathText.includes("reason") && (deathText.includes("mortality") || deathText.includes("age_ceiling"))
+    (deathText.includes("reason") && (deathText.includes("mortality") || deathText.includes("age_ceiling"))) ||
+      (deathText.includes("這段人生走到了終點") && deathText.includes("你活了"))
   );
   check("run_to_death_with_51_commands", finalCount === EXPECTED_COMMANDS, `commands=${finalCount}`);
   check("final_state_hash", finalStateHash === EXPECTED_STATE_HASH, finalStateHash ?? "null");
@@ -313,7 +317,10 @@ async function main() {
   await page.locator('[data-action="rebirth"]').click();
   await page.waitForSelector("[data-p3e-phase='life']", { timeout: 20000 });
   const rebirthText = (await page.locator("body").innerText()) ?? "";
-  check("rebirth_returns_age0", rebirthText.includes("年齡 0") && (await commandCount(page)) === 0);
+  check(
+    "rebirth_returns_age0",
+    (rebirthText.includes("年齡 0") || rebirthText.includes("0 歲")) && (await commandCount(page)) === 0
+  );
 
   // 8. 三個窄幅 viewport 不得水平溢出
   for (const viewport of [
@@ -373,6 +380,9 @@ async function main() {
     const query = seed === undefined ? "" : `?seed=${encodeURIComponent(seed)}`;
     await scenarioPage.goto(`${baseUrl}/${query}`, { waitUntil: "domcontentloaded" });
     await scenarioPage.waitForSelector("[data-p3e-live='true']", { timeout: 30000 });
+    // MVP v2 把技術性存檔操作收進 details；測試情境需先展開才能點擊。
+    const tools = scenarioPage.locator("details.p3e-tools");
+    if ((await tools.count()) === 1) await tools.evaluate((details) => { details.open = true; });
   }
 
   function readAttrs(scenarioPage) {
@@ -432,6 +442,8 @@ async function main() {
   async function reloadApp(scenarioPage) {
     await scenarioPage.reload({ waitUntil: "domcontentloaded" });
     await scenarioPage.waitForSelector("[data-p3e-live='true']", { timeout: 30000 });
+    const tools = scenarioPage.locator("details.p3e-tools");
+    if ((await tools.count()) === 1) await tools.evaluate((details) => { details.open = true; });
   }
 
   // 1. clean boot 建新命並存檔
@@ -869,6 +881,8 @@ async function main() {
   /* ---------------------------------------------------------------- */
 
   async function exportSave(scenarioPage) {
+    const tools = scenarioPage.locator("details.p3e-tools");
+    if ((await tools.count()) === 1) await tools.evaluate((details) => { details.open = true; });
     const [download] = await Promise.all([
       scenarioPage.waitForEvent("download"),
       scenarioPage.locator('[data-action="export"]').first().click()

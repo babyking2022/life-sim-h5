@@ -10,6 +10,7 @@ import {
   type P3EBrowserWorld,
   type P3EPlaySession
 } from "@life-sim/application";
+import { createLifeClock, type Speed } from "./p3e-time-controller.js";
 
 /**
  * H5-CTO-176-A／H5-CTO-188-A：真實 P3-E runtime 的瀏覽器垂直切片＋autosave。
@@ -83,6 +84,7 @@ let session: P3EPlaySession | null = null;
 let activeTab: TabKey = "life";
 let busy = false;
 let focusAdvanceAfterRender = false;
+let fastForwarding = false;
 
 /** UI 取得的最小儲存能力；null 代表不可用（ephemeral 模式）。 */
 let storage: Storage | null = null;
@@ -111,6 +113,20 @@ const app: HTMLDivElement = (() => {
   if (found === null) throw new Error("missing #app");
   return found;
 })();
+
+const lifeClock = createLifeClock({
+  baseIntervalMs: 6000,
+  initialSpeed: 1,
+  onTick: async () => {
+    if (session?.view.controls.canAdvanceYear === true) advanceYear();
+    else lifeClock.pause();
+  },
+  onStateChange: () => {
+    if (session !== null && !busy) render();
+  }
+});
+// 世界資料載入前先停住；boot 完成後才開始推進正式 session。
+lifeClock.pause();
 
 /* ------------------------------------------------------------------ */
 /* 小工具                                                              */
@@ -141,6 +157,66 @@ function describeError(error: unknown): string {
     if (typeof record.message === "string") return record.message;
   }
   return "E_UNKNOWN";
+}
+
+function formatMicroUsd(value: string): string {
+  const negative = value.startsWith("-");
+  const digits = negative ? value.slice(1) : value;
+  if (!/^\d+$/.test(digits)) return value;
+  const padded = digits.padStart(7, "0");
+  const whole = padded.slice(0, -6).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+  const cents = padded.slice(-6, -4);
+  return `${negative ? "-" : ""}$${whole}.${cents}`;
+}
+
+function ageStage(age: number): { label: string; icon: string } {
+  if (age <= 2) return { label: "嬰兒", icon: "👶" };
+  if (age <= 12) return { label: "童年", icon: "🧒" };
+  if (age <= 17) return { label: "少年", icon: "🧑" };
+  if (age <= 39) return { label: "青年", icon: "🧑" };
+  if (age <= 64) return { label: "中年", icon: "🧔" };
+  return { label: "晚年", icon: "🧓" };
+}
+
+const DISPLAY_TEXT: Readonly<Record<string, string>> = {
+  "ev.adult.burnout": "工作帶來了倦怠感",
+  "ev.adult.debt-scare": "債務壓力突然逼近",
+  "ev.adult.first-salary": "領到人生第一份薪水",
+  "ev.adult.housing-choice": "面臨居住安排的重要選擇",
+  "ev.adult.promotion": "在工作上獲得晉升",
+  "ev.adult.volunteer": "參加了一次志工活動",
+  "ev.any.quiet-year": "平靜地度過了一年",
+  "ev.any.setback": "遇到了一次挫折",
+  "ev.any.small-win": "收穫了一個小小的成功",
+  "ev.child.first-word": "說出了人生第一句話",
+  "ev.child.playground": "在遊樂場交到了新朋友",
+  "ev.child.school-choice": "面臨入學方式的選擇",
+  "ev.child.sibling-arrives": "家裡迎來了新的手足",
+  "ev.child.tantrum": "因為不順心而大哭了一場",
+  "ev.guardian.calm": "在家人的照顧下平靜成長",
+  "ev.senior.health-check": "完成了一次健康檢查",
+  "ev.senior.reflection": "回望自己走過的人生",
+  "ev.teen.exams": "迎來了一場重要考試",
+  "ev.teen.friendship": "交到了一位知心朋友",
+  "ev.teen.major-choice": "面臨未來方向的重要選擇",
+  "ev.teen.part-time-job": "開始了人生第一份打工",
+  "ev.teen.risk-experiment": "嘗試了一次冒險",
+  "p3b.decision.adult.housing": "你要怎麼安排接下來的住處？",
+  "p3b.decision.child.school": "你希望選擇哪一種學習方式？",
+  "p3b.decision.teen.path": "高中階段結束了，下一步要怎麼走？",
+  "p3b.option.adult.housing.rent": "先租房，換取自己的生活空間",
+  "p3b.option.adult.housing.save": "暫時不搬，把錢存下來",
+  "p3b.option.child.school.bold": "選擇更多元、充滿挑戰的學習環境",
+  "p3b.option.child.school.steady": "選擇穩定、按部就班的學習環境",
+  "p3b.option.teen.path.rest": "先休息一年，重新思考方向",
+  "p3b.option.teen.path.study": "繼續升學，累積知識",
+  "p3b.option.teen.path.work": "開始工作，累積實務經驗"
+};
+
+function friendlyKey(value: string): string {
+  const translated = DISPLAY_TEXT[value];
+  if (translated !== undefined) return translated;
+  return value.replace(/^event[._-]?/i, "").replace(/[._-]+/g, " ").trim() || "平凡的一年";
 }
 
 /* ------------------------------------------------------------------ */
@@ -391,6 +467,7 @@ function runCommand(command: unknown): void {
   try {
     const result = runP3EPlaySessionCommand({ session, command });
     session = result.session;
+    if (!session.view.controls.canAdvanceYear) lifeClock.pause();
     persistenceGeneration += 1;
     if (storage !== null && persistenceEnabled) persistenceStatus = "saving";
     focusAdvanceAfterRender = true;
@@ -408,8 +485,27 @@ function advanceYear(): void {
   runCommand({ type: "ADVANCE_YEAR", contentMode: "standard" });
 }
 
+async function jumpToNextDecision(): Promise<void> {
+  if (session === null || busy || fastForwarding || !session.view.controls.canAdvanceYear) return;
+  lifeClock.pause();
+  fastForwarding = true;
+  try {
+    for (let index = 0; index < 120; index += 1) {
+      if (session === null || !session.view.controls.canAdvanceYear || session.view.phase === "death") break;
+      advanceYear();
+      if ((index + 1) % 8 === 0) {
+        await new Promise<void>((resolve) => window.setTimeout(resolve, 0));
+      }
+    }
+  } finally {
+    fastForwarding = false;
+    render();
+  }
+}
+
 function chooseOption(optionId: string): void {
   runCommand({ type: "CHOOSE_DECISION", optionId });
+  if (session?.view.controls.canAdvanceYear === true) lifeClock.resume();
 }
 
 function rebirth(): void {
@@ -429,6 +525,7 @@ function rebirth(): void {
     }
     persistenceEnabled = true;
     session = startLife(readSeed());
+    lifeClock.resume();
     persistenceGeneration += 1;
     persistenceStatus = "cleared";
     persistCurrentSession();
@@ -436,6 +533,7 @@ function rebirth(): void {
     showAlert(describeError(error));
   } finally {
     busy = false;
+    if (session !== null && !session.view.controls.canAdvanceYear) lifeClock.pause();
     render();
   }
 }
@@ -460,7 +558,7 @@ function render(): void {
   if (session === null) return;
   const view = session.view;
 
-  const shell = element("main", "p3e-shell");
+  const shell = element("main", "p3e-shell p3e-game-shell");
   shell.id = "p3e-main";
   shell.setAttribute("aria-labelledby", "p3e-title");
   shell.dataset["p3eLive"] = "true";
@@ -474,23 +572,26 @@ function render(): void {
   shell.dataset["p3eLastExport"] = lastExport ?? "";
   shell.dataset["p3eLastImport"] = lastImport ?? "";
 
-  const header = element("header", "p3e-header");
-  const title = element("h1", undefined, "人生模擬");
+  const header = element("header", "p3e-hud");
+  const title = element("h1", "p3e-game-title", "人生模擬");
   title.id = "p3e-title";
-  const status = element(
-    "p", "p3e-status",
-    `第 ${view.currentYear} 年 · 年齡 ${view.age} · 階段 ${view.phase}`
-  );
+  const year = element("div", "p3e-hud-item p3e-hud-year");
+  year.append(element("span", undefined, "年份"), element("strong", undefined, String(view.currentYear)));
+  const age = element("div", "p3e-hud-item p3e-hud-age");
+  age.append(element("span", undefined, "年齡"), element("strong", undefined, `${view.age} 歲`));
+  const balance = element("div", "p3e-hud-item p3e-hud-assets");
+  balance.append(element("span", undefined, "資產"), element("strong", undefined, formatMicroUsd(view.assets.balanceMicroUsd)));
+  const income = element("div", "p3e-hud-item p3e-hud-income");
+  income.append(element("span", undefined, "年收入"), element("strong", undefined, formatMicroUsd(view.assets.annualIncomeMicroUsd)));
+  const menu = element("details", "p3e-hud-menu");
+  const menuSummary = element("summary", undefined, "☰");
+  menuSummary.setAttribute("aria-label", "開啟選單");
+  menu.append(menuSummary, element("p", undefined, "公開測試版 · 進度自動儲存在本機"));
+  const status = element("p", "p3e-status", `${view.currentYear} 年，${view.age} 歲`);
   status.id = "p3e-status";
   status.setAttribute("role", "status");
   status.setAttribute("aria-live", "polite");
-  header.append(title, status);
-
-  const mvpNotice = element(
-    "p",
-    "p3e-mvp-notice",
-    "MVP 公開測試版 · 遊戲內容使用虛構／合成資料，不代表真實人口統計。"
-  );
+  header.append(title, year, age, balance, income, menu, status);
 
   const alert = element("p", "p3e-alert");
   alert.id = "p3e-alert";
@@ -504,8 +605,6 @@ function render(): void {
 
   const tabs = renderTabs();
 
-  const persistence = renderPersistence();
-
   const content = element("section", "p3e-content");
   content.setAttribute("aria-label", "目前分頁內容");
   if (activeTab === "life") {
@@ -514,7 +613,21 @@ function render(): void {
     content.append(renderPlaceholder(activeTab));
   }
 
-  shell.append(header, mvpNotice, alert, persistence, tabs, content);
+  const tools = element("details", "p3e-tools");
+  const toolsSummary = element("summary", undefined, "存檔與測試資訊");
+  const notice = element(
+    "p",
+    "p3e-mvp-notice",
+    "MVP 公開測試版 · 遊戲內容使用虛構／合成資料，不代表真實人口統計。"
+  );
+  const technical = element(
+    "p",
+    "p3e-meta",
+    `seed=${readSeed()} · commands=${session.state.commandLog.count} · stateHash=${session.state.stateHash}`
+  );
+  tools.append(toolsSummary, notice, renderPersistence(), technical);
+
+  shell.append(header, alert, content, tools, tabs);
   app.replaceChildren(shell);
 
   const advance = shell.querySelector<HTMLButtonElement>('[data-action="advance"]');
@@ -639,112 +752,80 @@ function renderPlaceholder(tab: TabKey): HTMLElement {
 
 function renderLife(view: P3EPlaySession["view"], current: P3EPlaySession): HTMLElement {
   const root = element("div", "p3e-life");
+  const stage = ageStage(view.age);
+  const scene = element("section", `p3e-scene p3e-scene-${view.phase}`);
+  scene.setAttribute("aria-label", `${view.currentYear} 年的生活場景`);
+  const sceneCopy = element("div", "p3e-scene-copy");
+  sceneCopy.append(
+    element("span", undefined, `${view.identity.regionCode} · ${stage.label}`),
+    element("strong", undefined, `${view.age} 歲的你`)
+  );
+  const character = element("div", "p3e-character-stage");
+  character.dataset["ageStage"] = stage.label;
+  character.setAttribute("aria-label", `${stage.label}人物`);
+  character.append(element("span", undefined, stage.icon));
+  scene.append(sceneCopy, character);
 
-  /* 身份 */
-  const identity = element("section", "p3e-card");
-  identity.append(element("h2", undefined, "身分"));
-  const identityList = element("dl", "p3e-kv");
-  const identityRows: [string, string][] = [
-    ["entityId", view.identity.entityId],
-    ["sex", view.identity.sex],
-    ["birthYear", String(view.identity.birthYear)],
-    ["regionCode", view.identity.regionCode]
-  ];
-  for (const [key, value] of identityRows) {
-    identityList.append(element("dt", undefined, key), element("dd", undefined, value));
-  }
-  identity.append(identityList);
-
-  /* 數值 */
-  const stats = element("section", "p3e-card");
-  stats.append(element("h2", undefined, "狀態"));
-  const statsList = element("dl", "p3e-kv");
-  const statRows: [string, number][] = [
-    ["health", view.stats.health],
-    ["happiness", view.stats.happiness],
-    ["knowledge", view.stats.knowledge],
-    ["relationships", view.stats.relationships]
-  ];
-  for (const [key, value] of statRows) {
-    statsList.append(element("dt", undefined, key), element("dd", undefined, String(value)));
-  }
-  stats.append(statsList);
-
-  /* 金錢（base10 字串，不轉 number） */
-  const assets = element("section", "p3e-card");
-  assets.append(element("h2", undefined, "金錢"));
-  const assetsList = element("dl", "p3e-kv p3e-money");
-  const assetRows: [string, string][] = [
-    ["balanceMicroUsd", view.assets.balanceMicroUsd],
-    ["annualIncomeMicroUsd", view.assets.annualIncomeMicroUsd],
-    ["annualExpenseMicroUsd", view.assets.annualExpenseMicroUsd]
-  ];
-  for (const [key, value] of assetRows) {
-    assetsList.append(element("dt", undefined, key), element("dd", undefined, value));
-  }
-  assets.append(assetsList);
-
-  /* 最近事件 */
-  const outcome = element("section", "p3e-card");
-  outcome.append(element("h2", undefined, "最近事件"));
-  const outcomeList = element("dl", "p3e-kv");
+  const story = element("section", "p3e-story-card");
+  story.append(element("h2", undefined, view.phase === "pending_decision" ? "重要抉擇" : "當年訊息"));
   const last = current.lastOutcome;
   if (last === null) {
-    outcomeList.append(element("dt", undefined, "lastOutcome"), element("dd", undefined, "null"));
+    story.append(element("p", undefined, `${view.currentYear} 年，你的人生故事正要開始。`));
   } else if (last.kind === "advance_year") {
-    outcomeList.append(
-      element("dt", undefined, "kind"),
-      element("dd", undefined, "advance_year"),
-      element("dt", undefined, "selectedEventId"),
-      element("dd", undefined, last.selectedEventId ?? "null"),
-      element("dt", undefined, "selectionReason"),
-      element("dd", undefined, last.selectionReason),
-      element("dt", undefined, "contentMode"),
-      element("dd", undefined, last.contentMode)
-    );
+    const eventName = last.selectedEventId === null ? "平凡的一年" : friendlyKey(last.selectedEventId);
+    story.append(element("p", undefined, `${view.currentYear} 年，你 ${view.age} 歲。`));
+    story.append(element("strong", "p3e-event-name", eventName));
   } else {
-    outcomeList.append(
-      element("dt", undefined, "kind"),
-      element("dd", undefined, "choose_decision"),
-      element("dt", undefined, "eventId"),
-      element("dd", undefined, last.eventId),
-      element("dt", undefined, "selectedOptionId"),
-      element("dd", undefined, last.selectedOptionId)
-    );
+    story.append(element("p", undefined, "你已經做出了選擇。"));
+    story.append(element("strong", "p3e-event-name", friendlyKey(last.selectedOptionId)));
   }
-  outcome.append(outcomeList);
 
-  /* 待決策 */
   if (view.phase === "pending_decision" && view.pendingDecision !== null) {
-    root.append(renderPending(view.pendingDecision));
+    story.append(renderPending(view.pendingDecision));
   }
 
-  /* 死亡 */
   if (view.phase === "death") {
-    const death = element("section", "p3e-card p3e-death");
-    death.append(element("h2", undefined, "已死亡"));
-    const deathList = element("dl", "p3e-kv");
+    const death = element("div", "p3e-death");
+    death.append(element("h3", undefined, "這段人生走到了終點"));
     const deathOutcome = last !== null && last.kind === "advance_year" ? last.death : null;
-    deathList.append(
-      element("dt", undefined, "reason"),
-      element("dd", undefined, deathOutcome?.reason ?? "unknown"),
-      element("dt", undefined, "causeId"),
-      element("dd", undefined, deathOutcome?.causeId ?? "null")
-    );
-    death.append(deathList);
+    death.append(element("p", undefined, `你活了 ${view.age} 年。${deathOutcome?.causeId === null || deathOutcome?.causeId === undefined ? "" : ` 原因：${friendlyKey(deathOutcome.causeId)}`}`));
     const again = element("button", "p3e-primary", "重新開始");
     again.type = "button";
     again.dataset["action"] = "rebirth";
     again.addEventListener("click", rebirth);
     death.append(again);
-    root.append(death);
+    story.append(death);
   }
 
-  /* 控制項 */
+  const statDock = element("section", "p3e-stat-dock");
+  statDock.setAttribute("aria-label", "人物狀態");
+  const statRows: [string, string, number][] = [
+    ["❤️", "健康", view.stats.health],
+    ["🙂", "幸福", view.stats.happiness],
+    ["📘", "知識", view.stats.knowledge],
+    ["👥", "人際", view.stats.relationships]
+  ];
+  for (const [icon, label, value] of statRows) {
+    const item = element("div", "p3e-stat-item");
+    item.append(element("span", "p3e-stat-label", `${icon} ${label}`), element("strong", undefined, String(value)));
+    const meter = element("span", "p3e-stat-meter");
+    meter.setAttribute("role", "meter");
+    meter.setAttribute("aria-label", `${label}狀態`);
+    meter.setAttribute("aria-valuemin", "0");
+    meter.setAttribute("aria-valuemax", "100");
+    meter.setAttribute("aria-valuenow", String(value));
+    const fill = element("i");
+    fill.style.width = `${Math.max(0, Math.min(100, value))}%`;
+    meter.append(fill);
+    item.append(meter);
+    statDock.append(item);
+  }
+
+  const timeControls = renderTimeControls(view);
   const controls = element("section", "p3e-controls");
   controls.setAttribute("aria-label", "操作");
   if (view.controls.canAdvanceYear) {
-    const advance = element("button", "p3e-primary", "推進一年");
+    const advance = element("button", "p3e-primary p3e-next-button", "下一步");
     advance.type = "button";
     advance.dataset["action"] = "advance";
     advance.addEventListener("click", advanceYear);
@@ -755,27 +836,50 @@ function renderLife(view: P3EPlaySession["view"], current: P3EPlaySession): HTML
     controls.append(element("p", "p3e-hint", "這條命已結束"));
   }
 
-  const footer = element("p", "p3e-meta", `seed=${readSeed()} · commands=${current.state.commandLog.count}`);
-  footer.append(element("br"));
-  footer.append(element("span", undefined, `stateHash=${current.state.stateHash}`));
-
-  root.append(identity, stats, assets, outcome, controls, footer);
+  root.append(scene, story, statDock, timeControls, controls);
   return root;
+}
+
+function renderTimeControls(view: P3EPlaySession["view"]): HTMLElement {
+  const section = element("section", "p3e-time-controls");
+  section.setAttribute("aria-label", "時間控制");
+  const state = lifeClock.getState();
+  const pause = element("button", "p3e-time-toggle", state.running ? "❚❚ 暫停" : "▶ 繼續");
+  pause.type = "button";
+  pause.dataset["action"] = "toggle-time";
+  pause.disabled = view.phase === "death";
+  pause.addEventListener("click", () => lifeClock.togglePause());
+  section.append(pause);
+  const speeds: readonly Speed[] = [1, 2, 4, 8, 16];
+  for (const speed of speeds) {
+    const button = element("button", "p3e-speed-button", `${speed}×`);
+    button.type = "button";
+    button.dataset["speed"] = String(speed);
+    button.setAttribute("aria-pressed", String(state.speed === speed));
+    button.disabled = view.phase === "death";
+    button.addEventListener("click", () => lifeClock.setSpeed(speed));
+    section.append(button);
+  }
+  const jump = element("button", "p3e-jump-button", "下一個決定 »");
+  jump.type = "button";
+  jump.dataset["action"] = "jump-decision";
+  jump.disabled = !view.controls.canAdvanceYear || fastForwarding;
+  jump.addEventListener("click", () => void jumpToNextDecision());
+  section.append(jump);
+  return section;
 }
 
 function renderPending(
   pending: NonNullable<P3EPlaySession["view"]["pendingDecision"]>
 ): HTMLElement {
-  const section = element("section", "p3e-card p3e-pending");
+  const section = element("div", "p3e-pending");
   section.setAttribute("aria-labelledby", "p3e-pending-title");
-  const heading = element("h2", undefined, pending.promptKey !== "" ? pending.promptKey : pending.eventId);
+  const heading = element("h2", undefined, friendlyKey(pending.promptKey !== "" ? pending.promptKey : pending.eventId));
   heading.id = "p3e-pending-title";
   section.append(heading);
-  const meta = element("p", "p3e-meta", `eventId=${pending.eventId} · decisionId=${pending.decisionId}`);
-  section.append(meta);
-  const options = element("div", "p3e-options");
+  const options = element("div", "p3e-options p3e-choice-list");
   pending.options.forEach((option, index) => {
-    const button = element("button", "p3e-option", option.labelKey !== "" ? option.labelKey : option.optionId);
+    const button = element("button", "p3e-option", friendlyKey(option.labelKey !== "" ? option.labelKey : option.optionId));
     button.type = "button";
     button.dataset["action"] = "choose";
     button.dataset["optionId"] = option.optionId;
@@ -815,6 +919,7 @@ async function boot(): Promise<void> {
       session = startLife(seed);
       persistenceGeneration += 1;
       persistenceStatus = "ephemeral";
+      lifeClock.resume();
       render();
       return;
     }
@@ -840,6 +945,8 @@ async function boot(): Promise<void> {
       session = startLife(seed);
       persistenceGeneration += 1;
     }
+    if (session !== null && session.view.controls.canAdvanceYear) lifeClock.resume();
+    else lifeClock.pause();
     render();
   } catch (error) {
     renderBootError(describeError(error));
