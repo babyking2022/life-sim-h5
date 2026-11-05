@@ -1,0 +1,3 @@
+import { webcrypto } from "crypto/webcrypto";
+
+export const value = webcrypto;

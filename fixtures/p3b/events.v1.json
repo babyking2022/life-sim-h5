@@ -1,0 +1,889 @@
+{
+  "schemaVersion": "p3b-1",
+  "contentPackVersion": "1.0.0",
+  "dataset": "events",
+  "records": [
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.0.0",
+      "conditions": {
+        "op": "stat",
+        "stat": "happiness",
+        "min": 0,
+        "max": 35
+      },
+      "priority": 0,
+      "once": false,
+      "cooldownYears": 4,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "stat",
+          "stat": "health",
+          "delta": -5
+        },
+        {
+          "type": "stat",
+          "stat": "happiness",
+          "delta": -3
+        }
+      ],
+      "decision": null,
+      "sourceId": "p3b-synthetic-events-v1-source",
+      "eventId": "ev.adult.burnout",
+      "kind": "ordinary",
+      "localizationKey": "p3b.event.adult.burnout",
+      "ageMin": 25,
+      "ageMax": 60,
+      "lifeStages": [
+        "adulthood"
+      ],
+      "weight": 30
+    },
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.0.0",
+      "conditions": {
+        "op": "money",
+        "field": "balanceMicroUsd",
+        "min": "-100000000000",
+        "max": "-1"
+      },
+      "priority": 0,
+      "once": false,
+      "cooldownYears": 5,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "stat",
+          "stat": "happiness",
+          "delta": -4
+        },
+        {
+          "type": "money",
+          "field": "annualExpenseMicroUsd",
+          "deltaMicroUsd": "1000000"
+        }
+      ],
+      "decision": null,
+      "sourceId": "p3b-synthetic-events-v1-source",
+      "eventId": "ev.adult.debt-scare",
+      "kind": "ordinary",
+      "localizationKey": "p3b.event.adult.debt_scare",
+      "ageMin": 20,
+      "ageMax": 65,
+      "lifeStages": [
+        "adulthood"
+      ],
+      "weight": 20
+    },
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.0.0",
+      "conditions": {
+        "op": "flag",
+        "flag": "employed",
+        "present": true
+      },
+      "priority": 0,
+      "once": true,
+      "cooldownYears": 0,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "money",
+          "field": "balanceMicroUsd",
+          "deltaMicroUsd": "5000000"
+        },
+        {
+          "type": "stat",
+          "stat": "happiness",
+          "delta": 3
+        }
+      ],
+      "decision": null,
+      "sourceId": "p3b-synthetic-events-v1-source",
+      "eventId": "ev.adult.first-salary",
+      "kind": "milestone",
+      "localizationKey": "p3b.event.adult.first_salary",
+      "ageMin": 19,
+      "ageMax": 24,
+      "lifeStages": [
+        "adulthood"
+      ],
+      "weight": 50
+    },
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.0.0",
+      "conditions": null,
+      "priority": 90,
+      "once": true,
+      "cooldownYears": 0,
+      "exclusiveGroup": "adult.major",
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "openDecision",
+          "decisionId": "dec.adult.housing"
+        }
+      ],
+      "decision": {
+        "decisionId": "dec.adult.housing",
+        "promptKey": "p3b.decision.adult.housing",
+        "options": [
+          {
+            "optionId": "rent",
+            "labelKey": "p3b.option.adult.housing.rent",
+            "effects": [
+              {
+                "type": "money",
+                "field": "annualExpenseMicroUsd",
+                "deltaMicroUsd": "9000000"
+              }
+            ]
+          },
+          {
+            "optionId": "save",
+            "labelKey": "p3b.option.adult.housing.save",
+            "effects": [
+              {
+                "type": "money",
+                "field": "balanceMicroUsd",
+                "deltaMicroUsd": "2000000"
+              }
+            ]
+          }
+        ]
+      },
+      "sourceId": "p3b-synthetic-events-v1-source",
+      "eventId": "ev.adult.housing-choice",
+      "kind": "decision",
+      "localizationKey": "p3b.event.adult.housing_choice",
+      "ageMin": 25,
+      "ageMax": 40,
+      "lifeStages": [
+        "adulthood"
+      ],
+      "weight": 1
+    },
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.0.0",
+      "conditions": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "flag",
+            "flag": "employed",
+            "present": true
+          },
+          {
+            "op": "stat",
+            "stat": "knowledge",
+            "min": 40,
+            "max": 100
+          }
+        ]
+      },
+      "priority": 0,
+      "once": false,
+      "cooldownYears": 3,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "money",
+          "field": "annualIncomeMicroUsd",
+          "deltaMicroUsd": "4000000"
+        },
+        {
+          "type": "stat",
+          "stat": "happiness",
+          "delta": 2
+        }
+      ],
+      "decision": null,
+      "sourceId": "p3b-synthetic-events-v1-source",
+      "eventId": "ev.adult.promotion",
+      "kind": "ordinary",
+      "localizationKey": "p3b.event.adult.promotion",
+      "ageMin": 22,
+      "ageMax": 60,
+      "lifeStages": [
+        "adulthood"
+      ],
+      "weight": 45
+    },
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.0.0",
+      "conditions": {
+        "op": "flag",
+        "flag": "community:member",
+        "present": true
+      },
+      "priority": 0,
+      "once": false,
+      "cooldownYears": 0,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "stat",
+          "stat": "relationships",
+          "delta": 3
+        },
+        {
+          "type": "stat",
+          "stat": "happiness",
+          "delta": 1
+        }
+      ],
+      "decision": null,
+      "sourceId": "p3b-synthetic-events-v1-source",
+      "eventId": "ev.adult.volunteer",
+      "kind": "ordinary",
+      "localizationKey": "p3b.event.adult.volunteer",
+      "ageMin": 20,
+      "ageMax": 70,
+      "lifeStages": [
+        "adulthood",
+        "later_life"
+      ],
+      "weight": 25
+    },
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.0.0",
+      "conditions": {
+        "op": "happened",
+        "eventId": "ev.any.setback"
+      },
+      "priority": 0,
+      "once": false,
+      "cooldownYears": 0,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "informational"
+        }
+      ],
+      "decision": null,
+      "sourceId": "p3b-synthetic-events-v1-source",
+      "eventId": "ev.any.quiet-year",
+      "kind": "ordinary",
+      "localizationKey": "p3b.event.any.quiet_year",
+      "ageMin": 0,
+      "ageMax": 120,
+      "lifeStages": [
+        "childhood",
+        "adolescence",
+        "adulthood",
+        "later_life"
+      ],
+      "weight": 10
+    },
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.0.0",
+      "conditions": null,
+      "priority": 0,
+      "once": false,
+      "cooldownYears": 2,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "stat",
+          "stat": "happiness",
+          "delta": -2
+        },
+        {
+          "type": "money",
+          "field": "balanceMicroUsd",
+          "deltaMicroUsd": "-400000"
+        }
+      ],
+      "decision": null,
+      "sourceId": "p3b-synthetic-events-v1-source",
+      "eventId": "ev.any.setback",
+      "kind": "ordinary",
+      "localizationKey": "p3b.event.any.setback",
+      "ageMin": 0,
+      "ageMax": 120,
+      "lifeStages": [
+        "childhood",
+        "adolescence",
+        "adulthood",
+        "later_life"
+      ],
+      "weight": 35
+    },
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.0.0",
+      "conditions": {
+        "op": "cooldown",
+        "eventId": "ev.any.setback",
+        "years": 2
+      },
+      "priority": 0,
+      "once": false,
+      "cooldownYears": 0,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "stat",
+          "stat": "happiness",
+          "delta": 2
+        },
+        {
+          "type": "money",
+          "field": "balanceMicroUsd",
+          "deltaMicroUsd": "300000"
+        }
+      ],
+      "decision": null,
+      "sourceId": "p3b-synthetic-events-v1-source",
+      "eventId": "ev.any.small-win",
+      "kind": "ordinary",
+      "localizationKey": "p3b.event.any.small_win",
+      "ageMin": 0,
+      "ageMax": 120,
+      "lifeStages": [
+        "childhood",
+        "adolescence",
+        "adulthood",
+        "later_life"
+      ],
+      "weight": 70
+    },
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.0.0",
+      "conditions": null,
+      "priority": 10,
+      "once": true,
+      "cooldownYears": 0,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "stat",
+          "stat": "knowledge",
+          "delta": 2
+        },
+        {
+          "type": "stat",
+          "stat": "happiness",
+          "delta": 3
+        }
+      ],
+      "decision": null,
+      "sourceId": "p3b-synthetic-events-v1-source",
+      "eventId": "ev.child.first-word",
+      "kind": "milestone",
+      "localizationKey": "p3b.event.child.first_word",
+      "ageMin": 1,
+      "ageMax": 3,
+      "lifeStages": [
+        "childhood"
+      ],
+      "weight": 30
+    },
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.0.0",
+      "conditions": {
+        "op": "stat",
+        "stat": "health",
+        "min": 30,
+        "max": 100
+      },
+      "priority": 0,
+      "once": false,
+      "cooldownYears": 2,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "stat",
+          "stat": "relationships",
+          "delta": 2
+        },
+        {
+          "type": "stat",
+          "stat": "happiness",
+          "delta": 1
+        }
+      ],
+      "decision": null,
+      "sourceId": "p3b-synthetic-events-v1-source",
+      "eventId": "ev.child.playground",
+      "kind": "ordinary",
+      "localizationKey": "p3b.event.child.playground",
+      "ageMin": 4,
+      "ageMax": 11,
+      "lifeStages": [
+        "childhood"
+      ],
+      "weight": 120
+    },
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.0.0",
+      "conditions": null,
+      "priority": 100,
+      "once": true,
+      "cooldownYears": 0,
+      "exclusiveGroup": "child.major",
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "openDecision",
+          "decisionId": "dec.child.school"
+        }
+      ],
+      "decision": {
+        "decisionId": "dec.child.school",
+        "promptKey": "p3b.decision.child.school",
+        "options": [
+          {
+            "optionId": "steady",
+            "labelKey": "p3b.option.child.school.steady",
+            "effects": [
+              {
+                "type": "stat",
+                "stat": "knowledge",
+                "delta": 3
+              },
+              {
+                "type": "flag",
+                "flag": "school:steady",
+                "action": "add"
+              }
+            ]
+          },
+          {
+            "optionId": "bold",
+            "labelKey": "p3b.option.child.school.bold",
+            "effects": [
+              {
+                "type": "stat",
+                "stat": "knowledge",
+                "delta": 1
+              },
+              {
+                "type": "stat",
+                "stat": "happiness",
+                "delta": 2
+              },
+              {
+                "type": "flag",
+                "flag": "school:bold",
+                "action": "add"
+              }
+            ]
+          }
+        ]
+      },
+      "sourceId": "p3b-synthetic-events-v1-source",
+      "eventId": "ev.child.school-choice",
+      "kind": "decision",
+      "localizationKey": "p3b.event.child.school_choice",
+      "ageMin": 6,
+      "ageMax": 6,
+      "lifeStages": [
+        "childhood"
+      ],
+      "weight": 1
+    },
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.0.0",
+      "conditions": {
+        "op": "not",
+        "condition": {
+          "op": "flag",
+          "flag": "family:sibling",
+          "present": true
+        }
+      },
+      "priority": 0,
+      "once": true,
+      "cooldownYears": 0,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "flag",
+          "flag": "family:sibling",
+          "action": "add"
+        },
+        {
+          "type": "stat",
+          "stat": "relationships",
+          "delta": 3
+        }
+      ],
+      "decision": null,
+      "sourceId": "p3b-synthetic-events-v1-source",
+      "eventId": "ev.child.sibling-arrives",
+      "kind": "milestone",
+      "localizationKey": "p3b.event.child.sibling",
+      "ageMin": 2,
+      "ageMax": 8,
+      "lifeStages": [
+        "childhood"
+      ],
+      "weight": 20
+    },
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.0.0",
+      "conditions": null,
+      "priority": 0,
+      "once": false,
+      "cooldownYears": 1,
+      "exclusiveGroup": null,
+      "contentMode": "standard",
+      "effects": [
+        {
+          "type": "stat",
+          "stat": "happiness",
+          "delta": -2
+        },
+        {
+          "type": "stat",
+          "stat": "relationships",
+          "delta": -1
+        }
+      ],
+      "decision": null,
+      "sourceId": "p3b-synthetic-events-v1-source",
+      "eventId": "ev.child.tantrum",
+      "kind": "ordinary",
+      "localizationKey": "p3b.event.child.tantrum",
+      "ageMin": 2,
+      "ageMax": 6,
+      "lifeStages": [
+        "childhood"
+      ],
+      "weight": 60
+    },
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.0.0",
+      "conditions": {
+        "op": "contentMode",
+        "mode": "guardian"
+      },
+      "priority": 0,
+      "once": false,
+      "cooldownYears": 0,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "stat",
+          "stat": "happiness",
+          "delta": 1
+        }
+      ],
+      "decision": null,
+      "sourceId": "p3b-synthetic-events-v1-source",
+      "eventId": "ev.guardian.calm",
+      "kind": "ordinary",
+      "localizationKey": "p3b.event.guardian.calm",
+      "ageMin": 0,
+      "ageMax": 120,
+      "lifeStages": [
+        "childhood",
+        "adolescence",
+        "adulthood",
+        "later_life"
+      ],
+      "weight": 55
+    },
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.0.0",
+      "conditions": null,
+      "priority": 0,
+      "once": false,
+      "cooldownYears": 2,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "stat",
+          "stat": "health",
+          "delta": 2
+        },
+        {
+          "type": "money",
+          "field": "annualExpenseMicroUsd",
+          "deltaMicroUsd": "800000"
+        }
+      ],
+      "decision": null,
+      "sourceId": "p3b-synthetic-events-v1-source",
+      "eventId": "ev.senior.health-check",
+      "kind": "ordinary",
+      "localizationKey": "p3b.event.senior.health_check",
+      "ageMin": 65,
+      "ageMax": 120,
+      "lifeStages": [
+        "later_life"
+      ],
+      "weight": 80
+    },
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.0.0",
+      "conditions": null,
+      "priority": 0,
+      "once": true,
+      "cooldownYears": 0,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "stat",
+          "stat": "happiness",
+          "delta": 4
+        }
+      ],
+      "decision": null,
+      "sourceId": "p3b-synthetic-events-v1-source",
+      "eventId": "ev.senior.reflection",
+      "kind": "milestone",
+      "localizationKey": "p3b.event.senior.reflection",
+      "ageMin": 70,
+      "ageMax": 120,
+      "lifeStages": [
+        "later_life"
+      ],
+      "weight": 40
+    },
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.0.0",
+      "conditions": null,
+      "priority": 100,
+      "once": true,
+      "cooldownYears": 0,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "stat",
+          "stat": "knowledge",
+          "delta": 4
+        }
+      ],
+      "decision": null,
+      "sourceId": "p3b-synthetic-events-v1-source",
+      "eventId": "ev.teen.exams",
+      "kind": "milestone",
+      "localizationKey": "p3b.event.teen.exams",
+      "ageMin": 12,
+      "ageMax": 12,
+      "lifeStages": [
+        "adolescence"
+      ],
+      "weight": 1
+    },
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.0.0",
+      "conditions": null,
+      "priority": 0,
+      "once": false,
+      "cooldownYears": 2,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "stat",
+          "stat": "relationships",
+          "delta": 2
+        }
+      ],
+      "decision": null,
+      "sourceId": "p3b-synthetic-events-v1-source",
+      "eventId": "ev.teen.friendship",
+      "kind": "ordinary",
+      "localizationKey": "p3b.event.teen.friendship",
+      "ageMin": 13,
+      "ageMax": 17,
+      "lifeStages": [
+        "adolescence"
+      ],
+      "weight": 90
+    },
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.0.0",
+      "conditions": null,
+      "priority": 100,
+      "once": true,
+      "cooldownYears": 0,
+      "exclusiveGroup": "adult.major",
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "openDecision",
+          "decisionId": "dec.teen.path"
+        }
+      ],
+      "decision": {
+        "decisionId": "dec.teen.path",
+        "promptKey": "p3b.decision.teen.path",
+        "options": [
+          {
+            "optionId": "study",
+            "labelKey": "p3b.option.teen.path.study",
+            "effects": [
+              {
+                "type": "stat",
+                "stat": "knowledge",
+                "delta": 5
+              },
+              {
+                "type": "money",
+                "field": "annualExpenseMicroUsd",
+                "deltaMicroUsd": "2000000"
+              }
+            ]
+          },
+          {
+            "optionId": "work",
+            "labelKey": "p3b.option.teen.path.work",
+            "effects": [
+              {
+                "type": "money",
+                "field": "annualIncomeMicroUsd",
+                "deltaMicroUsd": "3000000"
+              },
+              {
+                "type": "stat",
+                "stat": "knowledge",
+                "delta": 1
+              }
+            ]
+          },
+          {
+            "optionId": "rest",
+            "labelKey": "p3b.option.teen.path.rest",
+            "effects": [
+              {
+                "type": "stat",
+                "stat": "health",
+                "delta": 3
+              },
+              {
+                "type": "stat",
+                "stat": "happiness",
+                "delta": 2
+              }
+            ]
+          }
+        ]
+      },
+      "sourceId": "p3b-synthetic-events-v1-source",
+      "eventId": "ev.teen.major-choice",
+      "kind": "decision",
+      "localizationKey": "p3b.event.teen.major_choice",
+      "ageMin": 18,
+      "ageMax": 18,
+      "lifeStages": [
+        "adulthood",
+        "adolescence"
+      ],
+      "weight": 1
+    },
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.0.0",
+      "conditions": {
+        "op": "money",
+        "field": "balanceMicroUsd",
+        "min": "-1000000000",
+        "max": "500000000"
+      },
+      "priority": 0,
+      "once": false,
+      "cooldownYears": 0,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "money",
+          "field": "balanceMicroUsd",
+          "deltaMicroUsd": "1500000"
+        },
+        {
+          "type": "stat",
+          "stat": "knowledge",
+          "delta": 1
+        },
+        {
+          "type": "stat",
+          "stat": "health",
+          "delta": -1
+        }
+      ],
+      "decision": null,
+      "sourceId": "p3b-synthetic-events-v1-source",
+      "eventId": "ev.teen.part-time-job",
+      "kind": "ordinary",
+      "localizationKey": "p3b.event.teen.part_time_job",
+      "ageMin": 15,
+      "ageMax": 17,
+      "lifeStages": [
+        "adolescence"
+      ],
+      "weight": 40
+    },
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.0.0",
+      "conditions": null,
+      "priority": 0,
+      "once": false,
+      "cooldownYears": 0,
+      "exclusiveGroup": null,
+      "contentMode": "standard",
+      "effects": [
+        {
+          "type": "stat",
+          "stat": "health",
+          "delta": -4
+        },
+        {
+          "type": "stat",
+          "stat": "happiness",
+          "delta": 2
+        }
+      ],
+      "decision": null,
+      "sourceId": "p3b-synthetic-events-v1-source",
+      "eventId": "ev.teen.risk-experiment",
+      "kind": "ordinary",
+      "localizationKey": "p3b.event.teen.risk_experiment",
+      "ageMin": 14,
+      "ageMax": 17,
+      "lifeStages": [
+        "adolescence"
+      ],
+      "weight": 25
+    }
+  ]
+}

@@ -1,0 +1,4125 @@
+{
+  "schemaVersion": "p3d-1",
+  "deathSpecVersion": "1.0.0",
+  "healthRuleVersion": "p3d-health-1.0.0",
+  "deathPackId": "p3d-synthetic-mortality-v1",
+  "deathPackChecksum": "532583fd4825df27eaf25f941d75368d0537e5bd11bde69b1d8ac88e3cc73cd7",
+  "basePackId": "p2a-synthetic-20261027",
+  "basePackChecksum": "c6d7e9261060e5ecacb1de2c7823d39dec12d6b4142512a6d3c1f10529f54c7b",
+  "digestDomain": "LIFE1/P3D/DEATH/v1",
+  "caseCount": 108,
+  "diedCount": 24,
+  "distinctCauses": [
+    "cause.neutral.circulatory",
+    "cause.neutral.infection",
+    "cause.neutral.neoplasm",
+    "cause.neutral.neurological",
+    "cause.neutral.respiratory"
+  ],
+  "cases": [
+    {
+      "id": "p3d-001",
+      "entityId": "cr:TUR",
+      "regionCode": "TUR",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "female",
+      "age": 15,
+      "calendarYear": 2015,
+      "health": 50,
+      "rngState": [
+        2019219171,
+        1896413573,
+        4368510,
+        971566646
+      ],
+      "digest": "12a60dc4bc993e6352632767269ab06f2e2c2fb309128ce00dd382d8b921f56d",
+      "baseHazardPpm": 5230,
+      "adjustedHazardPpm": 5230,
+      "healthFactorPpm": 1000000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "688006",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        2019219171,
+        1896413573,
+        4368510,
+        971566646
+      ],
+      "rngStateAfter": [
+        957864975,
+        1346450133,
+        2019526093,
+        1760229453
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-002",
+      "entityId": "cr:COG",
+      "regionCode": "COG",
+      "entityStatus": "enabled",
+      "region": "africa",
+      "sex": "male",
+      "age": 5,
+      "calendarYear": 2012,
+      "health": 0,
+      "rngState": [
+        376485618,
+        3240756076,
+        3398884041,
+        1176330456
+      ],
+      "digest": "ffb1b29f292c7f6afb6c1c3e22651513e1e559dd6350e0c1e433b85ead8e080b",
+      "baseHazardPpm": 10807,
+      "adjustedHazardPpm": 21614,
+      "healthFactorPpm": 2000000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "760602",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        376485618,
+        3240756076,
+        3398884041,
+        1176330456
+      ],
+      "rngStateAfter": [
+        932585000,
+        74124842,
+        2172243837,
+        2388358454
+      ],
+      "regionClass": "africa"
+    },
+    {
+      "id": "p3d-003",
+      "entityId": "cr:ARE",
+      "regionCode": "ARE",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "female",
+      "age": 5,
+      "calendarYear": 2038,
+      "health": 25,
+      "rngState": [
+        2038269773,
+        2581392346,
+        1371569945,
+        4118151374
+      ],
+      "digest": "ff0e4a26e765eeb83e79578cd911478c35edcb792cdeb8072f631b33769ff040",
+      "baseHazardPpm": 4100,
+      "adjustedHazardPpm": 6150,
+      "healthFactorPpm": 1500000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "300179",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        2038269773,
+        2581392346,
+        1371569945,
+        4118151374
+      ],
+      "rngStateAfter": [
+        4092517554,
+        903623555,
+        1184513037,
+        3448201009
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-004",
+      "entityId": "cr:SWZ",
+      "regionCode": "SWZ",
+      "entityStatus": "enabled",
+      "region": "africa",
+      "sex": "female",
+      "age": 120,
+      "calendarYear": 2037,
+      "health": 25,
+      "rngState": [
+        3892630065,
+        349012196,
+        481392462,
+        4115228190
+      ],
+      "digest": "25c89443dd6a9b954fc161d94365648da53ebf14d6ef63b6f24a06ce393d0c9c",
+      "baseHazardPpm": 988000,
+      "adjustedHazardPpm": 1000000,
+      "healthFactorPpm": 1500000,
+      "died": true,
+      "causeId": "cause.neutral.circulatory",
+      "mortalityDraw": "812601",
+      "drawsUsed": 4,
+      "rngStateBefore": [
+        3892630065,
+        349012196,
+        481392462,
+        4115228190
+      ],
+      "rngStateAfter": [
+        805011008,
+        698558054,
+        250903969,
+        1674594503
+      ],
+      "regionClass": "africa"
+    },
+    {
+      "id": "p3d-005",
+      "entityId": "cr:BHR",
+      "regionCode": "BHR",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "male",
+      "age": 30,
+      "calendarYear": 2047,
+      "health": 75,
+      "rngState": [
+        3089050409,
+        1732078052,
+        1546167824,
+        3158375866
+      ],
+      "digest": "6020944765b1d74b202fd490bcea83afece36ac8b0c27ee4081a56d8b3ac671e",
+      "baseHazardPpm": 13753,
+      "adjustedHazardPpm": 6877,
+      "healthFactorPpm": 500000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "800127",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        3089050409,
+        1732078052,
+        1546167824,
+        3158375866
+      ],
+      "rngStateAfter": [
+        214609265,
+        2123112083,
+        3897507918,
+        1083192189
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-006",
+      "entityId": "cr:BIH",
+      "regionCode": "BIH",
+      "entityStatus": "enabled",
+      "region": "europe",
+      "sex": "female",
+      "age": 90,
+      "calendarYear": 2001,
+      "health": 0,
+      "rngState": [
+        207904313,
+        1846795739,
+        2763492831,
+        3588124018
+      ],
+      "digest": "1938b9c6f233fd5ac3d0ed6fb80bbbe34bc6a69691b2c8bee7a73d596ec4cb1d",
+      "baseHazardPpm": 986000,
+      "adjustedHazardPpm": 1000000,
+      "healthFactorPpm": 2000000,
+      "died": true,
+      "causeId": "cause.neutral.circulatory",
+      "mortalityDraw": "744432",
+      "drawsUsed": 4,
+      "rngStateBefore": [
+        207904313,
+        1846795739,
+        2763492831,
+        3588124018
+      ],
+      "rngStateAfter": [
+        1711432332,
+        905520681,
+        242967399,
+        2193585527
+      ],
+      "regionClass": "europe"
+    },
+    {
+      "id": "p3d-007",
+      "entityId": "cr:SUR",
+      "regionCode": "SUR",
+      "entityStatus": "enabled",
+      "region": "americas",
+      "sex": "female",
+      "age": 0,
+      "calendarYear": 2049,
+      "health": 75,
+      "rngState": [
+        2860448239,
+        2473543078,
+        558098494,
+        258258839
+      ],
+      "digest": "f021114beae6e205dfc7f46a40a86094a6a972b71abc65375c2699bfe093527c",
+      "baseHazardPpm": 4721,
+      "adjustedHazardPpm": 2361,
+      "healthFactorPpm": 500000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "92444",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        2860448239,
+        2473543078,
+        558098494,
+        258258839
+      ],
+      "rngStateAfter": [
+        1907807049,
+        2073100920,
+        3345725455,
+        516209214
+      ],
+      "regionClass": "americas"
+    },
+    {
+      "id": "p3d-008",
+      "entityId": "cr:CAF",
+      "regionCode": "CAF",
+      "entityStatus": "enabled",
+      "region": "africa",
+      "sex": "female",
+      "age": 14,
+      "calendarYear": 2010,
+      "health": 75,
+      "rngState": [
+        2236983041,
+        2954441333,
+        484986066,
+        3319744898
+      ],
+      "digest": "15ff9759c72614bbbdabffdb5fc86030b3c9ab85f8cdf73283fa07dfd147982f",
+      "baseHazardPpm": 9670,
+      "adjustedHazardPpm": 4835,
+      "healthFactorPpm": 500000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "291432",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        2236983041,
+        2954441333,
+        484986066,
+        3319744898
+      ],
+      "rngStateAfter": [
+        3941121790,
+        1928201347,
+        318345509,
+        3675275475
+      ],
+      "regionClass": "africa"
+    },
+    {
+      "id": "p3d-009",
+      "entityId": "cr:VNM",
+      "regionCode": "VNM",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "female",
+      "age": 0,
+      "calendarYear": 2017,
+      "health": 75,
+      "rngState": [
+        1802115305,
+        4103137030,
+        1171139056,
+        2990946836
+      ],
+      "digest": "f57a75e0b5c9a7192c32d976b7c1dd8bfcb01635db19f2ef0f21090616970780",
+      "baseHazardPpm": 4381,
+      "adjustedHazardPpm": 2191,
+      "healthFactorPpm": 500000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "346537",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        1802115305,
+        4103137030,
+        1171139056,
+        2990946836
+      ],
+      "rngStateAfter": [
+        1096843730,
+        4175572733,
+        1266337506,
+        3793832806
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-010",
+      "entityId": "cr:SYR",
+      "regionCode": "SYR",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "female",
+      "age": 15,
+      "calendarYear": 2000,
+      "health": 50,
+      "rngState": [
+        672855145,
+        2611810214,
+        2695823541,
+        4234583252
+      ],
+      "digest": "4203ceb9e7a3076aa7fd47aa2b1da5c57674209741177394af378e76a1705a0f",
+      "baseHazardPpm": 4951,
+      "adjustedHazardPpm": 4951,
+      "healthFactorPpm": 1000000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "173927",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        672855145,
+        2611810214,
+        2695823541,
+        4234583252
+      ],
+      "rngStateAfter": [
+        5377887,
+        2388862141,
+        2894932935,
+        457319036
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-011",
+      "entityId": "cr:PSE",
+      "regionCode": "PSE",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "female",
+      "age": 1,
+      "calendarYear": 2012,
+      "health": 50,
+      "rngState": [
+        60351534,
+        3619297423,
+        2566364973,
+        2381059502
+      ],
+      "digest": "be1e0dccb5d45e9660e3d696c867efddaefa6a38738e56a3203f77f8d89a77a0",
+      "baseHazardPpm": 4740,
+      "adjustedHazardPpm": 4740,
+      "healthFactorPpm": 1000000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "723328",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        60351534,
+        3619297423,
+        2566364973,
+        2381059502
+      ],
+      "rngStateAfter": [
+        2775744593,
+        4198887296,
+        475501580,
+        3813341157
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-012",
+      "entityId": "cr:JPN",
+      "regionCode": "JPN",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "male",
+      "age": 60,
+      "calendarYear": 2017,
+      "health": 50,
+      "rngState": [
+        1188446839,
+        879173570,
+        1417114275,
+        1850067665
+      ],
+      "digest": "0f2a49e48a3e3d1a5fab37d58bc1e7cd3ce520dc85387bc7b389323ed9ac3789",
+      "baseHazardPpm": 269759,
+      "adjustedHazardPpm": 269759,
+      "healthFactorPpm": 1000000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "554080",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        1188446839,
+        879173570,
+        1417114275,
+        1850067665
+      ],
+      "rngStateAfter": [
+        748298915,
+        3870035110,
+        1278480304,
+        1974352259
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-013",
+      "entityId": "cr:AUS",
+      "regionCode": "AUS",
+      "entityStatus": "enabled",
+      "region": "oceania",
+      "sex": "male",
+      "age": 1,
+      "calendarYear": 2031,
+      "health": 0,
+      "rngState": [
+        4257566127,
+        2506741694,
+        2024970730,
+        1871120613
+      ],
+      "digest": "47d4b37a09dc502e3fb7221fa3db7ad8ac544ad790f124cfe992fff4411e6a77",
+      "baseHazardPpm": 4407,
+      "adjustedHazardPpm": 8814,
+      "healthFactorPpm": 2000000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "219560",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        4257566127,
+        2506741694,
+        2024970730,
+        1871120613
+      ],
+      "rngStateAfter": [
+        1640976088,
+        1106065738,
+        1844759729,
+        652305207
+      ],
+      "regionClass": "oceania"
+    },
+    {
+      "id": "p3d-014",
+      "entityId": "cr:VUT",
+      "regionCode": "VUT",
+      "entityStatus": "enabled",
+      "region": "oceania",
+      "sex": "female",
+      "age": 90,
+      "calendarYear": 2036,
+      "health": 100,
+      "rngState": [
+        1075259086,
+        3593656410,
+        2245207935,
+        740949818
+      ],
+      "digest": "1f028cb6e61726e8ef72618e645f177061542122438f7dc4e5547e39d78ab706",
+      "baseHazardPpm": 983000,
+      "adjustedHazardPpm": 98300,
+      "healthFactorPpm": 100000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "413625",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        1075259086,
+        3593656410,
+        2245207935,
+        740949818
+      ],
+      "rngStateAfter": [
+        1891753877,
+        160329204,
+        4157301279,
+        1861344854
+      ],
+      "regionClass": "oceania"
+    },
+    {
+      "id": "p3d-015",
+      "entityId": "cr:TKM",
+      "regionCode": "TKM",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "male",
+      "age": 90,
+      "calendarYear": 2036,
+      "health": 25,
+      "rngState": [
+        3273699161,
+        3244528819,
+        1260284981,
+        4092958310
+      ],
+      "digest": "ed7f20b2e102b03d974ac971cf2a7647639f8db51e011b334cdfad519c921698",
+      "baseHazardPpm": 978000,
+      "adjustedHazardPpm": 1000000,
+      "healthFactorPpm": 1500000,
+      "died": true,
+      "causeId": "cause.neutral.neurological",
+      "mortalityDraw": "143215",
+      "drawsUsed": 4,
+      "rngStateBefore": [
+        3273699161,
+        3244528819,
+        1260284981,
+        4092958310
+      ],
+      "rngStateAfter": [
+        737887338,
+        2947641869,
+        1271592981,
+        1085981784
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-016",
+      "entityId": "cr:MLI",
+      "regionCode": "MLI",
+      "entityStatus": "enabled",
+      "region": "africa",
+      "sex": "male",
+      "age": 45,
+      "calendarYear": 2022,
+      "health": 100,
+      "rngState": [
+        1422741197,
+        2125585836,
+        19325548,
+        1461950274
+      ],
+      "digest": "14fedb0276bd226ae1cd7c5ac0c1fd0b511e832cfa960c28156e38432c6be0e1",
+      "baseHazardPpm": 104851,
+      "adjustedHazardPpm": 10485,
+      "healthFactorPpm": 100000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "609612",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        1422741197,
+        2125585836,
+        19325548,
+        1461950274
+      ],
+      "rngStateAfter": [
+        3293709410,
+        1616216463,
+        4293782146,
+        1744965064
+      ],
+      "regionClass": "africa"
+    },
+    {
+      "id": "p3d-017",
+      "entityId": "cr:AGO",
+      "regionCode": "AGO",
+      "entityStatus": "enabled",
+      "region": "africa",
+      "sex": "male",
+      "age": 14,
+      "calendarYear": 2029,
+      "health": 100,
+      "rngState": [
+        1411256776,
+        3958353762,
+        1639405093,
+        424707699
+      ],
+      "digest": "daf76fd06b982d78c6942798e4c82b53c82aed9d4a992eafcdeec144b012c0e3",
+      "baseHazardPpm": 11227,
+      "adjustedHazardPpm": 1123,
+      "healthFactorPpm": 100000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "691331",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        1411256776,
+        3958353762,
+        1639405093,
+        424707699
+      ],
+      "rngStateAfter": [
+        2175754179,
+        2450543547,
+        3246892340,
+        1933103416
+      ],
+      "regionClass": "africa"
+    },
+    {
+      "id": "p3d-018",
+      "entityId": "cr:PAN",
+      "regionCode": "PAN",
+      "entityStatus": "enabled",
+      "region": "americas",
+      "sex": "female",
+      "age": 45,
+      "calendarYear": 2016,
+      "health": 0,
+      "rngState": [
+        1182277650,
+        3219857391,
+        3037052344,
+        2959067543
+      ],
+      "digest": "1268df2cbdc1e23e53ce64148cac35151731ac3a6305c6eaebbce7a5b1fefece",
+      "baseHazardPpm": 46801,
+      "adjustedHazardPpm": 93602,
+      "healthFactorPpm": 2000000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "859511",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        1182277650,
+        3219857391,
+        3037052344,
+        2959067543
+      ],
+      "rngStateAfter": [
+        2750002258,
+        538457989,
+        1099579328,
+        705808209
+      ],
+      "regionClass": "americas"
+    },
+    {
+      "id": "p3d-019",
+      "entityId": "cr:MYS",
+      "regionCode": "MYS",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "female",
+      "age": 30,
+      "calendarYear": 2010,
+      "health": 25,
+      "rngState": [
+        1947473655,
+        1749459084,
+        1822849220,
+        3367874147
+      ],
+      "digest": "643d9c0eee4ec484f588caca004825b078dab76dacb4c5f40ac2935bd58d5116",
+      "baseHazardPpm": 11684,
+      "adjustedHazardPpm": 17526,
+      "healthFactorPpm": 1500000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "330538",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        1947473655,
+        1749459084,
+        1822849220,
+        3367874147
+      ],
+      "rngStateAfter": [
+        2087496608,
+        837329044,
+        2827030571,
+        496878916
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-020",
+      "entityId": "cr:NGA",
+      "regionCode": "NGA",
+      "entityStatus": "enabled",
+      "region": "africa",
+      "sex": "female",
+      "age": 30,
+      "calendarYear": 2015,
+      "health": 50,
+      "rngState": [
+        416819520,
+        774332418,
+        1947627178,
+        2454264690
+      ],
+      "digest": "ff8446e5cd77eaf02ec145b454f4a43f6e308a6ce9a144727b46276df5d99cff",
+      "baseHazardPpm": 21870,
+      "adjustedHazardPpm": 21870,
+      "healthFactorPpm": 1000000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "580703",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        416819520,
+        774332418,
+        1947627178,
+        2454264690
+      ],
+      "rngStateAfter": [
+        2508517435,
+        3293656626,
+        1425523162,
+        2500876681
+      ],
+      "regionClass": "africa"
+    },
+    {
+      "id": "p3d-021",
+      "entityId": "cr:LKA",
+      "regionCode": "LKA",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "male",
+      "age": 14,
+      "calendarYear": 2056,
+      "health": 75,
+      "rngState": [
+        2459035103,
+        3212898432,
+        2296119453,
+        1036406151
+      ],
+      "digest": "2f4e9cd57fba169b5e855b954030c38320f2027e9b7c255202a2201def1deba7",
+      "baseHazardPpm": 6780,
+      "adjustedHazardPpm": 3390,
+      "healthFactorPpm": 500000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "97998",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        2459035103,
+        3212898432,
+        2296119453,
+        1036406151
+      ],
+      "rngStateAfter": [
+        2163372296,
+        2931206232,
+        2437953946,
+        693011585
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-022",
+      "entityId": "cr:ARG",
+      "regionCode": "ARG",
+      "entityStatus": "enabled",
+      "region": "americas",
+      "sex": "male",
+      "age": 14,
+      "calendarYear": 2020,
+      "health": 50,
+      "rngState": [
+        172416204,
+        3598772632,
+        3938046324,
+        2363760008
+      ],
+      "digest": "cf8e4b909e8d4715ea0e33f8e499ed4f3cae86fa2aaf849c6af960bc9ce00be7",
+      "baseHazardPpm": 7086,
+      "adjustedHazardPpm": 7086,
+      "healthFactorPpm": 1000000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "570376",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        172416204,
+        3598772632,
+        3938046324,
+        2363760008
+      ],
+      "rngStateAfter": [
+        1107119663,
+        2272391492,
+        1321620836,
+        4214724750
+      ],
+      "regionClass": "americas"
+    },
+    {
+      "id": "p3d-023",
+      "entityId": "cr:RUS",
+      "regionCode": "RUS",
+      "entityStatus": "enabled",
+      "region": "europe",
+      "sex": "female",
+      "age": 75,
+      "calendarYear": 2037,
+      "health": 0,
+      "rngState": [
+        3990253776,
+        2875746645,
+        1970745990,
+        3630858324
+      ],
+      "digest": "1cdb8b1fea968ad9a0cd55a087bf298dbf6fc9e9a615bf0af59414bacdfd54c1",
+      "baseHazardPpm": 1000000,
+      "adjustedHazardPpm": 1000000,
+      "healthFactorPpm": 2000000,
+      "died": true,
+      "causeId": "cause.neutral.circulatory",
+      "mortalityDraw": "732169",
+      "drawsUsed": 4,
+      "rngStateBefore": [
+        3990253776,
+        2875746645,
+        1970745990,
+        3630858324
+      ],
+      "rngStateAfter": [
+        434678208,
+        1877239918,
+        3775295015,
+        3164164734
+      ],
+      "regionClass": "europe"
+    },
+    {
+      "id": "p3d-024",
+      "entityId": "cr:SRB",
+      "regionCode": "SRB",
+      "entityStatus": "enabled",
+      "region": "europe",
+      "sex": "female",
+      "age": 15,
+      "calendarYear": 2046,
+      "health": 0,
+      "rngState": [
+        1740010429,
+        3354188023,
+        3039606206,
+        702550100
+      ],
+      "digest": "f06e7431f7a9d111bee5918c76e75664ce448ecf96f38284201bd7a37708359a",
+      "baseHazardPpm": 3779,
+      "adjustedHazardPpm": 7558,
+      "healthFactorPpm": 2000000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "798557",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        1740010429,
+        3354188023,
+        3039606206,
+        702550100
+      ],
+      "rngStateAfter": [
+        4203330202,
+        2548534761,
+        1856797469,
+        2550932377
+      ],
+      "regionClass": "europe"
+    },
+    {
+      "id": "p3d-025",
+      "entityId": "cr:SRB",
+      "regionCode": "SRB",
+      "entityStatus": "enabled",
+      "region": "europe",
+      "sex": "male",
+      "age": 45,
+      "calendarYear": 2035,
+      "health": 75,
+      "rngState": [
+        2104732962,
+        3331007404,
+        2496446186,
+        2651171818
+      ],
+      "digest": "55040a90ea29efbabfafaeb28c858da961706536ae5610a20aecae4ab8e89f66",
+      "baseHazardPpm": 40546,
+      "adjustedHazardPpm": 20273,
+      "healthFactorPpm": 500000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "515366",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        2104732962,
+        3331007404,
+        2496446186,
+        2651171818
+      ],
+      "rngStateAfter": [
+        2123048900,
+        4113653448,
+        2993006252,
+        2954167003
+      ],
+      "regionClass": "europe"
+    },
+    {
+      "id": "p3d-026",
+      "entityId": "cr:USA",
+      "regionCode": "USA",
+      "entityStatus": "enabled",
+      "region": "americas",
+      "sex": "female",
+      "age": 75,
+      "calendarYear": 2003,
+      "health": 25,
+      "rngState": [
+        2635771874,
+        3829161286,
+        2825271044,
+        411418426
+      ],
+      "digest": "73aa433f1eec88b00e94e93858b9576379bbe56af62db3dd1c9bed46ce75e4f3",
+      "baseHazardPpm": 1000000,
+      "adjustedHazardPpm": 1000000,
+      "healthFactorPpm": 1500000,
+      "died": true,
+      "causeId": "cause.neutral.respiratory",
+      "mortalityDraw": "959843",
+      "drawsUsed": 4,
+      "rngStateBefore": [
+        2635771874,
+        3829161286,
+        2825271044,
+        411418426
+      ],
+      "rngStateAfter": [
+        2304598699,
+        2916874025,
+        4113886034,
+        3586839700
+      ],
+      "regionClass": "americas"
+    },
+    {
+      "id": "p3d-027",
+      "entityId": "cr:LBY",
+      "regionCode": "LBY",
+      "entityStatus": "enabled",
+      "region": "africa",
+      "sex": "female",
+      "age": 45,
+      "calendarYear": 2056,
+      "health": 25,
+      "rngState": [
+        2767349426,
+        2028564529,
+        58898865,
+        1005229742
+      ],
+      "digest": "9746378d48c2076c52f00ed24a8167a18b94ceeb04d3ea4a4fcc5be6c8ceadd6",
+      "baseHazardPpm": 75184,
+      "adjustedHazardPpm": 112776,
+      "healthFactorPpm": 1500000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "952871",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        2767349426,
+        2028564529,
+        58898865,
+        1005229742
+      ],
+      "rngStateAfter": [
+        660395271,
+        1308135964,
+        2705283374,
+        1789482501
+      ],
+      "regionClass": "africa"
+    },
+    {
+      "id": "p3d-028",
+      "entityId": "cr:URY",
+      "regionCode": "URY",
+      "entityStatus": "enabled",
+      "region": "americas",
+      "sex": "female",
+      "age": 90,
+      "calendarYear": 2048,
+      "health": 50,
+      "rngState": [
+        1636810695,
+        3840462806,
+        3504663493,
+        1752597624
+      ],
+      "digest": "d57d3f9ee54df7e1f31ed23fda9f719886c502c5894914325740d7b85ce2514a",
+      "baseHazardPpm": 992000,
+      "adjustedHazardPpm": 992000,
+      "healthFactorPpm": 1000000,
+      "died": true,
+      "causeId": "cause.neutral.neoplasm",
+      "mortalityDraw": "254141",
+      "drawsUsed": 4,
+      "rngStateBefore": [
+        1636810695,
+        3840462806,
+        3504663493,
+        1752597624
+      ],
+      "rngStateAfter": [
+        2772117549,
+        1889394919,
+        2662781674,
+        2030808583
+      ],
+      "regionClass": "americas"
+    },
+    {
+      "id": "p3d-029",
+      "entityId": "cr:HUN",
+      "regionCode": "HUN",
+      "entityStatus": "enabled",
+      "region": "europe",
+      "sex": "female",
+      "age": 15,
+      "calendarYear": 2045,
+      "health": 0,
+      "rngState": [
+        3220392343,
+        3106103108,
+        3420451758,
+        4117885397
+      ],
+      "digest": "31293069627e0b2d087390570cd6198fa5528b749e4adde073e487622556c25b",
+      "baseHazardPpm": 3643,
+      "adjustedHazardPpm": 7286,
+      "healthFactorPpm": 2000000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "157824",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        3220392343,
+        3106103108,
+        3420451758,
+        4117885397
+      ],
+      "rngStateAfter": [
+        2883225625,
+        205271106,
+        3740872511,
+        3682138819
+      ],
+      "regionClass": "europe"
+    },
+    {
+      "id": "p3d-030",
+      "entityId": "cr:BWA",
+      "regionCode": "BWA",
+      "entityStatus": "enabled",
+      "region": "africa",
+      "sex": "male",
+      "age": 90,
+      "calendarYear": 2034,
+      "health": 0,
+      "rngState": [
+        1881948122,
+        3363283069,
+        2001558484,
+        1890210400
+      ],
+      "digest": "5e8bfcaa06831f4c05dedcbfac96936d2ea657f41a6e9c9065cb2be90742b8fa",
+      "baseHazardPpm": 1000000,
+      "adjustedHazardPpm": 1000000,
+      "healthFactorPpm": 2000000,
+      "died": true,
+      "causeId": "cause.neutral.respiratory",
+      "mortalityDraw": "523949",
+      "drawsUsed": 4,
+      "rngStateBefore": [
+        1881948122,
+        3363283069,
+        2001558484,
+        1890210400
+      ],
+      "rngStateAfter": [
+        1709238841,
+        1410677110,
+        2372992375,
+        3783764632
+      ],
+      "regionClass": "africa"
+    },
+    {
+      "id": "p3d-031",
+      "entityId": "cr:HKG",
+      "regionCode": "HKG",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "male",
+      "age": 30,
+      "calendarYear": 2013,
+      "health": 75,
+      "rngState": [
+        3660056973,
+        1263277429,
+        879466982,
+        725836557
+      ],
+      "digest": "4b246a73c3f83b623de524e8c96c83f508d2cca0532437070d76cbea6b54800d",
+      "baseHazardPpm": 14216,
+      "adjustedHazardPpm": 7108,
+      "healthFactorPpm": 500000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "46460",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        3660056973,
+        1263277429,
+        879466982,
+        725836557
+      ],
+      "rngStateAfter": [
+        1687894507,
+        1765900416,
+        3544463774,
+        3794859765
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-032",
+      "entityId": "cr:TKM",
+      "regionCode": "TKM",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "female",
+      "age": 45,
+      "calendarYear": 2030,
+      "health": 75,
+      "rngState": [
+        4090540068,
+        2274089401,
+        3903619537,
+        1774258936
+      ],
+      "digest": "9d967de3ed55f45e78042e8a1a978cc7973e68c49e5c5b2208ba08c7f8ea6839",
+      "baseHazardPpm": 36303,
+      "adjustedHazardPpm": 18152,
+      "healthFactorPpm": 500000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "636680",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        4090540068,
+        2274089401,
+        3903619537,
+        1774258936
+      ],
+      "rngStateAfter": [
+        3623322715,
+        2376255708,
+        4270176400,
+        1866069587
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-033",
+      "entityId": "cr:DEU",
+      "regionCode": "DEU",
+      "entityStatus": "enabled",
+      "region": "europe",
+      "sex": "male",
+      "age": 60,
+      "calendarYear": 2049,
+      "health": 25,
+      "rngState": [
+        185657117,
+        2135610494,
+        3332670866,
+        2107919096
+      ],
+      "digest": "33e06447f1fd5c15d9d228166696afc93e3b5b7bf778209c085b65064029353a",
+      "baseHazardPpm": 186915,
+      "adjustedHazardPpm": 280373,
+      "healthFactorPpm": 1500000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "520759",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        185657117,
+        2135610494,
+        3332670866,
+        2107919096
+      ],
+      "rngStateAfter": [
+        3488939901,
+        3810284005,
+        2895054100,
+        1412904496
+      ],
+      "regionClass": "europe"
+    },
+    {
+      "id": "p3d-034",
+      "entityId": "cr:FJI",
+      "regionCode": "FJI",
+      "entityStatus": "enabled",
+      "region": "oceania",
+      "sex": "female",
+      "age": 75,
+      "calendarYear": 2017,
+      "health": 100,
+      "rngState": [
+        1550257684,
+        564695266,
+        1713684928,
+        4016715595
+      ],
+      "digest": "8a642cc040df8ddf4ca82091a016fc39e1bf0571ee50a4684b97f79b3efc6078",
+      "baseHazardPpm": 968000,
+      "adjustedHazardPpm": 96800,
+      "healthFactorPpm": 100000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "236717",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        1550257684,
+        564695266,
+        1713684928,
+        4016715595
+      ],
+      "rngStateAfter": [
+        2624829693,
+        3794599263,
+        796511849,
+        2961834102
+      ],
+      "regionClass": "oceania"
+    },
+    {
+      "id": "p3d-035",
+      "entityId": "cr:LAO",
+      "regionCode": "LAO",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "female",
+      "age": 75,
+      "calendarYear": 2042,
+      "health": 50,
+      "rngState": [
+        1497521155,
+        2494822739,
+        3091275305,
+        769682190
+      ],
+      "digest": "99c657ca06cfee1a1ecc1af254910fb4dfe50c24b16502a809c9054f32628898",
+      "baseHazardPpm": 1000000,
+      "adjustedHazardPpm": 1000000,
+      "healthFactorPpm": 1000000,
+      "died": true,
+      "causeId": "cause.neutral.circulatory",
+      "mortalityDraw": "183574",
+      "drawsUsed": 4,
+      "rngStateBefore": [
+        1497521155,
+        2494822739,
+        3091275305,
+        769682190
+      ],
+      "rngStateAfter": [
+        1028745010,
+        3131317668,
+        1290986544,
+        1066195372
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-036",
+      "entityId": "cr:PRT",
+      "regionCode": "PRT",
+      "entityStatus": "enabled",
+      "region": "europe",
+      "sex": "female",
+      "age": 120,
+      "calendarYear": 2035,
+      "health": 0,
+      "rngState": [
+        2466191989,
+        3783961555,
+        1973142341,
+        3955848731
+      ],
+      "digest": "e47dcec903891adbadeff40cfef405690209b424146baa8fc92d0df40dd60ff9",
+      "baseHazardPpm": 968000,
+      "adjustedHazardPpm": 1000000,
+      "healthFactorPpm": 2000000,
+      "died": true,
+      "causeId": "cause.neutral.circulatory",
+      "mortalityDraw": "555353",
+      "drawsUsed": 4,
+      "rngStateBefore": [
+        2466191989,
+        3783961555,
+        1973142341,
+        3955848731
+      ],
+      "rngStateAfter": [
+        367691042,
+        1119723980,
+        1988705827,
+        294913989
+      ],
+      "regionClass": "europe"
+    },
+    {
+      "id": "p3d-037",
+      "entityId": "cr:KHM",
+      "regionCode": "KHM",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "female",
+      "age": 1,
+      "calendarYear": 2037,
+      "health": 25,
+      "rngState": [
+        4059810218,
+        2754125020,
+        3077452841,
+        2839391930
+      ],
+      "digest": "8426d4517e3489e54cc2cc32cf55fcb7e951eeeb7d233f530c4608128dc81a16",
+      "baseHazardPpm": 4422,
+      "adjustedHazardPpm": 6633,
+      "healthFactorPpm": 1500000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "942886",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        4059810218,
+        2754125020,
+        3077452841,
+        2839391930
+      ],
+      "rngStateAfter": [
+        3082857211,
+        167763728,
+        2441085007,
+        1921628761
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-038",
+      "entityId": "cr:TLS",
+      "regionCode": "TLS",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "male",
+      "age": 120,
+      "calendarYear": 2042,
+      "health": 25,
+      "rngState": [
+        794323667,
+        3497247949,
+        1378463704,
+        1208694777
+      ],
+      "digest": "c55667857ad7c9c7cf316d9b1f447c1748e84501c5c8b277757212eaa024b3f8",
+      "baseHazardPpm": 965000,
+      "adjustedHazardPpm": 1000000,
+      "healthFactorPpm": 1500000,
+      "died": true,
+      "causeId": "cause.neutral.neoplasm",
+      "mortalityDraw": "552816",
+      "drawsUsed": 4,
+      "rngStateBefore": [
+        794323667,
+        3497247949,
+        1378463704,
+        1208694777
+      ],
+      "rngStateAfter": [
+        1670419287,
+        3038593974,
+        3032857234,
+        3390988062
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-039",
+      "entityId": "cr:AFG",
+      "regionCode": "AFG",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "female",
+      "age": 120,
+      "calendarYear": 2030,
+      "health": 75,
+      "rngState": [
+        3237425947,
+        529022394,
+        1821885534,
+        919975119
+      ],
+      "digest": "73651c794a496b1df6b5973994300a38b311299487c7500fd9e429fe8fe0931f",
+      "baseHazardPpm": 1000000,
+      "adjustedHazardPpm": 500000,
+      "healthFactorPpm": 500000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "836041",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        3237425947,
+        529022394,
+        1821885534,
+        919975119
+      ],
+      "rngStateAfter": [
+        3054098907,
+        3864654804,
+        2217002795,
+        454929149
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-040",
+      "entityId": "cr:TGO",
+      "regionCode": "TGO",
+      "entityStatus": "enabled",
+      "region": "africa",
+      "sex": "male",
+      "age": 45,
+      "calendarYear": 2027,
+      "health": 0,
+      "rngState": [
+        1408307568,
+        4085285670,
+        4241729037,
+        2444181321
+      ],
+      "digest": "e1cc9bb9680e64ab62b861e9cd157bab90398399283109e7068315ef9039495b",
+      "baseHazardPpm": 101041,
+      "adjustedHazardPpm": 202082,
+      "healthFactorPpm": 2000000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "926879",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        1408307568,
+        4085285670,
+        4241729037,
+        2444181321
+      ],
+      "rngStateAfter": [
+        278913621,
+        3277349433,
+        3683836002,
+        175788298
+      ],
+      "regionClass": "africa"
+    },
+    {
+      "id": "p3d-041",
+      "entityId": "cr:FIN",
+      "regionCode": "FIN",
+      "entityStatus": "enabled",
+      "region": "europe",
+      "sex": "female",
+      "age": 5,
+      "calendarYear": 2015,
+      "health": 50,
+      "rngState": [
+        1713173819,
+        858584532,
+        271490230,
+        3156855777
+      ],
+      "digest": "e745d20cdc21dae52a8ff0e85ae7790dc7fdcd05a175514c8137e998ee624e31",
+      "baseHazardPpm": 3098,
+      "adjustedHazardPpm": 3098,
+      "healthFactorPpm": 1000000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "574988",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        1713173819,
+        858584532,
+        271490230,
+        3156855777
+      ],
+      "rngStateAfter": [
+        2247555887,
+        2212402906,
+        4227381379,
+        2038500199
+      ],
+      "regionClass": "europe"
+    },
+    {
+      "id": "p3d-042",
+      "entityId": "cr:UKR",
+      "regionCode": "UKR",
+      "entityStatus": "enabled",
+      "region": "europe",
+      "sex": "male",
+      "age": 45,
+      "calendarYear": 2006,
+      "health": 75,
+      "rngState": [
+        1229850275,
+        232815932,
+        4207749619,
+        1338581659
+      ],
+      "digest": "8a75603f26802dbe51fc6f97eda2a7bc175bb574a74ef66e07aab4acb51ac089",
+      "baseHazardPpm": 32668,
+      "adjustedHazardPpm": 16334,
+      "healthFactorPpm": 500000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "798195",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        1229850275,
+        232815932,
+        4207749619,
+        1338581659
+      ],
+      "rngStateAfter": [
+        4294521209,
+        3330104376,
+        3199915604,
+        4081315748
+      ],
+      "regionClass": "europe"
+    },
+    {
+      "id": "p3d-043",
+      "entityId": "cr:CMR",
+      "regionCode": "CMR",
+      "entityStatus": "enabled",
+      "region": "africa",
+      "sex": "female",
+      "age": 120,
+      "calendarYear": 2049,
+      "health": 0,
+      "rngState": [
+        2547953048,
+        3772128689,
+        2864589833,
+        257086722
+      ],
+      "digest": "1bb9fe56515d30bbc0de5f976c247f3d9fda4a38b0a1a92ae80ff679d2dd107d",
+      "baseHazardPpm": 961000,
+      "adjustedHazardPpm": 1000000,
+      "healthFactorPpm": 2000000,
+      "died": true,
+      "causeId": "cause.neutral.infection",
+      "mortalityDraw": "609402",
+      "drawsUsed": 4,
+      "rngStateBefore": [
+        2547953048,
+        3772128689,
+        2864589833,
+        257086722
+      ],
+      "rngStateAfter": [
+        1942555648,
+        1971762600,
+        164995583,
+        1824101094
+      ],
+      "regionClass": "africa"
+    },
+    {
+      "id": "p3d-044",
+      "entityId": "cr:SAU",
+      "regionCode": "SAU",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "female",
+      "age": 1,
+      "calendarYear": 2054,
+      "health": 25,
+      "rngState": [
+        734820312,
+        4149583201,
+        3848949704,
+        365745996
+      ],
+      "digest": "a564448a49b12e76cf9c8252141696aa8e404c7e7be7934f3b9b4faf05dd5265",
+      "baseHazardPpm": 4271,
+      "adjustedHazardPpm": 6407,
+      "healthFactorPpm": 1500000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "906640",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        734820312,
+        4149583201,
+        3848949704,
+        365745996
+      ],
+      "rngStateAfter": [
+        989329296,
+        2503631508,
+        1266886117,
+        374550429
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-045",
+      "entityId": "cr:OMN",
+      "regionCode": "OMN",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "male",
+      "age": 30,
+      "calendarYear": 2020,
+      "health": 50,
+      "rngState": [
+        3718070826,
+        1331141329,
+        755621419,
+        480219134
+      ],
+      "digest": "045788af1c37baa9acb4af8e377264f6504d9fce9df167713a6e53561b8f9188",
+      "baseHazardPpm": 11229,
+      "adjustedHazardPpm": 11229,
+      "healthFactorPpm": 1000000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "854871",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        3718070826,
+        1331141329,
+        755621419,
+        480219134
+      ],
+      "rngStateAfter": [
+        1899965259,
+        1849126868,
+        1475987716,
+        1407350779
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-046",
+      "entityId": "cr:CPV",
+      "regionCode": "CPV",
+      "entityStatus": "enabled",
+      "region": "africa",
+      "sex": "female",
+      "age": 15,
+      "calendarYear": 2009,
+      "health": 75,
+      "rngState": [
+        3835640907,
+        2238409264,
+        411544538,
+        1669776454
+      ],
+      "digest": "b8af77d441775925e6d5e8d50de76f1463c44377802a19ad8b4140385af6070b",
+      "baseHazardPpm": 8961,
+      "adjustedHazardPpm": 4481,
+      "healthFactorPpm": 500000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "414503",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        3835640907,
+        2238409264,
+        411544538,
+        1669776454
+      ],
+      "rngStateAfter": [
+        376625323,
+        1372428301,
+        3477415852,
+        39104672
+      ],
+      "regionClass": "africa"
+    },
+    {
+      "id": "p3d-047",
+      "entityId": "cr:LBN",
+      "regionCode": "LBN",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "female",
+      "age": 0,
+      "calendarYear": 2010,
+      "health": 25,
+      "rngState": [
+        15429675,
+        4040509103,
+        2560041581,
+        2301932083
+      ],
+      "digest": "9cd5d86aa4f0e224cca92e8481a5d30c84a377d610947a0828f357572940944f",
+      "baseHazardPpm": 4046,
+      "adjustedHazardPpm": 6069,
+      "healthFactorPpm": 1500000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "520173",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        15429675,
+        4040509103,
+        2560041581,
+        2301932083
+      ],
+      "rngStateAfter": [
+        503804817,
+        592616472,
+        433216241,
+        1874408248
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-048",
+      "entityId": "cr:ARE",
+      "regionCode": "ARE",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "male",
+      "age": 14,
+      "calendarYear": 2031,
+      "health": 50,
+      "rngState": [
+        2357366644,
+        2180787408,
+        2000597885,
+        3774301923
+      ],
+      "digest": "e9e2d05909b9b7308150d7b93a9b481ca434d0a08bf851946e2a516578dbaaef",
+      "baseHazardPpm": 5442,
+      "adjustedHazardPpm": 5442,
+      "healthFactorPpm": 1000000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "761529",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        2357366644,
+        2180787408,
+        2000597885,
+        3774301923
+      ],
+      "rngStateAfter": [
+        3432541846,
+        2485938583,
+        1850592078,
+        2355005704
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-049",
+      "entityId": "cr:GMB",
+      "regionCode": "GMB",
+      "entityStatus": "enabled",
+      "region": "africa",
+      "sex": "female",
+      "age": 0,
+      "calendarYear": 2047,
+      "health": 25,
+      "rngState": [
+        2435758709,
+        2489535006,
+        1125622097,
+        1394472687
+      ],
+      "digest": "315093a5a0c5ddb0414ac6ac8142ec1b3b8059a27737eca529f078dd5eb698bf",
+      "baseHazardPpm": 7811,
+      "adjustedHazardPpm": 11717,
+      "healthFactorPpm": 1500000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "366439",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        2435758709,
+        2489535006,
+        1125622097,
+        1394472687
+      ],
+      "rngStateAfter": [
+        3857570181,
+        78082202,
+        4133442976,
+        4009233821
+      ],
+      "regionClass": "africa"
+    },
+    {
+      "id": "p3d-050",
+      "entityId": "cr:RUS",
+      "regionCode": "RUS",
+      "entityStatus": "enabled",
+      "region": "europe",
+      "sex": "female",
+      "age": 1,
+      "calendarYear": 2005,
+      "health": 100,
+      "rngState": [
+        3742178744,
+        244771168,
+        4003464906,
+        842631862
+      ],
+      "digest": "ee8da2da14961a31d67a3ce3df9e706129519f7fa33878467fb8af6198f13228",
+      "baseHazardPpm": 3568,
+      "adjustedHazardPpm": 357,
+      "healthFactorPpm": 100000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "976014",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        3742178744,
+        244771168,
+        4003464906,
+        842631862
+      ],
+      "rngStateAfter": [
+        2810658201,
+        3236321038,
+        2285469980,
+        706722337
+      ],
+      "regionClass": "europe"
+    },
+    {
+      "id": "p3d-051",
+      "entityId": "cr:TGO",
+      "regionCode": "TGO",
+      "entityStatus": "enabled",
+      "region": "africa",
+      "sex": "male",
+      "age": 14,
+      "calendarYear": 2052,
+      "health": 25,
+      "rngState": [
+        2020019150,
+        4094083662,
+        4282866855,
+        316263788
+      ],
+      "digest": "bc3ca35d5471e2b31590e5bff384608db19defa3dbc4cf467478825ea6f5019a",
+      "baseHazardPpm": 11806,
+      "adjustedHazardPpm": 17709,
+      "healthFactorPpm": 1500000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "222551",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        2020019150,
+        4094083662,
+        4282866855,
+        316263788
+      ],
+      "rngStateAfter": [
+        367494909,
+        1731877538,
+        1496744325,
+        4228942938
+      ],
+      "regionClass": "africa"
+    },
+    {
+      "id": "p3d-052",
+      "entityId": "cr:EGY",
+      "regionCode": "EGY",
+      "entityStatus": "enabled",
+      "region": "africa",
+      "sex": "female",
+      "age": 14,
+      "calendarYear": 2010,
+      "health": 100,
+      "rngState": [
+        1435975701,
+        3213038813,
+        3585300457,
+        3611517853
+      ],
+      "digest": "da015e27efa07244c773fe4a6ba72708e0788fe8c240727c51b9ea3bfbd89362",
+      "baseHazardPpm": 8394,
+      "adjustedHazardPpm": 839,
+      "healthFactorPpm": 100000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "968919",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        1435975701,
+        3213038813,
+        3585300457,
+        3611517853
+      ],
+      "rngStateAfter": [
+        21641010,
+        2231212424,
+        4116502697,
+        3892525536
+      ],
+      "regionClass": "africa"
+    },
+    {
+      "id": "p3d-053",
+      "entityId": "cr:EGY",
+      "regionCode": "EGY",
+      "entityStatus": "enabled",
+      "region": "africa",
+      "sex": "male",
+      "age": 45,
+      "calendarYear": 2045,
+      "health": 100,
+      "rngState": [
+        1517426713,
+        3038661244,
+        2646310779,
+        830157439
+      ],
+      "digest": "e49bda1e69579aac062ebe70a630275f4e17e6ce3192392d396e5a087e115357",
+      "baseHazardPpm": 93539,
+      "adjustedHazardPpm": 9354,
+      "healthFactorPpm": 100000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "99543",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        1517426713,
+        3038661244,
+        2646310779,
+        830157439
+      ],
+      "rngStateAfter": [
+        2264944935,
+        1469960806,
+        2333131640,
+        3112823496
+      ],
+      "regionClass": "africa"
+    },
+    {
+      "id": "p3d-054",
+      "entityId": "cr:PRK",
+      "regionCode": "PRK",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "female",
+      "age": 60,
+      "calendarYear": 2033,
+      "health": 50,
+      "rngState": [
+        2353338538,
+        2299367256,
+        3819531577,
+        2184779042
+      ],
+      "digest": "1fef7640455599ce3a2258aba1f074b7c8cb1751252b7ff0fd8321d6383cfeb0",
+      "baseHazardPpm": 236753,
+      "adjustedHazardPpm": 236753,
+      "healthFactorPpm": 1000000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "451977",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        2353338538,
+        2299367256,
+        3819531577,
+        2184779042
+      ],
+      "rngStateAfter": [
+        3309545538,
+        358792584,
+        813093187,
+        2438238737
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-055",
+      "entityId": "cr:SGP",
+      "regionCode": "SGP",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "female",
+      "age": 0,
+      "calendarYear": 2036,
+      "health": 50,
+      "rngState": [
+        518178190,
+        577603345,
+        2511616860,
+        2172315263
+      ],
+      "digest": "a7adca77af19f7ad5f9cb5f1eaab23b50e9de41f51a2c37890749937d65e4615",
+      "baseHazardPpm": 3777,
+      "adjustedHazardPpm": 3777,
+      "healthFactorPpm": 1000000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "174239",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        518178190,
+        577603345,
+        2511616860,
+        2172315263
+      ],
+      "rngStateAfter": [
+        2948966459,
+        1150681585,
+        2606693938,
+        2154223761
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-056",
+      "entityId": "cr:BDI",
+      "regionCode": "BDI",
+      "entityStatus": "enabled",
+      "region": "africa",
+      "sex": "female",
+      "age": 14,
+      "calendarYear": 2057,
+      "health": 50,
+      "rngState": [
+        890716171,
+        2286150341,
+        254931459,
+        2058150953
+      ],
+      "digest": "6070d7124210752a6816f9aade6cb9ebc96cdbe34c62f0a0a084542f5b3a3149",
+      "baseHazardPpm": 9169,
+      "adjustedHazardPpm": 9169,
+      "healthFactorPpm": 1000000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "315237",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        890716171,
+        2286150341,
+        254931459,
+        2058150953
+      ],
+      "rngStateAfter": [
+        229274045,
+        3363712546,
+        2965038319,
+        2444940882
+      ],
+      "regionClass": "africa"
+    },
+    {
+      "id": "p3d-057",
+      "entityId": "cr:NZL",
+      "regionCode": "NZL",
+      "entityStatus": "enabled",
+      "region": "oceania",
+      "sex": "male",
+      "age": 45,
+      "calendarYear": 2027,
+      "health": 25,
+      "rngState": [
+        1331231298,
+        2411350458,
+        20716180,
+        948724767
+      ],
+      "digest": "5ece9bc31264dccc90bae1866c6ad898c7386137c0e5c43cdaab761db101dd89",
+      "baseHazardPpm": 44472,
+      "adjustedHazardPpm": 66708,
+      "healthFactorPpm": 1500000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "695812",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        1331231298,
+        2411350458,
+        20716180,
+        948724767
+      ],
+      "rngStateAfter": [
+        2296206130,
+        55044701,
+        2144049969,
+        2619779973
+      ],
+      "regionClass": "oceania"
+    },
+    {
+      "id": "p3d-058",
+      "entityId": "cr:LBN",
+      "regionCode": "LBN",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "female",
+      "age": 120,
+      "calendarYear": 2012,
+      "health": 50,
+      "rngState": [
+        122908179,
+        741316795,
+        1990575409,
+        2536436632
+      ],
+      "digest": "151c3c96043d2c49d15d85d236925a7ce9ecce76f9c79d6fab540b3f137cd61a",
+      "baseHazardPpm": 1000000,
+      "adjustedHazardPpm": 1000000,
+      "healthFactorPpm": 1000000,
+      "died": true,
+      "causeId": "cause.neutral.neurological",
+      "mortalityDraw": "466874",
+      "drawsUsed": 4,
+      "rngStateBefore": [
+        122908179,
+        741316795,
+        1990575409,
+        2536436632
+      ],
+      "rngStateAfter": [
+        3599310551,
+        1920415685,
+        2941177133,
+        782552979
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-059",
+      "entityId": "cr:PHL",
+      "regionCode": "PHL",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "female",
+      "age": 75,
+      "calendarYear": 2042,
+      "health": 75,
+      "rngState": [
+        123627813,
+        2989965873,
+        4102770836,
+        1143327615
+      ],
+      "digest": "bffb4a09ac86be7a0ecfb5187a022f2ad7c8dfe3f63764834e2cf8aeb2c9c75f",
+      "baseHazardPpm": 1000000,
+      "adjustedHazardPpm": 500000,
+      "healthFactorPpm": 500000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "996612",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        123627813,
+        2989965873,
+        4102770836,
+        1143327615
+      ],
+      "rngStateAfter": [
+        618982491,
+        771735642,
+        2833955802,
+        1080133293
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-060",
+      "entityId": "cr:GAB",
+      "regionCode": "GAB",
+      "entityStatus": "enabled",
+      "region": "africa",
+      "sex": "female",
+      "age": 1,
+      "calendarYear": 2012,
+      "health": 0,
+      "rngState": [
+        1595172970,
+        2675712813,
+        3873020022,
+        465327739
+      ],
+      "digest": "4a1c3e1a18004614acbd2455cb437dd2a7bca3b8ae3057d209dfc63294a09e11",
+      "baseHazardPpm": 7627,
+      "adjustedHazardPpm": 15254,
+      "healthFactorPpm": 2000000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "462112",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        1595172970,
+        2675712813,
+        3873020022,
+        465327739
+      ],
+      "rngStateAfter": [
+        4275010091,
+        3169739793,
+        4193899808,
+        3677927720
+      ],
+      "regionClass": "africa"
+    },
+    {
+      "id": "p3d-061",
+      "entityId": "cr:MUS",
+      "regionCode": "MUS",
+      "entityStatus": "enabled",
+      "region": "africa",
+      "sex": "female",
+      "age": 90,
+      "calendarYear": 2044,
+      "health": 75,
+      "rngState": [
+        4109828375,
+        1445574768,
+        2883732273,
+        318233614
+      ],
+      "digest": "04a830473f78e8c8fa0826a06811b51ad1a37cd83181b9492726ddf6fb8e8c09",
+      "baseHazardPpm": 977000,
+      "adjustedHazardPpm": 488500,
+      "healthFactorPpm": 500000,
+      "died": true,
+      "causeId": "cause.neutral.infection",
+      "mortalityDraw": "394575",
+      "drawsUsed": 4,
+      "rngStateBefore": [
+        4109828375,
+        1445574768,
+        2883732273,
+        318233614
+      ],
+      "rngStateAfter": [
+        2687346422,
+        1376770249,
+        2491907462,
+        1133065529
+      ],
+      "regionClass": "africa"
+    },
+    {
+      "id": "p3d-062",
+      "entityId": "cr:BOL",
+      "regionCode": "BOL",
+      "entityStatus": "enabled",
+      "region": "americas",
+      "sex": "male",
+      "age": 45,
+      "calendarYear": 2055,
+      "health": 50,
+      "rngState": [
+        1542047840,
+        3596357009,
+        815195718,
+        702623045
+      ],
+      "digest": "5a17ca15c5ea569e4ad899648693ae33300ff74084ce8b52856576316be441d1",
+      "baseHazardPpm": 66534,
+      "adjustedHazardPpm": 66534,
+      "healthFactorPpm": 1000000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "434776",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        1542047840,
+        3596357009,
+        815195718,
+        702623045
+      ],
+      "rngStateAfter": [
+        4033965310,
+        3390293797,
+        829917842,
+        740446881
+      ],
+      "regionClass": "americas"
+    },
+    {
+      "id": "p3d-063",
+      "entityId": "cr:NZL",
+      "regionCode": "NZL",
+      "entityStatus": "enabled",
+      "region": "oceania",
+      "sex": "female",
+      "age": 1,
+      "calendarYear": 2031,
+      "health": 75,
+      "rngState": [
+        2423445479,
+        2113395404,
+        3089301976,
+        1446591215
+      ],
+      "digest": "9d308cd1f1105063600245254f71ce03e9072af09883281071f4c1ced542d7c2",
+      "baseHazardPpm": 4667,
+      "adjustedHazardPpm": 2334,
+      "healthFactorPpm": 500000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "303750",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        2423445479,
+        2113395404,
+        3089301976,
+        1446591215
+      ],
+      "rngStateAfter": [
+        2568692329,
+        704541960,
+        809607163,
+        950888725
+      ],
+      "regionClass": "oceania"
+    },
+    {
+      "id": "p3d-064",
+      "entityId": "cr:MKD",
+      "regionCode": "MKD",
+      "entityStatus": "enabled",
+      "region": "europe",
+      "sex": "female",
+      "age": 0,
+      "calendarYear": 2009,
+      "health": 25,
+      "rngState": [
+        4097776625,
+        1308115324,
+        523768412,
+        1889078320
+      ],
+      "digest": "0b565f550cb45d6e733d2a839a479ba69e7d8545bf765985e03e859c3214eee5",
+      "baseHazardPpm": 3363,
+      "adjustedHazardPpm": 5045,
+      "healthFactorPpm": 1500000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "295145",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        4097776625,
+        1308115324,
+        523768412,
+        1889078320
+      ],
+      "rngStateAfter": [
+        1707835271,
+        1948577729,
+        743048464,
+        2840188260
+      ],
+      "regionClass": "europe"
+    },
+    {
+      "id": "p3d-065",
+      "entityId": "cr:BWA",
+      "regionCode": "BWA",
+      "entityStatus": "enabled",
+      "region": "africa",
+      "sex": "male",
+      "age": 14,
+      "calendarYear": 2053,
+      "health": 25,
+      "rngState": [
+        2596279075,
+        341654224,
+        71487440,
+        2403627049
+      ],
+      "digest": "9e9fbbd20d0a9e2e3d21bfdd48d36d553cdf42d12616e1889d3e1b48b5de06e5",
+      "baseHazardPpm": 10174,
+      "adjustedHazardPpm": 15261,
+      "healthFactorPpm": 1500000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "127987",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        2596279075,
+        341654224,
+        71487440,
+        2403627049
+      ],
+      "rngStateAfter": [
+        1095856929,
+        2951856906,
+        2598527785,
+        1096276484
+      ],
+      "regionClass": "africa"
+    },
+    {
+      "id": "p3d-066",
+      "entityId": "cr:TCD",
+      "regionCode": "TCD",
+      "entityStatus": "enabled",
+      "region": "africa",
+      "sex": "male",
+      "age": 0,
+      "calendarYear": 2019,
+      "health": 0,
+      "rngState": [
+        2975379003,
+        549686141,
+        3535802823,
+        1141550379
+      ],
+      "digest": "8e3fadc9bea501556f157e0477d92b97f597f4f77694f89a05fc28bb4468dac3",
+      "baseHazardPpm": 10039,
+      "adjustedHazardPpm": 20078,
+      "healthFactorPpm": 2000000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "812712",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        2975379003,
+        549686141,
+        3535802823,
+        1141550379
+      ],
+      "rngStateAfter": [
+        3757576138,
+        1917122832,
+        2272710545,
+        1279080531
+      ],
+      "regionClass": "africa"
+    },
+    {
+      "id": "p3d-067",
+      "entityId": "cr:POL",
+      "regionCode": "POL",
+      "entityStatus": "enabled",
+      "region": "europe",
+      "sex": "male",
+      "age": 120,
+      "calendarYear": 2001,
+      "health": 0,
+      "rngState": [
+        1644377627,
+        1043031554,
+        2231782688,
+        602259035
+      ],
+      "digest": "d1d93559084cf09ecdf7776dda0ec38165475c6745c2e19f571b8383a191ccec",
+      "baseHazardPpm": 1000000,
+      "adjustedHazardPpm": 1000000,
+      "healthFactorPpm": 2000000,
+      "died": true,
+      "causeId": "cause.neutral.circulatory",
+      "mortalityDraw": "5454",
+      "drawsUsed": 4,
+      "rngStateBefore": [
+        1644377627,
+        1043031554,
+        2231782688,
+        602259035
+      ],
+      "rngStateAfter": [
+        3575227786,
+        3818325738,
+        3691711046,
+        3849913253
+      ],
+      "regionClass": "europe"
+    },
+    {
+      "id": "p3d-068",
+      "entityId": "cr:BDI",
+      "regionCode": "BDI",
+      "entityStatus": "enabled",
+      "region": "africa",
+      "sex": "female",
+      "age": 45,
+      "calendarYear": 2040,
+      "health": 100,
+      "rngState": [
+        3011582475,
+        1822678645,
+        2722736963,
+        1194012640
+      ],
+      "digest": "b235e9d68b93355f5eaa8f3c2771f21823fc5f4fa8eb8a199e56269b319e999a",
+      "baseHazardPpm": 86730,
+      "adjustedHazardPpm": 8673,
+      "healthFactorPpm": 100000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "368193",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        3011582475,
+        1822678645,
+        2722736963,
+        1194012640
+      ],
+      "rngStateAfter": [
+        2733518335,
+        3004620779,
+        413387478,
+        1043532247
+      ],
+      "regionClass": "africa"
+    },
+    {
+      "id": "p3d-069",
+      "entityId": "cr:SGP",
+      "regionCode": "SGP",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "female",
+      "age": 30,
+      "calendarYear": 2004,
+      "health": 25,
+      "rngState": [
+        3228088597,
+        3119200050,
+        521221206,
+        986643269
+      ],
+      "digest": "5b66b25c6ab8be55f355defb0e483a2273487f9b9aa8a535794eb46f1e71d184",
+      "baseHazardPpm": 9053,
+      "adjustedHazardPpm": 13580,
+      "healthFactorPpm": 1500000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "757440",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        3228088597,
+        3119200050,
+        521221206,
+        986643269
+      ],
+      "rngStateAfter": [
+        196899594,
+        751314512,
+        1865317921,
+        2285060679
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-070",
+      "entityId": "cr:TLS",
+      "regionCode": "TLS",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "male",
+      "age": 1,
+      "calendarYear": 2014,
+      "health": 50,
+      "rngState": [
+        4230562193,
+        795258150,
+        3416704218,
+        1444935958
+      ],
+      "digest": "871665a8acb43431adf1f04fde2823401dd45a3e053d580e4811051b855a3fd2",
+      "baseHazardPpm": 5136,
+      "adjustedHazardPpm": 5136,
+      "healthFactorPpm": 1000000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "489454",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        4230562193,
+        795258150,
+        3416704218,
+        1444935958
+      ],
+      "rngStateAfter": [
+        1461239303,
+        1735193735,
+        2916419306,
+        1163736722
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-071",
+      "entityId": "cr:MOZ",
+      "regionCode": "MOZ",
+      "entityStatus": "enabled",
+      "region": "africa",
+      "sex": "male",
+      "age": 15,
+      "calendarYear": 2055,
+      "health": 25,
+      "rngState": [
+        3439228070,
+        2115770419,
+        3759585524,
+        1960830773
+      ],
+      "digest": "71144e66eb814f1ad870f64b8e2235373f2ec2b0a2a0b4b0ea81adc14395bd3f",
+      "baseHazardPpm": 10570,
+      "adjustedHazardPpm": 15855,
+      "healthFactorPpm": 1500000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "526599",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        3439228070,
+        2115770419,
+        3759585524,
+        1960830773
+      ],
+      "rngStateAfter": [
+        2335272855,
+        2148660627,
+        994960370,
+        1730263656
+      ],
+      "regionClass": "africa"
+    },
+    {
+      "id": "p3d-072",
+      "entityId": "cr:IRL",
+      "regionCode": "IRL",
+      "entityStatus": "enabled",
+      "region": "europe",
+      "sex": "male",
+      "age": 120,
+      "calendarYear": 2039,
+      "health": 75,
+      "rngState": [
+        2023750254,
+        3620967287,
+        3508956342,
+        294629188
+      ],
+      "digest": "77b1dadf96843dc720a3d8052e42a21f170cc2f5183f3f7c9f6bd118a7d852c4",
+      "baseHazardPpm": 1000000,
+      "adjustedHazardPpm": 500000,
+      "healthFactorPpm": 500000,
+      "died": true,
+      "causeId": "cause.neutral.neoplasm",
+      "mortalityDraw": "424988",
+      "drawsUsed": 4,
+      "rngStateBefore": [
+        2023750254,
+        3620967287,
+        3508956342,
+        294629188
+      ],
+      "rngStateAfter": [
+        1781905646,
+        283305276,
+        3385277779,
+        3180840652
+      ],
+      "regionClass": "europe"
+    },
+    {
+      "id": "p3d-073",
+      "entityId": "cr:ARE",
+      "regionCode": "ARE",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "female",
+      "age": 0,
+      "calendarYear": 2020,
+      "health": 100,
+      "rngState": [
+        658545625,
+        1024380101,
+        336835126,
+        1176487379
+      ],
+      "digest": "e6e047c058627fd02d9568d5350218df27058605b96bd38c488b9c84b2cb7eb7",
+      "baseHazardPpm": 3906,
+      "adjustedHazardPpm": 391,
+      "healthFactorPpm": 100000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "990715",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        658545625,
+        1024380101,
+        336835126,
+        1176487379
+      ],
+      "rngStateAfter": [
+        3661939773,
+        2093405194,
+        3377554720,
+        2864157744
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-074",
+      "entityId": "cr:URY",
+      "regionCode": "URY",
+      "entityStatus": "enabled",
+      "region": "americas",
+      "sex": "male",
+      "age": 14,
+      "calendarYear": 2053,
+      "health": 50,
+      "rngState": [
+        239335124,
+        1808190635,
+        3865946674,
+        3695578513
+      ],
+      "digest": "d237a1c0737fb9e614726ead2b2b235aab01a385f4b765389a85d10f71a10b28",
+      "baseHazardPpm": 7294,
+      "adjustedHazardPpm": 7294,
+      "healthFactorPpm": 1000000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "292113",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        239335124,
+        1808190635,
+        3865946674,
+        3695578513
+      ],
+      "rngStateAfter": [
+        1008890399,
+        1604103493,
+        223651592,
+        170888239
+      ],
+      "regionClass": "americas"
+    },
+    {
+      "id": "p3d-075",
+      "entityId": "cr:TUR",
+      "regionCode": "TUR",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "male",
+      "age": 90,
+      "calendarYear": 2028,
+      "health": 50,
+      "rngState": [
+        150119493,
+        2298629397,
+        2984270605,
+        325503408
+      ],
+      "digest": "a776ecad2ecd63db7051f46fc817e91ce1c43de4525e5f785020bc567f98f82d",
+      "baseHazardPpm": 1000000,
+      "adjustedHazardPpm": 1000000,
+      "healthFactorPpm": 1000000,
+      "died": true,
+      "causeId": "cause.neutral.circulatory",
+      "mortalityDraw": "394616",
+      "drawsUsed": 4,
+      "rngStateBefore": [
+        150119493,
+        2298629397,
+        2984270605,
+        325503408
+      ],
+      "rngStateAfter": [
+        1932827286,
+        920134863,
+        241431804,
+        1755144755
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-076",
+      "entityId": "cr:TKM",
+      "regionCode": "TKM",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "male",
+      "age": 5,
+      "calendarYear": 2019,
+      "health": 50,
+      "rngState": [
+        3829663853,
+        1343126125,
+        2734706900,
+        4149009300
+      ],
+      "digest": "2ce662d2172c724771c415eac304872c6e346035c5ed9e1862e40930ae68a378",
+      "baseHazardPpm": 6007,
+      "adjustedHazardPpm": 6007,
+      "healthFactorPpm": 1000000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "561290",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        3829663853,
+        1343126125,
+        2734706900,
+        4149009300
+      ],
+      "rngStateAfter": [
+        1094927994,
+        268175865,
+        2364769069,
+        796880914
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-077",
+      "entityId": "cr:THA",
+      "regionCode": "THA",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "female",
+      "age": 14,
+      "calendarYear": 2056,
+      "health": 0,
+      "rngState": [
+        4049242613,
+        2618453544,
+        3072549690,
+        791904798
+      ],
+      "digest": "1a700eda99f468f5af362d71906f5701bfcd9a2494f517683f4226e105ae1d38",
+      "baseHazardPpm": 5424,
+      "adjustedHazardPpm": 10848,
+      "healthFactorPpm": 2000000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "783090",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        4049242613,
+        2618453544,
+        3072549690,
+        791904798
+      ],
+      "rngStateAfter": [
+        2540786877,
+        4206189547,
+        4158066956,
+        1368127144
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-078",
+      "entityId": "cr:BFA",
+      "regionCode": "BFA",
+      "entityStatus": "enabled",
+      "region": "africa",
+      "sex": "male",
+      "age": 75,
+      "calendarYear": 2048,
+      "health": 50,
+      "rngState": [
+        1420483280,
+        982275814,
+        1048862485,
+        1899270550
+      ],
+      "digest": "3391e3eadabc97a8233110da81bb814e5a096420c72f55ce1733aed134c0d330",
+      "baseHazardPpm": 1000000,
+      "adjustedHazardPpm": 1000000,
+      "healthFactorPpm": 1000000,
+      "died": true,
+      "causeId": "cause.neutral.infection",
+      "mortalityDraw": "685713",
+      "drawsUsed": 4,
+      "rngStateBefore": [
+        1420483280,
+        982275814,
+        1048862485,
+        1899270550
+      ],
+      "rngStateAfter": [
+        555970924,
+        604910698,
+        2805077911,
+        2188509944
+      ],
+      "regionClass": "africa"
+    },
+    {
+      "id": "p3d-079",
+      "entityId": "cr:KHM",
+      "regionCode": "KHM",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "female",
+      "age": 30,
+      "calendarYear": 2045,
+      "health": 0,
+      "rngState": [
+        263785298,
+        931573251,
+        712089786,
+        2745781456
+      ],
+      "digest": "be3be527fcd69b21b15497d08690f3ff3a651dfed0ef2f0f73f9c26f1449bbd1",
+      "baseHazardPpm": 10901,
+      "adjustedHazardPpm": 21802,
+      "healthFactorPpm": 2000000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "970325",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        263785298,
+        931573251,
+        712089786,
+        2745781456
+      ],
+      "rngStateAfter": [
+        4140724427,
+        2706129282,
+        789156457,
+        3301593962
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-080",
+      "entityId": "cr:PRK",
+      "regionCode": "PRK",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "male",
+      "age": 0,
+      "calendarYear": 2025,
+      "health": 25,
+      "rngState": [
+        1774347208,
+        3711485058,
+        575426897,
+        543884987
+      ],
+      "digest": "15acc3dce05c4ceb260603bc63219737d7b37cef79418bc2b8a67585d44f135a",
+      "baseHazardPpm": 5439,
+      "adjustedHazardPpm": 8159,
+      "healthFactorPpm": 1500000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "508216",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        1774347208,
+        3711485058,
+        575426897,
+        543884987
+      ],
+      "rngStateAfter": [
+        2620823552,
+        941646195,
+        3279593832,
+        969902149
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-081",
+      "entityId": "cr:JOR",
+      "regionCode": "JOR",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "male",
+      "age": 15,
+      "calendarYear": 2001,
+      "health": 50,
+      "rngState": [
+        201716332,
+        988439799,
+        3884582397,
+        469722104
+      ],
+      "digest": "d32422b8f0144a27d18acf02e422d179ae0a462059ccd411341e50d47b635d2d",
+      "baseHazardPpm": 5912,
+      "adjustedHazardPpm": 5912,
+      "healthFactorPpm": 1000000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "648739",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        201716332,
+        988439799,
+        3884582397,
+        469722104
+      ],
+      "rngStateAfter": [
+        1414340365,
+        3274932116,
+        3648004338,
+        4015223754
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-082",
+      "entityId": "cr:ARE",
+      "regionCode": "ARE",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "male",
+      "age": 0,
+      "calendarYear": 2047,
+      "health": 100,
+      "rngState": [
+        3580395551,
+        263400118,
+        1556126492,
+        1694486569
+      ],
+      "digest": "79740193044cd0ef46aaf17909d36d33c06735dcf643c1387b3dcf31ce086de8",
+      "baseHazardPpm": 4988,
+      "adjustedHazardPpm": 499,
+      "healthFactorPpm": 100000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "66567",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        3580395551,
+        263400118,
+        1556126492,
+        1694486569
+      ],
+      "rngStateAfter": [
+        1609281647,
+        3619830838,
+        1740269443,
+        2119663374
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-083",
+      "entityId": "cr:TZA",
+      "regionCode": "TZA",
+      "entityStatus": "enabled",
+      "region": "africa",
+      "sex": "male",
+      "age": 15,
+      "calendarYear": 2031,
+      "health": 0,
+      "rngState": [
+        3417724097,
+        2244074357,
+        1797712895,
+        1552062320
+      ],
+      "digest": "4fe1494611ebd6c1496629703f5df9423dc4d6b964cbcf7b60b749eed202228f",
+      "baseHazardPpm": 12410,
+      "adjustedHazardPpm": 24820,
+      "healthFactorPpm": 2000000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "457541",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        3417724097,
+        2244074357,
+        1797712895,
+        1552062320
+      ],
+      "rngStateAfter": [
+        767840837,
+        344074673,
+        2468076538,
+        2320763385
+      ],
+      "regionClass": "africa"
+    },
+    {
+      "id": "p3d-084",
+      "entityId": "cr:AGO",
+      "regionCode": "AGO",
+      "entityStatus": "enabled",
+      "region": "africa",
+      "sex": "male",
+      "age": 30,
+      "calendarYear": 2027,
+      "health": 25,
+      "rngState": [
+        1786312590,
+        2783159743,
+        2038138536,
+        178712054
+      ],
+      "digest": "54059a5c96497c05a552aa5f4511366f5acad35e9e7d4fa0b9d4776eb1f4fc50",
+      "baseHazardPpm": 23799,
+      "adjustedHazardPpm": 35699,
+      "healthFactorPpm": 1500000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "802961",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        1786312590,
+        2783159743,
+        2038138536,
+        178712054
+      ],
+      "rngStateAfter": [
+        1503602212,
+        2811585656,
+        3504112353,
+        349117669
+      ],
+      "regionClass": "africa"
+    },
+    {
+      "id": "p3d-085",
+      "entityId": "cr:ITA",
+      "regionCode": "ITA",
+      "entityStatus": "enabled",
+      "region": "europe",
+      "sex": "female",
+      "age": 120,
+      "calendarYear": 2049,
+      "health": 25,
+      "rngState": [
+        2821520650,
+        1626410426,
+        728575815,
+        4173692615
+      ],
+      "digest": "014bea29cb6a60393978d4d6bf21817eb2739f69345a06a15afda4b9e416b75b",
+      "baseHazardPpm": 1000000,
+      "adjustedHazardPpm": 1000000,
+      "healthFactorPpm": 1500000,
+      "died": true,
+      "causeId": "cause.neutral.circulatory",
+      "mortalityDraw": "236545",
+      "drawsUsed": 4,
+      "rngStateBefore": [
+        2821520650,
+        1626410426,
+        728575815,
+        4173692615
+      ],
+      "rngStateAfter": [
+        860492640,
+        3427112256,
+        1197503990,
+        2539613504
+      ],
+      "regionClass": "europe"
+    },
+    {
+      "id": "p3d-086",
+      "entityId": "cr:IDN",
+      "regionCode": "IDN",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "male",
+      "age": 30,
+      "calendarYear": 2020,
+      "health": 50,
+      "rngState": [
+        1325167304,
+        2428311615,
+        2005981663,
+        1465857600
+      ],
+      "digest": "233443cee5359c47189e65d93ff6b5bcba6f97395416ec958b29d1100976737e",
+      "baseHazardPpm": 11339,
+      "adjustedHazardPpm": 11339,
+      "healthFactorPpm": 1000000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "50984",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        1325167304,
+        2428311615,
+        2005981663,
+        1465857600
+      ],
+      "rngStateAfter": [
+        834408864,
+        1670593160,
+        1764022688,
+        308854213
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-087",
+      "entityId": "cr:GAB",
+      "regionCode": "GAB",
+      "entityStatus": "enabled",
+      "region": "africa",
+      "sex": "male",
+      "age": 90,
+      "calendarYear": 2017,
+      "health": 100,
+      "rngState": [
+        1588895152,
+        2516341229,
+        886419697,
+        2236630961
+      ],
+      "digest": "0e03a069cbbcb9902235a6dfecde60bcbfe399f80738dfd8e24a99274cf2a1d4",
+      "baseHazardPpm": 1000000,
+      "adjustedHazardPpm": 100000,
+      "healthFactorPpm": 100000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "886135",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        1588895152,
+        2516341229,
+        886419697,
+        2236630961
+      ],
+      "rngStateAfter": [
+        3510048709,
+        591855617,
+        3861062829,
+        2095140089
+      ],
+      "regionClass": "africa"
+    },
+    {
+      "id": "p3d-088",
+      "entityId": "cr:OMN",
+      "regionCode": "OMN",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "male",
+      "age": 1,
+      "calendarYear": 2031,
+      "health": 50,
+      "rngState": [
+        1779186767,
+        56808727,
+        2517302233,
+        46727190
+      ],
+      "digest": "e118cedee9f63afcc0ee925354abb24bcf6b360acef0d721e18f3e756afe23b6",
+      "baseHazardPpm": 5072,
+      "adjustedHazardPpm": 5072,
+      "healthFactorPpm": 1000000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "548654",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        1779186767,
+        56808727,
+        2517302233,
+        46727190
+      ],
+      "rngStateAfter": [
+        3396072386,
+        2909737561,
+        2586706648,
+        1624532238
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-089",
+      "entityId": "cr:NAM",
+      "regionCode": "NAM",
+      "entityStatus": "enabled",
+      "region": "africa",
+      "sex": "male",
+      "age": 45,
+      "calendarYear": 2043,
+      "health": 25,
+      "rngState": [
+        275929559,
+        3018169752,
+        2702322056,
+        4157402256
+      ],
+      "digest": "b89fdbf6ece8817d3a02694bdbb266ad08b52641eac8873fd3af3b8f33ce1e60",
+      "baseHazardPpm": 91655,
+      "adjustedHazardPpm": 137483,
+      "healthFactorPpm": 1500000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "483766",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        275929559,
+        3018169752,
+        2702322056,
+        4157402256
+      ],
+      "rngStateAfter": [
+        492209977,
+        746947911,
+        635168384,
+        1837052488
+      ],
+      "regionClass": "africa"
+    },
+    {
+      "id": "p3d-090",
+      "entityId": "cr:MKD",
+      "regionCode": "MKD",
+      "entityStatus": "enabled",
+      "region": "europe",
+      "sex": "male",
+      "age": 15,
+      "calendarYear": 2048,
+      "health": 0,
+      "rngState": [
+        2222595226,
+        2687477574,
+        4066194647,
+        3485764302
+      ],
+      "digest": "2ea8a606702c616223d7093102d5deab11f052c2edfe4c28cdccbcf9750b4290",
+      "baseHazardPpm": 4882,
+      "adjustedHazardPpm": 9764,
+      "healthFactorPpm": 2000000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "738127",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        2222595226,
+        2687477574,
+        4066194647,
+        3485764302
+      ],
+      "rngStateAfter": [
+        1693842790,
+        351279700,
+        3555099487,
+        644064379
+      ],
+      "regionClass": "europe"
+    },
+    {
+      "id": "p3d-091",
+      "entityId": "cr:ZMB",
+      "regionCode": "ZMB",
+      "entityStatus": "enabled",
+      "region": "africa",
+      "sex": "female",
+      "age": 5,
+      "calendarYear": 2010,
+      "health": 100,
+      "rngState": [
+        3629645718,
+        2615279289,
+        2183848146,
+        1677270892
+      ],
+      "digest": "2f131d74a3f179da789cbd84486192d79ec350bdc17f2a5c4496be3e5deb9252",
+      "baseHazardPpm": 7237,
+      "adjustedHazardPpm": 724,
+      "healthFactorPpm": 100000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "668292",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        3629645718,
+        2615279289,
+        2183848146,
+        1677270892
+      ],
+      "rngStateAfter": [
+        652038270,
+        2018743034,
+        2148305159,
+        2456938548
+      ],
+      "regionClass": "africa"
+    },
+    {
+      "id": "p3d-092",
+      "entityId": "cr:YEM",
+      "regionCode": "YEM",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "female",
+      "age": 120,
+      "calendarYear": 2002,
+      "health": 0,
+      "rngState": [
+        3097085420,
+        448401041,
+        1600795253,
+        3109148105
+      ],
+      "digest": "55417008e6cd92a1011e5bfc334cecc56754e896da63ceea3b6c6acec7b686cd",
+      "baseHazardPpm": 993000,
+      "adjustedHazardPpm": 1000000,
+      "healthFactorPpm": 2000000,
+      "died": true,
+      "causeId": "cause.neutral.circulatory",
+      "mortalityDraw": "138433",
+      "drawsUsed": 4,
+      "rngStateBefore": [
+        3097085420,
+        448401041,
+        1600795253,
+        3109148105
+      ],
+      "rngStateAfter": [
+        787982672,
+        2338706879,
+        3903342612,
+        405165009
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-093",
+      "entityId": "cr:EST",
+      "regionCode": "EST",
+      "entityStatus": "enabled",
+      "region": "europe",
+      "sex": "female",
+      "age": 75,
+      "calendarYear": 2054,
+      "health": 25,
+      "rngState": [
+        2900070188,
+        2430200101,
+        74203331,
+        2197886006
+      ],
+      "digest": "10b6673628e720eb12ed0932ce38f9780f881811109fe21c11f017dfb2032165",
+      "baseHazardPpm": 1000000,
+      "adjustedHazardPpm": 1000000,
+      "healthFactorPpm": 1500000,
+      "died": true,
+      "causeId": "cause.neutral.respiratory",
+      "mortalityDraw": "305653",
+      "drawsUsed": 4,
+      "rngStateBefore": [
+        2900070188,
+        2430200101,
+        74203331,
+        2197886006
+      ],
+      "rngStateAfter": [
+        2658070883,
+        1691705239,
+        2358141750,
+        2321511352
+      ],
+      "regionClass": "europe"
+    },
+    {
+      "id": "p3d-094",
+      "entityId": "cr:ISL",
+      "regionCode": "ISL",
+      "entityStatus": "enabled",
+      "region": "europe",
+      "sex": "male",
+      "age": 90,
+      "calendarYear": 2012,
+      "health": 0,
+      "rngState": [
+        3695448535,
+        413274809,
+        1884040426,
+        4259632342
+      ],
+      "digest": "aec802028fd1baef3c645414779900f8fc238d15b4f0d06625475e05c8da407b",
+      "baseHazardPpm": 984000,
+      "adjustedHazardPpm": 1000000,
+      "healthFactorPpm": 2000000,
+      "died": true,
+      "causeId": "cause.neutral.circulatory",
+      "mortalityDraw": "457179",
+      "drawsUsed": 4,
+      "rngStateBefore": [
+        3695448535,
+        413274809,
+        1884040426,
+        4259632342
+      ],
+      "rngStateAfter": [
+        1240287721,
+        2054222082,
+        4234114448,
+        2960085739
+      ],
+      "regionClass": "europe"
+    },
+    {
+      "id": "p3d-095",
+      "entityId": "cr:LVA",
+      "regionCode": "LVA",
+      "entityStatus": "enabled",
+      "region": "europe",
+      "sex": "male",
+      "age": 120,
+      "calendarYear": 2019,
+      "health": 0,
+      "rngState": [
+        3460419098,
+        276607383,
+        3031536700,
+        637108222
+      ],
+      "digest": "10aa3bccb00ce883a22b20c4fba4df157171dcbf68b29d91c7cb4be22ac03524",
+      "baseHazardPpm": 997000,
+      "adjustedHazardPpm": 1000000,
+      "healthFactorPpm": 2000000,
+      "died": true,
+      "causeId": "cause.neutral.circulatory",
+      "mortalityDraw": "78042",
+      "drawsUsed": 4,
+      "rngStateBefore": [
+        3460419098,
+        276607383,
+        3031536700,
+        637108222
+      ],
+      "rngStateAfter": [
+        3342787340,
+        4111761481,
+        4179826070,
+        1906642110
+      ],
+      "regionClass": "europe"
+    },
+    {
+      "id": "p3d-096",
+      "entityId": "cr:ZWE",
+      "regionCode": "ZWE",
+      "entityStatus": "enabled",
+      "region": "africa",
+      "sex": "male",
+      "age": 0,
+      "calendarYear": 2016,
+      "health": 100,
+      "rngState": [
+        3165553328,
+        3806295055,
+        2857122991,
+        1420372888
+      ],
+      "digest": "fa805bae2424ab27f657fd225d0b07cc59e7402b681540fb75897504657fb5c8",
+      "baseHazardPpm": 8826,
+      "adjustedHazardPpm": 883,
+      "healthFactorPpm": 100000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "782898",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        3165553328,
+        3806295055,
+        2857122991,
+        1420372888
+      ],
+      "rngStateAfter": [
+        1276750468,
+        1458550568,
+        3645267256,
+        196942390
+      ],
+      "regionClass": "africa"
+    },
+    {
+      "id": "p3d-097",
+      "entityId": "cr:GBR",
+      "regionCode": "GBR",
+      "entityStatus": "enabled",
+      "region": "europe",
+      "sex": "female",
+      "age": 75,
+      "calendarYear": 2045,
+      "health": 50,
+      "rngState": [
+        1646013526,
+        868775302,
+        2931916167,
+        1215644602
+      ],
+      "digest": "3bb820aa9d4ff35226b456df7c87931bb1faf96d250b2345b45fddea96eb8266",
+      "baseHazardPpm": 922235,
+      "adjustedHazardPpm": 922235,
+      "healthFactorPpm": 1000000,
+      "died": true,
+      "causeId": "cause.neutral.respiratory",
+      "mortalityDraw": "180965",
+      "drawsUsed": 4,
+      "rngStateBefore": [
+        1646013526,
+        868775302,
+        2931916167,
+        1215644602
+      ],
+      "rngStateAfter": [
+        3094967787,
+        771642709,
+        1191800034,
+        349868382
+      ],
+      "regionClass": "europe"
+    },
+    {
+      "id": "p3d-098",
+      "entityId": "cr:QAT",
+      "regionCode": "QAT",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "female",
+      "age": 15,
+      "calendarYear": 2026,
+      "health": 0,
+      "rngState": [
+        4122496974,
+        383246877,
+        4010511225,
+        488608568
+      ],
+      "digest": "3f9b464c885f72361bd62489a059fab1a674e6a435981408835255e51f5021d1",
+      "baseHazardPpm": 4686,
+      "adjustedHazardPpm": 9372,
+      "healthFactorPpm": 2000000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "504142",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        4122496974,
+        383246877,
+        4010511225,
+        488608568
+      ],
+      "rngStateAfter": [
+        2979868703,
+        1197729526,
+        2202702940,
+        1752670847
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-099",
+      "entityId": "cr:SSD",
+      "regionCode": "SSD",
+      "entityStatus": "enabled",
+      "region": "africa",
+      "sex": "male",
+      "age": 0,
+      "calendarYear": 2033,
+      "health": 25,
+      "rngState": [
+        2655162915,
+        1482676981,
+        4069630818,
+        903568095
+      ],
+      "digest": "bdd583a77576bf77ae483387f7000d9eb9231ccd9162cbc67030a33d3c3be603",
+      "baseHazardPpm": 9845,
+      "adjustedHazardPpm": 14768,
+      "healthFactorPpm": 1500000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "535515",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        2655162915,
+        1482676981,
+        4069630818,
+        903568095
+      ],
+      "rngStateAfter": [
+        3813386961,
+        338436860,
+        964141384,
+        1841741956
+      ],
+      "regionClass": "africa"
+    },
+    {
+      "id": "p3d-100",
+      "entityId": "cr:CPV",
+      "regionCode": "CPV",
+      "entityStatus": "enabled",
+      "region": "africa",
+      "sex": "male",
+      "age": 30,
+      "calendarYear": 2035,
+      "health": 0,
+      "rngState": [
+        1029562793,
+        2152854439,
+        2461724943,
+        3904150433
+      ],
+      "digest": "459fe9e9cc3de53d5aee505bd5abd752940f82b81515b53459224ef302964af8",
+      "baseHazardPpm": 25397,
+      "adjustedHazardPpm": 50794,
+      "healthFactorPpm": 2000000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "282927",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        1029562793,
+        2152854439,
+        2461724943,
+        3904150433
+      ],
+      "rngStateAfter": [
+        1364089321,
+        1980642312,
+        880727305,
+        3061985319
+      ],
+      "regionClass": "africa"
+    },
+    {
+      "id": "p3d-101",
+      "entityId": "cr:IRN",
+      "regionCode": "IRN",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "female",
+      "age": 120,
+      "calendarYear": 2043,
+      "health": 100,
+      "rngState": [
+        3951889555,
+        2213951847,
+        3486847393,
+        1531955768
+      ],
+      "digest": "9fbf57079af57053ae71e2612cb230bbeede2a1b42a870673b35e57b698dc1ba",
+      "baseHazardPpm": 1000000,
+      "adjustedHazardPpm": 100000,
+      "healthFactorPpm": 100000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "415611",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        3951889555,
+        2213951847,
+        3486847393,
+        1531955768
+      ],
+      "rngStateAfter": [
+        1526736220,
+        1555040427,
+        2807465726,
+        2798945089
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-102",
+      "entityId": "cr:HKG",
+      "regionCode": "HKG",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "female",
+      "age": 120,
+      "calendarYear": 2054,
+      "health": 25,
+      "rngState": [
+        1656416214,
+        2747748478,
+        3829672840,
+        968243136
+      ],
+      "digest": "7c2476a58de202d11bf433535fe07f27920e47ddc82f842339ef235c4579b110",
+      "baseHazardPpm": 1000000,
+      "adjustedHazardPpm": 1000000,
+      "healthFactorPpm": 1500000,
+      "died": true,
+      "causeId": "cause.neutral.circulatory",
+      "mortalityDraw": "390725",
+      "drawsUsed": 4,
+      "rngStateBefore": [
+        1656416214,
+        2747748478,
+        3829672840,
+        968243136
+      ],
+      "rngStateAfter": [
+        4251015921,
+        768629227,
+        2977373008,
+        672686826
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-103",
+      "entityId": "cr:GEO",
+      "regionCode": "GEO",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "male",
+      "age": 0,
+      "calendarYear": 2053,
+      "health": 100,
+      "rngState": [
+        2303930483,
+        1006381300,
+        194681488,
+        2809209881
+      ],
+      "digest": "638c7be2181b8a9df473600676d727a47ada1383113057523c5d3b579a7183f1",
+      "baseHazardPpm": 5179,
+      "adjustedHazardPpm": 518,
+      "healthFactorPpm": 100000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "240199",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        2303930483,
+        1006381300,
+        194681488,
+        2809209881
+      ],
+      "rngStateAfter": [
+        3297563245,
+        3597925482,
+        71454845,
+        2541198986
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-104",
+      "entityId": "cr:RWA",
+      "regionCode": "RWA",
+      "entityStatus": "enabled",
+      "region": "africa",
+      "sex": "female",
+      "age": 0,
+      "calendarYear": 2011,
+      "health": 100,
+      "rngState": [
+        4197416604,
+        1254022680,
+        1940309935,
+        3643746673
+      ],
+      "digest": "31e57f88ab8e1716d5daaf2083eb501e1966859c4c12806edc621beea6a60b9f",
+      "baseHazardPpm": 6774,
+      "adjustedHazardPpm": 677,
+      "healthFactorPpm": 100000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "335080",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        4197416604,
+        1254022680,
+        1940309935,
+        3643746673
+      ],
+      "rngStateAfter": [
+        624075330,
+        1589405677,
+        4081407686,
+        1633532516
+      ],
+      "regionClass": "africa"
+    },
+    {
+      "id": "p3d-105",
+      "entityId": "cr:LKA",
+      "regionCode": "LKA",
+      "entityStatus": "enabled",
+      "region": "asia",
+      "sex": "female",
+      "age": 45,
+      "calendarYear": 2037,
+      "health": 0,
+      "rngState": [
+        2798408209,
+        205008345,
+        599294664,
+        4144265344
+      ],
+      "digest": "725086b4939815037ff7ded8f6bea98b367aac6bb59c6ea172ef7347fec825e7",
+      "baseHazardPpm": 40561,
+      "adjustedHazardPpm": 81122,
+      "healthFactorPpm": 2000000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "134735",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        2798408209,
+        205008345,
+        599294664,
+        4144265344
+      ],
+      "rngStateAfter": [
+        907425169,
+        563320977,
+        824534417,
+        831966047
+      ],
+      "regionClass": "asia"
+    },
+    {
+      "id": "p3d-106",
+      "entityId": "cr:CAN",
+      "regionCode": "CAN",
+      "entityStatus": "enabled",
+      "region": "americas",
+      "sex": "female",
+      "age": 45,
+      "calendarYear": 2027,
+      "health": 100,
+      "rngState": [
+        1735530218,
+        2112334247,
+        3657142673,
+        2113033439
+      ],
+      "digest": "2ff4c4f7215c651a74fcb8085c9672e3ddf485fd7712538e5a38d2e6881d7e34",
+      "baseHazardPpm": 46762,
+      "adjustedHazardPpm": 4676,
+      "healthFactorPpm": 100000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "275304",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        1735530218,
+        2112334247,
+        3657142673,
+        2113033439
+      ],
+      "rngStateAfter": [
+        199361870,
+        3587378229,
+        3403717353,
+        796320612
+      ],
+      "regionClass": "americas"
+    },
+    {
+      "id": "p3d-107",
+      "entityId": "cr:SLB",
+      "regionCode": "SLB",
+      "entityStatus": "enabled",
+      "region": "oceania",
+      "sex": "female",
+      "age": 90,
+      "calendarYear": 2058,
+      "health": 100,
+      "rngState": [
+        1845074124,
+        1280906942,
+        210146006,
+        1634569345
+      ],
+      "digest": "36f3fab95c89ba5fa539f9078357bb14084e35ce147c1d53de0d888bf8889482",
+      "baseHazardPpm": 991000,
+      "adjustedHazardPpm": 99100,
+      "healthFactorPpm": 100000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "433584",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        1845074124,
+        1280906942,
+        210146006,
+        1634569345
+      ],
+      "rngStateAfter": [
+        3376080702,
+        3199821901,
+        3752213737,
+        3207490639
+      ],
+      "regionClass": "oceania"
+    },
+    {
+      "id": "p3d-108",
+      "entityId": "cr:CAF",
+      "regionCode": "CAF",
+      "entityStatus": "enabled",
+      "region": "africa",
+      "sex": "female",
+      "age": 1,
+      "calendarYear": 2003,
+      "health": 0,
+      "rngState": [
+        3691393655,
+        1024552312,
+        1461769711,
+        2268549697
+      ],
+      "digest": "8062a87fb47aa357e5aca9c411da648a1ec486bda5cd2a5c8333ea0e62064fc2",
+      "baseHazardPpm": 7696,
+      "adjustedHazardPpm": 15392,
+      "healthFactorPpm": 2000000,
+      "died": false,
+      "causeId": null,
+      "mortalityDraw": "638847",
+      "drawsUsed": 2,
+      "rngStateBefore": [
+        3691393655,
+        1024552312,
+        1461769711,
+        2268549697
+      ],
+      "rngStateAfter": [
+        3790490239,
+        2045481014,
+        2697583318,
+        1916374078
+      ],
+      "regionClass": "africa"
+    }
+  ]
+}

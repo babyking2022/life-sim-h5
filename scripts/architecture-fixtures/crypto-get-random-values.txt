@@ -1,0 +1,1 @@
+export const value = crypto.getRandomValues(new Uint8Array(1));

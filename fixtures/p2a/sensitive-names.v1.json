@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "p2a-1",
+  "dataVersion": "1.0.0",
+  "dataset": "sensitive-names",
+  "records": [
+    {
+      "entityId": "cr:HKG",
+      "displayNameZhHans": "中国香港特别行政区",
+      "reviewStatus": "approved",
+      "reviewedBy": "P2-A fixture review (placeholder)",
+      "reviewedAt": "2026-10-27",
+      "note": "敏感名稱集中在這張映射表；顯示名稱與審核狀態由法務／產品審核，不寫進程式碼或 registry。"
+    },
+    {
+      "entityId": "cr:MAC",
+      "displayNameZhHans": "中国澳门特别行政区",
+      "reviewStatus": "approved",
+      "reviewedBy": "P2-A fixture review (placeholder)",
+      "reviewedAt": "2026-10-27",
+      "note": "敏感名稱集中在這張映射表；顯示名稱與審核狀態由法務／產品審核，不寫進程式碼或 registry。"
+    },
+    {
+      "entityId": "cr:TWN",
+      "displayNameZhHans": "中国台湾地区",
+      "reviewStatus": "approved",
+      "reviewedBy": "P2-A fixture review (placeholder)",
+      "reviewedAt": "2026-10-27",
+      "note": "敏感名稱集中在這張映射表；顯示名稱與審核狀態由法務／產品審核，不寫進程式碼或 registry。"
+    }
+  ]
+}

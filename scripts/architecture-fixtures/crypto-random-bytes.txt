@@ -1,0 +1,1 @@
+export const value = crypto.randomBytes(1);

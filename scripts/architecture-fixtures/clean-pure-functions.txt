@@ -1,0 +1,15 @@
+export function add(a: number, b: number): number {
+  return a + b;
+}
+
+export function clamp(value: number, min: number, max: number): number {
+  return Math.min(Math.max(value, min), max);
+}
+
+export function sum(values: readonly number[]): number {
+  return values.reduce((total, item) => total + item, 0);
+}
+
+export function roundHalfEven(value: number): number {
+  return Math.round(value * 2) / 2;
+}

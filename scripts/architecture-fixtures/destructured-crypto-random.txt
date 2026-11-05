@@ -1,0 +1,3 @@
+const { getRandomValues: fill } = crypto;
+
+export const value = fill;

@@ -1,0 +1,3 @@
+import { randomUUID as makeId } from "crypto";
+
+export const value = makeId;

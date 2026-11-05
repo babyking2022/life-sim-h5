@@ -1,0 +1,274 @@
+{
+  "schemaVersion": "p3b-1",
+  "contentPackVersion": "1.0.0",
+  "dataset": "events",
+  "records": [
+    {
+      "eventId": "ev.p3c.child.decision",
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.0.0",
+      "kind": "decision",
+      "localizationKey": "p3c.child.decision",
+      "ageMin": 5,
+      "ageMax": 5,
+      "lifeStages": [
+        "childhood"
+      ],
+      "conditions": null,
+      "weight": 1,
+      "priority": 100,
+      "once": true,
+      "cooldownYears": 0,
+      "exclusiveGroup": "p3c.choice",
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "openDecision",
+          "decisionId": "dec.p3c.choice"
+        }
+      ],
+      "decision": {
+        "decisionId": "dec.p3c.choice",
+        "promptKey": "p3c.child.decision.prompt",
+        "options": [
+          {
+            "optionId": "alpha",
+            "labelKey": "p3c.child.decision.alpha",
+            "effects": [
+              {
+                "type": "stat",
+                "stat": "happiness",
+                "delta": 5
+              },
+              {
+                "type": "flag",
+                "flag": "p3c:alpha",
+                "action": "add"
+              }
+            ]
+          },
+          {
+            "optionId": "beta",
+            "labelKey": "p3c.child.decision.beta",
+            "effects": [
+              {
+                "type": "money",
+                "field": "balanceMicroUsd",
+                "deltaMicroUsd": "1000000"
+              },
+              {
+                "type": "flag",
+                "flag": "p3c:beta",
+                "action": "add"
+              }
+            ]
+          }
+        ]
+      },
+      "sourceId": "p3c-synthetic-events-v1-source"
+    },
+    {
+      "eventId": "ev.p3c.cooldown",
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.0.0",
+      "kind": "ordinary",
+      "localizationKey": "p3c.cooldown",
+      "ageMin": 6,
+      "ageMax": 120,
+      "lifeStages": [
+        "childhood",
+        "adolescence",
+        "adulthood",
+        "later_life"
+      ],
+      "conditions": null,
+      "weight": 1,
+      "priority": 0,
+      "once": false,
+      "cooldownYears": 3,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "stat",
+          "stat": "relationships",
+          "delta": 2
+        }
+      ],
+      "decision": null,
+      "sourceId": "p3c-synthetic-events-v1-source"
+    },
+    {
+      "eventId": "ev.p3c.guardian.only",
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.0.0",
+      "kind": "ordinary",
+      "localizationKey": "p3c.guardian_only",
+      "ageMin": 6,
+      "ageMax": 120,
+      "lifeStages": [
+        "childhood",
+        "adolescence",
+        "adulthood",
+        "later_life"
+      ],
+      "conditions": {
+        "op": "contentMode",
+        "mode": "guardian"
+      },
+      "weight": 1,
+      "priority": 0,
+      "once": false,
+      "cooldownYears": 0,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "stat",
+          "stat": "happiness",
+          "delta": 1
+        }
+      ],
+      "decision": null,
+      "sourceId": "p3c-synthetic-events-v1-source"
+    },
+    {
+      "eventId": "ev.p3c.informational",
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.0.0",
+      "kind": "ordinary",
+      "localizationKey": "p3c.informational",
+      "ageMin": 6,
+      "ageMax": 120,
+      "lifeStages": [
+        "childhood",
+        "adolescence",
+        "adulthood",
+        "later_life"
+      ],
+      "conditions": {
+        "op": "flag",
+        "flag": "p3c:ordinary",
+        "present": true
+      },
+      "weight": 1,
+      "priority": 0,
+      "once": false,
+      "cooldownYears": 0,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "informational"
+        }
+      ],
+      "decision": null,
+      "sourceId": "p3c-synthetic-events-v1-source"
+    },
+    {
+      "eventId": "ev.p3c.late",
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.0.0",
+      "kind": "ordinary",
+      "localizationKey": "p3c.late",
+      "ageMin": 60,
+      "ageMax": 120,
+      "lifeStages": [
+        "later_life"
+      ],
+      "conditions": null,
+      "weight": 1,
+      "priority": 0,
+      "once": false,
+      "cooldownYears": 0,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "stat",
+          "stat": "health",
+          "delta": -5
+        }
+      ],
+      "decision": null,
+      "sourceId": "p3c-synthetic-events-v1-source"
+    },
+    {
+      "eventId": "ev.p3c.once",
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.0.0",
+      "kind": "ordinary",
+      "localizationKey": "p3c.once",
+      "ageMin": 6,
+      "ageMax": 120,
+      "lifeStages": [
+        "childhood",
+        "adolescence",
+        "adulthood",
+        "later_life"
+      ],
+      "conditions": null,
+      "weight": 1,
+      "priority": 0,
+      "once": true,
+      "cooldownYears": 0,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "stat",
+          "stat": "knowledge",
+          "delta": 3
+        }
+      ],
+      "decision": null,
+      "sourceId": "p3c-synthetic-events-v1-source"
+    },
+    {
+      "eventId": "ev.p3c.ordinary",
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.0.0",
+      "kind": "ordinary",
+      "localizationKey": "p3c.ordinary",
+      "ageMin": 6,
+      "ageMax": 120,
+      "lifeStages": [
+        "childhood",
+        "adolescence",
+        "adulthood",
+        "later_life"
+      ],
+      "conditions": null,
+      "weight": 5,
+      "priority": 0,
+      "once": false,
+      "cooldownYears": 0,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "stat",
+          "stat": "health",
+          "delta": 2
+        },
+        {
+          "type": "stat",
+          "stat": "happiness",
+          "delta": -1
+        },
+        {
+          "type": "money",
+          "field": "balanceMicroUsd",
+          "deltaMicroUsd": "500000"
+        },
+        {
+          "type": "flag",
+          "flag": "p3c:ordinary",
+          "action": "add"
+        }
+      ],
+      "decision": null,
+      "sourceId": "p3c-synthetic-events-v1-source"
+    }
+  ]
+}

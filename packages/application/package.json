@@ -1,0 +1,17 @@
+{
+  "name": "@life-sim/application",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@life-sim/contracts": "workspace:*",
+    "@life-sim/birth": "workspace:*",
+    "@life-sim/engine": "workspace:*",
+    "@life-sim/save": "workspace:*",
+    "@life-sim/simulation": "workspace:*"
+  }
+}

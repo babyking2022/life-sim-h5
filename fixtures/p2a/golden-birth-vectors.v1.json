@@ -1,0 +1,1402 @@
+{
+  "schemaVersion": "p2a-1",
+  "dataVersion": "1.0.0",
+  "packId": "p2a-synthetic-20261027",
+  "packChecksum": "c6d7e9261060e5ecacb1de2c7823d39dec12d6b4142512a6d3c1f10529f54c7b",
+  "generatedAt": "2026-10-27",
+  "caseCount": 48,
+  "cases": [
+    {
+      "id": "001-random",
+      "seed": "LS-TP-001",
+      "birthYear": 2024,
+      "sexPolicy": "random",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:KGZ",
+        "regionCode": "KGZ",
+        "region": "asia",
+        "displayNameZhHans": "吉尔吉斯斯坦",
+        "sex": "male",
+        "birthYear": 2024,
+        "weightBandId": "3000_3499",
+        "weightGrams": 3455,
+        "weightBandIndex": 2,
+        "rng": {
+          "state": [
+            791662133,
+            2254897441,
+            2403988286,
+            3244817677
+          ],
+          "draws": 4
+        },
+        "drawHash": "ff4007ffe9df0dd088e8edec83aeb07e46cea2454d97eb205b7008acb5f803ca"
+      }
+    },
+    {
+      "id": "002-female",
+      "seed": "LS-TP-001",
+      "birthYear": 2024,
+      "sexPolicy": "female",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:KGZ",
+        "regionCode": "KGZ",
+        "region": "asia",
+        "displayNameZhHans": "吉尔吉斯斯坦",
+        "sex": "female",
+        "birthYear": 2024,
+        "weightBandId": "2500_2999",
+        "weightGrams": 2666,
+        "weightBandIndex": 1,
+        "rng": {
+          "state": [
+            2458862358,
+            1050359275,
+            3366107874,
+            579048503
+          ],
+          "draws": 3
+        },
+        "drawHash": "1f4e542e1db48ff424481076f3d736d3357ae3c5ab2572ecd2f058a46b72b4c1"
+      }
+    },
+    {
+      "id": "003-male",
+      "seed": "LS-TP-001",
+      "birthYear": 2024,
+      "sexPolicy": "male",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:KGZ",
+        "regionCode": "KGZ",
+        "region": "asia",
+        "displayNameZhHans": "吉尔吉斯斯坦",
+        "sex": "male",
+        "birthYear": 2024,
+        "weightBandId": "2500_2999",
+        "weightGrams": 2666,
+        "weightBandIndex": 1,
+        "rng": {
+          "state": [
+            2458862358,
+            1050359275,
+            3366107874,
+            579048503
+          ],
+          "draws": 3
+        },
+        "drawHash": "ff11e7439ff623f0da1a2761f3dd511c624530c1aa9fc2daf08c703a50f300b7"
+      }
+    },
+    {
+      "id": "004-random",
+      "seed": "p2a-seed-01",
+      "birthYear": 2024,
+      "sexPolicy": "random",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:IRQ",
+        "regionCode": "IRQ",
+        "region": "asia",
+        "displayNameZhHans": "伊拉克",
+        "sex": "female",
+        "birthYear": 2024,
+        "weightBandId": "3500_3999",
+        "weightGrams": 3776,
+        "weightBandIndex": 3,
+        "rng": {
+          "state": [
+            233511777,
+            1714821696,
+            2991665513,
+            2161795148
+          ],
+          "draws": 4
+        },
+        "drawHash": "c42c1ac3af6655c68a62a576a988b4369740ead977c174be3810631980e152e5"
+      }
+    },
+    {
+      "id": "005-female",
+      "seed": "p2a-seed-01",
+      "birthYear": 2024,
+      "sexPolicy": "female",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:IRQ",
+        "regionCode": "IRQ",
+        "region": "asia",
+        "displayNameZhHans": "伊拉克",
+        "sex": "female",
+        "birthYear": 2024,
+        "weightBandId": "2500_2999",
+        "weightGrams": 2856,
+        "weightBandIndex": 1,
+        "rng": {
+          "state": [
+            1220927617,
+            4191010925,
+            1335712197,
+            3044221121
+          ],
+          "draws": 3
+        },
+        "drawHash": "b971167bfedcbacfbd7a8e3b32aac368475e8850051bf90ffce01e65d63819b1"
+      }
+    },
+    {
+      "id": "006-male",
+      "seed": "p2a-seed-01",
+      "birthYear": 2024,
+      "sexPolicy": "male",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:IRQ",
+        "regionCode": "IRQ",
+        "region": "asia",
+        "displayNameZhHans": "伊拉克",
+        "sex": "male",
+        "birthYear": 2024,
+        "weightBandId": "2500_2999",
+        "weightGrams": 2856,
+        "weightBandIndex": 1,
+        "rng": {
+          "state": [
+            1220927617,
+            4191010925,
+            1335712197,
+            3044221121
+          ],
+          "draws": 3
+        },
+        "drawHash": "e0fd5c05b46b4a53afdb998aad1e60ab6bffad04d1b8b4655818c0c5dc87635c"
+      }
+    },
+    {
+      "id": "007-random",
+      "seed": "p2a-seed-02",
+      "birthYear": 2024,
+      "sexPolicy": "random",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:CHL",
+        "regionCode": "CHL",
+        "region": "americas",
+        "displayNameZhHans": "智利",
+        "sex": "male",
+        "birthYear": 2024,
+        "weightBandId": "3000_3499",
+        "weightGrams": 3166,
+        "weightBandIndex": 2,
+        "rng": {
+          "state": [
+            3529599040,
+            4233019765,
+            1746221123,
+            761021093
+          ],
+          "draws": 4
+        },
+        "drawHash": "9ebb78dae5a22a2452613b61815877ab941112b0ad4ccc77a28790b68f29021a"
+      }
+    },
+    {
+      "id": "008-female",
+      "seed": "p2a-seed-02",
+      "birthYear": 2024,
+      "sexPolicy": "female",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:CHL",
+        "regionCode": "CHL",
+        "region": "americas",
+        "displayNameZhHans": "智利",
+        "sex": "female",
+        "birthYear": 2024,
+        "weightBandId": "3000_3499",
+        "weightGrams": 3058,
+        "weightBandIndex": 2,
+        "rng": {
+          "state": [
+            1359001935,
+            2356902077,
+            2852803780,
+            1539244602
+          ],
+          "draws": 3
+        },
+        "drawHash": "d256bc2a2d7efdad26c5fdb880e4ff0aa3be2d77b6805b5a337957314f3b55d7"
+      }
+    },
+    {
+      "id": "009-male",
+      "seed": "p2a-seed-02",
+      "birthYear": 2024,
+      "sexPolicy": "male",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:CHL",
+        "regionCode": "CHL",
+        "region": "americas",
+        "displayNameZhHans": "智利",
+        "sex": "male",
+        "birthYear": 2024,
+        "weightBandId": "3000_3499",
+        "weightGrams": 3058,
+        "weightBandIndex": 2,
+        "rng": {
+          "state": [
+            1359001935,
+            2356902077,
+            2852803780,
+            1539244602
+          ],
+          "draws": 3
+        },
+        "drawHash": "78c626caaf41f2c60ed7b73c4f0f7e6e4d1fd23eebf6cebd164ef1ac361335c9"
+      }
+    },
+    {
+      "id": "010-random",
+      "seed": "p2a-seed-03",
+      "birthYear": 2024,
+      "sexPolicy": "random",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:POL",
+        "regionCode": "POL",
+        "region": "europe",
+        "displayNameZhHans": "波兰",
+        "sex": "female",
+        "birthYear": 2024,
+        "weightBandId": "3500_3999",
+        "weightGrams": 3953,
+        "weightBandIndex": 3,
+        "rng": {
+          "state": [
+            3572150303,
+            3641917140,
+            2766672086,
+            604142807
+          ],
+          "draws": 4
+        },
+        "drawHash": "46464ec2ac184fe8691eb3fb4e5196ffffa2eec28c408e8d0171f3cec209f7c9"
+      }
+    },
+    {
+      "id": "011-female",
+      "seed": "p2a-seed-03",
+      "birthYear": 2024,
+      "sexPolicy": "female",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:POL",
+        "regionCode": "POL",
+        "region": "europe",
+        "displayNameZhHans": "波兰",
+        "sex": "female",
+        "birthYear": 2024,
+        "weightBandId": "2500_2999",
+        "weightGrams": 2920,
+        "weightBandIndex": 1,
+        "rng": {
+          "state": [
+            129571109,
+            3071280772,
+            2466657699,
+            4272369649
+          ],
+          "draws": 3
+        },
+        "drawHash": "ad359d19165cb3af1b80996bb9d46ef6d5e7c97ee62ef20e2ad16070a49d6fd8"
+      }
+    },
+    {
+      "id": "012-male",
+      "seed": "p2a-seed-03",
+      "birthYear": 2024,
+      "sexPolicy": "male",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:POL",
+        "regionCode": "POL",
+        "region": "europe",
+        "displayNameZhHans": "波兰",
+        "sex": "male",
+        "birthYear": 2024,
+        "weightBandId": "2500_2999",
+        "weightGrams": 2920,
+        "weightBandIndex": 1,
+        "rng": {
+          "state": [
+            129571109,
+            3071280772,
+            2466657699,
+            4272369649
+          ],
+          "draws": 3
+        },
+        "drawHash": "8ca6a61374893f0b3d5483a026dd8ee41479f12bbc53dbe3272f513a32447b7a"
+      }
+    },
+    {
+      "id": "013-random",
+      "seed": "p2a-seed-04",
+      "birthYear": 2024,
+      "sexPolicy": "random",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:SLB",
+        "regionCode": "SLB",
+        "region": "oceania",
+        "displayNameZhHans": "所罗门群岛",
+        "sex": "male",
+        "birthYear": 2024,
+        "weightBandId": "2500_2999",
+        "weightGrams": 2622,
+        "weightBandIndex": 1,
+        "rng": {
+          "state": [
+            2571272290,
+            3325358836,
+            3889756061,
+            3455849928
+          ],
+          "draws": 4
+        },
+        "drawHash": "d61e6a12eeef2d851d1eb837f0cf29d6f2d01a3665045364b49d204daa9ef2cc"
+      }
+    },
+    {
+      "id": "014-female",
+      "seed": "p2a-seed-04",
+      "birthYear": 2024,
+      "sexPolicy": "female",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:SLB",
+        "regionCode": "SLB",
+        "region": "oceania",
+        "displayNameZhHans": "所罗门群岛",
+        "sex": "female",
+        "birthYear": 2024,
+        "weightBandId": "2500_2999",
+        "weightGrams": 2978,
+        "weightBandIndex": 1,
+        "rng": {
+          "state": [
+            1027118221,
+            2913330452,
+            887072496,
+            2965786233
+          ],
+          "draws": 3
+        },
+        "drawHash": "b13e5475dab4b006c6bd92f6072dc914516b912c11ec5a9285f50bed9c56f7d0"
+      }
+    },
+    {
+      "id": "015-male",
+      "seed": "p2a-seed-04",
+      "birthYear": 2024,
+      "sexPolicy": "male",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:SLB",
+        "regionCode": "SLB",
+        "region": "oceania",
+        "displayNameZhHans": "所罗门群岛",
+        "sex": "male",
+        "birthYear": 2024,
+        "weightBandId": "2500_2999",
+        "weightGrams": 2978,
+        "weightBandIndex": 1,
+        "rng": {
+          "state": [
+            1027118221,
+            2913330452,
+            887072496,
+            2965786233
+          ],
+          "draws": 3
+        },
+        "drawHash": "ce81ac70f3459ce1072094dc6ded6b16ffc106630b0d777f45a5f641c711cc79"
+      }
+    },
+    {
+      "id": "016-random",
+      "seed": "p2a-seed-05",
+      "birthYear": 2024,
+      "sexPolicy": "random",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:KWT",
+        "regionCode": "KWT",
+        "region": "asia",
+        "displayNameZhHans": "科威特",
+        "sex": "male",
+        "birthYear": 2024,
+        "weightBandId": "2500_2999",
+        "weightGrams": 2790,
+        "weightBandIndex": 1,
+        "rng": {
+          "state": [
+            2693498443,
+            531967813,
+            3385984065,
+            2726202677
+          ],
+          "draws": 4
+        },
+        "drawHash": "62fa302ced038e82ed00ad1eba942daa4c8991399a356b9e0897a32561ad8b20"
+      }
+    },
+    {
+      "id": "017-female",
+      "seed": "p2a-seed-05",
+      "birthYear": 2024,
+      "sexPolicy": "female",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:KWT",
+        "regionCode": "KWT",
+        "region": "asia",
+        "displayNameZhHans": "科威特",
+        "sex": "female",
+        "birthYear": 2024,
+        "weightBandId": "lt_2500",
+        "weightGrams": 2486,
+        "weightBandIndex": 0,
+        "rng": {
+          "state": [
+            2627312439,
+            1866160351,
+            1736696044,
+            4120709746
+          ],
+          "draws": 3
+        },
+        "drawHash": "ab9608ac3f790d6c66d74a5689d0b854b6171c3d9d69abad559365123b046ea9"
+      }
+    },
+    {
+      "id": "018-male",
+      "seed": "p2a-seed-05",
+      "birthYear": 2024,
+      "sexPolicy": "male",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:KWT",
+        "regionCode": "KWT",
+        "region": "asia",
+        "displayNameZhHans": "科威特",
+        "sex": "male",
+        "birthYear": 2024,
+        "weightBandId": "lt_2500",
+        "weightGrams": 2486,
+        "weightBandIndex": 0,
+        "rng": {
+          "state": [
+            2627312439,
+            1866160351,
+            1736696044,
+            4120709746
+          ],
+          "draws": 3
+        },
+        "drawHash": "7e89b8623265b6a06da05a16dd0310fac5df7abeda4348f53c8a926d3dd7786c"
+      }
+    },
+    {
+      "id": "019-random",
+      "seed": "p2a-seed-06",
+      "birthYear": 2024,
+      "sexPolicy": "random",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:NOR",
+        "regionCode": "NOR",
+        "region": "europe",
+        "displayNameZhHans": "挪威",
+        "sex": "female",
+        "birthYear": 2024,
+        "weightBandId": "3000_3499",
+        "weightGrams": 3489,
+        "weightBandIndex": 2,
+        "rng": {
+          "state": [
+            2379410319,
+            85133987,
+            1446791983,
+            802245174
+          ],
+          "draws": 4
+        },
+        "drawHash": "662c2dcd8e787ca7c8a91edc0e3686b5bb35062a6c420db8845698a8ea513349"
+      }
+    },
+    {
+      "id": "020-female",
+      "seed": "p2a-seed-06",
+      "birthYear": 2024,
+      "sexPolicy": "female",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:NOR",
+        "regionCode": "NOR",
+        "region": "europe",
+        "displayNameZhHans": "挪威",
+        "sex": "female",
+        "birthYear": 2024,
+        "weightBandId": "lt_2500",
+        "weightGrams": 1917,
+        "weightBandIndex": 0,
+        "rng": {
+          "state": [
+            3216161426,
+            2183532805,
+            1443426843,
+            4135828017
+          ],
+          "draws": 3
+        },
+        "drawHash": "7c98ea432ce4956961d90591dce393f0bac5f1e535866cff954cbab42b9b3c58"
+      }
+    },
+    {
+      "id": "021-male",
+      "seed": "p2a-seed-06",
+      "birthYear": 2024,
+      "sexPolicy": "male",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:NOR",
+        "regionCode": "NOR",
+        "region": "europe",
+        "displayNameZhHans": "挪威",
+        "sex": "male",
+        "birthYear": 2024,
+        "weightBandId": "lt_2500",
+        "weightGrams": 1917,
+        "weightBandIndex": 0,
+        "rng": {
+          "state": [
+            3216161426,
+            2183532805,
+            1443426843,
+            4135828017
+          ],
+          "draws": 3
+        },
+        "drawHash": "8f73a3b339a32824f61ab2a849ffa60d7776f1bcf96dfca0b7cae2fe4c74d908"
+      }
+    },
+    {
+      "id": "022-random",
+      "seed": "p2a-seed-07",
+      "birthYear": 2024,
+      "sexPolicy": "random",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:CHE",
+        "regionCode": "CHE",
+        "region": "europe",
+        "displayNameZhHans": "瑞士",
+        "sex": "male",
+        "birthYear": 2024,
+        "weightBandId": "lt_2500",
+        "weightGrams": 1863,
+        "weightBandIndex": 0,
+        "rng": {
+          "state": [
+            2551686292,
+            2798231766,
+            172518211,
+            3100675871
+          ],
+          "draws": 4
+        },
+        "drawHash": "3b3b898dfbf1f8f9cf04ae9bdb58e158960958bde400b57963ec9d3755dcc971"
+      }
+    },
+    {
+      "id": "023-female",
+      "seed": "p2a-seed-07",
+      "birthYear": 2024,
+      "sexPolicy": "female",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:CHE",
+        "regionCode": "CHE",
+        "region": "europe",
+        "displayNameZhHans": "瑞士",
+        "sex": "female",
+        "birthYear": 2024,
+        "weightBandId": "3500_3999",
+        "weightGrams": 3894,
+        "weightBandIndex": 3,
+        "rng": {
+          "state": [
+            192538682,
+            1851373651,
+            1281536508,
+            515960556
+          ],
+          "draws": 3
+        },
+        "drawHash": "f8f28f56b54387e88ecb22c89f5ce08fe296bd799399b136b45009cc983790e3"
+      }
+    },
+    {
+      "id": "024-male",
+      "seed": "p2a-seed-07",
+      "birthYear": 2024,
+      "sexPolicy": "male",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:CHE",
+        "regionCode": "CHE",
+        "region": "europe",
+        "displayNameZhHans": "瑞士",
+        "sex": "male",
+        "birthYear": 2024,
+        "weightBandId": "3500_3999",
+        "weightGrams": 3894,
+        "weightBandIndex": 3,
+        "rng": {
+          "state": [
+            192538682,
+            1851373651,
+            1281536508,
+            515960556
+          ],
+          "draws": 3
+        },
+        "drawHash": "598752fa707fd99a2413be9f6cd9da54fca5dc4afd4282588b7ae23526cef94e"
+      }
+    },
+    {
+      "id": "025-random",
+      "seed": "p2a-seed-08",
+      "birthYear": 2024,
+      "sexPolicy": "random",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:UGA",
+        "regionCode": "UGA",
+        "region": "africa",
+        "displayNameZhHans": "乌干达",
+        "sex": "female",
+        "birthYear": 2024,
+        "weightBandId": "3000_3499",
+        "weightGrams": 3076,
+        "weightBandIndex": 2,
+        "rng": {
+          "state": [
+            2377020217,
+            1093486407,
+            2113097947,
+            3326150099
+          ],
+          "draws": 4
+        },
+        "drawHash": "dd1451ef631efd99d41bc1f20593cd51afbd78e48f4f799cf37935fc9bec3185"
+      }
+    },
+    {
+      "id": "026-female",
+      "seed": "p2a-seed-08",
+      "birthYear": 2024,
+      "sexPolicy": "female",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:UGA",
+        "regionCode": "UGA",
+        "region": "africa",
+        "displayNameZhHans": "乌干达",
+        "sex": "female",
+        "birthYear": 2024,
+        "weightBandId": "2500_2999",
+        "weightGrams": 2611,
+        "weightBandIndex": 1,
+        "rng": {
+          "state": [
+            3225822245,
+            2155561054,
+            2126269415,
+            2011946850
+          ],
+          "draws": 3
+        },
+        "drawHash": "4bdec74853fd1dde7ea05987d778953f359621847308b8f0e8d4067550304e31"
+      }
+    },
+    {
+      "id": "027-male",
+      "seed": "p2a-seed-08",
+      "birthYear": 2024,
+      "sexPolicy": "male",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:UGA",
+        "regionCode": "UGA",
+        "region": "africa",
+        "displayNameZhHans": "乌干达",
+        "sex": "male",
+        "birthYear": 2024,
+        "weightBandId": "2500_2999",
+        "weightGrams": 2611,
+        "weightBandIndex": 1,
+        "rng": {
+          "state": [
+            3225822245,
+            2155561054,
+            2126269415,
+            2011946850
+          ],
+          "draws": 3
+        },
+        "drawHash": "ee259b233ff20861ed68b638c3f23497e5932d0a6c24e02b26c6a74a667070c8"
+      }
+    },
+    {
+      "id": "028-random",
+      "seed": "p2a-seed-09",
+      "birthYear": 2024,
+      "sexPolicy": "random",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:COD",
+        "regionCode": "COD",
+        "region": "africa",
+        "displayNameZhHans": "刚果（金）",
+        "sex": "male",
+        "birthYear": 2024,
+        "weightBandId": "2500_2999",
+        "weightGrams": 2882,
+        "weightBandIndex": 1,
+        "rng": {
+          "state": [
+            2955258540,
+            1467079817,
+            3580563247,
+            836630090
+          ],
+          "draws": 4
+        },
+        "drawHash": "7a94864710b87e21420ff4510cc429e7879accc03d980146f7489d3bcb8cc0fe"
+      }
+    },
+    {
+      "id": "029-female",
+      "seed": "p2a-seed-09",
+      "birthYear": 2024,
+      "sexPolicy": "female",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:COD",
+        "regionCode": "COD",
+        "region": "africa",
+        "displayNameZhHans": "刚果（金）",
+        "sex": "female",
+        "birthYear": 2024,
+        "weightBandId": "3000_3499",
+        "weightGrams": 3182,
+        "weightBandIndex": 2,
+        "rng": {
+          "state": [
+            4200832358,
+            3840244635,
+            3617814875,
+            1743091695
+          ],
+          "draws": 3
+        },
+        "drawHash": "f9a7d987c2116ba8ca5b7167ea237cf67d2f2f3ec5a7ec119a5602ee250b7b4b"
+      }
+    },
+    {
+      "id": "030-male",
+      "seed": "p2a-seed-09",
+      "birthYear": 2024,
+      "sexPolicy": "male",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:COD",
+        "regionCode": "COD",
+        "region": "africa",
+        "displayNameZhHans": "刚果（金）",
+        "sex": "male",
+        "birthYear": 2024,
+        "weightBandId": "3000_3499",
+        "weightGrams": 3182,
+        "weightBandIndex": 2,
+        "rng": {
+          "state": [
+            4200832358,
+            3840244635,
+            3617814875,
+            1743091695
+          ],
+          "draws": 3
+        },
+        "drawHash": "4b5c95a69470cd5cacebee429905d5bdf1017e2ad43a1bb759965632820d5d99"
+      }
+    },
+    {
+      "id": "031-random",
+      "seed": "p2a-seed-10",
+      "birthYear": 2024,
+      "sexPolicy": "random",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:ESP",
+        "regionCode": "ESP",
+        "region": "europe",
+        "displayNameZhHans": "西班牙",
+        "sex": "female",
+        "birthYear": 2024,
+        "weightBandId": "2500_2999",
+        "weightGrams": 2671,
+        "weightBandIndex": 1,
+        "rng": {
+          "state": [
+            2787077903,
+            2802134230,
+            2807394393,
+            150748230
+          ],
+          "draws": 4
+        },
+        "drawHash": "9f7354e0cbba20b4563f2f212f2ebf0767467abd31d6c5880212496bec86d61c"
+      }
+    },
+    {
+      "id": "032-female",
+      "seed": "p2a-seed-10",
+      "birthYear": 2024,
+      "sexPolicy": "female",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:ESP",
+        "regionCode": "ESP",
+        "region": "europe",
+        "displayNameZhHans": "西班牙",
+        "sex": "female",
+        "birthYear": 2024,
+        "weightBandId": "3000_3499",
+        "weightGrams": 3012,
+        "weightBandIndex": 2,
+        "rng": {
+          "state": [
+            2413441539,
+            3189497950,
+            2601816274,
+            522166997
+          ],
+          "draws": 3
+        },
+        "drawHash": "487f94644220e7266e89c6f68b639bfe5b1181b61ba9d0ccaebbc3535e076f0b"
+      }
+    },
+    {
+      "id": "033-male",
+      "seed": "p2a-seed-10",
+      "birthYear": 2024,
+      "sexPolicy": "male",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:ESP",
+        "regionCode": "ESP",
+        "region": "europe",
+        "displayNameZhHans": "西班牙",
+        "sex": "male",
+        "birthYear": 2024,
+        "weightBandId": "3000_3499",
+        "weightGrams": 3012,
+        "weightBandIndex": 2,
+        "rng": {
+          "state": [
+            2413441539,
+            3189497950,
+            2601816274,
+            522166997
+          ],
+          "draws": 3
+        },
+        "drawHash": "4915f18070a5993586569938c49dada0988dd7c3df463914cb2394a257804466"
+      }
+    },
+    {
+      "id": "034-random",
+      "seed": "  p2a-padded-seed  ",
+      "birthYear": 2024,
+      "sexPolicy": "random",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:SGP",
+        "regionCode": "SGP",
+        "region": "asia",
+        "displayNameZhHans": "新加坡",
+        "sex": "female",
+        "birthYear": 2024,
+        "weightBandId": "2500_2999",
+        "weightGrams": 2601,
+        "weightBandIndex": 1,
+        "rng": {
+          "state": [
+            551770430,
+            3378140468,
+            4221656011,
+            268493694
+          ],
+          "draws": 4
+        },
+        "drawHash": "b3c931f23172db9e126fb49df895d647a900d857b96e70c462a7e3293df18f9d"
+      }
+    },
+    {
+      "id": "035-female",
+      "seed": "  p2a-padded-seed  ",
+      "birthYear": 2024,
+      "sexPolicy": "female",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:SGP",
+        "regionCode": "SGP",
+        "region": "asia",
+        "displayNameZhHans": "新加坡",
+        "sex": "female",
+        "birthYear": 2024,
+        "weightBandId": "3000_3499",
+        "weightGrams": 3001,
+        "weightBandIndex": 2,
+        "rng": {
+          "state": [
+            1397506620,
+            4030406678,
+            2758644437,
+            3965074184
+          ],
+          "draws": 3
+        },
+        "drawHash": "8c86d40e2f6567b87120cff90e91dca0e2a2ee90e5ef279ab0cb35d3635c27f0"
+      }
+    },
+    {
+      "id": "036-male",
+      "seed": "  p2a-padded-seed  ",
+      "birthYear": 2024,
+      "sexPolicy": "male",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:SGP",
+        "regionCode": "SGP",
+        "region": "asia",
+        "displayNameZhHans": "新加坡",
+        "sex": "male",
+        "birthYear": 2024,
+        "weightBandId": "3000_3499",
+        "weightGrams": 3001,
+        "weightBandIndex": 2,
+        "rng": {
+          "state": [
+            1397506620,
+            4030406678,
+            2758644437,
+            3965074184
+          ],
+          "draws": 3
+        },
+        "drawHash": "962382521cd7d8fc61275e3f526f4b1e6383f6bebb331f08e34af38dfe88b582"
+      }
+    },
+    {
+      "id": "037-random",
+      "seed": "人生-種子-001",
+      "birthYear": 2024,
+      "sexPolicy": "random",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:MNE",
+        "regionCode": "MNE",
+        "region": "europe",
+        "displayNameZhHans": "黑山",
+        "sex": "female",
+        "birthYear": 2024,
+        "weightBandId": "3000_3499",
+        "weightGrams": 3194,
+        "weightBandIndex": 2,
+        "rng": {
+          "state": [
+            3217447034,
+            1537433724,
+            227910205,
+            3034308709
+          ],
+          "draws": 4
+        },
+        "drawHash": "7c31c4ca825fe5921f1ba45641be136c7ecbcf4c19c92099aad5c5827e51f34b"
+      }
+    },
+    {
+      "id": "038-female",
+      "seed": "人生-種子-001",
+      "birthYear": 2024,
+      "sexPolicy": "female",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:MNE",
+        "regionCode": "MNE",
+        "region": "europe",
+        "displayNameZhHans": "黑山",
+        "sex": "female",
+        "birthYear": 2024,
+        "weightBandId": "3000_3499",
+        "weightGrams": 3344,
+        "weightBandIndex": 2,
+        "rng": {
+          "state": [
+            3570795293,
+            310204282,
+            4229764134,
+            1977325409
+          ],
+          "draws": 3
+        },
+        "drawHash": "0370d66daaf64b48d4397c76ac350d4848d38975f90d8fa4cabe5cc4035b956f"
+      }
+    },
+    {
+      "id": "039-male",
+      "seed": "人生-種子-001",
+      "birthYear": 2024,
+      "sexPolicy": "male",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:MNE",
+        "regionCode": "MNE",
+        "region": "europe",
+        "displayNameZhHans": "黑山",
+        "sex": "male",
+        "birthYear": 2024,
+        "weightBandId": "3000_3499",
+        "weightGrams": 3344,
+        "weightBandIndex": 2,
+        "rng": {
+          "state": [
+            3570795293,
+            310204282,
+            4229764134,
+            1977325409
+          ],
+          "draws": 3
+        },
+        "drawHash": "9b02a60231ed915116d9d1718a7d73ce3b03228e16b037556f8916af075bf635"
+      }
+    },
+    {
+      "id": "040-random",
+      "seed": "p2a/seed:with:punct",
+      "birthYear": 2024,
+      "sexPolicy": "random",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:GNB",
+        "regionCode": "GNB",
+        "region": "africa",
+        "displayNameZhHans": "几内亚比绍",
+        "sex": "male",
+        "birthYear": 2024,
+        "weightBandId": "3000_3499",
+        "weightGrams": 3349,
+        "weightBandIndex": 2,
+        "rng": {
+          "state": [
+            3692233944,
+            4044465534,
+            2124476301,
+            2995317493
+          ],
+          "draws": 4
+        },
+        "drawHash": "004a0e9e4cb3356163f888fc1f6032ca2b4fdcc6a1b8f9d8b59ad11dc6aab4fa"
+      }
+    },
+    {
+      "id": "041-female",
+      "seed": "p2a/seed:with:punct",
+      "birthYear": 2024,
+      "sexPolicy": "female",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:GNB",
+        "regionCode": "GNB",
+        "region": "africa",
+        "displayNameZhHans": "几内亚比绍",
+        "sex": "female",
+        "birthYear": 2024,
+        "weightBandId": "3000_3499",
+        "weightGrams": 3360,
+        "weightBandIndex": 2,
+        "rng": {
+          "state": [
+            1063607834,
+            12158651,
+            1630827602,
+            3178859876
+          ],
+          "draws": 3
+        },
+        "drawHash": "e98066495d709ce874f410c4fbb46511bfb3a79545c4938ab2b7b19b493b2ba7"
+      }
+    },
+    {
+      "id": "042-male",
+      "seed": "p2a/seed:with:punct",
+      "birthYear": 2024,
+      "sexPolicy": "male",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:GNB",
+        "regionCode": "GNB",
+        "region": "africa",
+        "displayNameZhHans": "几内亚比绍",
+        "sex": "male",
+        "birthYear": 2024,
+        "weightBandId": "3000_3499",
+        "weightGrams": 3360,
+        "weightBandIndex": 2,
+        "rng": {
+          "state": [
+            1063607834,
+            12158651,
+            1630827602,
+            3178859876
+          ],
+          "draws": 3
+        },
+        "drawHash": "e42eb1b5ca2671b2e273155f414c64a311ac0106b90fc694eea00410f835229b"
+      }
+    },
+    {
+      "id": "043-random",
+      "seed": "p2a-seed-14",
+      "birthYear": 2024,
+      "sexPolicy": "random",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:SEN",
+        "regionCode": "SEN",
+        "region": "africa",
+        "displayNameZhHans": "塞内加尔",
+        "sex": "male",
+        "birthYear": 2024,
+        "weightBandId": "2500_2999",
+        "weightGrams": 2791,
+        "weightBandIndex": 1,
+        "rng": {
+          "state": [
+            252645061,
+            1216727255,
+            2262436084,
+            2203552545
+          ],
+          "draws": 4
+        },
+        "drawHash": "af9fb4282d3aeecabc5d9d3df81b71a24f11094fd56e1681756b25d20b300e88"
+      }
+    },
+    {
+      "id": "044-female",
+      "seed": "p2a-seed-14",
+      "birthYear": 2024,
+      "sexPolicy": "female",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:SEN",
+        "regionCode": "SEN",
+        "region": "africa",
+        "displayNameZhHans": "塞内加尔",
+        "sex": "female",
+        "birthYear": 2024,
+        "weightBandId": "2500_2999",
+        "weightGrams": 2671,
+        "weightBandIndex": 1,
+        "rng": {
+          "state": [
+            4051617865,
+            4251937507,
+            1698833545,
+            1731118750
+          ],
+          "draws": 3
+        },
+        "drawHash": "f4497c7c4bc2cfff0f6c3cb9025aae4b039d7967e8c02143861a800e932d5333"
+      }
+    },
+    {
+      "id": "045-male",
+      "seed": "p2a-seed-14",
+      "birthYear": 2024,
+      "sexPolicy": "male",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:SEN",
+        "regionCode": "SEN",
+        "region": "africa",
+        "displayNameZhHans": "塞内加尔",
+        "sex": "male",
+        "birthYear": 2024,
+        "weightBandId": "2500_2999",
+        "weightGrams": 2671,
+        "weightBandIndex": 1,
+        "rng": {
+          "state": [
+            4051617865,
+            4251937507,
+            1698833545,
+            1731118750
+          ],
+          "draws": 3
+        },
+        "drawHash": "e1663b05fe3c0487dcc9f9fe10bb144c298da86f173c33d3027a3cdc83889320"
+      }
+    },
+    {
+      "id": "046-random",
+      "seed": "p2a-seed-15",
+      "birthYear": 2024,
+      "sexPolicy": "random",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:HKG",
+        "regionCode": "HKG",
+        "region": "asia",
+        "displayNameZhHans": "中国香港特别行政区",
+        "sex": "female",
+        "birthYear": 2024,
+        "weightBandId": "lt_2500",
+        "weightGrams": 2088,
+        "weightBandIndex": 0,
+        "rng": {
+          "state": [
+            1117488346,
+            3139789421,
+            221574445,
+            935108964
+          ],
+          "draws": 4
+        },
+        "drawHash": "005556f01c0d045fc2246c2a97d1738ef4a711eba723d5ca3a59ebf31aaa34cc"
+      }
+    },
+    {
+      "id": "047-female",
+      "seed": "p2a-seed-15",
+      "birthYear": 2024,
+      "sexPolicy": "female",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:HKG",
+        "regionCode": "HKG",
+        "region": "asia",
+        "displayNameZhHans": "中国香港特别行政区",
+        "sex": "female",
+        "birthYear": 2024,
+        "weightBandId": "lt_2500",
+        "weightGrams": 2005,
+        "weightBandIndex": 0,
+        "rng": {
+          "state": [
+            1954669682,
+            4187379491,
+            1160291345,
+            3809132575
+          ],
+          "draws": 3
+        },
+        "drawHash": "096872dbf31adb33b1564cffa2bcecc19120c36289def835f03b1931540247bd"
+      }
+    },
+    {
+      "id": "048-male",
+      "seed": "p2a-seed-15",
+      "birthYear": 2024,
+      "sexPolicy": "male",
+      "draft": {
+        "schemaVersion": "p2a-1",
+        "dataVersion": "1.0.0",
+        "entityId": "cr:HKG",
+        "regionCode": "HKG",
+        "region": "asia",
+        "displayNameZhHans": "中国香港特别行政区",
+        "sex": "male",
+        "birthYear": 2024,
+        "weightBandId": "2500_2999",
+        "weightGrams": 2605,
+        "weightBandIndex": 1,
+        "rng": {
+          "state": [
+            1954669682,
+            4187379491,
+            1160291345,
+            3809132575
+          ],
+          "draws": 3
+        },
+        "drawHash": "364f6f84af1a9abe37ee72f231f677146447b5315cf3d804c3bc453a9c7309bc"
+      }
+    }
+  ]
+}

@@ -1,0 +1,3 @@
+const { now } = Date;
+
+export const value = now();

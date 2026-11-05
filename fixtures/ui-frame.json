@@ -1,0 +1,667 @@
+{
+  "fixtureVersion": "p1c1-ui-frame-v1",
+  "locale": "zh-CN",
+  "build": {
+    "buildId": "p1c1-20261027",
+    "uiVersion": "P1-C.1",
+    "dataSource": "fixtures/ui-frame.json",
+    "note": "静态 fixture：UI 只读取、格式化与显示，不计算人生结果，不接 engine，不写正式存档。"
+  },
+  "chrome": {
+    "appTitle": "人生",
+    "year": "年份",
+    "assets": "资产",
+    "income": "年收入",
+    "pause": "暂停",
+    "resume": "继续",
+    "settings": "设置",
+    "menu": "菜单",
+    "close": "关闭",
+    "next": "下一步",
+    "life": "人生",
+    "family": "家庭",
+    "work": "工作",
+    "map": "地图",
+    "summary": "人生总结",
+    "orientation": "请竖屏使用",
+    "orientationHint": "将手机旋转为竖向，继续你的生活。",
+    "back": "返回",
+    "paused": "时间已暂停",
+    "expand": "展开",
+    "collapse": "收起",
+    "share": "分享",
+    "rebirth": "再次出生",
+    "confirm": "确认",
+    "cancel": "取消"
+  },
+  "header": {
+    "year": 2026,
+    "age": 17,
+    "assetsText": "¥12.9万",
+    "incomeText": "¥3.6万"
+  },
+  "nextStates": {
+    "cards": "下一步",
+    "paused": "暂停",
+    "resume": "继续",
+    "choiceBlocked": "请先选择",
+    "choiceReady": "确认选择",
+    "summary": "查看总结",
+    "hintCards": "年度卡片 · 切换不推进年份",
+    "hintPaused": "已暂停 · 时间不前进",
+    "hintResume": "已继续 · 时间不前进"
+  },
+  "yearCards": [
+    {
+      "page": "1/3",
+      "tag": "当年讯息",
+      "title": "2026年，你17岁。",
+      "lines": [
+        "你完成了高中阶段的重要学习。",
+        "家里今年收入稳定，但仍需为未来做选择。"
+      ],
+      "highlight": "家庭稳定 · 学业阶段完成"
+    },
+    {
+      "page": "2/3",
+      "tag": "当年讯息",
+      "title": "夏天带来了新的可能。",
+      "lines": [
+        "你在旧书桌里找到一本志愿指南。",
+        "家人愿意听你说说，下一步想去哪里。"
+      ],
+      "highlight": "新的方向 · 需要一次决定"
+    },
+    {
+      "page": "3/3",
+      "tag": "当年讯息",
+      "title": "选择之前，先听听自己。",
+      "lines": [
+        "升学、工作或休息一年，都有自己的节奏。",
+        "这一页只是静态演示，不会推进年份。"
+      ],
+      "highlight": "重大抉择 · 尚未确认"
+    }
+  ],
+  "stats": [
+    { "key": "health", "label": "健康", "value": 82, "max": 100, "percent": 82, "tone": "coral" },
+    { "key": "happiness", "label": "幸福", "value": 63, "max": 100, "percent": 63, "tone": "amber" },
+    { "key": "knowledge", "label": "知识", "value": 74, "max": 100, "percent": 74, "tone": "aqua" },
+    { "key": "relationships", "label": "人际关系", "value": 55, "max": 100, "percent": 55, "tone": "violet" }
+  ],
+  "scene": {
+    "caption": "家门前的小路，夏天的风刚刚好。",
+    "alt": "自制的夏日乡村家庭场景：蓝天、远山、木屋、家人和一只小鸡。",
+    "time": "夏 · 午后"
+  },
+  "choice": {
+    "tag": "重大抉择",
+    "title": "高中毕业后，你想先做什么？",
+    "description": "这是一个静态选择。确认后只显示固定后果，不改变年份、资产或状态。",
+    "selectedHint": "已选择：{choice}",
+    "confirm": "确认选择",
+    "disabledHint": "请先选择一个方向",
+    "consequenceTitle": "你选择了继续升学",
+    "consequenceBody": "你决定走进大学，继续学习专业知识。家人支持你的选择，但未来的路仍要自己走。",
+    "consequenceNote": "静态后果演示 · 年份仍为 2026",
+    "consequenceKicker": "选择已记录",
+    "pausedBadge": "时间已暂停",
+    "pausedNote": "重大抉择期间，年份与时间都不会推进。",
+    "remainingLabel": "剩余时间",
+    "remainingValue": "00:00"
+  },
+  "choices": [
+    {
+      "id": "study",
+      "icon": "book",
+      "title": "继续升学",
+      "description": "进入大学，继续学习专业知识。",
+      "tone": "gold",
+      "consequenceTitle": "你选择了继续升学",
+      "consequenceBody": "你决定走进大学，继续学习专业知识。家人支持你的选择，但未来的路仍要自己走。"
+    },
+    {
+      "id": "work",
+      "icon": "briefcase",
+      "title": "开始工作",
+      "description": "进入社会，积累工作经验。",
+      "tone": "blue",
+      "consequenceTitle": "你选择了开始工作",
+      "consequenceBody": "你准备进入社会，先在熟悉的镇上积累经验。收入会慢慢增加，时间也会变得更紧。"
+    },
+    {
+      "id": "rest",
+      "icon": "leaf",
+      "title": "先休息一年",
+      "description": "放慢脚步，思考未来的方向。",
+      "tone": "green",
+      "consequenceTitle": "你选择了先休息一年",
+      "consequenceBody": "你决定放慢脚步，留一点时间给自己。家人没有催促，只希望你找到自己的节奏。"
+    }
+  ],
+  "family": {
+    "heading": "家庭",
+    "subheading": "一起生活的人",
+    "intro": "家里的节奏不快，但每个人都在用自己的方式向前。",
+    "treeLabel": "家庭树",
+    "tree": [
+      { "label": "父母", "nodeIds": ["father", "mother"] },
+      { "label": "你与伴侣", "nodeIds": ["player", "partner"] },
+      { "label": "子女", "nodeIds": [] }
+    ],
+    "player": { "id": "player", "name": "林知遥", "role": "你", "tone": "teal", "initial": "你" },
+    "members": [
+      {
+        "id": "father",
+        "name": "林知远",
+        "role": "父亲",
+        "age": 46,
+        "tone": "blue",
+        "initial": "父",
+        "note": "在镇上做木工，周末喜欢修理旧家具。",
+        "bond": 78,
+        "bondNote": "话不多，但总会把工具递到你手边。",
+        "events": [
+          { "tag": "上周", "title": "一起修好了院门", "body": "他让你自己量尺寸，只在旁边扶着木板。" },
+          { "tag": "今年", "title": "第一次一起送货", "body": "路上他讲了很多年轻时的事，你没打断。" }
+        ]
+      },
+      {
+        "id": "mother",
+        "name": "周岚",
+        "role": "母亲",
+        "age": 44,
+        "tone": "rose",
+        "initial": "母",
+        "note": "照看家里的小菜园，记得每个人的口味。",
+        "bond": 82,
+        "bondNote": "她总能在你开口之前，把话说得轻一点。",
+        "events": [
+          { "tag": "本周", "title": "晚饭多了一道菜", "body": "她把菜园里第一根黄瓜切片，放进了凉面。" },
+          { "tag": "上月", "title": "她留下一盏灯", "body": "你补课回家，门口的灯一直亮着。" }
+        ]
+      },
+      {
+        "id": "sister",
+        "name": "林小满",
+        "role": "妹妹",
+        "age": 14,
+        "tone": "green",
+        "initial": "妹",
+        "note": "正在读初中，梦想是画出整条街的地图。",
+        "bond": 64,
+        "bondNote": "她会抢你的笔，也会把最后一颗糖留给你。",
+        "events": [
+          { "tag": "昨天", "title": "画了第三版地图", "body": "她把木工房画得比学校还大，说是故意的。" },
+          { "tag": "上个月", "title": "第一次自己坐公交", "body": "你在站台等她，她下车时笑得很得意。" }
+        ]
+      },
+      {
+        "id": "partner",
+        "name": "陈雨",
+        "role": "伴侣",
+        "age": 17,
+        "tone": "violet",
+        "initial": "雨",
+        "note": "同班同学，喜欢在放学后和你一起走回家。",
+        "bond": 71,
+        "bondNote": "你们还没有说过以后，但会一起走完那条路。",
+        "events": [
+          { "tag": "上周", "title": "一起躲了一场雨", "body": "屋檐下站了二十分钟，谁都没有先走。" },
+          { "tag": "这个夏天", "title": "她借走了志愿指南", "body": "还回来的时候，书页里夹了一张便签。" }
+        ]
+      }
+    ],
+    "partnerLabel": "伴侣",
+    "partnerEmpty": "还没有伴侣。",
+    "childrenLabel": "子女",
+    "childrenEmpty": {
+      "title": "还没有子女",
+      "body": "人生还很长。子女会在后续阶段出现，这一页只是静态演示。"
+    },
+    "relationshipsLabel": "关系",
+    "relationships": [
+      { "memberId": "father", "label": "与父亲", "value": 78, "percent": 78, "tone": "blue", "note": "尊重 · 少话" },
+      { "memberId": "mother", "label": "与母亲", "value": 82, "percent": 82, "tone": "rose", "note": "亲近 · 被理解" },
+      { "memberId": "sister", "label": "与妹妹", "value": 64, "percent": 64, "tone": "green", "note": "打闹 · 照顾" },
+      { "memberId": "partner", "label": "与伴侣", "value": 71, "percent": 71, "tone": "violet", "note": "安静 · 同行" }
+    ],
+    "homeLabel": "家庭氛围",
+    "homeValue": "温和 · 互相支持",
+    "homeNote": "此页只展示 fixture 中的家庭资料。",
+    "detail": {
+      "back": "返回家庭",
+      "relationLabel": "亲密度",
+      "ageLabel": "年龄",
+      "eventsLabel": "最近的事",
+      "detailLabel": "家人详情",
+      "notFound": "找不到这位家人。"
+    },
+    "moments": [
+      { "tag": "本周", "title": "一起修好了院门", "body": "父亲找出旧木板，妹妹负责递工具。院门又能关上了。" },
+      { "tag": "小确幸", "title": "晚饭多了一道菜", "body": "母亲把菜园里第一根黄瓜切片，放进了凉面。" }
+    ]
+  },
+  "work": {
+    "heading": "工作",
+    "subheading": "用时间换取经验",
+    "intro": "还没有正式工作，但你已经在家里的木工房帮忙。",
+    "tabs": [
+      { "id": "education", "label": "学历" },
+      { "id": "career", "label": "职业" },
+      { "id": "income", "label": "收入" },
+      { "id": "jobs", "label": "求职" },
+      { "id": "retire", "label": "退休" }
+    ],
+    "education": {
+      "heading": "学历",
+      "level": "高中毕业",
+      "school": "青山镇中学",
+      "period": "2023 - 2026",
+      "note": "按目前成绩，可以报考省内本科，也可以先工作。",
+      "rows": [
+        { "label": "最高学历", "value": "高中" },
+        { "label": "毕业年份", "value": "2026" },
+        { "label": "优势科目", "value": "文科" }
+      ]
+    },
+    "career": {
+      "heading": "职业",
+      "jobTitle": "木工房帮手",
+      "jobTag": "临时 · 周末",
+      "employer": "家里的木工房",
+      "period": "2024 至今",
+      "note": "整理工具、打磨木板，偶尔跟着父亲去送货。",
+      "skills": [
+        { "label": "木工基础", "value": 32, "percent": 32, "tone": "amber" },
+        { "label": "沟通协作", "value": 48, "percent": 48, "tone": "aqua" },
+        { "label": "时间管理", "value": 41, "percent": 41, "tone": "violet" }
+      ]
+    },
+    "income": {
+      "heading": "收入",
+      "totalLabel": "年度收入",
+      "total": "¥3.6万",
+      "note": "家庭合计，非个人工资。",
+      "breakdown": [
+        { "label": "家庭经营", "value": "¥2.6万", "tone": "steady" },
+        { "label": "零工收入", "value": "¥0.8万", "tone": "steady" },
+        { "label": "其他", "value": "¥0.2万", "tone": "steady" }
+      ]
+    },
+    "jobs": {
+      "heading": "求职",
+      "intro": "镇上有几处招人的地方，先看看条件。",
+      "action": "查看条件",
+      "sheetNote": "招聘信息为静态 fixture，不会真的投递简历。",
+      "openings": [
+        {
+          "id": "apprentice",
+          "title": "木工学徒",
+          "employer": "镇木器合作社",
+          "pay": "¥2.4万/年",
+          "tag": "全职",
+          "note": "跟着老师傅学两年，能独立做完一套桌椅。",
+          "requirements": ["16 岁以上", "能连续站立作业", "愿意学看图纸"]
+        },
+        {
+          "id": "clerk",
+          "title": "便利店店员",
+          "employer": "县城便利店",
+          "pay": "¥2.1万/年",
+          "tag": "轮班",
+          "note": "两班倒，需要会收银和理货。",
+          "requirements": ["18 岁以上", "能接受夜班", "普通话流利"]
+        },
+        {
+          "id": "assistant",
+          "title": "小学助教",
+          "employer": "青山镇中心小学",
+          "pay": "¥1.8万/年",
+          "tag": "兼职",
+          "note": "协助老师批改作业，每周去三个下午。",
+          "requirements": ["高中以上学历", "有耐心", "每周可到岗三天"]
+        }
+      ]
+    },
+    "retire": {
+      "heading": "退休",
+      "intro": "现在谈退休还早，但可以先看看时间表。",
+      "currentAgeLabel": "现在年龄",
+      "currentAge": "17 岁",
+      "retireAgeLabel": "预计退休",
+      "retireAge": "60 岁",
+      "yearsLabel": "还有",
+      "years": "43 年",
+      "status": "距离退休还有 43 年。",
+      "action": "查看退休测算",
+      "projection": [
+        { "label": "预计缴费年限", "value": "40 年" },
+        { "label": "预计养老金", "value": "¥2.8万/年" },
+        { "label": "静态假设", "value": "不考虑通胀与政策变化" }
+      ],
+      "sheetNote": "退休测算为静态示例，不接正式规则。"
+    },
+    "log": [
+      { "tag": "上周", "title": "第一次独立打磨桌面", "body": "父亲只在旁边看，最后说了一句：比上次稳。" },
+      { "tag": "本月", "title": "记下第一笔工钱", "body": "你把工钱放进抽屉，决定先不花。" }
+    ],
+    "note": "此页只展示 fixture 中的工作资料。"
+  },
+  "map": {
+    "heading": "地图",
+    "subheading": "你熟悉的地方",
+    "intro": "从家出发，步行能到的地方不多，但每一处都有记忆。",
+    "currentCountryId": "cn",
+    "currentLabel": "当前所在国家／地区",
+    "statsLabel": "国家统计",
+    "switchLabel": "切换国家",
+    "currentBadge": "当前",
+    "countries": [
+      {
+        "id": "cn",
+        "name": "中国",
+        "region": "湖南 · 青山镇",
+        "tone": "green",
+        "stats": [
+          { "label": "人均 PPP 收入", "value": "¥2.4万/年" },
+          { "label": "预期寿命", "value": "78.6 岁" },
+          { "label": "城镇化率", "value": "66%" },
+          { "label": "机会指数", "value": "62" }
+        ],
+        "note": "你出生并长大的地方，资料为静态示例。"
+      },
+      {
+        "id": "jp",
+        "name": "日本",
+        "region": "东京都 · 足立区",
+        "tone": "rose",
+        "stats": [
+          { "label": "人均 PPP 收入", "value": "¥3.9万/年" },
+          { "label": "预期寿命", "value": "84.7 岁" },
+          { "label": "城镇化率", "value": "92%" },
+          { "label": "机会指数", "value": "74" }
+        ],
+        "note": "只看过照片的城市，资料为静态示例。"
+      },
+      {
+        "id": "ca",
+        "name": "加拿大",
+        "region": "安大略 · 伦敦市",
+        "tone": "blue",
+        "stats": [
+          { "label": "人均 PPP 收入", "value": "¥4.6万/年" },
+          { "label": "预期寿命", "value": "82.6 岁" },
+          { "label": "城镇化率", "value": "82%" },
+          { "label": "机会指数", "value": "79" }
+        ],
+        "note": "听人说起过的地方，资料为静态示例。"
+      }
+    ],
+    "places": [
+      { "id": "home", "name": "家", "kind": "家", "distance": "0 km", "note": "木屋、菜园和一只总在打鸣的小鸡。", "tone": "green", "current": true },
+      { "id": "school", "name": "镇上的学校", "kind": "学习", "distance": "1.2 km", "note": "你在这里读完高中，操场边有一排老槐树。", "tone": "blue", "current": false },
+      { "id": "workshop", "name": "木工房", "kind": "工作", "distance": "2.4 km", "note": "父亲工作的地方，空气里有木屑的味道。", "tone": "amber", "current": false },
+      { "id": "market", "name": "周末集市", "kind": "生活", "distance": "3.0 km", "note": "母亲常来这里换菜种，妹妹喜欢看旧书摊。", "tone": "rose", "current": false },
+      { "id": "station", "name": "县城的车站", "kind": "远方", "distance": "8.6 km", "note": "还没去过。听说车站的钟声很响。", "tone": "violet", "current": false }
+    ],
+    "migrate": {
+      "label": "考虑移居",
+      "title": "移居",
+      "intro": "先看看需要多少钱，以及要达到什么条件。",
+      "costLabel": "移居成本",
+      "confirm": "确认移居",
+      "disabledHint": "请先选择一个目的地",
+      "selectedHint": "已选择：{choice}",
+      "consequenceTitle": "移居申请已记录",
+      "consequenceBody": "这是一个静态演示：不会改变年份、资产或存档，也不会真的搬走。",
+      "note": "静态演示 · 不改变年份与存档",
+      "items": [
+        {
+          "id": "jp",
+          "name": "日本 · 东京都",
+          "cost": "¥18万",
+          "note": "语言学校加一年生活费。",
+          "requirements": ["有效护照", "语言基础 N4", "担保人"]
+        },
+        {
+          "id": "ca",
+          "name": "加拿大 · 安大略",
+          "cost": "¥46万",
+          "note": "留学签证与第一年学费。",
+          "requirements": ["有效护照", "雅思 5.5", "财力证明"]
+        }
+      ]
+    },
+    "legend": "地图为静态示意，不代表真实地理数据。",
+    "note": "此页只展示 fixture 中的地图资料。"
+  },
+  "settings": {
+    "heading": "设置",
+    "subheading": "只影响显示与播放偏好，不影响人生数值",
+    "storageNote": "主题、语言与显示偏好只保存在 localStorage；不会写入正式存档。",
+    "summaryLabel": "查看人生总结",
+    "summaryDescription": "打开只读的死亡／人生总结画面。",
+    "closeLabel": "关闭设置",
+    "groups": [
+      {
+        "label": "显示与语言",
+        "items": [
+          {
+            "id": "language",
+            "kind": "choice",
+            "label": "语言",
+            "description": "切换界面标记；fixture 文案仍为简体中文。",
+            "value": "zh-CN",
+            "options": [
+              { "value": "zh-CN", "label": "简体中文" },
+              { "value": "en-US", "label": "English" }
+            ]
+          },
+          {
+            "id": "theme",
+            "kind": "choice",
+            "label": "主题",
+            "description": "浅色或夜间模式。",
+            "value": "light",
+            "options": [
+              { "value": "light", "label": "浅色" },
+              { "value": "dark", "label": "夜间" }
+            ]
+          },
+          {
+            "id": "reduceMotion",
+            "kind": "switch",
+            "label": "减少动态效果",
+            "description": "关闭过渡与动画。",
+            "value": false,
+            "options": []
+          }
+        ]
+      },
+      {
+        "label": "声音与触感",
+        "items": [
+          {
+            "id": "sound",
+            "kind": "switch",
+            "label": "界面音效",
+            "description": "仅保存偏好，不播放正式内容。",
+            "value": true,
+            "options": []
+          },
+          {
+            "id": "haptics",
+            "kind": "switch",
+            "label": "轻触反馈",
+            "description": "仅保存偏好，不改变游戏结果。",
+            "value": true,
+            "options": []
+          }
+        ]
+      },
+      {
+        "label": "播放",
+        "items": [
+          {
+            "id": "speed",
+            "kind": "choice",
+            "label": "速度",
+            "description": "时间流速，只影响播放。",
+            "value": "1x",
+            "options": [
+              { "value": "1x", "label": "1x" },
+              { "value": "2x", "label": "2x" },
+              { "value": "4x", "label": "4x" }
+            ]
+          },
+          {
+            "id": "auto",
+            "kind": "choice",
+            "label": "自动抉择",
+            "description": "没有选择时由谁决定。",
+            "value": "ask",
+            "options": [
+              { "value": "ask", "label": "每次询问" },
+              { "value": "semi", "label": "半自动" },
+              { "value": "full", "label": "全自动" }
+            ]
+          }
+        ]
+      },
+      {
+        "label": "内容",
+        "items": [
+          {
+            "id": "contentMode",
+            "kind": "choice",
+            "label": "内容模式",
+            "description": "影响事件文本的尺度；本批只保存偏好。",
+            "value": "standard",
+            "options": [
+              { "value": "standard", "label": "标准" },
+              { "value": "gentle", "label": "温和" },
+              { "value": "realistic", "label": "写实" }
+            ]
+          }
+        ]
+      }
+    ],
+    "save": {
+      "label": "存档",
+      "status": "正式存档尚未启用",
+      "description": "P1-C 不提供存档按钮；写入存档属于 P2。",
+      "items": [
+        { "label": "存档格式", "value": "SaveEnvelope v3（P1-B）" },
+        { "label": "容量上限", "value": "压缩 5 MiB／解压 20 MiB" },
+        { "label": "本批行为", "value": "不写入正式存档" }
+      ]
+    },
+    "about": {
+      "label": "关于",
+      "description": "版本、数据来源与素材说明。",
+      "items": [
+        { "label": "UI 版本", "value": "P1-C.1" },
+        { "label": "构建编号", "value": "p1c1-20261027" },
+        { "label": "数据来源", "value": "fixtures/ui-frame.json" },
+        { "label": "引擎", "value": "未接入（纯静态）" },
+        { "label": "素材", "value": "自制 SVG／CSS，无外部 CDN" }
+      ],
+      "note": "关于页为静态内容，不代表正式发布版本。"
+    }
+  },
+  "death": {
+    "kicker": "人生总结 · 静态演示",
+    "title": "这一生，先留在这里。",
+    "subtitle": "这不是正式结局，也不会写进存档；只展示固定 fixture 中的总结样式。",
+    "years": "17 年",
+    "yearsLabel": "已走过",
+    "places": "5 个",
+    "placesLabel": "熟悉的地方",
+    "people": "3 人",
+    "peopleLabel": "家人",
+    "summaryLabel": "人生摘要",
+    "summary": [
+      { "label": "家庭", "value": "3 位家人" },
+      { "label": "金钱", "value": "¥12.9万" },
+      { "label": "子女", "value": "0 人" },
+      { "label": "到过国家", "value": "1 个" }
+    ],
+    "family": {
+      "heading": "家庭",
+      "members": [
+        { "name": "林知远", "role": "父亲" },
+        { "name": "周岚", "role": "母亲" },
+        { "name": "林小满", "role": "妹妹" }
+      ],
+      "note": "家庭资料来自 fixture，不计算继承或遗产。"
+    },
+    "money": {
+      "heading": "金钱",
+      "value": "¥12.9万",
+      "items": [
+        { "label": "资产", "value": "¥12.9万" },
+        { "label": "年收入", "value": "¥3.6万" },
+        { "label": "负债", "value": "¥0" }
+      ],
+      "note": "金额为 PPP 美元 micro 的显示投影，静态示例。"
+    },
+    "children": {
+      "heading": "子女",
+      "value": "0 人",
+      "note": "还没有子女。",
+      "empty": true
+    },
+    "map": {
+      "heading": "地图与曲线",
+      "countries": ["中国"],
+      "placesLabel": "熟悉的地方",
+      "places": "5 个",
+      "note": "地图与曲线为静态示意。"
+    },
+    "curve": {
+      "heading": "人生曲线",
+      "labels": ["0 岁", "5 岁", "10 岁", "17 岁"],
+      "happiness": [62, 70, 58, 63],
+      "money": [8, 26, 72, 100],
+      "legendHappiness": "幸福",
+      "legendMoney": "金钱",
+      "note": "曲线是固定 fixture 数据，不是模拟结果。"
+    },
+    "stats": [
+      { "label": "健康", "value": 82, "percent": 82, "tone": "coral" },
+      { "label": "幸福", "value": 63, "percent": 63, "tone": "amber" },
+      { "label": "知识", "value": 74, "percent": 74, "tone": "aqua" },
+      { "label": "人际关系", "value": 55, "percent": 55, "tone": "violet" }
+    ],
+    "expandLabel": "展开更多",
+    "collapseLabel": "收起更多",
+    "more": [
+      { "label": "健康", "value": "82 / 100" },
+      { "label": "幸福", "value": "63 / 100" },
+      { "label": "知识", "value": "74 / 100" },
+      { "label": "人际关系", "value": "55 / 100" },
+      { "label": "家庭氛围", "value": "温和 · 互相支持" }
+    ],
+    "share": {
+      "label": "分享",
+      "sheetTitle": "分享人生卡",
+      "title": "17 岁 · 2026",
+      "body": "¥12.9万资产 · 3 位家人 · 5 个熟悉的地方",
+      "copyLabel": "复制分享文案",
+      "copiedToast": "分享文案已复制（静态演示）",
+      "note": "静态演示，不产生真实分享链接。"
+    },
+    "rebirth": {
+      "label": "再次出生",
+      "sheetTitle": "再次出生",
+      "body": "这会回到出生画面，重新选择种子。静态演示不会写入存档。",
+      "confirm": "确认再次出生",
+      "cancel": "再想想",
+      "toast": "已回到出生（静态演示）"
+    },
+    "quote": "你还没有走完这一生。这里只是把此刻的风景，轻轻放在一页上。",
+    "backLabel": "回到人生",
+    "note": "死亡／人生总结画面为静态壳，未接入正式结局规则。"
+  }
+}

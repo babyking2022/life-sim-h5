@@ -1,0 +1,33 @@
+{
+  "schemaVersion": "p2b-1",
+  "dataVersion": "1.0.0",
+  "dataset": "story-templates",
+  "records": [
+    {"templateId":"han_a","cultureId":"han","paragraphs":["{name}在{place}出生。家里属于{income}，父亲是{fatherJob}，母亲是{motherJob}。","家人按{religion}的习惯迎接这个孩子，也记住了这一天的天气。","没有人知道以后会发生什么，但{country}的这一年，从这里开始。"],"dataVersion":"1.0.0"},
+    {"templateId":"han_b","cultureId":"han","paragraphs":["这一年，{country}的一个{place}家庭多了一个孩子：{name}。","母亲{motherJob}、父亲{fatherJob}，一家人在{income}的日子里慢慢安顿下来。","家里保留着{religion}的传统，也保留着对未来的小心愿。"],"dataVersion":"1.0.0"},
+    {"templateId":"ja_a","cultureId":"ja","paragraphs":["{name}在{place}出生。家里属于{income}，父亲是{fatherJob}，母亲是{motherJob}。","家人按{religion}的习惯迎接这个孩子，也记住了这一天的天气。","没有人知道以后会发生什么，但{country}的这一年，从这里开始。"],"dataVersion":"1.0.0"},
+    {"templateId":"ja_b","cultureId":"ja","paragraphs":["这一年，{country}的一个{place}家庭多了一个孩子：{name}。","母亲{motherJob}、父亲{fatherJob}，一家人在{income}的日子里慢慢安顿下来。","家里保留着{religion}的传统，也保留着对未来的小心愿。"],"dataVersion":"1.0.0"},
+    {"templateId":"ko_a","cultureId":"ko","paragraphs":["{name}在{place}出生。家里属于{income}，父亲是{fatherJob}，母亲是{motherJob}。","家人按{religion}的习惯迎接这个孩子，也记住了这一天的天气。","没有人知道以后会发生什么，但{country}的这一年，从这里开始。"],"dataVersion":"1.0.0"},
+    {"templateId":"ko_b","cultureId":"ko","paragraphs":["这一年，{country}的一个{place}家庭多了一个孩子：{name}。","母亲{motherJob}、父亲{fatherJob}，一家人在{income}的日子里慢慢安顿下来。","家里保留着{religion}的传统，也保留着对未来的小心愿。"],"dataVersion":"1.0.0"},
+    {"templateId":"south_asia_a","cultureId":"south_asia","paragraphs":["{name}在{place}出生。家里属于{income}，父亲是{fatherJob}，母亲是{motherJob}。","家人按{religion}的习惯迎接这个孩子，也记住了这一天的天气。","没有人知道以后会发生什么，但{country}的这一年，从这里开始。"],"dataVersion":"1.0.0"},
+    {"templateId":"south_asia_b","cultureId":"south_asia","paragraphs":["这一年，{country}的一个{place}家庭多了一个孩子：{name}。","母亲{motherJob}、父亲{fatherJob}，一家人在{income}的日子里慢慢安顿下来。","家里保留着{religion}的传统，也保留着对未来的小心愿。"],"dataVersion":"1.0.0"},
+    {"templateId":"southeast_asia_a","cultureId":"southeast_asia","paragraphs":["{name}在{place}出生。家里属于{income}，父亲是{fatherJob}，母亲是{motherJob}。","家人按{religion}的习惯迎接这个孩子，也记住了这一天的天气。","没有人知道以后会发生什么，但{country}的这一年，从这里开始。"],"dataVersion":"1.0.0"},
+    {"templateId":"southeast_asia_b","cultureId":"southeast_asia","paragraphs":["这一年，{country}的一个{place}家庭多了一个孩子：{name}。","母亲{motherJob}、父亲{fatherJob}，一家人在{income}的日子里慢慢安顿下来。","家里保留着{religion}的传统，也保留着对未来的小心愿。"],"dataVersion":"1.0.0"},
+    {"templateId":"central_asia_a","cultureId":"central_asia","paragraphs":["{name}在{place}出生。家里属于{income}，父亲是{fatherJob}，母亲是{motherJob}。","家人按{religion}的习惯迎接这个孩子，也记住了这一天的天气。","没有人知道以后会发生什么，但{country}的这一年，从这里开始。"],"dataVersion":"1.0.0"},
+    {"templateId":"central_asia_b","cultureId":"central_asia","paragraphs":["这一年，{country}的一个{place}家庭多了一个孩子：{name}。","母亲{motherJob}、父亲{fatherJob}，一家人在{income}的日子里慢慢安顿下来。","家里保留着{religion}的传统，也保留着对未来的小心愿。"],"dataVersion":"1.0.0"},
+    {"templateId":"middle_east_a","cultureId":"middle_east","paragraphs":["{name}在{place}出生。家里属于{income}，父亲是{fatherJob}，母亲是{motherJob}。","家人按{religion}的习惯迎接这个孩子，也记住了这一天的天气。","没有人知道以后会发生什么，但{country}的这一年，从这里开始。"],"dataVersion":"1.0.0"},
+    {"templateId":"middle_east_b","cultureId":"middle_east","paragraphs":["这一年，{country}的一个{place}家庭多了一个孩子：{name}。","母亲{motherJob}、父亲{fatherJob}，一家人在{income}的日子里慢慢安顿下来。","家里保留着{religion}的传统，也保留着对未来的小心愿。"],"dataVersion":"1.0.0"},
+    {"templateId":"africa_a","cultureId":"africa","paragraphs":["{name}在{place}出生。家里属于{income}，父亲是{fatherJob}，母亲是{motherJob}。","家人按{religion}的习惯迎接这个孩子，也记住了这一天的天气。","没有人知道以后会发生什么，但{country}的这一年，从这里开始。"],"dataVersion":"1.0.0"},
+    {"templateId":"africa_b","cultureId":"africa","paragraphs":["这一年，{country}的一个{place}家庭多了一个孩子：{name}。","母亲{motherJob}、父亲{fatherJob}，一家人在{income}的日子里慢慢安顿下来。","家里保留着{religion}的传统，也保留着对未来的小心愿。"],"dataVersion":"1.0.0"},
+    {"templateId":"europe_west_a","cultureId":"europe_west","paragraphs":["{name}在{place}出生。家里属于{income}，父亲是{fatherJob}，母亲是{motherJob}。","家人按{religion}的习惯迎接这个孩子，也记住了这一天的天气。","没有人知道以后会发生什么，但{country}的这一年，从这里开始。"],"dataVersion":"1.0.0"},
+    {"templateId":"europe_west_b","cultureId":"europe_west","paragraphs":["这一年，{country}的一个{place}家庭多了一个孩子：{name}。","母亲{motherJob}、父亲{fatherJob}，一家人在{income}的日子里慢慢安顿下来。","家里保留着{religion}的传统，也保留着对未来的小心愿。"],"dataVersion":"1.0.0"},
+    {"templateId":"europe_east_a","cultureId":"europe_east","paragraphs":["{name}在{place}出生。家里属于{income}，父亲是{fatherJob}，母亲是{motherJob}。","家人按{religion}的习惯迎接这个孩子，也记住了这一天的天气。","没有人知道以后会发生什么，但{country}的这一年，从这里开始。"],"dataVersion":"1.0.0"},
+    {"templateId":"europe_east_b","cultureId":"europe_east","paragraphs":["这一年，{country}的一个{place}家庭多了一个孩子：{name}。","母亲{motherJob}、父亲{fatherJob}，一家人在{income}的日子里慢慢安顿下来。","家里保留着{religion}的传统，也保留着对未来的小心愿。"],"dataVersion":"1.0.0"},
+    {"templateId":"latin_america_a","cultureId":"latin_america","paragraphs":["{name}在{place}出生。家里属于{income}，父亲是{fatherJob}，母亲是{motherJob}。","家人按{religion}的习惯迎接这个孩子，也记住了这一天的天气。","没有人知道以后会发生什么，但{country}的这一年，从这里开始。"],"dataVersion":"1.0.0"},
+    {"templateId":"latin_america_b","cultureId":"latin_america","paragraphs":["这一年，{country}的一个{place}家庭多了一个孩子：{name}。","母亲{motherJob}、父亲{fatherJob}，一家人在{income}的日子里慢慢安顿下来。","家里保留着{religion}的传统，也保留着对未来的小心愿。"],"dataVersion":"1.0.0"},
+    {"templateId":"anglo_a","cultureId":"anglo","paragraphs":["{name}在{place}出生。家里属于{income}，父亲是{fatherJob}，母亲是{motherJob}。","家人按{religion}的习惯迎接这个孩子，也记住了这一天的天气。","没有人知道以后会发生什么，但{country}的这一年，从这里开始。"],"dataVersion":"1.0.0"},
+    {"templateId":"anglo_b","cultureId":"anglo","paragraphs":["这一年，{country}的一个{place}家庭多了一个孩子：{name}。","母亲{motherJob}、父亲{fatherJob}，一家人在{income}的日子里慢慢安顿下来。","家里保留着{religion}的传统，也保留着对未来的小心愿。"],"dataVersion":"1.0.0"},
+    {"templateId":"pacific_a","cultureId":"pacific","paragraphs":["{name}在{place}出生。家里属于{income}，父亲是{fatherJob}，母亲是{motherJob}。","家人按{religion}的习惯迎接这个孩子，也记住了这一天的天气。","没有人知道以后会发生什么，但{country}的这一年，从这里开始。"],"dataVersion":"1.0.0"},
+    {"templateId":"pacific_b","cultureId":"pacific","paragraphs":["这一年，{country}的一个{place}家庭多了一个孩子：{name}。","母亲{motherJob}、父亲{fatherJob}，一家人在{income}的日子里慢慢安顿下来。","家里保留着{religion}的传统，也保留着对未来的小心愿。"],"dataVersion":"1.0.0"}
+  ]
+}

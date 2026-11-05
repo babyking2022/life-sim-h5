@@ -1,0 +1,9 @@
+{
+  "name": "@life-sim/ui",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@life-sim/application": "workspace:*"
+  }
+}

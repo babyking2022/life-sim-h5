@@ -1,0 +1,1356 @@
+{
+  "schemaVersion": "p3b-1",
+  "eventSpecVersion": "1.0.0",
+  "contentPackVersion": "1.0.0",
+  "packs": [
+    {
+      "packId": "p3b-synthetic-events-v1",
+      "manifestFile": "manifest.v1.json",
+      "eventsFile": "events.v1.json",
+      "packChecksum": "6c9a25319b0afa93b6a9c6d71bcb6d102cc602fc21e1770be34693e58b2049c5",
+      "datasetChecksum": "f065580ab2edb89803e6b10d0258e993df322cc895f239b320c3c6f9bbc9851f",
+      "cases": [
+        {
+          "id": "case-01-infant-standard",
+          "contentMode": "standard",
+          "state": {
+            "currentYear": 2022,
+            "age": 2,
+            "phase": "life",
+            "stats": {
+              "health": 60,
+              "happiness": 60,
+              "knowledge": 50,
+              "relationships": 50
+            },
+            "assets": {
+              "balanceMicroUsd": "0",
+              "annualIncomeMicroUsd": "12000000",
+              "annualExpenseMicroUsd": "9000000"
+            },
+            "flags": []
+          },
+          "history": {
+            "occurrences": []
+          },
+          "rngState": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "candidateIds": [
+            "ev.any.setback",
+            "ev.any.small-win",
+            "ev.child.first-word",
+            "ev.child.sibling-arrives",
+            "ev.child.tantrum"
+          ],
+          "selectedEventId": "ev.any.small-win",
+          "reason": "weighted",
+          "drawsUsed": 2,
+          "rngStateAfter": [
+            12295,
+            1029,
+            1029,
+            25165824
+          ],
+          "selectionHash": "9be2b373c2d7f553dbdff9a876e97619ff9ec617a0d8a41fc039d611de80a553"
+        },
+        {
+          "id": "case-02-infant-guardian",
+          "contentMode": "guardian",
+          "state": {
+            "currentYear": 2022,
+            "age": 2,
+            "phase": "life",
+            "stats": {
+              "health": 60,
+              "happiness": 60,
+              "knowledge": 50,
+              "relationships": 50
+            },
+            "assets": {
+              "balanceMicroUsd": "0",
+              "annualIncomeMicroUsd": "12000000",
+              "annualExpenseMicroUsd": "9000000"
+            },
+            "flags": []
+          },
+          "history": {
+            "occurrences": []
+          },
+          "rngState": [
+            5,
+            6,
+            7,
+            8
+          ],
+          "candidateIds": [
+            "ev.any.setback",
+            "ev.any.small-win",
+            "ev.child.first-word",
+            "ev.child.sibling-arrives",
+            "ev.guardian.calm"
+          ],
+          "selectedEventId": "ev.any.setback",
+          "reason": "weighted",
+          "drawsUsed": 2,
+          "rngStateAfter": [
+            28687,
+            3085,
+            1033,
+            58728448
+          ],
+          "selectionHash": "6a570245c816d33748c61adae6f3b163d2f1b5f0f03cc34dbbc1e39448b66e43"
+        },
+        {
+          "id": "case-03-school-decision",
+          "contentMode": "standard",
+          "state": {
+            "currentYear": 2026,
+            "age": 6,
+            "phase": "life",
+            "stats": {
+              "health": 60,
+              "happiness": 60,
+              "knowledge": 50,
+              "relationships": 50
+            },
+            "assets": {
+              "balanceMicroUsd": "0",
+              "annualIncomeMicroUsd": "12000000",
+              "annualExpenseMicroUsd": "9000000"
+            },
+            "flags": []
+          },
+          "history": {
+            "occurrences": []
+          },
+          "rngState": [
+            9,
+            10,
+            11,
+            12
+          ],
+          "candidateIds": [
+            "ev.any.setback",
+            "ev.any.small-win",
+            "ev.child.playground",
+            "ev.child.school-choice",
+            "ev.child.sibling-arrives",
+            "ev.child.tantrum"
+          ],
+          "selectedEventId": "ev.child.tantrum",
+          "reason": "weighted",
+          "drawsUsed": 2,
+          "rngStateAfter": [
+            12295,
+            5125,
+            1037,
+            25182208
+          ],
+          "selectionHash": "404f024be90fa540a21c6333255c8cbdee1c6ecc0716bb3776bfd317df3e9bad"
+        },
+        {
+          "id": "case-04-school-decision-guardian",
+          "contentMode": "guardian",
+          "state": {
+            "currentYear": 2026,
+            "age": 6,
+            "phase": "life",
+            "stats": {
+              "health": 60,
+              "happiness": 60,
+              "knowledge": 50,
+              "relationships": 50
+            },
+            "assets": {
+              "balanceMicroUsd": "0",
+              "annualIncomeMicroUsd": "12000000",
+              "annualExpenseMicroUsd": "9000000"
+            },
+            "flags": []
+          },
+          "history": {
+            "occurrences": []
+          },
+          "rngState": [
+            13,
+            14,
+            15,
+            16
+          ],
+          "candidateIds": [
+            "ev.any.setback",
+            "ev.any.small-win",
+            "ev.child.playground",
+            "ev.child.school-choice",
+            "ev.child.sibling-arrives",
+            "ev.guardian.calm"
+          ],
+          "selectedEventId": "ev.any.small-win",
+          "reason": "weighted",
+          "drawsUsed": 2,
+          "rngStateAfter": [
+            61471,
+            7197,
+            1041,
+            125853696
+          ],
+          "selectionHash": "d02342f25c3aa1cd96160c1825828f7e83f866b49d8a3e29ce4acfa28ec7c789"
+        },
+        {
+          "id": "case-05-sibling-flag",
+          "contentMode": "standard",
+          "state": {
+            "currentYear": 2028,
+            "age": 8,
+            "phase": "life",
+            "stats": {
+              "health": 60,
+              "happiness": 60,
+              "knowledge": 50,
+              "relationships": 50
+            },
+            "assets": {
+              "balanceMicroUsd": "0",
+              "annualIncomeMicroUsd": "12000000",
+              "annualExpenseMicroUsd": "9000000"
+            },
+            "flags": [
+              "family:sibling"
+            ]
+          },
+          "history": {
+            "occurrences": []
+          },
+          "rngState": [
+            17,
+            18,
+            19,
+            20
+          ],
+          "candidateIds": [
+            "ev.any.setback",
+            "ev.any.small-win",
+            "ev.child.playground"
+          ],
+          "selectedEventId": "ev.any.small-win",
+          "reason": "weighted",
+          "drawsUsed": 2,
+          "rngStateAfter": [
+            12295,
+            9221,
+            1045,
+            25198592
+          ],
+          "selectionHash": "785cf17f8512e0458fa1d0d54734a551d9b06a8b46caaf236c671364ab464a34"
+        },
+        {
+          "id": "case-06-teen-standard",
+          "contentMode": "standard",
+          "state": {
+            "currentYear": 2033,
+            "age": 13,
+            "phase": "life",
+            "stats": {
+              "health": 60,
+              "happiness": 60,
+              "knowledge": 50,
+              "relationships": 50
+            },
+            "assets": {
+              "balanceMicroUsd": "0",
+              "annualIncomeMicroUsd": "12000000",
+              "annualExpenseMicroUsd": "9000000"
+            },
+            "flags": []
+          },
+          "history": {
+            "occurrences": []
+          },
+          "rngState": [
+            21,
+            22,
+            23,
+            24
+          ],
+          "candidateIds": [
+            "ev.any.setback",
+            "ev.any.small-win",
+            "ev.teen.friendship"
+          ],
+          "selectedEventId": "ev.any.small-win",
+          "reason": "weighted",
+          "drawsUsed": 2,
+          "rngStateAfter": [
+            28687,
+            11277,
+            1049,
+            58761216
+          ],
+          "selectionHash": "98f10b6f2754b699484714d737a6816f7bf7529bd7dcd841a35e2c75cdc72d7a"
+        },
+        {
+          "id": "case-07-teen-negative-balance",
+          "contentMode": "standard",
+          "state": {
+            "currentYear": 2036,
+            "age": 16,
+            "phase": "life",
+            "stats": {
+              "health": 60,
+              "happiness": 60,
+              "knowledge": 70,
+              "relationships": 50
+            },
+            "assets": {
+              "balanceMicroUsd": "-1",
+              "annualIncomeMicroUsd": "12000000",
+              "annualExpenseMicroUsd": "9000000"
+            },
+            "flags": [
+              "school:steady"
+            ]
+          },
+          "history": {
+            "occurrences": []
+          },
+          "rngState": [
+            25,
+            26,
+            27,
+            28
+          ],
+          "candidateIds": [
+            "ev.any.setback",
+            "ev.any.small-win",
+            "ev.teen.friendship",
+            "ev.teen.part-time-job",
+            "ev.teen.risk-experiment"
+          ],
+          "selectedEventId": "ev.teen.friendship",
+          "reason": "weighted",
+          "drawsUsed": 2,
+          "rngStateAfter": [
+            12295,
+            13317,
+            1053,
+            25214976
+          ],
+          "selectionHash": "bc2c8e43b1208ddf9d566e70b3366e22214dd1a4d2b6d1b8c5c2fb19ba7fb773"
+        },
+        {
+          "id": "case-08-exams-year",
+          "contentMode": "standard",
+          "state": {
+            "currentYear": 2032,
+            "age": 12,
+            "phase": "life",
+            "stats": {
+              "health": 60,
+              "happiness": 60,
+              "knowledge": 50,
+              "relationships": 50
+            },
+            "assets": {
+              "balanceMicroUsd": "0",
+              "annualIncomeMicroUsd": "12000000",
+              "annualExpenseMicroUsd": "9000000"
+            },
+            "flags": []
+          },
+          "history": {
+            "occurrences": []
+          },
+          "rngState": [
+            29,
+            30,
+            31,
+            32
+          ],
+          "candidateIds": [
+            "ev.any.setback",
+            "ev.any.small-win"
+          ],
+          "selectedEventId": "ev.any.small-win",
+          "reason": "weighted",
+          "drawsUsed": 2,
+          "rngStateAfter": [
+            127039,
+            15421,
+            1057,
+            260104192
+          ],
+          "selectionHash": "1229af6b6879c7f36cadde58da65f3165c065f0a755bbcb3faaf92d7180f1b18"
+        },
+        {
+          "id": "case-09-adult-employed",
+          "contentMode": "standard",
+          "state": {
+            "currentYear": 2045,
+            "age": 25,
+            "phase": "life",
+            "stats": {
+              "health": 60,
+              "happiness": 60,
+              "knowledge": 70,
+              "relationships": 50
+            },
+            "assets": {
+              "balanceMicroUsd": "0",
+              "annualIncomeMicroUsd": "20000000",
+              "annualExpenseMicroUsd": "9000000"
+            },
+            "flags": [
+              "employed"
+            ]
+          },
+          "history": {
+            "occurrences": [
+              {
+                "eventId": "ev.teen.exams",
+                "lastYear": 2032,
+                "count": 1
+              }
+            ]
+          },
+          "rngState": [
+            33,
+            34,
+            35,
+            36
+          ],
+          "candidateIds": [
+            "ev.adult.housing-choice",
+            "ev.adult.promotion",
+            "ev.any.setback",
+            "ev.any.small-win"
+          ],
+          "selectedEventId": "ev.any.setback",
+          "reason": "weighted",
+          "drawsUsed": 2,
+          "rngStateAfter": [
+            12295,
+            17413,
+            1061,
+            25231360
+          ],
+          "selectionHash": "731ed2edf5f3340d439dbfaa491f595c2880511ca405712abfc7de31fded6d29"
+        },
+        {
+          "id": "case-10-adult-guardian",
+          "contentMode": "guardian",
+          "state": {
+            "currentYear": 2045,
+            "age": 25,
+            "phase": "life",
+            "stats": {
+              "health": 60,
+              "happiness": 60,
+              "knowledge": 70,
+              "relationships": 50
+            },
+            "assets": {
+              "balanceMicroUsd": "0",
+              "annualIncomeMicroUsd": "20000000",
+              "annualExpenseMicroUsd": "9000000"
+            },
+            "flags": [
+              "employed"
+            ]
+          },
+          "history": {
+            "occurrences": []
+          },
+          "rngState": [
+            37,
+            38,
+            39,
+            40
+          ],
+          "candidateIds": [
+            "ev.adult.housing-choice",
+            "ev.adult.promotion",
+            "ev.any.setback",
+            "ev.any.small-win",
+            "ev.guardian.calm"
+          ],
+          "selectedEventId": "ev.any.small-win",
+          "reason": "weighted",
+          "drawsUsed": 2,
+          "rngStateAfter": [
+            28687,
+            19469,
+            1065,
+            58793984
+          ],
+          "selectionHash": "d2cbf7d8684a5c56ad9ddeebf7a7ccc76d7b4f3e10d77f5a65f0e8ec04484e39"
+        },
+        {
+          "id": "case-11-low-happiness",
+          "contentMode": "standard",
+          "state": {
+            "currentYear": 2050,
+            "age": 30,
+            "phase": "life",
+            "stats": {
+              "health": 60,
+              "happiness": 20,
+              "knowledge": 50,
+              "relationships": 50
+            },
+            "assets": {
+              "balanceMicroUsd": "0",
+              "annualIncomeMicroUsd": "12000000",
+              "annualExpenseMicroUsd": "9000000"
+            },
+            "flags": [
+              "employed"
+            ]
+          },
+          "history": {
+            "occurrences": []
+          },
+          "rngState": [
+            41,
+            42,
+            43,
+            44
+          ],
+          "candidateIds": [
+            "ev.adult.burnout",
+            "ev.adult.housing-choice",
+            "ev.adult.promotion",
+            "ev.any.setback",
+            "ev.any.small-win"
+          ],
+          "selectedEventId": "ev.any.setback",
+          "reason": "weighted",
+          "drawsUsed": 2,
+          "rngStateAfter": [
+            12295,
+            21509,
+            1069,
+            25247744
+          ],
+          "selectionHash": "6dc87ccb41d6cff059a9171c7fc469f5cc81ffe9600a55d5065c8a7e7ec957aa"
+        },
+        {
+          "id": "case-12-promotion-cooldown",
+          "contentMode": "standard",
+          "state": {
+            "currentYear": 2050,
+            "age": 30,
+            "phase": "life",
+            "stats": {
+              "health": 60,
+              "happiness": 60,
+              "knowledge": 80,
+              "relationships": 50
+            },
+            "assets": {
+              "balanceMicroUsd": "0",
+              "annualIncomeMicroUsd": "30000000",
+              "annualExpenseMicroUsd": "9000000"
+            },
+            "flags": [
+              "employed"
+            ]
+          },
+          "history": {
+            "occurrences": [
+              {
+                "eventId": "ev.adult.promotion",
+                "lastYear": 2049,
+                "count": 1
+              }
+            ]
+          },
+          "rngState": [
+            45,
+            46,
+            47,
+            48
+          ],
+          "candidateIds": [
+            "ev.adult.housing-choice",
+            "ev.any.setback",
+            "ev.any.small-win"
+          ],
+          "selectedEventId": "ev.any.setback",
+          "reason": "weighted",
+          "drawsUsed": 2,
+          "rngStateAfter": [
+            61471,
+            23581,
+            1073,
+            125919232
+          ],
+          "selectionHash": "49d9891a0e99acffee413bf0bbd40f93f8e42d678e87f44f6bc608f96b279ef3"
+        },
+        {
+          "id": "case-13-community-flag",
+          "contentMode": "standard",
+          "state": {
+            "currentYear": 2050,
+            "age": 30,
+            "phase": "life",
+            "stats": {
+              "health": 60,
+              "happiness": 60,
+              "knowledge": 50,
+              "relationships": 50
+            },
+            "assets": {
+              "balanceMicroUsd": "0",
+              "annualIncomeMicroUsd": "12000000",
+              "annualExpenseMicroUsd": "9000000"
+            },
+            "flags": [
+              "community:member"
+            ]
+          },
+          "history": {
+            "occurrences": []
+          },
+          "rngState": [
+            49,
+            50,
+            51,
+            52
+          ],
+          "candidateIds": [
+            "ev.adult.housing-choice",
+            "ev.adult.volunteer",
+            "ev.any.setback",
+            "ev.any.small-win"
+          ],
+          "selectedEventId": "ev.any.small-win",
+          "reason": "weighted",
+          "drawsUsed": 2,
+          "rngStateAfter": [
+            12295,
+            25605,
+            1077,
+            25264128
+          ],
+          "selectionHash": "0b3cd743549cbee1fa736ce3187623af8a15661a4de381c266cf775feeff2a1c"
+        },
+        {
+          "id": "case-14-setback-cooldown",
+          "contentMode": "standard",
+          "state": {
+            "currentYear": 2060,
+            "age": 40,
+            "phase": "life",
+            "stats": {
+              "health": 60,
+              "happiness": 60,
+              "knowledge": 50,
+              "relationships": 50
+            },
+            "assets": {
+              "balanceMicroUsd": "0",
+              "annualIncomeMicroUsd": "12000000",
+              "annualExpenseMicroUsd": "9000000"
+            },
+            "flags": []
+          },
+          "history": {
+            "occurrences": [
+              {
+                "eventId": "ev.any.setback",
+                "lastYear": 2059,
+                "count": 1
+              }
+            ]
+          },
+          "rngState": [
+            53,
+            54,
+            55,
+            56
+          ],
+          "candidateIds": [
+            "ev.adult.housing-choice",
+            "ev.any.quiet-year"
+          ],
+          "selectedEventId": "ev.any.quiet-year",
+          "reason": "weighted",
+          "drawsUsed": 2,
+          "rngStateAfter": [
+            28687,
+            27661,
+            1081,
+            58826752
+          ],
+          "selectionHash": "2a85756e5da2fd174d852d393fded0ed44e3fd188f68b699ab2d6eb10bd0c312"
+        },
+        {
+          "id": "case-15-debt",
+          "contentMode": "standard",
+          "state": {
+            "currentYear": 2040,
+            "age": 20,
+            "phase": "life",
+            "stats": {
+              "health": 60,
+              "happiness": 60,
+              "knowledge": 50,
+              "relationships": 50
+            },
+            "assets": {
+              "balanceMicroUsd": "-500000000",
+              "annualIncomeMicroUsd": "12000000",
+              "annualExpenseMicroUsd": "9000000"
+            },
+            "flags": []
+          },
+          "history": {
+            "occurrences": []
+          },
+          "rngState": [
+            57,
+            58,
+            59,
+            60
+          ],
+          "candidateIds": [
+            "ev.adult.debt-scare",
+            "ev.any.setback",
+            "ev.any.small-win"
+          ],
+          "selectedEventId": "ev.any.small-win",
+          "reason": "weighted",
+          "drawsUsed": 2,
+          "rngStateAfter": [
+            12295,
+            29701,
+            1085,
+            25280512
+          ],
+          "selectionHash": "63ee8036871d48f23dedcf85d8444ff96b0c23c557710c2ed15874cb046175ad"
+        },
+        {
+          "id": "case-16-senior-standard",
+          "contentMode": "standard",
+          "state": {
+            "currentYear": 2090,
+            "age": 70,
+            "phase": "life",
+            "stats": {
+              "health": 45,
+              "happiness": 60,
+              "knowledge": 50,
+              "relationships": 50
+            },
+            "assets": {
+              "balanceMicroUsd": "0",
+              "annualIncomeMicroUsd": "6000000",
+              "annualExpenseMicroUsd": "9000000"
+            },
+            "flags": []
+          },
+          "history": {
+            "occurrences": []
+          },
+          "rngState": [
+            61,
+            62,
+            63,
+            64
+          ],
+          "candidateIds": [
+            "ev.any.setback",
+            "ev.any.small-win",
+            "ev.senior.health-check",
+            "ev.senior.reflection"
+          ],
+          "selectedEventId": "ev.any.small-win",
+          "reason": "weighted",
+          "drawsUsed": 2,
+          "rngStateAfter": [
+            258175,
+            31869,
+            1089,
+            528605184
+          ],
+          "selectionHash": "99a2cd621a90316e9fa421e9a214784465a683f9470f7d3fd457b165af3cb475"
+        },
+        {
+          "id": "case-17-senior-guardian",
+          "contentMode": "guardian",
+          "state": {
+            "currentYear": 2090,
+            "age": 70,
+            "phase": "life",
+            "stats": {
+              "health": 45,
+              "happiness": 60,
+              "knowledge": 50,
+              "relationships": 50
+            },
+            "assets": {
+              "balanceMicroUsd": "0",
+              "annualIncomeMicroUsd": "6000000",
+              "annualExpenseMicroUsd": "9000000"
+            },
+            "flags": []
+          },
+          "history": {
+            "occurrences": []
+          },
+          "rngState": [
+            65,
+            66,
+            67,
+            68
+          ],
+          "candidateIds": [
+            "ev.any.setback",
+            "ev.any.small-win",
+            "ev.guardian.calm",
+            "ev.senior.health-check",
+            "ev.senior.reflection"
+          ],
+          "selectedEventId": "ev.guardian.calm",
+          "reason": "weighted",
+          "drawsUsed": 2,
+          "rngStateAfter": [
+            12295,
+            33797,
+            1093,
+            25296896
+          ],
+          "selectionHash": "958eb4ea30384436df64a8b8b785f437a3a7076e43d8ad3c7febe81792cd778e"
+        },
+        {
+          "id": "case-18-late-life-100",
+          "contentMode": "standard",
+          "state": {
+            "currentYear": 2120,
+            "age": 100,
+            "phase": "life",
+            "stats": {
+              "health": 20,
+              "happiness": 40,
+              "knowledge": 50,
+              "relationships": 50
+            },
+            "assets": {
+              "balanceMicroUsd": "0",
+              "annualIncomeMicroUsd": "12000000",
+              "annualExpenseMicroUsd": "9000000"
+            },
+            "flags": []
+          },
+          "history": {
+            "occurrences": []
+          },
+          "rngState": [
+            69,
+            70,
+            71,
+            72
+          ],
+          "candidateIds": [
+            "ev.any.setback",
+            "ev.any.small-win",
+            "ev.senior.health-check",
+            "ev.senior.reflection"
+          ],
+          "selectedEventId": "ev.senior.health-check",
+          "reason": "weighted",
+          "drawsUsed": 2,
+          "rngStateAfter": [
+            28687,
+            35853,
+            1097,
+            58859520
+          ],
+          "selectionHash": "53de3a46043f27ffae033d7b34f612cc786d369fbe2d4022b296d08aa729a60f"
+        },
+        {
+          "id": "case-19-exams-taken",
+          "contentMode": "standard",
+          "state": {
+            "currentYear": 2032,
+            "age": 12,
+            "phase": "life",
+            "stats": {
+              "health": 60,
+              "happiness": 60,
+              "knowledge": 50,
+              "relationships": 50
+            },
+            "assets": {
+              "balanceMicroUsd": "0",
+              "annualIncomeMicroUsd": "12000000",
+              "annualExpenseMicroUsd": "9000000"
+            },
+            "flags": []
+          },
+          "history": {
+            "occurrences": [
+              {
+                "eventId": "ev.teen.exams",
+                "lastYear": 2032,
+                "count": 1
+              }
+            ]
+          },
+          "rngState": [
+            73,
+            74,
+            75,
+            76
+          ],
+          "candidateIds": [
+            "ev.any.setback",
+            "ev.any.small-win"
+          ],
+          "selectedEventId": "ev.any.small-win",
+          "reason": "weighted",
+          "drawsUsed": 2,
+          "rngStateAfter": [
+            12295,
+            37893,
+            1101,
+            25313280
+          ],
+          "selectionHash": "0eab67f95ed8d96338d69690e99b2e852f36d6d3f55af37c23e44318ce32df71"
+        },
+        {
+          "id": "case-20-no-promotion-knowledge",
+          "contentMode": "standard",
+          "state": {
+            "currentYear": 2065,
+            "age": 45,
+            "phase": "life",
+            "stats": {
+              "health": 60,
+              "happiness": 60,
+              "knowledge": 30,
+              "relationships": 50
+            },
+            "assets": {
+              "balanceMicroUsd": "0",
+              "annualIncomeMicroUsd": "12000000",
+              "annualExpenseMicroUsd": "9000000"
+            },
+            "flags": [
+              "employed"
+            ]
+          },
+          "history": {
+            "occurrences": []
+          },
+          "rngState": [
+            77,
+            78,
+            79,
+            80
+          ],
+          "candidateIds": [
+            "ev.any.setback",
+            "ev.any.small-win"
+          ],
+          "selectedEventId": "ev.any.small-win",
+          "reason": "weighted",
+          "drawsUsed": 2,
+          "rngStateAfter": [
+            61471,
+            39965,
+            1105,
+            125984768
+          ],
+          "selectionHash": "c40a1d87768843f1cc01f2fbeb31011a12e83121132fe8a346399d7b29cf54a0"
+        },
+        {
+          "id": "case-21-all-zero-rng",
+          "contentMode": "standard",
+          "state": {
+            "currentYear": 2023,
+            "age": 3,
+            "phase": "life",
+            "stats": {
+              "health": 60,
+              "happiness": 60,
+              "knowledge": 50,
+              "relationships": 50
+            },
+            "assets": {
+              "balanceMicroUsd": "0",
+              "annualIncomeMicroUsd": "12000000",
+              "annualExpenseMicroUsd": "9000000"
+            },
+            "flags": []
+          },
+          "history": {
+            "occurrences": []
+          },
+          "rngState": [
+            0,
+            0,
+            0,
+            0
+          ],
+          "candidateIds": [
+            "ev.any.setback",
+            "ev.any.small-win",
+            "ev.child.first-word",
+            "ev.child.sibling-arrives",
+            "ev.child.tantrum"
+          ],
+          "selectedEventId": "ev.any.setback",
+          "reason": "weighted",
+          "drawsUsed": 2,
+          "rngStateAfter": [
+            4293906521,
+            1045419862,
+            3777114885,
+            1407991002
+          ],
+          "selectionHash": "cdffbb4ab4d8b7423e36c51e96e2f346cd4b253a6452d938992667e02547c137"
+        },
+        {
+          "id": "case-22-high-happiness",
+          "contentMode": "standard",
+          "state": {
+            "currentYear": 2075,
+            "age": 55,
+            "phase": "life",
+            "stats": {
+              "health": 90,
+              "happiness": 95,
+              "knowledge": 88,
+              "relationships": 92
+            },
+            "assets": {
+              "balanceMicroUsd": "123456789",
+              "annualIncomeMicroUsd": "12000000",
+              "annualExpenseMicroUsd": "9000000"
+            },
+            "flags": [
+              "employed",
+              "community:member"
+            ]
+          },
+          "history": {
+            "occurrences": []
+          },
+          "rngState": [
+            81,
+            82,
+            83,
+            84
+          ],
+          "candidateIds": [
+            "ev.adult.promotion",
+            "ev.adult.volunteer",
+            "ev.any.setback",
+            "ev.any.small-win"
+          ],
+          "selectedEventId": "ev.any.small-win",
+          "reason": "weighted",
+          "drawsUsed": 2,
+          "rngStateAfter": [
+            12295,
+            41989,
+            1109,
+            25329664
+          ],
+          "selectionHash": "116f98570ac78ef7c699ec047df014f67941f2b035c98ccd8bf7ea01045066b2"
+        },
+        {
+          "id": "case-23-guardian-teen",
+          "contentMode": "guardian",
+          "state": {
+            "currentYear": 2035,
+            "age": 15,
+            "phase": "life",
+            "stats": {
+              "health": 60,
+              "happiness": 60,
+              "knowledge": 50,
+              "relationships": 50
+            },
+            "assets": {
+              "balanceMicroUsd": "0",
+              "annualIncomeMicroUsd": "12000000",
+              "annualExpenseMicroUsd": "9000000"
+            },
+            "flags": []
+          },
+          "history": {
+            "occurrences": []
+          },
+          "rngState": [
+            85,
+            86,
+            87,
+            88
+          ],
+          "candidateIds": [
+            "ev.any.setback",
+            "ev.any.small-win",
+            "ev.guardian.calm",
+            "ev.teen.friendship",
+            "ev.teen.part-time-job"
+          ],
+          "selectedEventId": "ev.teen.friendship",
+          "reason": "weighted",
+          "drawsUsed": 2,
+          "rngStateAfter": [
+            28687,
+            44045,
+            1113,
+            58892288
+          ],
+          "selectionHash": "1c625a9cc100bc9e70efe05c8277a139365bc215b2197c58f850aaf58114ea64"
+        },
+        {
+          "id": "case-24-tantrum-age",
+          "contentMode": "standard",
+          "state": {
+            "currentYear": 2024,
+            "age": 4,
+            "phase": "life",
+            "stats": {
+              "health": 60,
+              "happiness": 60,
+              "knowledge": 50,
+              "relationships": 50
+            },
+            "assets": {
+              "balanceMicroUsd": "0",
+              "annualIncomeMicroUsd": "12000000",
+              "annualExpenseMicroUsd": "9000000"
+            },
+            "flags": []
+          },
+          "history": {
+            "occurrences": []
+          },
+          "rngState": [
+            89,
+            90,
+            91,
+            92
+          ],
+          "candidateIds": [
+            "ev.any.setback",
+            "ev.any.small-win",
+            "ev.child.playground",
+            "ev.child.sibling-arrives",
+            "ev.child.tantrum"
+          ],
+          "selectedEventId": "ev.any.small-win",
+          "reason": "weighted",
+          "drawsUsed": 2,
+          "rngStateAfter": [
+            12295,
+            46085,
+            1117,
+            25346048
+          ],
+          "selectionHash": "70fbd4f33539e321cf66a586d04529982343a18588d00cd8ee52daaf45d33093"
+        }
+      ]
+    },
+    {
+      "packId": "p3b-synthetic-edges-v1",
+      "manifestFile": "edge-manifest.v1.json",
+      "eventsFile": "edge-events.v1.json",
+      "packChecksum": "5aada8774f0d33b9891ff28b6937ee2749bdee1f7f3d9991db052610f3cff99f",
+      "datasetChecksum": "39ae1da70b5250496f93749ee2d98503c8a82ce96cc843e8a82a9dcb05107128",
+      "cases": [
+        {
+          "id": "edge-01-single-candidate",
+          "contentMode": "standard",
+          "state": {
+            "currentYear": 2050,
+            "age": 30,
+            "phase": "life",
+            "stats": {
+              "health": 60,
+              "happiness": 60,
+              "knowledge": 50,
+              "relationships": 50
+            },
+            "assets": {
+              "balanceMicroUsd": "0",
+              "annualIncomeMicroUsd": "12000000",
+              "annualExpenseMicroUsd": "9000000"
+            },
+            "flags": []
+          },
+          "history": {
+            "occurrences": []
+          },
+          "rngState": [
+            101,
+            102,
+            103,
+            104
+          ],
+          "candidateIds": [
+            "edge.only-one"
+          ],
+          "selectedEventId": "edge.only-one",
+          "reason": "single_candidate",
+          "drawsUsed": 0,
+          "rngStateAfter": [
+            101,
+            102,
+            103,
+            104
+          ],
+          "selectionHash": "466899345b7c09ea8b0be3545f720d21ee6148c1f3c66fc0c4f6c55f8b4b077f"
+        },
+        {
+          "id": "edge-02-no-candidate",
+          "contentMode": "standard",
+          "state": {
+            "currentYear": 2050,
+            "age": 30,
+            "phase": "life",
+            "stats": {
+              "health": 60,
+              "happiness": 60,
+              "knowledge": 50,
+              "relationships": 50
+            },
+            "assets": {
+              "balanceMicroUsd": "0",
+              "annualIncomeMicroUsd": "12000000",
+              "annualExpenseMicroUsd": "9000000"
+            },
+            "flags": []
+          },
+          "history": {
+            "occurrences": [
+              {
+                "eventId": "edge.only-one",
+                "lastYear": 2050,
+                "count": 1
+              }
+            ]
+          },
+          "rngState": [
+            105,
+            106,
+            107,
+            108
+          ],
+          "candidateIds": [],
+          "selectedEventId": null,
+          "reason": "no_candidates",
+          "drawsUsed": 0,
+          "rngStateAfter": [
+            105,
+            106,
+            107,
+            108
+          ],
+          "selectionHash": "7767098ca589eab341e65d4f3a8481238bb1f463167ffb948b1f6fff113648f5"
+        },
+        {
+          "id": "edge-03-two-candidates-guardian",
+          "contentMode": "guardian",
+          "state": {
+            "currentYear": 2050,
+            "age": 30,
+            "phase": "life",
+            "stats": {
+              "health": 60,
+              "happiness": 60,
+              "knowledge": 50,
+              "relationships": 50
+            },
+            "assets": {
+              "balanceMicroUsd": "0",
+              "annualIncomeMicroUsd": "12000000",
+              "annualExpenseMicroUsd": "9000000"
+            },
+            "flags": []
+          },
+          "history": {
+            "occurrences": []
+          },
+          "rngState": [
+            109,
+            110,
+            111,
+            112
+          ],
+          "candidateIds": [
+            "edge.guardian-only",
+            "edge.only-one"
+          ],
+          "selectedEventId": "edge.guardian-only",
+          "reason": "weighted",
+          "drawsUsed": 2,
+          "rngStateAfter": [
+            61471,
+            56349,
+            1137,
+            126050304
+          ],
+          "selectionHash": "45c46e571cca72314dd5819a83ebfb69eaf81fc41330f2df1be7ee0498a82674"
+        },
+        {
+          "id": "edge-04-single-after-once",
+          "contentMode": "guardian",
+          "state": {
+            "currentYear": 2050,
+            "age": 30,
+            "phase": "life",
+            "stats": {
+              "health": 60,
+              "happiness": 60,
+              "knowledge": 50,
+              "relationships": 50
+            },
+            "assets": {
+              "balanceMicroUsd": "0",
+              "annualIncomeMicroUsd": "12000000",
+              "annualExpenseMicroUsd": "9000000"
+            },
+            "flags": []
+          },
+          "history": {
+            "occurrences": [
+              {
+                "eventId": "edge.only-one",
+                "lastYear": 2050,
+                "count": 1
+              }
+            ]
+          },
+          "rngState": [
+            113,
+            114,
+            115,
+            116
+          ],
+          "candidateIds": [
+            "edge.guardian-only"
+          ],
+          "selectedEventId": "edge.guardian-only",
+          "reason": "single_candidate",
+          "drawsUsed": 0,
+          "rngStateAfter": [
+            113,
+            114,
+            115,
+            116
+          ],
+          "selectionHash": "cce087b1eced746768689c286985c45da2ab6ccb86770af0f76e8d23dff95534"
+        }
+      ]
+    }
+  ]
+}

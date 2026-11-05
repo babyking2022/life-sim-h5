@@ -1,0 +1,72 @@
+{
+  "schemaVersion": "p3b-1",
+  "contentPackVersion": "1.0.0",
+  "dataset": "events",
+  "records": [
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.0.0",
+      "conditions": {
+        "op": "contentMode",
+        "mode": "guardian"
+      },
+      "priority": 0,
+      "once": false,
+      "cooldownYears": 0,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "stat",
+          "stat": "happiness",
+          "delta": 2
+        }
+      ],
+      "decision": null,
+      "sourceId": "p3b-synthetic-edges-v1-source",
+      "eventId": "edge.guardian-only",
+      "kind": "ordinary",
+      "localizationKey": "p3b.edge.guardian_only",
+      "ageMin": 0,
+      "ageMax": 120,
+      "lifeStages": [
+        "childhood",
+        "adolescence",
+        "adulthood",
+        "later_life"
+      ],
+      "weight": 11
+    },
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.0.0",
+      "conditions": null,
+      "priority": 0,
+      "once": true,
+      "cooldownYears": 0,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "stat",
+          "stat": "happiness",
+          "delta": 1
+        }
+      ],
+      "decision": null,
+      "sourceId": "p3b-synthetic-edges-v1-source",
+      "eventId": "edge.only-one",
+      "kind": "ordinary",
+      "localizationKey": "p3b.edge.only_one",
+      "ageMin": 0,
+      "ageMax": 120,
+      "lifeStages": [
+        "childhood",
+        "adolescence",
+        "adulthood",
+        "later_life"
+      ],
+      "weight": 7
+    }
+  ]
+}

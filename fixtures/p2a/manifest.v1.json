@@ -1,0 +1,60 @@
+{
+  "schemaVersion": "p2a-1",
+  "dataVersion": "1.0.0",
+  "packId": "p2a-synthetic-20261027",
+  "packKind": "synthetic",
+  "createdAt": "2026-10-27",
+  "engineVersion": "0.1.0",
+  "rngSpecVersion": "1.0.0",
+  "entityCount": 172,
+  "indicatorYear": 2024,
+  "indicatorIds": [
+    "birth_share_weight",
+    "underweight_rate_ppm"
+  ],
+  "licenseSourceIds": [
+    "SYNTH-P2A-REGISTRY",
+    "SYNTH-P2A-INDICATORS",
+    "SYNTH-P2A-BIRTH-WEIGHTS",
+    "SYNTH-P2A-SENSITIVE-NAMES"
+  ],
+  "datasets": [
+    {
+      "datasetId": "country-registry",
+      "fileName": "country-registry.v1.json",
+      "recordCount": 172,
+      "checksum": "7cd7551faa6c81ed6b91a28221ba86583ede7d38ac06e6c99de02b6173029e73"
+    },
+    {
+      "datasetId": "indicators",
+      "fileName": "indicators.v1.json",
+      "recordCount": 344,
+      "checksum": "80a0b0c7245f9bb4f2e79a723d61ca5ab33f3391ffe2232f6883c95935b8635a"
+    },
+    {
+      "datasetId": "birth-weights",
+      "fileName": "birth-weights.v1.json",
+      "recordCount": 344,
+      "checksum": "44b529972f6829d36a8f28a60036f0f44b91260f40cf020b294f639ad277c474"
+    },
+    {
+      "datasetId": "sensitive-names",
+      "fileName": "sensitive-names.v1.json",
+      "recordCount": 3,
+      "checksum": "d49b3ace6ccaf93e2e9241270a44f0fb2d7d9c0dc5d71e70a326d675f762506e"
+    },
+    {
+      "datasetId": "licenses",
+      "fileName": "licenses.v1.json",
+      "recordCount": 4,
+      "checksum": "ae0557596c20751c9dfc5e0519376433dfc7a3b5c1fbde331b8dabbf59393383"
+    },
+    {
+      "datasetId": "lineage",
+      "fileName": "lineage.v1.json",
+      "recordCount": 4,
+      "checksum": "757e46d86850a339dd3e76516184bc5b850a8d8947fb60539a11a56930e5a9ee"
+    }
+  ],
+  "packChecksum": "c6d7e9261060e5ecacb1de2c7823d39dec12d6b4142512a6d3c1f10529f54c7b"
+}

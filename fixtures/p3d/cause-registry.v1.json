@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "p3d-1",
+  "deathDataVersion": "1.0.0",
+  "dataset": "cause-registry",
+  "records": [
+{"causeId":"cause.neutral.circulatory","labelKey":"p3d.cause.neutral.circulatory","sensitivity":"neutral","shareSafe":true},
+{"causeId":"cause.neutral.respiratory","labelKey":"p3d.cause.neutral.respiratory","sensitivity":"neutral","shareSafe":true},
+{"causeId":"cause.neutral.infection","labelKey":"p3d.cause.neutral.infection","sensitivity":"neutral","shareSafe":true},
+{"causeId":"cause.neutral.neoplasm","labelKey":"p3d.cause.neutral.neoplasm","sensitivity":"neutral","shareSafe":false},
+{"causeId":"cause.neutral.neurological","labelKey":"p3d.cause.neutral.neurological","sensitivity":"neutral","shareSafe":false},
+{"causeId":"cause.neutral.digestive","labelKey":"p3d.cause.neutral.digestive","sensitivity":"neutral","shareSafe":true},
+{"causeId":"cause.neutral.external","labelKey":"p3d.cause.neutral.external","sensitivity":"neutral","shareSafe":false},
+{"causeId":"cause.neutral.other","labelKey":"p3d.cause.neutral.other","sensitivity":"neutral","shareSafe":true}
+  ]
+}
