@@ -1,4 +1,6 @@
 import {
+  applyP3ELifeFocusAnnualStats,
+  readP3ELifeFocus,
   type P3EAssets,
   type P3EErrorCode,
   type P3ELifeRngState,
@@ -190,7 +192,14 @@ export function resolveP3EAnnualRoll(input: unknown): P3EAnnualRollResult {
     lifeRng: state.rng.life
   });
 
-  // 6. 獨立、深層凍結的結果
+  // 6. GPT-0029-B：重心對四項核心屬性的年度小幅累積效果。
+  //    只在 state.flags 帶有合法 focus flag 時套用；沒有重心的既有決定性路徑
+  //    （官方 golden）連一個位元都不會改變，也不消耗任何額外 RNG。
+  //    加成後的 stats 會繼續進入事件條件、effects 與死亡判定，不是純顯示。
+  const focus = readP3ELifeFocus(state.flags);
+  const statsAfter = focus === null ? roll.stats : applyP3ELifeFocusAnnualStats(roll.stats, focus.focusId);
+
+  // 7. 獨立、深層凍結的結果
   return Object.freeze({
     rollSpecVersion: roll.rollSpecVersion,
     yearBefore: state.currentYear,
@@ -198,7 +207,7 @@ export function resolveP3EAnnualRoll(input: unknown): P3EAnnualRollResult {
     ageBefore: state.age,
     ageAfter: targetAge,
     statsBefore: copyStats(state.stats),
-    statsAfter: copyStats(roll.stats),
+    statsAfter: copyStats(statsAfter),
     assetsBefore: copyAssets(state.assets),
     assetsAfter: copyAssets(roll.assets),
     lifeRngBefore: copyLifeRng(state.rng.life),

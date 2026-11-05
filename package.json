@@ -40,6 +40,7 @@
     "p3b:golden": "esbuild scripts/p3b-generate-golden.ts --bundle --platform=node --format=esm --target=node20 --outfile=.artifacts/p3b-golden.mjs && node .artifacts/p3b-golden.mjs",
     "test:p3b-browser": "node scripts/p3b-golden-browser.mjs",
     "p3b:distribution": "esbuild scripts/p3b-distribution.ts --bundle --platform=node --format=esm --target=node20 --outfile=.artifacts/p3b-distribution.mjs && node .artifacts/p3b-distribution.mjs",
+    "p3d:mortality-distribution": "esbuild scripts/p3d-mortality-distribution.ts --bundle --platform=node --format=esm --target=node20 --outfile=.artifacts/p3d-mortality-distribution.mjs && node .artifacts/p3d-mortality-distribution.mjs",
     "p3b:coverage": "esbuild scripts/p3b-choice-coverage.ts --bundle --platform=node --format=esm --target=node20 --outfile=.artifacts/p3b-choice-coverage.mjs && node .artifacts/p3b-choice-coverage.mjs",
     "p3c:fixtures": "esbuild scripts/p3c-generate-fixtures.ts --bundle --platform=node --format=esm --target=node20 --outfile=.artifacts/p3c-fixtures.mjs && node .artifacts/p3c-fixtures.mjs",
     "p3c:golden": "esbuild scripts/p3c-generate-golden.ts --bundle --platform=node --format=esm --target=node20 --outfile=.artifacts/p3c-golden.mjs && node .artifacts/p3c-golden.mjs",

@@ -167,6 +167,7 @@ function advance(initial: readonly [number, number, number, number], draws: numb
 
 interface StateOptions {
   readonly pack?: ValidatedEventPack;
+  readonly health?: number;
   readonly phase?: contracts.P3EPhase;
 }
 
@@ -182,7 +183,7 @@ function stateAt(age: number, options: StateOptions = {}): contracts.P3ELifeStat
     age,
     phase: options.phase ?? (age >= contracts.P3E_MAX_AGE ? ("death" as const) : ("life" as const)),
     pendingDecision: null,
-    stats: { health: 60, happiness: 55, knowledge: 40, relationships: 35 },
+    stats: { health: options.health ?? 60, happiness: 55, knowledge: 40, relationships: 35 },
     assets: {
       balanceMicroUsd: 1_900_000n,
       annualIncomeMicroUsd:
@@ -352,10 +353,10 @@ describe("H5-CTO-166-A 可玩 façade：基本行為", () => {
   });
 
   it("自然死亡：死亡年度封存 death 且 pendingDecision 為 null", () => {
-    const previous = stateAt(76, { pack: packPlain });
+    const previous = stateAt(118, { pack: packPlain, health: 50 });
     const result = run(previous, { ...ADVANCE }, packPlain);
     expect(result.state.phase).toBe("death");
-    expect(result.state.age).toBe(77);
+    expect(result.state.age).toBe(119);
     expect(result.state.pendingDecision).toBeNull();
     expect(result.yearRecord.phase).toBe("death");
   });
@@ -607,7 +608,7 @@ describe("H5-CTO-166-A 完整可玩流程", () => {
     expect(stable(viaApp)).toBe(stable(viaSimulation));
     expect(viaApp.outcome.kind).toBe("advance_year");
 
-    const deadState = stateAt(76, { pack: packPlain });
+    const deadState = stateAt(118, { pack: packPlain, health: 50 });
     const deadViaApp = runP3EGameCommand({
       state: deadState,
       eventPack: packPlain,

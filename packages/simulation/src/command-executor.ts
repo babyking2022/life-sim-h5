@@ -1,4 +1,8 @@
-import type { P3ELifeState } from "@life-sim/contracts";
+import {
+  P3E_LIFE_FOCUS_FIRST_AGE,
+  readP3ELifeFocus,
+  type P3ELifeState
+} from "@life-sim/contracts";
 import { P3EError } from "./errors";
 import { readP3EState } from "./state-invariants";
 import { readP3ECommand } from "./command-envelope";
@@ -6,7 +10,8 @@ import { resolveP3EAnnualPendingDecision } from "./pending-decision-persistence"
 import { resolveP3EDecisionChoice } from "./decision-choice-effects";
 import {
   assembleP3EAnnualStateCoreDraft,
-  assembleP3EDecisionStateCoreDraft
+  assembleP3EDecisionStateCoreDraft,
+  assembleP3ELifeFocusStateCoreDraft
 } from "./state-core-draft";
 import {
   appendP3ELedgerTransition,
@@ -15,6 +20,7 @@ import {
 import {
   buildP3EAdvanceYearOutcome,
   buildP3EChooseDecisionOutcome,
+  buildP3ESetLifeFocusOutcome,
   type P3ECommandOutcome
 } from "./command-outcome";
 
@@ -100,6 +106,7 @@ export interface P3ECommandExecutionResult extends P3ELedgerAppendResult {
 export type {
   P3EAdvanceYearOutcome,
   P3EChooseDecisionOutcome,
+  P3ESetLifeFocusOutcome,
   P3ECommandOutcome
 } from "./command-outcome";
 
@@ -232,6 +239,25 @@ export function executeP3ECommand(input: unknown): P3ECommandExecutionResult {
     });
     const coreDraft = assembleP3EAnnualStateCoreDraft(state, stage);
     const outcome = buildP3EAdvanceYearOutcome(stage);
+    return sealCommandResult(appendP3ELedgerTransition(state, command, coreDraft), outcome);
+  }
+
+  if (command.type === "SET_LIFE_FOCUS") {
+    // 重心路徑（GPT-0029-B）：只換 focus flag，不推進模擬年。
+    // 門檻全部落在正式 State 上，replay 用同一筆 command 會得到相同結果。
+    if (state.age < P3E_LIFE_FOCUS_FIRST_AGE) {
+      throw new P3EError("E_P3E_COMMAND", "commandExecution.lifeFocus.age");
+    }
+    if (state.phase !== "life") {
+      throw new P3EError("E_P3E_PHASE", "commandExecution.lifeFocus.phase");
+    }
+    const current = readP3ELifeFocus(state.flags);
+    if (current !== null && current.changedYear === state.currentYear) {
+      // 同一個模擬年至多更改一次。
+      throw new P3EError("E_P3E_COMMAND", "commandExecution.lifeFocus.yearLimit");
+    }
+    const coreDraft = assembleP3ELifeFocusStateCoreDraft(state, command.focusId, state.currentYear);
+    const outcome = buildP3ESetLifeFocusOutcome(command.focusId, state.currentYear);
     return sealCommandResult(appendP3ELedgerTransition(state, command, coreDraft), outcome);
   }
 

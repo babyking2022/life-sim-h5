@@ -74,8 +74,18 @@ export interface P3EChooseDecisionOutcome {
   readonly informational: boolean;
 }
 
+/** `SET_LIFE_FOCUS` 的呈現結果（GPT-0029-B：只報告重心，不含任何內部鍵）。 */
+export interface P3ESetLifeFocusOutcome {
+  readonly kind: "set_life_focus";
+  readonly focusId: string;
+  readonly changedYear: number;
+}
+
 /** 一次命令交易的呈現結果。 */
-export type P3ECommandOutcome = P3EAdvanceYearOutcome | P3EChooseDecisionOutcome;
+export type P3ECommandOutcome =
+  | P3EAdvanceYearOutcome
+  | P3EChooseDecisionOutcome
+  | P3ESetLifeFocusOutcome;
 
 /* ------------------------------------------------------------------ */
 /* 深層凍結與獨立副本                                                  */
@@ -180,4 +190,12 @@ export function buildP3EChooseDecisionOutcome(
     changes: copyChanges(stage.changes),
     informational: stage.informational
   });
+}
+
+/** `SET_LIFE_FOCUS` 的呈現結果：由已驗證的 state 與 focusId 直接建立。 */
+export function buildP3ESetLifeFocusOutcome(
+  focusId: string,
+  changedYear: number
+): P3ESetLifeFocusOutcome {
+  return deepFreeze({ kind: "set_life_focus" as const, focusId, changedYear });
 }

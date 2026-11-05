@@ -169,9 +169,9 @@ function rngProjection(rng: P3ERngState): unknown {
 }
 
 function commandProjection(command: P3ECommand): unknown {
-  return command.type === "ADVANCE_YEAR"
-    ? { type: command.type, contentMode: command.contentMode }
-    : { type: command.type, optionId: command.optionId };
+  if (command.type === "ADVANCE_YEAR") return { type: command.type, contentMode: command.contentMode };
+  if (command.type === "CHOOSE_DECISION") return { type: command.type, optionId: command.optionId };
+  return { type: command.type, focusId: command.focusId };
 }
 
 /** Command Record 的固定九欄（順序固定）。 */

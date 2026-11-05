@@ -253,6 +253,107 @@ function pageSnapshot() {
  * GPT-0025-D：把字典中最長的標題／問題／選項直接注入目前的決策卡，
  * 在同一個 evaluate 內完成量測（避免自動時間流動重繪覆蓋注入值）。
  */
+/* GPT-0029-B：出生卡與人生重心的手機單畫面探測（在瀏覽器內執行）。 */
+function focusSnapshot() {
+  const doc = document.documentElement;
+  const body = document.body;
+  const q = (s) => document.querySelector(s);
+  const box = (node) => {
+    if (node === null) return null;
+    const r = node.getBoundingClientRect();
+    return { top: r.top, bottom: r.bottom, left: r.left, right: r.right, width: r.width, height: r.height };
+  };
+  const shown = (node) => {
+    if (node === null) return false;
+    const style = getComputedStyle(node);
+    return style.display !== "none" && style.visibility !== "hidden" && box(node).height > 0;
+  };
+  window.scrollTo(0, 99999);
+  const scrolled = window.scrollY;
+  window.scrollTo(0, 0);
+
+  const live = q("[data-p3e-live]");
+  const focusBox = q(".p3e-focus");
+  const line = q(".p3e-focus-current");
+  const panel = q(".p3e-focus-panel");
+  const card = q(".p3e-story-card");
+  const birthCard = q(".p3e-birth-card");
+  const optionNodes = [...document.querySelectorAll(".p3e-focus-option")].filter(shown);
+  const toggle = q(".p3e-focus-toggle");
+  const allButtons = [...(focusBox?.querySelectorAll("button") ?? [])].filter(shown);
+  const fontOf = (node) => (node === null ? null : parseFloat(getComputedStyle(node).fontSize));
+  const text = (focusBox?.textContent ?? "").replace(/\s+/g, " ").trim();
+
+  return {
+    phase: live?.getAttribute("data-p3e-phase") ?? "unknown",
+    age: Number(live?.getAttribute("data-p3e-life-focus-age") ?? "-1"),
+    shellFocus: live?.getAttribute("data-p3e-life-focus") ?? "none",
+    focusPresent: shown(focusBox),
+    expanded: focusBox?.dataset.p3eFocusExpanded ?? "false",
+    birthCardVisible: shown(birthCard),
+    birthButtons: [...(birthCard?.querySelectorAll("button") ?? [])].filter(shown)
+      .map((b) => ({ label: (b.textContent ?? "").trim().slice(0, 12), height: box(b).height, width: box(b).width })),
+    overflow: {
+      docY: doc.scrollHeight - doc.clientHeight,
+      bodyY: body.scrollHeight - body.clientHeight,
+      docX: doc.scrollWidth - doc.clientWidth,
+      bodyX: body.scrollWidth - body.clientWidth,
+      scrolled
+    },
+    lineText: (line?.textContent ?? "").replace(/\s+/g, " ").trim(),
+    lineHeight: line === null ? 0 : box(line).height,
+    focusBoxHeight: focusBox === null ? 0 : box(focusBox).height,
+    panelOverflowY: panel === null ? null : getComputedStyle(panel).overflowY,
+    panelScrollable: panel === null ? false : panel.scrollHeight > panel.clientHeight + 1,
+    panelInViewport: panel === null ? true : box(panel).bottom <= window.innerHeight + 2,
+    cardOverflowY: card === null ? null : getComputedStyle(card).overflowY,
+    focusPosition: focusBox === null ? null : getComputedStyle(focusBox).position,
+    focusOverflowY: focusBox === null ? null : getComputedStyle(focusBox).overflowY,
+    focusScrollable: focusBox === null ? false : focusBox.scrollHeight > focusBox.clientHeight + 1,
+    optionCount: optionNodes.length,
+    optionsInViewport: optionNodes.filter((b) => {
+      const r = box(b);
+      return r.top >= -2 && r.bottom <= window.innerHeight + 2 && r.left >= -2 && r.right <= window.innerWidth + 2;
+    }).length,
+    optionLabels: optionNodes.map((b) => (b.textContent ?? "").replace(/\s+/g, " ").trim().slice(0, 24)),
+    minOptionHeight: Math.min(...optionNodes.map((b) => box(b).height), 999),
+    minOptionFont: Math.min(...optionNodes.map((b) => fontOf(b) ?? 0), 999),
+    minButtonHeight: Math.min(...allButtons.map((b) => box(b).height), 999),
+    toggleDisabled: toggle?.disabled ?? null,
+    toggleHeight: toggle === null ? 0 : box(toggle).height,
+    internalKeyLeak: /focus:|p3b\.|SET_LIFE_FOCUS|data-focus-id|focusId/.test(text),
+    bodyText: (body.textContent ?? "").replace(/\s+/g, " ")
+  };
+}
+
+/** 把前景選擇卡捲到底，確認第五個選項與「先不改」都能局部捲到。 */
+function focusBottomProbe() {
+  const box = document.querySelector('.p3e-focus[data-p3e-focus-expanded="true"]');
+  if (box !== null) box.scrollTop = box.scrollHeight;
+  const options = [...document.querySelectorAll(".p3e-focus-option")];
+  const last = options[options.length - 1] ?? null;
+  const dismiss = document.querySelector(".p3e-focus-dismiss");
+  const visible = (node) => {
+    if (node === null) return false;
+    const r = node.getBoundingClientRect();
+    return r.top >= -2 && r.bottom <= window.innerHeight + 2 && r.height > 0;
+  };
+  const doc = document.documentElement;
+  const body = document.body;
+  window.scrollTo(0, 99999);
+  const scrolled = window.scrollY;
+  window.scrollTo(0, 0);
+  return {
+    scrollTop: box?.scrollTop ?? 0,
+    scrollable: box === null ? false : box.scrollHeight > box.clientHeight + 1,
+    lastOptionVisible: visible(last),
+    dismissVisible: visible(dismiss),
+    docY: doc.scrollHeight - doc.clientHeight,
+    bodyY: body.scrollHeight - body.clientHeight,
+    scrolled
+  };
+}
+
 function longestCopyProbe(payload) {
   const question = document.querySelector("#p3e-pending-title");
   const eventName = document.querySelector(".p3e-event-name");
@@ -294,6 +395,99 @@ function check(name, ok, detail) {
   checks.push({ name, ok: Boolean(ok), detail: detail ?? null });
   console.log(`${ok ? "PASS" : "FAIL"} ${name}${detail ? ` — ${detail}` : ""}`);
   if (!ok) process.exitCode = 1;
+}
+
+/** GPT-0029-B：出生卡的單畫面檢查（birth phase）。 */
+function evaluateBirth(label, s) {
+  const prefix = `${label}_birth`;
+  const o = s.overflow;
+  check(
+    `${prefix}_no_page_scroll`,
+    o.docY <= 1 && o.bodyY <= 1 && o.docX <= 1 && o.bodyX <= 1 && o.scrolled === 0,
+    `docY=${o.docY} bodyY=${o.bodyY} docX=${o.docX} bodyX=${o.bodyX} scrolled=${o.scrolled}`
+  );
+  check(`${prefix}_card_visible`, s.birthCardVisible, `visible=${s.birthCardVisible}`);
+  check(
+    `${prefix}_buttons_44px`,
+    s.birthButtons.length >= 2 && s.birthButtons.every((b) => b.height >= 43.5 && b.width >= 43.5),
+    JSON.stringify(s.birthButtons)
+  );
+  check(`${prefix}_no_focus_before_school`, !s.focusPresent, `focus=${s.focusPresent}`);
+}
+
+/** GPT-0029-B：滿 7 歲第一次自動出現清楚的五選一面板。 */
+function evaluateFocusPicker(label, s) {
+  const prefix = `${label}_focus_picker`;
+  const o = s.overflow;
+  check(
+    `${prefix}_no_page_scroll`,
+    o.docY <= 1 && o.bodyY <= 1 && o.docX <= 1 && o.bodyX <= 1 && o.scrolled === 0,
+    `docY=${o.docY} bodyY=${o.bodyY} docX=${o.docX} scrolled=${o.scrolled}`
+  );
+  check(
+    `${prefix}_auto_opens_at_age7`,
+    s.age === 7 && s.focusPresent && s.expanded === "true" && s.optionCount === 5,
+    `age=${s.age} present=${s.focusPresent} expanded=${s.expanded} options=${s.optionCount}`
+  );
+  check(
+    `${prefix}_all_targets_44px`,
+    s.minOptionHeight >= 43.5 && s.minButtonHeight >= 43.5,
+    `optionH=${s.minOptionHeight} buttonH=${s.minButtonHeight}`
+  );
+  check(
+    `${prefix}_text_readable`,
+    s.minOptionFont >= 13.9 && !s.internalKeyLeak,
+    `font=${s.minOptionFont} leak=${s.internalKeyLeak}`
+  );
+  check(
+    `${prefix}_panel_scrolls_locally_only`,
+    s.focusPosition === "fixed" &&
+      (s.focusOverflowY === "auto" || s.focusOverflowY === "scroll") &&
+      s.cardOverflowY !== "visible",
+    `position=${s.focusPosition} focusOverflow=${s.focusOverflowY} card=${s.cardOverflowY} scrollable=${s.focusScrollable}`
+  );
+  check(
+    `${prefix}_options_visible_or_card_scrollable`,
+    s.optionCount === 5 && s.optionsInViewport >= 4 &&
+      (s.optionsInViewport === 5 || s.focusScrollable),
+    `options=${s.optionCount} inViewport=${s.optionsInViewport} cardScrollable=${s.focusScrollable}`
+  );
+  check(
+    `${prefix}_five_natural_labels`,
+    s.optionLabels.length === 5 &&
+      s.optionLabels.some((t) => t.includes("學業")) &&
+      s.optionLabels.some((t) => t.includes("自我實現")) &&
+      s.optionLabels.some((t) => t.includes("家庭")) &&
+      s.optionLabels.some((t) => t.includes("興趣")) &&
+      s.optionLabels.some((t) => t.includes("健康")),
+    JSON.stringify(s.optionLabels)
+  );
+}
+
+/** GPT-0029-B：選定後只佔一行、可更改、重整後仍在。 */
+function evaluateFocusChosen(label, s, expectedLabel, expectToggleDisabled) {
+  const prefix = `${label}_focus_chosen`;
+  const o = s.overflow;
+  check(
+    `${prefix}_no_page_scroll`,
+    o.docY <= 1 && o.bodyY <= 1 && o.docX <= 1 && o.bodyX <= 1 && o.scrolled === 0,
+    `docY=${o.docY} bodyY=${o.bodyY} scrolled=${o.scrolled}`
+  );
+  // 「緊湊」= 重心本身只佔一行（lineH <= 56px），且整個區塊（含 44px 觸控
+  // 按鈕與「今年已調整」提示）不超過視窗的 22%，不是整頁高度。
+  check(
+    `${prefix}_compact_one_line`,
+    s.shellFocus === "study" && s.focusPresent && s.expanded === "false" &&
+      s.lineText.includes(`目前重心：${expectedLabel}`) &&
+      s.lineHeight <= 56 && s.focusBoxHeight <= 120,
+    `focus=${s.shellFocus} line="${s.lineText}" lineH=${s.lineHeight} boxH=${s.focusBoxHeight} expanded=${s.expanded}`
+  );
+  check(
+    `${prefix}_change_entry_44px`,
+    s.toggleHeight >= 43.5 && s.toggleDisabled === expectToggleDisabled,
+    `h=${s.toggleHeight} disabled=${s.toggleDisabled}`
+  );
+  check(`${prefix}_no_internal_keys`, !s.internalKeyLeak, `leak=${s.internalKeyLeak}`);
 }
 
 function evaluate(label, phase, s) {
@@ -434,6 +628,20 @@ async function runTo(page, target, maxSteps = 400) {
   return steps;
 }
 
+/** GPT-0029-B：把畫面推到指定年齡（遇決策就選第一個選項）。 */
+async function runToAge(page, targetAge, maxSteps = 40) {
+  for (let step = 0; step < maxSteps; step += 1) {
+    const live = page.locator("[data-p3e-live]");
+    const age = Number(await live.getAttribute("data-p3e-life-focus-age"));
+    if (age >= targetAge) return age;
+    const phase = await phaseOf(page);
+    if (phase === "death") return age;
+    const selector = phase === "pending_decision" ? '[data-action="choose"]' : '[data-action="advance"]';
+    await clickAndWait(page, selector);
+  }
+  return Number(await page.locator("[data-p3e-live]").getAttribute("data-p3e-life-focus-age"));
+}
+
 async function main() {
   await mkdir(outDir, { recursive: true });
   const server = staticServer();
@@ -461,6 +669,12 @@ async function main() {
     const page = await context.newPage();
     await page.goto(`${baseUrl}/?seed=${encodeURIComponent(GOLDEN_SEED)}`, { waitUntil: "domcontentloaded" });
     await page.waitForSelector("[data-p3e-live='true']", { timeout: 30000 });
+
+    // GPT-0029-B：先量測出生卡（birth phase）再開始人生。
+    const birth = await page.evaluate(focusSnapshot);
+    evaluateBirth(label, birth);
+    await page.screenshot({ path: join(outDir, `${label}-birth.png`) });
+
     const start = page.locator('[data-action="start-life"], [data-action="begin-life"]');
     if ((await start.count()) > 0) {
       await start.first().click();
@@ -483,6 +697,18 @@ async function main() {
       await page.screenshot({ path: shot });
       evaluate(label, actual, snapshot);
       phases.push({ phase: actual, screenshot: shot, ...snapshot });
+
+      // GPT-0029-B：0–6 歲的主畫面（life phase）也不能出現重心區塊。
+      if (actual === "life") {
+        const early = await page.evaluate(focusSnapshot);
+        if (early.age < 7) {
+          check(
+            `${label}_life_no_focus_before_school`,
+            !early.focusPresent && early.shellFocus === "none",
+            `age=${early.age} present=${early.focusPresent}`
+          );
+        }
+      }
 
       if (actual === "pending_decision") {
         const probe = await page.evaluate(longestCopyProbe, {
@@ -510,7 +736,84 @@ async function main() {
         );
       }
     }
-    report.viewports.push({ label, phases });
+    /* ---------------------------------------------------------------- */
+    /* GPT-0029-B：人生重心專屬 probe（乾淨 context，不干擾既有 golden 量測） */
+    /* ---------------------------------------------------------------- */
+    const focusContext = await browser.newContext({
+      viewport,
+      deviceScaleFactor: 1,
+      isMobile: true,
+      hasTouch: true
+    });
+    const focusPage = await focusContext.newPage();
+    await focusPage.goto(`${baseUrl}/?seed=${encodeURIComponent(GOLDEN_SEED)}`, { waitUntil: "domcontentloaded" });
+    await focusPage.waitForSelector("[data-p3e-live='true']", { timeout: 30000 });
+    await focusPage.locator('[data-action="start-life"], [data-action="begin-life"]').first().click();
+    await focusPage.waitForFunction(
+      () => document.querySelector("[data-p3e-live]")?.getAttribute("data-p3e-phase") === "life",
+      undefined,
+      { timeout: 20000 }
+    );
+
+    const age7 = await runToAge(focusPage, 7);
+    const picker = await focusPage.evaluate(focusSnapshot);
+    evaluateFocusPicker(label, picker);
+    await focusPage.screenshot({ path: join(outDir, `${label}-focus-picker.png`) });
+    const bottom = await focusPage.evaluate(focusBottomProbe);
+    check(
+      `${label}_focus_picker_local_scroll_reaches_last_option`,
+      bottom.lastOptionVisible && bottom.dismissVisible &&
+        bottom.docY <= 1 && bottom.bodyY <= 1 && bottom.scrolled === 0,
+      `last=${bottom.lastOptionVisible} dismiss=${bottom.dismissVisible} scrollTop=${bottom.scrollTop} scrollable=${bottom.scrollable} docY=${bottom.docY}`
+    );
+    await focusPage.evaluate(() => {
+      const box = document.querySelector('.p3e-focus[data-p3e-focus-expanded="true"]');
+      if (box !== null) box.scrollTop = 0;
+    });
+
+    await focusPage.locator('[data-action="set-focus"][data-focus-id="study"]').first().click();
+    await focusPage.waitForFunction(
+      () => document.querySelector("[data-p3e-live]")?.getAttribute("data-p3e-life-focus") === "study",
+      undefined,
+      { timeout: 15000 }
+    );
+    const chosen = await focusPage.evaluate(focusSnapshot);
+    evaluateFocusChosen(label, chosen, "學業", true);
+    await focusPage.screenshot({ path: join(outDir, `${label}-focus-chosen.png`) });
+
+    // 重心必須進正式存檔：等 autosave 落盤後重整，畫面仍要是同一個重心。
+    await focusPage.waitForFunction(
+      () => document.querySelector("[data-p3e-live]")?.getAttribute("data-p3e-persistence-status") === "saved",
+      undefined,
+      { timeout: 20000 }
+    );
+    await focusPage.reload({ waitUntil: "domcontentloaded" });
+    await focusPage.waitForFunction(
+      () => document.querySelector("[data-p3e-live]")?.getAttribute("data-p3e-life-focus") === "study",
+      undefined,
+      { timeout: 20000 }
+    );
+    const restored = await focusPage.evaluate(focusSnapshot);
+    check(
+      `${label}_focus_survives_reload`,
+      restored.shellFocus === "study" &&
+        restored.lineText.includes("目前重心：") &&
+        restored.overflow.docY <= 1 && restored.overflow.bodyY <= 1,
+      `focus=${restored.shellFocus} line="${restored.lineText}" docY=${restored.overflow.docY}`
+    );
+
+    const age18 = await runToAge(focusPage, 18);
+    const adult = await focusPage.evaluate(focusSnapshot);
+    check(
+      `${label}_focus_adult_label_is_work`,
+      age18 >= 18 && adult.shellFocus === "study" && adult.lineText.includes("目前重心：工作") &&
+        !adult.lineText.includes("目前重心：學業") && adult.overflow.docY <= 1,
+      `age=${age18} line="${adult.lineText}" docY=${adult.overflow.docY}`
+    );
+    await focusPage.screenshot({ path: join(outDir, `${label}-focus-adult.png`) });
+
+    report.viewports.push({ label, phases, birth, focus: { age7, picker, chosen, restored, age18, adult } });
+    await focusContext.close();
     await context.close();
   }
 

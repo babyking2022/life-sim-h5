@@ -668,8 +668,9 @@ describe("H5-CTO-175-A Ledger History V1：append（正向）", () => {
     );
     expect((pendingHistory.records[0] as P3ELedgerHistoryRecordPair).yearRecord.phase).toBe("pending_decision");
 
-    // death（自然死亡；age > 0 的起點：改用外部 anchor）
-    const deathState = stateAt(76, { pack: packPlain });
+    // death（age 119 → 120 歲硬上限，必定死亡；age > 0 的起點：改用外部 anchor）
+    // GPT-0029-A：新的 game-tuned 死亡曲線下，76 歲不再保證自然死亡，改用年齡上限。
+    const deathState = stateAt(119, { pack: packPlain });
     const deathHistory = appendP3ELedgerHistory(
       appendInput(
         externalAnchorHistory(deathState),
@@ -1911,8 +1912,8 @@ describe("H5-CTO-175-A 正式整合", () => {
       expect(commands).toBeLessThanOrEqual(contracts.P3E_MAX_COMMANDS);
     }
 
-    expect(commands).toBe(78);
-    expect(history.records.length).toBe(78);
+    expect(commands).toBe(105);
+    expect(history.records.length).toBe(105);
     const tail = history.records[history.records.length - 1] as P3ELedgerHistoryRecordPair;
     expect(tail.commandRecord.commandHash).toBe(state.commandLog.headHash);
     expect(tail.yearRecord.chainHash).toBe(state.heads.hashChain);
@@ -1921,7 +1922,7 @@ describe("H5-CTO-175-A 正式整合", () => {
     expect(tail.yearRecord.snapshotHash).toBe(state.heads.lastSnapshotHash);
     expect(tail.yearRecord.deltaHash).toBe(state.heads.lastDeltaHash);
     expect(state.stateHash).toBe(
-      "e3c69dc08cc2c26808141cf20972283b36ec780b29d57c1f590c9cefe622a7b8"
+      "85ef17166e7bfe0aa6bb3f3ecba792d83f7bc3dbeeb402ae00734c9fe002c0e4"
     );
   });
 

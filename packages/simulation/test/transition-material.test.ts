@@ -218,6 +218,7 @@ function advance(initial: readonly [number, number, number, number], draws: numb
 
 interface StateOptions {
   readonly pack?: ValidatedEventPack;
+  readonly health?: number;
   readonly deathPackOverride?: typeof deathPack;
 }
 
@@ -234,7 +235,7 @@ function stateAt(age: number, options: StateOptions = {}): contracts.P3ELifeStat
     age,
     phase: age >= contracts.P3E_MAX_AGE ? ("death" as const) : ("life" as const),
     pendingDecision: null,
-    stats: { health: 60, happiness: 55, knowledge: 40, relationships: 35 },
+    stats: { health: options.health ?? 60, happiness: 55, knowledge: 40, relationships: 35 },
     assets: {
       balanceMicroUsd: 1_900_000n,
       annualIncomeMicroUsd:
@@ -486,7 +487,7 @@ describe("P3-E.1b-2f 正式流程", () => {
   });
 
   it("ADVANCE_YEAR → death（mortality）", () => {
-    const previous = stateAt(76, { pack: packPlain });
+    const previous = stateAt(118, { pack: packPlain, health: 50 });
     const stage = annualStage(previous, packPlain);
     expect(stage.annualDeath.diedThisYear).toBe(true);
     const draft = assembleP3EAnnualStateCoreDraft(previous, stage);
@@ -616,7 +617,7 @@ describe("P3-E.1b-2f 正式流程", () => {
     const lifePrevious = stateAt(5, { pack: packNoCandidates });
     cases.push([lifePrevious, assembleP3EAnnualStateCoreDraft(lifePrevious, annualStage(lifePrevious, packNoCandidates))]);
     cases.push([genesisState, assembleP3EAnnualStateCoreDraft(genesisState, annualStage(genesisState, packDecision))]);
-    const deathPrevious = stateAt(76, { pack: packPlain });
+    const deathPrevious = stateAt(118, { pack: packPlain, health: 50 });
     cases.push([deathPrevious, assembleP3EAnnualStateCoreDraft(deathPrevious, annualStage(deathPrevious, packPlain))]);
 
     for (const [previous, draft] of cases) {

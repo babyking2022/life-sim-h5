@@ -4236,3 +4236,236 @@ body:has(:is(.p3e-game-shell, .p3e-birth-screen)) {
     padding-bottom: 7px;
   }
 }
+
+/* ================================================================== */
+/* GPT-0029-B｜人生重心（單畫面、緊湊、只讓卡片內容區局部捲動）      */
+/* ================================================================== */
+
+.p3e-game-shell .p3e-focus {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 4px;
+  margin: 2px 6px 6px;
+  padding: 5px 7px 7px;
+  border: 2px solid var(--game-green-dark, #185439);
+  border-radius: 10px;
+  background: linear-gradient(180deg, #fffdf1, #f3f7de);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.75);
+}
+
+/* 選定後只佔一行；「更改」按鈕本身就是 >=44px 的觸控區。 */
+.p3e-game-shell .p3e-focus-current {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  min-height: 30px;
+  margin: 0;
+  font-size: 0.94rem;
+  line-height: 1.35;
+  color: var(--game-ink, #342719);
+}
+
+.p3e-game-shell .p3e-focus-current strong {
+  color: var(--game-green-dark, #185439);
+  font-size: 1.02rem;
+}
+
+.p3e-game-shell .p3e-focus-toggle,
+.p3e-game-shell .p3e-focus-dismiss {
+  min-width: 84px;
+  min-height: 44px;
+  margin-left: auto;
+  padding: 8px 10px;
+  border: 2px solid var(--game-green-dark, #185439);
+  border-radius: 9px;
+  background: #ffffff;
+  color: var(--game-green-dark, #185439);
+  font-size: 0.94rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.p3e-game-shell .p3e-focus-toggle:disabled,
+.p3e-game-shell .p3e-focus-option:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.p3e-game-shell .p3e-focus-note {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.4;
+  color: var(--game-muted, #705f48);
+}
+
+/* 面板只在卡片內容區內捲動；整頁與 body 一律不捲動。 */
+.p3e-game-shell .p3e-focus-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: min(42dvh, 320px);
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  padding-right: 2px;
+}
+
+.p3e-game-shell .p3e-focus-panel > h3 {
+  position: sticky;
+  z-index: 1;
+  top: 0;
+  margin: 0;
+  padding: 4px 0 6px;
+  background: #fffdf1;
+  font-size: 1rem;
+  line-height: 1.3;
+  color: var(--game-ink, #342719);
+}
+
+.p3e-game-shell .p3e-focus-options {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
+}
+
+.p3e-game-shell .p3e-focus-option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 2px;
+  width: 100%;
+  min-height: 54px;
+  padding: 8px 10px;
+  border: 2px solid #b7c9a4;
+  border-radius: 10px;
+  background: #ffffff;
+  color: var(--game-ink, #342719);
+  text-align: left;
+  cursor: pointer;
+}
+
+.p3e-game-shell .p3e-focus-option[aria-current="true"] {
+  border-color: var(--game-green-dark, #185439);
+  background: #eaf6e6;
+}
+
+.p3e-game-shell .p3e-focus-option-title {
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.p3e-game-shell .p3e-focus-option-summary {
+  font-size: 0.88rem;
+  line-height: 1.4;
+  color: var(--game-muted, #705f48);
+}
+
+.p3e-game-shell .p3e-focus-dismiss {
+  width: 100%;
+  margin-left: 0;
+  border-color: #9a8b6c;
+  color: var(--game-muted, #705f48);
+}
+
+/* 死亡卡既有規則會收掉 story 的直接子元素；重心列仍以一行保留，
+   但選擇面板在死亡畫面不出現（不能更改已結束的人生）。 */
+.p3e-game-shell .p3e-story-card:has(> .p3e-death) > .p3e-focus {
+  display: flex;
+  margin-bottom: 4px;
+}
+
+.p3e-game-shell .p3e-story-card:has(> .p3e-death) > .p3e-focus > .p3e-focus-panel {
+  display: none;
+}
+
+@media (max-height: 700px) {
+  .p3e-game-shell .p3e-focus {
+    margin: 1px 5px 4px;
+    padding: 3px 6px 5px;
+  }
+
+  .p3e-game-shell .p3e-focus-panel {
+    max-height: min(34dvh, 210px);
+  }
+
+  .p3e-game-shell .p3e-focus-option {
+    min-height: 48px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+  }
+
+  .p3e-game-shell .p3e-focus-option-summary {
+    font-size: 0.86rem;
+  }
+}
+
+/* 7 歲第一次（或玩家點「更改」）時，選擇卡改成固定前景卡：
+   不被故事卡的局部捲動裁切，五個選項在單畫面內清楚可見；
+   只有這張卡可以捲，document／body 仍然不捲動。 */
+.p3e-game-shell .p3e-focus[data-p3e-focus-expanded="true"] {
+  position: fixed;
+  z-index: 40;
+  /* 貼在 HUD 下方，刻意不蓋住底部時間控制／下一步／導航：
+     玩家可以不選重心直接繼續人生，既有決定性流程也不會被面板擋住。 */
+  top: max(62px, calc(env(safe-area-inset-top) + 58px));
+  left: 50%;
+  width: min(calc(100vw - 18px), 439px);
+  max-height: min(66dvh, 520px);
+  margin: 0;
+  padding: 9px 11px 11px;
+  transform: translateX(-50%);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-width: 3px;
+  background: linear-gradient(180deg, #fffdf3, #f1f6dc);
+  box-shadow: 0 18px 44px rgba(30, 24, 12, 0.42);
+}
+
+.p3e-game-shell .p3e-focus[data-p3e-focus-expanded="true"] .p3e-focus-panel {
+  max-height: none;
+  overflow-y: visible;
+}
+
+.p3e-game-shell .p3e-focus[data-p3e-focus-expanded="true"] .p3e-focus-panel > h3 {
+  position: static;
+  background: transparent;
+}
+
+@media (max-height: 700px) {
+  .p3e-game-shell .p3e-focus[data-p3e-focus-expanded="true"] {
+    max-height: min(62dvh, 360px);
+    padding: 7px 9px 9px;
+  }
+
+  .p3e-game-shell .p3e-focus[data-p3e-focus-expanded="true"] .p3e-focus-option {
+    min-height: 46px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+
+  .p3e-game-shell .p3e-focus[data-p3e-focus-expanded="true"] .p3e-focus-panel > h3 {
+    padding-top: 2px;
+    padding-bottom: 3px;
+  }
+}
+
+/* 320×568 的內容比前景卡高時，改用 block 排版讓卡片自己捲動，
+   避免 flex 子項被壓縮後「看得到標題卻捲不到第五個選項」。 */
+.p3e-game-shell .p3e-focus[data-p3e-focus-expanded="true"] {
+  display: block;
+}
+
+.p3e-game-shell .p3e-focus[data-p3e-focus-expanded="true"] > .p3e-focus-current {
+  margin-bottom: 7px;
+}
+
+.p3e-game-shell .p3e-focus[data-p3e-focus-expanded="true"] > .p3e-focus-note {
+  margin-bottom: 4px;
+}

@@ -198,6 +198,7 @@ function lifeCursorAt(age: number): [number, number, number, number] {
 
 interface StateOptions {
   readonly pack?: ValidatedEventPack;
+  readonly health?: number;
   readonly deathPackOverride?: typeof deathPack;
 }
 
@@ -214,7 +215,7 @@ function stateAt(age: number, options: StateOptions = {}): contracts.P3ELifeStat
     age,
     phase: age >= contracts.P3E_MAX_AGE ? "death" : "life",
     pendingDecision: null,
-    stats: { health: 60, happiness: 55, knowledge: 40, relationships: 35 },
+    stats: { health: options.health ?? 60, happiness: 55, knowledge: 40, relationships: 35 },
     assets: {
       balanceMicroUsd: 1_900_000n,
       annualIncomeMicroUsd:
@@ -385,7 +386,7 @@ describe("H5-CTO-127-B 年度路徑（V1 行為保留）", () => {
   });
 
   it("mortality 死亡：phase=death、pending 被壓制為 null", () => {
-    const previous = stateAt(76, { pack: packPlain });
+    const previous = stateAt(118, { pack: packPlain, health: 50 });
     const stage = annualStage(previous, packPlain);
     expect(stage.annualDeath.diedThisYear).toBe(true);
     expect(stage.annualDeath.deathReason).toBe("mortality");
@@ -460,12 +461,12 @@ describe("H5-CTO-127-B 年度路徑（V1 行為保留）", () => {
   });
 
   it("反例：死亡年度卻帶著 pending 摘要", () => {
-    const previous = stateAt(76, { pack: packPlain });
+    const previous = stateAt(118, { pack: packPlain, health: 50 });
     const stage = annualStage(previous, packPlain);
     expect(stage.pendingDecisionSummary).toBeNull();
     const broken = patch(stage, ["pendingDecisionSummary"], {
       year: 2101,
-      age: 77,
+      age: 119,
       eventId: "ev.adult.housing-choice",
       decisionId: "dec.adult.housing",
       selectionHash: "b".repeat(64),
@@ -566,7 +567,7 @@ describe("H5-CTO-127-B Pending 摘要與完整事實交叉比對（新增反例�
   });
 
   it("反例：死亡年度殘留完整待決策事實", () => {
-    const previous = stateAt(76, { pack: packPlain });
+    const previous = stateAt(118, { pack: packPlain, health: 50 });
     const stage = annualStage(previous, packPlain);
     expect(stage.annualDeath.diedThisYear).toBe(true);
     const broken = patch(stage, ["annualDeath", "pendingDecisionAfterDeath"], pendingFacts) as never;

@@ -1,4 +1,7 @@
 import {
+  P3E_LIFE_FOCUS_WEIGHT_MULTIPLIER,
+  p3eLifeFocusEventIds,
+  readP3ELifeFocus,
   P3E_MAX_AGE,
   P3E_MAX_U32_DRAWS_PER_EVENT,
   type P3BContentMode,
@@ -270,13 +273,26 @@ export function resolveP3EAnnualEventSelection(input: unknown): P3EAnnualEventSe
       count: entry.count
     }))
   };
-  const selection = selectP3EEvent({
+  const selectionInput: Record<string, unknown> = {
     pack: packs.eventPack,
     state: selectionState,
     history,
     contentMode,
     rngState: state.rng.events.state
-  });
+  };
+  // GPT-0029-B：有重心時，把相符事件權重加倍；沒有重心時**完全不帶第六欄**，
+  // 讓 selectEvent 的既有五欄呼叫路徑逐位元不變（P3B／P3C golden 不受影響）。
+  const focus = readP3ELifeFocus(state.flags);
+  if (focus !== null) {
+    selectionInput.weightBias = {
+      eventIds: p3eLifeFocusEventIds(
+        focus.focusId,
+        packs.eventPack.events.map((event) => event.eventId)
+      ),
+      multiplier: P3E_LIFE_FOCUS_WEIGHT_MULTIPLIER
+    };
+  }
+  const selection = selectP3EEvent(selectionInput);
 
   const u32DrawsAfter = applyP3EEventDraws(state.rng.events.u32Draws, selection.drawsUsed, roll.ageAfter);
 

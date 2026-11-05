@@ -59,9 +59,9 @@ const mime = {
   ".woff2": "font/woff2"
 };
 
-const EXPECTED_STATE_HASH = "e3c69dc08cc2c26808141cf20972283b36ec780b29d57c1f590c9cefe622a7b8";
-const EXPECTED_COMMAND_HEAD = "9c7f87e83da055f6887cec66e71698c4afdc4e02f225fa81e4823887e85d3baf";
-const EXPECTED_COMMANDS = 78;
+const EXPECTED_STATE_HASH = "85ef17166e7bfe0aa6bb3f3ecba792d83f7bc3dbeeb402ae00734c9fe002c0e4";
+const EXPECTED_COMMAND_HEAD = "ce744bf48ba2e5f9e6eea88a7aa411e64bbfc4d92e386cb201a93bc3caa35a07";
+const EXPECTED_COMMANDS = 105;
 /**
  * GPT-0025-D：新增獨立的 307 條繁中字典資產（gzip ≈6.2KB）後，boot 必要資產
  * 從 511169 增加到約 518KB，已超過原本的 500KiB gate。這裡把 gate 調到
@@ -224,7 +224,22 @@ async function commandCount(page) {
   return Number(await page.locator("[data-p3e-live]").getAttribute("data-p3e-command-count"));
 }
 
+/**
+ * GPT-0029-B：滿 7 歲會自動出現一次人生重心選擇卡。官方 golden 路徑刻意
+ * 不設定重心，按「先不改」收起即可；這是純 UI 呈現狀態，不產生 command，
+ * 不影響 golden state hash、command head 與命令數，也不會讓前景卡擋住
+ * 「下一步」或決策選項。
+ */
+async function dismissFocusPickerIfOpen(page) {
+  const dismiss = page.locator(
+    '.p3e-focus[data-p3e-focus-expanded="true"] .p3e-focus-dismiss'
+  );
+  if ((await dismiss.count()) === 0) return;
+  await dismiss.first().click({ timeout: 3000 }).catch(() => {});
+}
+
 async function clickAndWait(page, selector) {
+  await dismissFocusPickerIfOpen(page);
   const before = await commandCount(page);
   await page.locator(selector).first().click();
   await page.waitForFunction(
@@ -438,7 +453,7 @@ async function main() {
   });
 
   const bootStarted = Date.now();
-  // 主線要跑官方 golden（GPT-0025-A 之後是 78 命令）：明確釘住 seed，不受首次開頁隨機 seed 影響。
+  // 主線要跑官方 golden（GPT-0029-A 之後是 105 命令）：明確釘住 seed，不受首次開頁隨機 seed 影響。
   await page.goto(`${baseUrl}/${GOLDEN_QUERY}`, { waitUntil: "networkidle" });
   await page.waitForSelector("[data-p3e-live='true']", { timeout: 30000 });
   const bootMs = Date.now() - bootStarted;
@@ -1171,6 +1186,7 @@ async function main() {
   }
 
   async function advanceOnce(scenarioPage) {
+    await dismissFocusPickerIfOpen(scenarioPage);
     const before = await commandCount(scenarioPage);
     await scenarioPage.locator('[data-action="advance"]').first().click();
     await scenarioPage.waitForFunction(

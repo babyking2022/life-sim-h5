@@ -71,7 +71,7 @@ import { computeDeathDatasetChecksum, computeDeathPackChecksum } from "../../bir
  *   checksum 重算；
  * - 決策政策：pending 時 `CHOOSE_DECISION` 取第一個 `optionId`，否則
  *   `ADVANCE_YEAR contentMode=standard`；
- * - 期望：51 命令、恰好 1 個 pending choice、age 50 死亡（year 2074），
+ * - 期望：105 命令、38 個 pending choice、age 67 死亡（year 2091），
  *   最終 state／command head／chain／尾端 entry hash 為工作單固定值。
  */
 
@@ -628,8 +628,8 @@ describe("H5-CTO-180-A Ledger Replay V1：正向", () => {
     const genesisInput = genesisInputOf(eventPackOfficial, deathPack, SEED_OFFICIAL);
     const genesisProduct = createP3EGenesis(genesisInput);
     const commands = productPathCommands(genesisProduct, eventPackOfficial, deathPack);
-    expect(commands.length).toBe(78);
-    expect(commands.filter((command) => command.type === "CHOOSE_DECISION").length).toBe(28);
+    expect(commands.length).toBe(105);
+    expect(commands.filter((command) => command.type === "CHOOSE_DECISION").length).toBe(38);
 
     // live history：formal executor + formal history 逐命令 append。
     const built = buildHistory(genesisProduct, eventPackOfficial, deathPack, commands);
@@ -637,43 +637,43 @@ describe("H5-CTO-180-A Ledger Replay V1：正向", () => {
 
     const result = replayP3ELedgerHistory(input);
 
-    // 期望值（GPT-0025-A 抉擇包）：78 命令、28 個決策、age 50 死亡（year 2074）＋四個 hash。
+    // 期望值（GPT-0029-A 死亡曲線）：105 命令、38 個決策、age 67 死亡（year 2091）＋四個 hash。
     expect(built.finalState.phase).toBe("death");
-    expect(built.finalState.age).toBe(50);
-    expect(built.finalState.currentYear).toBe(2074);
+    expect(built.finalState.age).toBe(67);
+    expect(built.finalState.currentYear).toBe(2091);
     expect(built.finalState.stateHash).toBe(
-      "e3c69dc08cc2c26808141cf20972283b36ec780b29d57c1f590c9cefe622a7b8"
+      "85ef17166e7bfe0aa6bb3f3ecba792d83f7bc3dbeeb402ae00734c9fe002c0e4"
     );
     expect(built.finalState.commandLog.headHash).toBe(
-      "9c7f87e83da055f6887cec66e71698c4afdc4e02f225fa81e4823887e85d3baf"
+      "ce744bf48ba2e5f9e6eea88a7aa411e64bbfc4d92e386cb201a93bc3caa35a07"
     );
     expect(built.finalState.heads.hashChain).toBe(
-      "7e56ba257fe6a2c3f7a9c7f7182f7fd76a761ad3a24a60744424971788072f50"
+      "225e617ff764313352d5002760bb2d2ace7134e6e26d3ad07bcedbbf78dd9d34"
     );
     const records = result.history.records as unknown as readonly Dict[];
     const lastPair = records[records.length - 1] as Dict;
     expect((lastPair.commandRecord as P3ECommandRecord).entryHash).toBe(
-      "1fdf6ed52a914137ab3b437031f85f1f6258cd9b1b9366583887f26c2bf94d17"
+      "adc4c77fc684581558b9c60f424484822fa8fc49edb1a8b283857fa7cc2cea59"
     );
     expect((lastPair.yearRecord as Dict).entryHash).toBe(
-      "1fdf6ed52a914137ab3b437031f85f1f6258cd9b1b9366583887f26c2bf94d17"
+      "adc4c77fc684581558b9c60f424484822fa8fc49edb1a8b283857fa7cc2cea59"
     );
 
     // replay bit-exact：最終 State、全部 78 對 Record 都與 live 完全一致。
-    expect(result.commandsConsumed).toBe(78);
+    expect(result.commandsConsumed).toBe(105);
     expect(result.state.phase).toBe("death");
-    expect(result.state.age).toBe(50);
+    expect(result.state.age).toBe(67);
     expect(stable(result.state)).toBe(stable(built.finalState));
-    expect(records.length).toBe(78);
-    for (let index = 0; index < 78; index += 1) {
+    expect(records.length).toBe(105);
+    for (let index = 0; index < 105; index += 1) {
       const pair = records[index] as Dict;
       expect(stable(pair.commandRecord)).toBe(stable((built.live[index] as unknown as Dict).commandRecord));
       expect(stable(pair.yearRecord)).toBe(stable((built.live[index] as unknown as Dict).yearRecord));
     }
     // 全路徑恰好一個 pending choice（其餘 50 個命令都是 ADVANCE_YEAR）。
     const types = records.map((pair) => (pair.commandRecord as P3ECommandRecord).command.type);
-    expect(types.filter((type) => type === "CHOOSE_DECISION").length).toBe(28);
-    expect(types.filter((type) => type === "ADVANCE_YEAR").length).toBe(50);
+    expect(types.filter((type) => type === "CHOOSE_DECISION").length).toBe(38);
+    expect(types.filter((type) => type === "ADVANCE_YEAR").length).toBe(67);
     expect(result.state.stateHash).toBe(((records[records.length - 1] as Dict).yearRecord as Dict).stateHashAfter);
   });
 

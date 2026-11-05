@@ -8,8 +8,14 @@ import {
   restoreP3EBrowserPortableSave,
   runP3EPlaySessionCommand,
   saveP3EBrowserAutosaveSession,
+  P3E_LIFE_FOCUS_FIRST_AGE,
+  P3E_LIFE_FOCUS_OPTIONS,
+  isP3ELifeFocusId,
+  p3eLifeFocusLabel,
+  readP3ELifeFocus,
   type P3EBrowserBirthPreview,
   type P3EBrowserWorld,
+  type P3ELifeFocusId,
   type P3EPlaySession
 } from "@life-sim/application";
 import { createLifeClock, type Speed } from "./p3e-time-controller.js";
@@ -422,6 +428,12 @@ let session: P3EPlaySession | null = null;
 let eventCopy: Readonly<Record<string, string>> | null = null;
 let eventCopyKeys = 0;
 let activeTab: TabKey = "life";
+/**
+ * 重心選擇面板的呈現狀態（純 UI，不進存檔、不產生 command）：
+ * null＝交給系統判斷（7 歲首次進入可操作階段時自動展開一次）、
+ * true＝玩家主動展開、false＝玩家按「先不改」收起。
+ */
+let focusPickerOpen: boolean | null = null;
 let busy = false;
 let focusAdvanceAfterRender = false;
 let fastForwarding = false;
@@ -1183,6 +1195,110 @@ function chooseOption(optionId: string): void {
   if (session?.view.controls.canAdvanceYear === true) lifeClock.resume();
 }
 
+/** 設定／更改人生重心：走正式 command，狀態進 state flags、存檔、replay 與 state hash。 */
+function setLifeFocus(focusId: P3ELifeFocusId): void {
+  focusPickerOpen = null;
+  runCommand({ type: "SET_LIFE_FOCUS", focusId });
+}
+
+/** 玩家主動展開選擇面板（純 UI 呈現狀態，不是遊戲狀態）。 */
+function toggleFocusPicker(): void {
+  focusPickerOpen = true;
+  render();
+}
+
+/** 「先不改」：收起面板且本命不再自動跳出；玩家仍可按「選擇重心」回來設定。 */
+function dismissFocusPicker(): void {
+  focusPickerOpen = false;
+  render();
+}
+
+/**
+ * GPT-0029-B：人生重心區塊。
+ *
+ * - 0–6 歲完全不顯示；
+ * - 滿 7 歲第一次自動展開一次清楚的選擇面板，之後不再每年強迫跳出；
+ * - 選定後只佔一行「目前重心：…」，另有「更改」入口；
+ * - 同一模擬年已改過、待決策或死亡時，選項按鈕直接停用；
+ * - 展開時是貼在 HUD 下方的固定前景卡，只有這張卡可以局部捲動；
+ * - 待決策／死亡階段一律收起，避免前景卡擋住決策選項或「重新開始」。
+ */
+function renderFocusSection(current: P3EPlaySession): HTMLElement | null {
+  const state = current.state;
+  if (state.age < P3E_LIFE_FOCUS_FIRST_AGE) return null;
+  const snapshot = readP3ELifeFocus(state.flags);
+  const label = snapshot === null ? null : p3eLifeFocusLabel(snapshot.focusId, state.age);
+  const changedThisYear = snapshot !== null && snapshot.changedYear === state.currentYear;
+  const canChange = state.phase === "life" && !changedThisYear;
+  const firstTime = snapshot === null && state.age === P3E_LIFE_FOCUS_FIRST_AGE;
+  const expanded =
+    state.phase === "life" && (focusPickerOpen === true || (focusPickerOpen === null && firstTime));
+
+  const box = element("section", "p3e-focus");
+  box.setAttribute("aria-label", "人生重心");
+  box.dataset["p3eFocus"] = snapshot?.focusId ?? "none";
+  box.dataset["p3eFocusChangedYear"] = snapshot === null ? "" : String(snapshot.changedYear);
+  box.dataset["p3eFocusExpanded"] = expanded ? "true" : "false";
+
+  const line = element("p", "p3e-focus-current");
+  if (label === null) {
+    line.append(element("span", undefined, "上學了，還沒有設定人生重心。"));
+  } else {
+    line.append(element("span", undefined, "目前重心："), element("strong", undefined, label));
+  }
+  if (!expanded) {
+    const toggle = element("button", "p3e-focus-toggle", label === null ? "選擇重心" : "更改");
+    toggle.type = "button";
+    toggle.dataset["action"] = "toggle-focus";
+    toggle.disabled = !canChange;
+    toggle.addEventListener("click", toggleFocusPicker);
+    line.append(toggle);
+  }
+  box.append(line);
+
+  if (!expanded) {
+    if (changedThisYear) box.append(element("p", "p3e-focus-note", "今年已經調整過重心，明年才能再改。"));
+    return box;
+  }
+
+  const panel = element("div", "p3e-focus-panel");
+  panel.append(element("h3", undefined, label === null ? "上學了，想先把心力放在哪裡？" : "想把心力改放在哪裡？"));
+  panel.append(
+    element("p", "p3e-focus-note", "每年至多調整一次；不同重心會慢慢改變狀態，也會讓相關事件更容易遇到。")
+  );
+  const options = element("div", "p3e-focus-options");
+  const icons: Readonly<Record<P3ELifeFocusId, string>> = {
+    study: "📚",
+    growth: "🌱",
+    family: "👨‍👩‍👧",
+    hobby: "🎨",
+    health: "❤️"
+  };
+  for (const option of P3E_LIFE_FOCUS_OPTIONS) {
+    const button = element("button", "p3e-focus-option");
+    button.type = "button";
+    button.dataset["action"] = "set-focus";
+    button.dataset["focusId"] = option.focusId;
+    button.disabled = !canChange;
+    if (snapshot?.focusId === option.focusId) button.setAttribute("aria-current", "true");
+    const optionLabel = p3eLifeFocusLabel(option.focusId, state.age);
+    button.append(
+      element("span", "p3e-focus-option-title", `${icons[option.focusId]} ${optionLabel}`),
+      element("span", "p3e-focus-option-summary", option.summary)
+    );
+    button.addEventListener("click", () => setLifeFocus(option.focusId));
+    options.append(button);
+  }
+  panel.append(options);
+  const dismiss = element("button", "p3e-focus-dismiss", "先不改");
+  dismiss.type = "button";
+  dismiss.dataset["action"] = "toggle-focus";
+  dismiss.addEventListener("click", dismissFocusPicker);
+  panel.append(dismiss);
+  box.append(panel);
+  return box;
+}
+
 /**
  * 死亡後的「重新開始」：清掉上一條命的 autosave，回到出生卡（新的隨機 seed）。
  *
@@ -1246,6 +1362,8 @@ function render(): void {
   shell.dataset["p3ePhase"] = view.phase;
   shell.dataset["p3eCopyKeys"] = String(eventCopyKeys);
   shell.dataset["p3eCopySchema"] = COPY_SCHEMA_VERSION;
+  shell.dataset["p3eLifeFocus"] = readP3ELifeFocus(session.state.flags)?.focusId ?? "none";
+  shell.dataset["p3eLifeFocusAge"] = String(session.state.age);
   shell.dataset["p3eStateHash"] = session.state.stateHash;
   shell.dataset["p3eCommandCount"] = String(session.state.commandLog.count);
   shell.dataset["p3eCommandHead"] = session.state.commandLog.headHash;
@@ -1315,7 +1433,13 @@ function render(): void {
 
   const advance = shell.querySelector<HTMLButtonElement>('[data-action="advance"]');
   if (focusAdvanceAfterRender && advance !== null) {
-    advance.focus();
+    // 單畫面本來就 overflow:hidden，focus 一律不需要 scroll-into-view。
+    // 7 歲第一次出現固定前景重心卡時，「下一步」被前景卡遮住，對它 focus()
+    // 會強制一次同步版面計算（CPU 4x 下約 250ms），鍵盤焦點也落在看不見的
+    // 按鈕；此時直接略過，讓 Tab 依 DOM 順序先到重心卡。
+    const pickerOpen =
+      shell.querySelector('.p3e-focus[data-p3e-focus-expanded="true"]') !== null;
+    if (!pickerOpen) advance.focus({ preventScroll: true });
     focusAdvanceAfterRender = false;
   }
 }
@@ -1451,6 +1575,8 @@ function renderLife(view: P3EPlaySession["view"], current: P3EPlaySession): HTML
 
   const story = element("section", "p3e-story-card");
   story.append(element("h2", undefined, view.phase === "pending_decision" ? "重要抉擇" : "當年訊息"));
+  const focusSection = renderFocusSection(current);
+  if (focusSection !== null) story.append(focusSection);
   const last = current.lastOutcome;
   if (last === null) {
     story.append(element("p", undefined, `${view.currentYear} 年，你的人生故事正要開始。`));
@@ -1458,9 +1584,13 @@ function renderLife(view: P3EPlaySession["view"], current: P3EPlaySession): HTML
     const eventName = last.selectedEventId === null ? "平凡的一年" : friendlyKey(last.selectedEventId);
     story.append(element("p", undefined, `${view.currentYear} 年，你 ${view.age} 歲。`));
     story.append(element("strong", "p3e-event-name", eventName));
-  } else {
+  } else if (last.kind === "choose_decision") {
     story.append(element("p", undefined, "你已經做出了選擇。"));
     story.append(element("strong", "p3e-event-name", friendlyChosenOption(last)));
+  } else {
+    const chosen = isP3ELifeFocusId(last.focusId) ? p3eLifeFocusLabel(last.focusId, view.age) : "新的方向";
+    story.append(element("p", undefined, `你把人生重心放在了${chosen}。`));
+    story.append(element("strong", "p3e-event-name", chosen));
   }
 
   if (view.phase === "pending_decision" && view.pendingDecision !== null) {

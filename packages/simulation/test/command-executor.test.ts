@@ -229,6 +229,7 @@ function advance(initial: readonly [number, number, number, number], draws: numb
 
 interface StateOptions {
   readonly pack?: ValidatedEventPack;
+  readonly health?: number;
   readonly deathPackOverride?: typeof deathPack;
   readonly phase?: contracts.P3EPhase;
 }
@@ -246,7 +247,7 @@ function stateAt(age: number, options: StateOptions = {}): contracts.P3ELifeStat
     age,
     phase: options.phase ?? (age >= contracts.P3E_MAX_AGE ? ("death" as const) : ("life" as const)),
     pendingDecision: null,
-    stats: { health: 60, happiness: 55, knowledge: 40, relationships: 35 },
+    stats: { health: options.health ?? 60, happiness: 55, knowledge: 40, relationships: 35 },
     assets: {
       balanceMicroUsd: 1_900_000n,
       annualIncomeMicroUsd:
@@ -437,11 +438,11 @@ describe("H5-CTO-163-A Command Executor V1：正向流程", () => {
   });
 
   it("ADVANCE_YEAR → mortality death（自然死亡）：phase 與 age 一致封存", () => {
-    const previous = stateAt(76, { pack: packPlain });
+    const previous = stateAt(118, { pack: packPlain, health: 50 });
     const result = execute(previous, { ...ADVANCE }, packPlain);
 
     expect(result.state.phase).toBe("death");
-    expect(result.state.age).toBe(77);
+    expect(result.state.age).toBe(119);
     expect(result.yearRecord.phase).toBe("death");
     expect(result.state.pendingDecision).toBeNull();
   });
@@ -946,7 +947,7 @@ describe("H5-CTO-173-A Command Outcome V1", () => {
   });
 
   it("mortality_death_real_causeId：自然死亡帶真實 causeId", () => {
-    const previous = stateAt(76, { pack: packPlain });
+    const previous = stateAt(118, { pack: packPlain, health: 50 });
     const result = execute(previous, { ...ADVANCE }, packPlain);
     if (result.outcome.kind !== "advance_year") throw new Error("outcome kind");
     expect(result.outcome.death?.reason).toBe("mortality");
@@ -968,7 +969,7 @@ describe("H5-CTO-173-A Command Outcome V1", () => {
   });
 
   it("death_clears_pending：死亡年度即使事件開啟決策，outcome 與 State 都不保留 pending", () => {
-    const previous = stateAt(76, { pack: packDecision });
+    const previous = stateAt(118, { pack: packDecision, health: 50 });
     const result = execute(previous, { ...ADVANCE }, packDecision);
     if (result.outcome.kind !== "advance_year") throw new Error("outcome kind");
     expect(result.state.phase).toBe("death");
@@ -1100,7 +1101,7 @@ describe("H5-CTO-173-A Command Outcome V1", () => {
       expect(Object.keys(pending.outcome)).not.toContain(forbidden);
     }
 
-    const dead = execute(stateAt(76, { pack: packPlain }), { ...ADVANCE }, packPlain);
+    const dead = execute(stateAt(118, { pack: packPlain, health: 50 }), { ...ADVANCE }, packPlain);
     if (dead.outcome.kind !== "advance_year") throw new Error("outcome kind");
     expect(Object.keys(dead.outcome.death ?? {}).sort()).toEqual(["causeId", "reason"]);
   });

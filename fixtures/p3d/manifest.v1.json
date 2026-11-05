@@ -27,19 +27,19 @@
       "datasetId": "mortality",
       "fileName": "mortality.v1.json",
       "recordCount": 41624,
-      "checksum": "4907b9cf86769b679a99663bc1bc99bc0c099ba30f8e8141d7eac3311b978374"
+      "checksum": "f4f54a93c69dd8e173a2bdfd9572aacefe3b8acb2790f08ee1e28d00253b04c2"
     },
     {
       "datasetId": "licenses",
       "fileName": "licenses.v1.json",
       "recordCount": 3,
-      "checksum": "0fc1e6fa15cab364c662eb397ddda2313e6ee5cdebd2a60be1c79b52689a7783"
+      "checksum": "6808692b27c8fcc9322e6698ea10ee0a608286f692c1340cb9e77ab3db7c5a3e"
     },
     {
       "datasetId": "lineage",
       "fileName": "lineage.v1.json",
       "recordCount": 3,
-      "checksum": "b2300425b534d0c8ec9259027407babf7354435c75ddc906203a876ec61b4eb5"
+      "checksum": "9e04b7518b8b9d8cddfcba54e44182d416023963eeffb2197f2e57bed2a3eed6"
     }
   ],
   "licenses": [
@@ -99,12 +99,12 @@
       "commercialUse": "allowed",
       "legalStatus": "cleared",
       "evidence": [
-        "integer Gompertz-shaped hazard generated from a fixed seed string"
+        "game-tuned integer age-shape curve (anchors + linear interpolation); not a life table"
       ],
       "grant": null,
-      "checksum": "4907b9cf86769b679a99663bc1bc99bc0c099ba30f8e8141d7eac3311b978374",
+      "checksum": "f4f54a93c69dd8e173a2bdfd9572aacefe3b8acb2790f08ee1e28d00253b04c2",
       "lineageId": "lin.p3d.mortality",
-      "notes": "not a life table; synthetic engineering values only"
+      "notes": "game-tuned synthetic mortality for MVP pacing (NOT a life table); no external mortality source"
     }
   ],
   "lineage": [
@@ -138,13 +138,13 @@
       "lineageId": "lin.p3d.mortality",
       "datasetId": "mortality",
       "parentLineageIds": [],
-      "transform": "integer Gompertz-shaped hazard per entity × sex × age",
+      "transform": "game-tuned integer age-shape hazard per entity × sex × age (anchors + linear interpolation)",
       "generatedBy": "scripts/p3d-generate-fixtures.ts",
       "generatedAt": "2026-10-28",
       "inputChecksums": [],
-      "outputChecksum": "4907b9cf86769b679a99663bc1bc99bc0c099ba30f8e8141d7eac3311b978374",
-      "notes": "covers all 172 base-pack entities; no external mortality source"
+      "outputChecksum": "f4f54a93c69dd8e173a2bdfd9572aacefe3b8acb2790f08ee1e28d00253b04c2",
+      "notes": "covers all 172 base-pack entities; game-tuned, not a life table, no external mortality source"
     }
   ],
-  "packChecksum": "532583fd4825df27eaf25f941d75368d0537e5bd11bde69b1d8ac88e3cc73cd7"
+  "packChecksum": "7ae8539c3d950f9feb6236aeba6f62097f36b064115f83aa9140308f42bb74b5"
 }

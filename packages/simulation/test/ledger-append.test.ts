@@ -238,6 +238,7 @@ function advance(initial: readonly [number, number, number, number], draws: numb
 
 interface StateOptions {
   readonly pack?: ValidatedEventPack;
+  readonly health?: number;
   readonly deathPackOverride?: typeof deathPack;
   readonly phase?: contracts.P3EPhase;
 }
@@ -255,7 +256,7 @@ function stateAt(age: number, options: StateOptions = {}): contracts.P3ELifeStat
     age,
     phase: options.phase ?? (age >= contracts.P3E_MAX_AGE ? ("death" as const) : ("life" as const)),
     pendingDecision: null,
-    stats: { health: 60, happiness: 55, knowledge: 40, relationships: 35 },
+    stats: { health: options.health ?? 60, happiness: 55, knowledge: 40, relationships: 35 },
     assets: {
       balanceMicroUsd: 1_900_000n,
       annualIncomeMicroUsd:
@@ -439,7 +440,7 @@ describe("H5-CTO-147-B Ledger Append V1：正向案例", () => {
   });
 
   it("ADVANCE_YEAR → death（自然死亡）：phase 與 age 一致封存", () => {
-    const previous = stateAt(76, { pack: packPlain });
+    const previous = stateAt(118, { pack: packPlain, health: 50 });
     const stage = resolveP3EAnnualPendingDecision({
       state: previous,
       eventPack: packPlain,
@@ -453,7 +454,7 @@ describe("H5-CTO-147-B Ledger Append V1：正向案例", () => {
     const result = appendP3ELedgerTransition(previous, ADVANCE, draft);
 
     expect(result.state.phase).toBe("death");
-    expect(result.state.age).toBe(77);
+    expect(result.state.age).toBe(119);
     expect(result.yearRecord.phase).toBe("death");
     expect(result.state.pendingDecision).toBeNull();
   });

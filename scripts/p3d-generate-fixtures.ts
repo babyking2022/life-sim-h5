@@ -98,18 +98,59 @@ const REGION_BASE_PPM: Readonly<Record<P3DRegionClass, number>> = {
 const SEX_FACTOR_PPM: Readonly<Record<string, number>> = { female: 820_000, male: 1_000_000 };
 
 /**
- * 以整數遞迴產生 hazard 曲線（Gompertz 形狀，全程整數）：
- * `hazard(0) = level`，`step(0) = max(1, level/180)`，每歲 `hazard += step`、`step = max(1, step×113/100)`。
+ * 年齡形狀曲線（ppm 倍數；0 歲 = 1,000,000），**game-tuned**、不是生命表。
+ *
+ * GPT-0029-A：舊版是「`step` 每年複利 13%」的累積曲線，約 50 歲就讓 hazard 撞到
+ * 1,000,000 ppm（= 必死），造成幾乎所有人生都在 51 歲左右結束、中晚年內容看不到。
+ * 新版改成「低齡震盪、中年平緩、50 歲後才指數上升」的分段錨點，並以整數線性內插，
+ * 全程整數、可重播：
+ *
+ * - 0 歲保留嬰兒死亡率（region×sex 基準仍在，因此國家／性別仍影響風險）；
+ * - 5–45 歲維持低 hazard（約 0.02%–0.15%／年），讓多數人能活到中年；
+ * - 55 歲後才快速上升，80 歲約 3–4%／年、95 歲約 15%／年、110 歲後接近必死，
+ *   因此 120 歲硬上限仍是最後一道終止條件。
+ *
+ * 以 p2a 的 birth-share 加權試算：中位死亡 76 歲、87% 活到 60 歲、34% 活到 80 歲、
+ * 單一年齡最高只占 4.2% 的死亡（完整 500 條人生實測見
+ * `reports/p3d-mortality-distribution.json`）。
+ */
+const AGE_SHAPE_PPM: readonly (readonly [age: number, ppm: number])[] = [
+  [0, 1_000_000],
+  [1, 420_000],
+  [5, 240_000],
+  [15, 200_000],
+  [30, 230_000],
+  [45, 380_000],
+  [55, 800_000],
+  [65, 3_200_000],
+  [75, 12_000_000],
+  [85, 36_000_000],
+  [95, 95_000_000],
+  [105, 220_000_000],
+  [120, 520_000_000]
+];
+
+/** 錨點之間整數線性內插（含頭含尾；超出範圍用最後一段）。 */
+function ageShapePpm(age: number): number {
+  for (let index = 0; index < AGE_SHAPE_PPM.length - 1; index += 1) {
+    const [ageA, ppmA] = AGE_SHAPE_PPM[index] as readonly [number, number];
+    const [ageB, ppmB] = AGE_SHAPE_PPM[index + 1] as readonly [number, number];
+    if (age >= ageA && age <= ageB) {
+      const span = ageB - ageA;
+      if (span === 0) return ppmA;
+      return ppmA + Math.floor(((ppmB - ppmA) * (age - ageA)) / span);
+    }
+  }
+  return (AGE_SHAPE_PPM[AGE_SHAPE_PPM.length - 1] as readonly [number, number])[1];
+}
+
+/**
+ * 以整數產生 hazard：`level`（0 歲基準，含 region×sex）乘以年齡形狀，clamp 到
+ * 1..1,000,000 ppm。沒有任何浮點、沒有時間、沒有隨機；同一份程式永遠產生同一張表。
  */
 function hazardAtAge(level: number, age: number): number {
-  let hazard = level;
-  let step = Math.max(1, Math.floor(level / 180));
-  for (let index = 0; index < age; index += 1) {
-    hazard += step;
-    step = Math.max(1, Math.floor((step * 113) / 100));
-    if (hazard > PPM) return PPM;
-  }
-  return Math.min(PPM, hazard);
+  const scaled = Math.floor((level * ageShapePpm(age)) / PPM);
+  return Math.min(PPM, Math.max(1, scaled));
 }
 
 function buildMortality(entities: readonly BaseEntity[]): readonly P3DMortalityRecord[] {
@@ -243,11 +284,11 @@ function buildLicenses(datasetChecksums: Readonly<Record<string, string>>) {
       licenseId: "synthetic-generated",
       commercialUse: "allowed" as const,
       legalStatus: "cleared" as const,
-      evidence: ["integer Gompertz-shaped hazard generated from a fixed seed string"],
+      evidence: ["game-tuned integer age-shape curve (anchors + linear interpolation); not a life table"],
       grant: null,
       checksum: datasetChecksums.mortality as string,
       lineageId: "lin.p3d.mortality",
-      notes: "not a life table; synthetic engineering values only"
+      notes: "game-tuned synthetic mortality for MVP pacing (NOT a life table); no external mortality source"
     }
   ];
 }
@@ -280,12 +321,12 @@ function buildLineage(datasetChecksums: Readonly<Record<string, string>>) {
       lineageId: "lin.p3d.mortality",
       datasetId: "mortality",
       parentLineageIds: [],
-      transform: "integer Gompertz-shaped hazard per entity × sex × age",
+      transform: "game-tuned integer age-shape hazard per entity × sex × age (anchors + linear interpolation)",
       generatedBy: "scripts/p3d-generate-fixtures.ts",
       generatedAt: CREATED_AT,
       inputChecksums: [],
       outputChecksum: datasetChecksums.mortality as string,
-      notes: "covers all 172 base-pack entities; no external mortality source"
+      notes: "covers all 172 base-pack entities; game-tuned, not a life table, no external mortality source"
     }
   ];
 }

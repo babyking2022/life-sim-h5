@@ -1,4 +1,10 @@
-import { P3B_CONTENT_MODES, type P3BContentMode, type P3EHex64 } from "@life-sim/contracts";
+import {
+  isP3ELifeFocusId,
+  P3B_CONTENT_MODES,
+  type P3BContentMode,
+  type P3EHex64,
+  type P3ELifeFocusId
+} from "@life-sim/contracts";
 import { ascii, canonicalBytes, concatBytes, sha256Hex } from "@life-sim/engine";
 import { P3EError } from "./errors";
 
@@ -30,7 +36,7 @@ import { P3EError } from "./errors";
 /* 型別                                                                */
 /* ------------------------------------------------------------------ */
 
-/** 本批唯一的兩種命令（沒有第三種）。 */
+/** 主線三種命令：年度推進、決策選擇、人生重心設定／更改（GPT-0029-B）。 */
 export type P3ECommand =
   | {
       readonly type: "ADVANCE_YEAR";
@@ -39,6 +45,10 @@ export type P3ECommand =
   | {
       readonly type: "CHOOSE_DECISION";
       readonly optionId: string;
+    }
+  | {
+      readonly type: "SET_LIFE_FOCUS";
+      readonly focusId: P3ELifeFocusId;
     };
 
 /* ------------------------------------------------------------------ */
@@ -59,6 +69,7 @@ const OPTION_ID_PATTERN = /^[a-z0-9][a-z0-9._-]{2,63}$/;
 
 const ADVANCE_YEAR_KEYS = ["type", "contentMode"] as const;
 const CHOOSE_DECISION_KEYS = ["type", "optionId"] as const;
+const SET_LIFE_FOCUS_KEYS = ["type", "focusId"] as const;
 
 /* ------------------------------------------------------------------ */
 /* 錯誤                                                                */
@@ -145,6 +156,12 @@ export function readP3ECommand(input: unknown): P3ECommand {
     if (typeof optionId !== "string" || !OPTION_ID_PATTERN.test(optionId)) fail("command.optionId");
     return Object.freeze({ type: "CHOOSE_DECISION" as const, optionId });
   }
+  if (type === "SET_LIFE_FOCUS") {
+    if (!isExactKeys(keys, SET_LIFE_FOCUS_KEYS)) fail("command");
+    const focusId = values.get("focusId");
+    if (typeof focusId !== "string" || !isP3ELifeFocusId(focusId)) fail("command.focusId");
+    return Object.freeze({ type: "SET_LIFE_FOCUS" as const, focusId });
+  }
   fail("command");
 }
 
@@ -166,9 +183,13 @@ export function readP3ECommand(input: unknown): P3ECommand {
  */
 export function computeP3ECommandArgsHash(input: unknown): P3EHex64 {
   const command = readP3ECommand(input);
-  const projection =
-    command.type === "ADVANCE_YEAR"
-      ? { type: command.type, contentMode: command.contentMode }
-      : { type: command.type, optionId: command.optionId };
+  let projection: Record<string, string>;
+  if (command.type === "ADVANCE_YEAR") {
+    projection = { type: command.type, contentMode: command.contentMode };
+  } else if (command.type === "CHOOSE_DECISION") {
+    projection = { type: command.type, optionId: command.optionId };
+  } else {
+    projection = { type: command.type, focusId: command.focusId };
+  }
   return sha256Hex(concatBytes(ascii(ARGS_DOMAIN), Uint8Array.of(0), canonicalBytes(projection as never)));
 }

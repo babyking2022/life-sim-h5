@@ -8,26 +8,24 @@
     "totalDecisionOptions": 172
   },
   "totals": {
-    "commands": 6452,
-    "decisions": 2273,
-    "years": 4179,
-    "yearsPerDecision": 1.839,
-    "averageDecisionsPerLife": 22.73,
-    "averageDeathAge": 41.79
+    "commands": 11529,
+    "decisions": 4094,
+    "years": 7435,
+    "yearsPerDecision": 1.816,
+    "averageDecisionsPerLife": 40.94,
+    "averageDeathAge": 74.35
   },
   "coverage": {
-    "decisionEventsSeen": 54,
+    "decisionEventsSeen": 56,
     "decisionEventsTotal": 58,
-    "decisionEventCoverage": 0.931,
+    "decisionEventCoverage": 0.966,
     "uncoveredDecisionEvents": [
       "ev.child.school-choice",
-      "ev.senior.housing",
-      "ev.senior.medical",
       "ev.teen.major-choice"
     ],
-    "decisionOptionsSeen": 150,
+    "decisionOptionsSeen": 165,
     "decisionOptionsTotal": 172,
-    "decisionOptionCoverage": 0.872
+    "decisionOptionCoverage": 0.959
   },
   "reachability": {
     "census": "0–119 歲逐年建候選（flags=[] 與 flags=全部條件旗標 兩輪）",
@@ -105,16 +103,16 @@
   },
   "stageDecisions": {
     "perStageTotals": {
-      "childhood": 494,
-      "adolescence": 242,
-      "adulthood": 1531,
-      "later_life": 6
+      "childhood": 515,
+      "adolescence": 265,
+      "adulthood": 2728,
+      "later_life": 586
     },
     "averagePerLife": {
-      "childhood": 4.94,
-      "adolescence": 2.42,
-      "adulthood": 15.31,
-      "later_life": 0.06
+      "childhood": 5.15,
+      "adolescence": 2.65,
+      "adulthood": 27.28,
+      "later_life": 5.86
     },
     "decisionEventsPerStage": {
       "childhood": 16,
@@ -127,35 +125,35 @@
     "yearsBetweenDecisions": [
       {
         "years": 1,
-        "count": 1222
+        "count": 2179
       },
       {
         "years": 2,
-        "count": 614
+        "count": 1174
       },
       {
         "years": 3,
-        "count": 225
+        "count": 403
       },
       {
         "years": 4,
-        "count": 68
+        "count": 147
       },
       {
         "years": 5,
-        "count": 30
+        "count": 60
       },
       {
         "years": 6,
-        "count": 9
+        "count": 19
       },
       {
         "years": 7,
-        "count": 6
+        "count": 10
       },
       {
         "years": 8,
-        "count": 2
+        "count": 4
       }
     ]
   },
@@ -197,13 +195,13 @@
     },
     {
       "seed": "p3b-choice-001",
-      "commands": 49,
-      "decisions": 16,
-      "deathAge": 33,
+      "commands": 93,
+      "decisions": 29,
+      "deathAge": 64,
       "stageDecisions": {
         "childhood": 4,
         "adolescence": 3,
-        "adulthood": 9,
+        "adulthood": 22,
         "later_life": 0
       },
       "decisionsSeen": [
@@ -222,37 +220,79 @@
         "ev.adult.friend-circle",
         "ev.adult.side-project",
         "ev.adult.children",
-        "ev.adult.career-pivot"
+        "ev.adult.career-pivot",
+        "ev.adult.career-pivot",
+        "ev.adult.kids-school",
+        "ev.adult.network",
+        "ev.adult.housing-buy",
+        "ev.adult.midlife-review",
+        "ev.adult.network",
+        "ev.adult.investment",
+        "ev.adult.elder-care",
+        "ev.late.pension",
+        "ev.late.family-time",
+        "ev.late.career-change",
+        "ev.late.new-hobby",
+        "ev.late.chronic-care"
       ]
     },
     {
       "seed": "p3b-choice-002",
-      "commands": 15,
-      "decisions": 4,
-      "deathAge": 11,
+      "commands": 92,
+      "decisions": 33,
+      "deathAge": 59,
       "stageDecisions": {
-        "childhood": 4,
-        "adolescence": 0,
-        "adulthood": 0,
+        "childhood": 5,
+        "adolescence": 5,
+        "adulthood": 23,
         "later_life": 0
       },
       "decisionsSeen": [
         "ev.child.interest-seed",
         "ev.child.chores",
         "ev.child.family-move",
-        "ev.child.chores"
+        "ev.child.chores",
+        "ev.child.sport-team",
+        "ev.teen.online-life",
+        "ev.teen.study-plan",
+        "ev.teen.family-duty",
+        "ev.teen.risk-invite",
+        "ev.teen.exam-strategy",
+        "ev.adult.after-school",
+        "ev.adult.move-city",
+        "ev.adult.first-job",
+        "ev.adult.side-project",
+        "ev.adult.finance-start",
+        "ev.adult.friend-circle",
+        "ev.adult.further-study",
+        "ev.adult.network",
+        "ev.adult.career-pivot",
+        "ev.adult.startup",
+        "ev.adult.housing-buy",
+        "ev.adult.children",
+        "ev.adult.career-pivot",
+        "ev.adult.health-checkup",
+        "ev.adult.investment",
+        "ev.adult.elder-care",
+        "ev.adult.midlife-review",
+        "ev.adult.investment",
+        "ev.adult.health-checkup",
+        "ev.late.career-change",
+        "ev.late.chronic-care",
+        "ev.late.elder-care",
+        "ev.late.new-hobby"
       ]
     },
     {
       "seed": "p3b-choice-003",
-      "commands": 40,
-      "decisions": 11,
-      "deathAge": 29,
+      "commands": 135,
+      "decisions": 46,
+      "deathAge": 89,
       "stageDecisions": {
         "childhood": 4,
         "adolescence": 1,
-        "adulthood": 6,
-        "later_life": 0
+        "adulthood": 29,
+        "later_life": 12
       },
       "decisionsSeen": [
         "ev.child.kindergarten",
@@ -265,19 +305,54 @@
         "ev.adult.first-job",
         "ev.adult.friend-circle",
         "ev.adult.further-study",
-        "ev.adult.finance-start"
+        "ev.adult.finance-start",
+        "ev.adult.relationship",
+        "ev.adult.friend-circle",
+        "ev.adult.children",
+        "ev.adult.startup",
+        "ev.adult.investment",
+        "ev.adult.health-checkup",
+        "ev.adult.career-pivot",
+        "ev.adult.housing-buy",
+        "ev.adult.midlife-review",
+        "ev.adult.startup",
+        "ev.adult.investment",
+        "ev.adult.elder-care",
+        "ev.adult.kids-school",
+        "ev.adult.midlife-review",
+        "ev.adult.investment",
+        "ev.late.chronic-care",
+        "ev.late.elder-care",
+        "ev.late.family-time",
+        "ev.late.pension",
+        "ev.late.career-change",
+        "ev.late.chronic-care",
+        "ev.late.new-hobby",
+        "ev.late.family-time",
+        "ev.senior.daily-health",
+        "ev.senior.medical",
+        "ev.senior.grandchildren",
+        "ev.senior.legacy",
+        "ev.senior.retirement",
+        "ev.senior.medical",
+        "ev.senior.housing",
+        "ev.senior.social",
+        "ev.senior.daily-health",
+        "ev.senior.social",
+        "ev.senior.housing",
+        "ev.senior.medical"
       ]
     },
     {
       "seed": "p3b-choice-004",
-      "commands": 89,
-      "decisions": 33,
-      "deathAge": 56,
+      "commands": 119,
+      "decisions": 45,
+      "deathAge": 74,
       "stageDecisions": {
         "childhood": 4,
         "adolescence": 4,
-        "adulthood": 25,
-        "later_life": 0
+        "adulthood": 32,
+        "later_life": 5
       },
       "decisionsSeen": [
         "ev.child.picky-eating",
@@ -312,7 +387,19 @@
         "ev.adult.investment",
         "ev.late.elder-care",
         "ev.late.career-change",
-        "ev.late.chronic-care"
+        "ev.late.chronic-care",
+        "ev.late.family-time",
+        "ev.late.pension",
+        "ev.late.new-hobby",
+        "ev.late.chronic-care",
+        "ev.late.career-change",
+        "ev.late.new-hobby",
+        "ev.late.elder-care",
+        "ev.senior.medical",
+        "ev.senior.grandchildren",
+        "ev.senior.social",
+        "ev.senior.legacy",
+        "ev.senior.medical"
       ]
     }
   ]

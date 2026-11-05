@@ -40,6 +40,29 @@ export interface SelectEventInput {
   readonly rngState: readonly [number, number, number, number];
 }
 
+/**
+ * GPT-0029-B：人生重心的選填動態加權。
+ *
+ * 這是 `selectEvent` 的**選填第六欄**；不傳（或傳 `null`）時，候選權重與
+ * 既有 P3-B 決定性抽選逐位元相同，因此所有 P3B／P3C golden vectors 不受影響。
+ * 加權後的 weight 會進入 `candidates`，而 `selectionHash` 本來就綁定
+ * `candidates`，所以有加權的路徑依然完全可重播。
+ */
+export interface P3BWeightBias {
+  /** 需要加權的 eventId（canonical 升冪、不重複）。 */
+  readonly eventIds: readonly string[];
+  /** 整數倍率，1..8。 */
+  readonly multiplier: number;
+}
+
+interface BoundSelectInput extends SelectEventInput {
+  readonly weightBias: P3BWeightBias | null;
+}
+
+const SELECT_BASE_KEYS = ["pack", "state", "history", "contentMode", "rngState"] as const;
+const SELECT_BIAS_KEYS = [...SELECT_BASE_KEYS, "weightBias"] as const;
+const WEIGHT_BIAS_KEYS = ["eventIds", "multiplier"] as const;
+
 export function lifeStageOfAge(age: number): P3BLifeStage {
   if (age <= 12) return "childhood";
   if (age <= 17) return "adolescence";
@@ -99,6 +122,7 @@ export interface CandidateContext {
   readonly state: P3BSelectionState;
   readonly contentMode: P3BContentMode;
   readonly occurrences: readonly P3BEventOccurrence[];
+  readonly weightBias: P3BWeightBias | null;
 }
 
 function occurrenceOf(context: CandidateContext, eventId: string): P3BEventOccurrence | null {
@@ -126,15 +150,40 @@ function passesFilters(context: CandidateContext, event: P3BEventRecord): boolea
   return true;
 }
 
-/** 頂層信任邊界：exact object，先驗證再讀任何屬性。 */
-function readSelectInput(value: unknown): SelectEventInput {
-  const node = readExactObject(value, "input", ["pack", "state", "history", "contentMode", "rngState"]);
+/** `weightBias` 的精確兩欄驗證；`null` 代表「不加權」。 */
+function readWeightBias(value: unknown): P3BWeightBias | null {
+  if (value === null) return null;
+  const node = readExactObject(value, "input.weightBias", WEIGHT_BIAS_KEYS);
+  const multiplier = readInt(node.multiplier, "input.weightBias.multiplier", 1, 8);
+  const ids = readArray(node.eventIds, "input.weightBias.eventIds", 0, 4096).map((entry, index) =>
+    readString(entry, `input.weightBias.eventIds[${index}]`, { min: 3, max: 64, pattern: EVENT_ID_PATTERN })
+  );
+  return Object.freeze({
+    eventIds: Object.freeze([...new Set(ids)].sort()),
+    multiplier
+  });
+}
+
+/** 頂層信任邊界：exact object（五欄，或帶選填 `weightBias` 的六欄）。 */
+function readSelectInput(value: unknown): BoundSelectInput {
+  let hasBias = false;
+  try {
+    hasBias =
+      typeof value === "object" &&
+      value !== null &&
+      Object.prototype.hasOwnProperty.call(value, "weightBias");
+  } catch {
+    // revoked Proxy 等反射失敗交給 readExactObject 用既有固定錯誤碼處理。
+    hasBias = false;
+  }
+  const node = readExactObject(value, "input", hasBias ? SELECT_BIAS_KEYS : SELECT_BASE_KEYS);
   return {
     pack: node.pack as SelectEventInput["pack"],
     state: node.state as SelectEventInput["state"],
     history: node.history as SelectEventInput["history"],
     contentMode: node.contentMode as SelectEventInput["contentMode"],
-    rngState: node.rngState as SelectEventInput["rngState"]
+    rngState: node.rngState as SelectEventInput["rngState"],
+    weightBias: hasBias ? readWeightBias(node.weightBias) : null
   };
 }
 
@@ -146,7 +195,7 @@ export function buildCandidates(input: unknown): { readonly candidates: readonly
   const state = readSelectionState(bound.state);
   const contentMode = readEnum(bound.contentMode, "input.contentMode", P3B_CONTENT_MODES);
   const occurrences = readHistory(bound.history, state.currentYear);
-  const context: CandidateContext = { pack, state, contentMode, occurrences };
+  const context: CandidateContext = { pack, state, contentMode, occurrences, weightBias: bound.weightBias };
 
   const eligible: P3BEventRecord[] = [];
   for (const event of pack.events) if (passesFilters(context, event)) eligible.push(event);
@@ -161,7 +210,13 @@ export function buildCandidates(input: unknown): { readonly candidates: readonly
   const candidates: P3BCandidate[] = [];
   for (const event of eligible) {
     if (event.exclusiveGroup !== null && groupBest.get(event.exclusiveGroup)?.eventId !== event.eventId) continue;
-    candidates.push({ eventId: event.eventId, weight: event.weight, priority: event.priority });
+    // GPT-0029-B：只在有重心加權時調整相符事件權重；null 時完全沿用 pack 原值。
+    const bias = context.weightBias;
+    const weight =
+      bias !== null && bias.eventIds.includes(event.eventId)
+        ? event.weight * bias.multiplier
+        : event.weight;
+    candidates.push({ eventId: event.eventId, weight, priority: event.priority });
   }
   return { candidates, context };
 }

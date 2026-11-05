@@ -89,7 +89,7 @@ export interface P3ELedgerContinuityFacts {
   /** 連續性索引（= `previousState.commandLog.count + 1`）。 */
   readonly index: number;
   /** 本次命令的種類。 */
-  readonly commandType: "ADVANCE_YEAR" | "CHOOSE_DECISION";
+  readonly commandType: "ADVANCE_YEAR" | "CHOOSE_DECISION" | "SET_LIFE_FOCUS";
   /** 已驗證的 previous State（深層凍結快照）。 */
   readonly previousState: P3ELifeState;
   /** 已驗證的 Command Record（深層凍結快照）。 */
@@ -270,6 +270,18 @@ function checkChooseDecision(previous: P3ELifeState, yearRecord: P3EYearLedgerRe
   if (!sameRngState(yearRecord.rngAfter, previous.rng)) failRng(PATH_RNG_AFTER);
 }
 
+/**
+ * `SET_LIFE_FOCUS`（GPT-0029-B）：重心不是一次模擬年，所以 year／age／phase
+ * 全部不變，RNG 游標也完全不動。年齡門檻與「同年至多一次」屬於業務驗證，
+ * 由 `command-executor` 負責；這裡只守住 ledger 連續性。
+ */
+function checkSetLifeFocus(previous: P3ELifeState, yearRecord: P3EYearLedgerRecord): void {
+  if (yearRecord.year !== previous.currentYear) failHistory(PATH_YEAR_AGE);
+  if (yearRecord.age !== previous.age) failHistory(PATH_YEAR_AGE);
+  if (yearRecord.phase !== previous.phase) failHistory(PATH_YEAR_AGE);
+  if (!sameRngState(yearRecord.rngAfter, previous.rng)) failRng(PATH_RNG_AFTER);
+}
+
 /* ------------------------------------------------------------------ */
 /* 入口                                                                */
 /* ------------------------------------------------------------------ */
@@ -338,8 +350,10 @@ export function validateP3ELedgerContinuity(input: unknown): P3ELedgerContinuity
   const commandType = commandRecord.command.type;
   if (commandType === "ADVANCE_YEAR") {
     checkAdvanceYear(previousState, yearRecord);
+  } else if (commandType === "SET_LIFE_FOCUS") {
+    checkSetLifeFocus(previousState, yearRecord);
   } else {
-    // `P3ECommand` 只有這兩種；`readP3ECommandRecord` 已保證不會有第三種。
+    // 剩下只可能是 `CHOOSE_DECISION`；`readP3ECommandRecord` 已保證沒有第四種。
     const pending = previousState.pendingDecision;
     if (previousState.phase !== "pending_decision" || pending === null) failCommand(PATH_COMMAND);
     if (!pending.optionIds.includes(commandRecord.command.optionId)) failCommand(PATH_COMMAND);

@@ -1,4 +1,6 @@
 import {
+  replaceP3ELifeFocusFlag,
+  type P3ELifeFocusId,
   P3E_DEATH_DOMAIN,
   P3E_EVENT_DOMAIN,
   P3E_LIFE_DOMAIN,
@@ -452,6 +454,43 @@ export function assembleP3EDecisionStateCoreDraft(
     stats: copyStats(stage.stats),
     assets: copyAssets(stage.assets),
     flags: copyFlags(stage.flags),
+    occurrences: copyOccurrences(previous.occurrences),
+    rng: copyRng(previous.rng)
+  });
+}
+
+/* ------------------------------------------------------------------ */
+/* GPT-0029-B：人生重心（第三種命令）                                  */
+/* ------------------------------------------------------------------ */
+
+/**
+ * 重心路徑：只替換 `flags` 裡的 focus 旗標，**不推進年度、不消耗 RNG、
+ * 不改 phase／stats／assets／occurrences**。
+ *
+ * 這是刻意的最小轉移：重心是玩家的年度取向，不是一次模擬年。所有其他欄位
+ * 沿用 previous（獨立深層凍結副本），因此 `materializeP3ETransition` 的
+ * snapshot／delta／entry hash 仍完全由正式原語計算，且 replay 只要重送
+ * 同一筆 `SET_LIFE_FOCUS` command 就會得到逐位元相同的 State。
+ *
+ * 輸入驗證（年齡／phase／同年至多一次）由 `command-executor` 負責；
+ * 本函式只接受已驗證的 `focusId` 與 `changedYear`。
+ */
+export function assembleP3ELifeFocusStateCoreDraft(
+  previous: P3ELifeState,
+  focusId: P3ELifeFocusId,
+  changedYear: number
+): P3EStateCoreDraft {
+  return Object.freeze({
+    ...copyVersions(previous),
+    identity: copyIdentity(previous.identity),
+    packs: copyPacks(previous.packs),
+    currentYear: previous.currentYear,
+    age: previous.age,
+    phase: previous.phase,
+    pendingDecision: copyPendingSummary(previous.pendingDecision),
+    stats: copyStats(previous.stats),
+    assets: copyAssets(previous.assets),
+    flags: copyFlags(replaceP3ELifeFocusFlag(previous.flags, focusId, changedYear)),
     occurrences: copyOccurrences(previous.occurrences),
     rng: copyRng(previous.rng)
   });
