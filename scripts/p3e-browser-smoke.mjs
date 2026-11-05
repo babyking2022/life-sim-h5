@@ -40,8 +40,17 @@ const EXPECTED_STATE_HASH = "9418bd66908eed8abaae458ccf914af43cbca730eb0b9fb7393
 const EXPECTED_COMMAND_HEAD = "cf0cc74720628ad5aa5fd367241b8b43b530802187ad2f5ff12a57a00b28b60f";
 const EXPECTED_COMMANDS = 51;
 const BOOT_BUDGET_GZIP = 500 * 1024;
+/**
+ * 官方 golden（state hash／command head）建立在這個 seed 上。
+ * GPT-0017-E：全新使用者首次開頁已改為安全隨機 seed，所以所有需要決定性的
+ * 流程都必須明確用 `?seed=GOLDEN_SEED` 開頁，不再依賴「乾淨啟動固定 seed」。
+ */
+const GOLDEN_SEED = "p3e-166-playable-runtime-v4";
+const GOLDEN_QUERY = `?seed=${encodeURIComponent(GOLDEN_SEED)}`;
 
 const results = [];
+const layoutReport = [];
+const birthReport = {};
 function check(name, ok, detail) {
   results.push({ name, ok: Boolean(ok), detail: detail ?? null });
   console.log(`${ok ? "PASS" : "FAIL"} ${name}${detail ? ` — ${detail}` : ""}`);
@@ -222,6 +231,160 @@ function horizontalOverflow(page) {
 }
 
 /* ------------------------------------------------------------------ */
+/* 手機單畫面驗收 helpers（GPT-WORKBUDDY-0017）                        */
+/* ------------------------------------------------------------------ */
+
+/** document / body 的垂直溢出與實際可捲動量，兩者都必須為 0。 */
+function verticalOverflow(page) {
+  return page.evaluate(() => {
+    const doc = document.documentElement;
+    const body = document.body;
+    const before = window.scrollY;
+    window.scrollTo(0, 9999);
+    const scrolled = window.scrollY;
+    window.scrollTo(0, before);
+    return {
+      documentOverflow: Math.max(0, doc.scrollHeight - doc.clientHeight),
+      bodyOverflow: Math.max(0, body.scrollHeight - body.clientHeight),
+      scrolled,
+      docOverflowY: getComputedStyle(doc).overflowY,
+      bodyOverflowY: getComputedStyle(body).overflowY
+    };
+  });
+}
+
+/** 出生卡快照：國家、身份／家庭欄位、故事、動作與 seed／identity 屬性。 */
+function birthSnapshot(page) {
+  return page.evaluate(() => {
+    const card = document.querySelector(".p3e-birth-card");
+    if (card === null) return null;
+    const live = document.querySelector("[data-p3e-live]");
+    const country = card.querySelector(".p3e-birth-country");
+    const grid = card.querySelector(".p3e-birth-grid");
+    const story = card.querySelector(".p3e-birth-story");
+    const actions = card.querySelector(".p3e-birth-actions");
+    return {
+      text: (card.innerText ?? "").trim(),
+      country: (country?.textContent ?? "").trim(),
+      gridItems: grid?.children.length ?? 0,
+      gridText: (grid?.innerText ?? "").trim(),
+      story: (story?.innerText ?? "").trim(),
+      actionCount: actions?.querySelectorAll("button").length ?? 0,
+      seed:
+        live?.getAttribute("data-p3e-birth-seed") ??
+        live?.getAttribute("data-p3e-seed") ??
+        live?.getAttribute("data-p3e-identity-hash") ??
+        live?.getAttribute("data-p3e-birth-hash") ??
+        live?.getAttribute("data-p3e-birth-certificate-hash") ??
+        live?.getAttribute("data-p3e-certificate-hash") ??
+        "",
+      phase: live?.getAttribute("data-p3e-phase") ?? null
+    };
+  });
+}
+
+/** 有出生畫面時按「開始人生」；沒有時直接沿用既有的 age0 路徑。 */
+async function startLifeFromBirth(page) {
+  const start = page.locator('[data-action="start-life"], [data-action="begin-life"]');
+  if ((await start.count()) === 0) return false;
+  await start.first().click();
+  await page.waitForFunction(
+    () =>
+      document.querySelector(".p3e-birth-card") === null ||
+      document.querySelector("[data-p3e-live]")?.getAttribute("data-p3e-phase") === "life",
+    undefined,
+    { timeout: 20000 }
+  );
+  return true;
+}
+
+/** 情境頁／效能頁：只有停在出生卡且完全沒有遊戲控制時才先進入遊戲。 */
+async function ensurePlayable(page) {
+  await page.waitForSelector("[data-p3e-live='true']", { timeout: 30000 });
+  const playable = await page.locator(
+    '[data-action="advance"], [data-action="choose"], [data-action="rebirth"]'
+  ).count();
+  if (playable > 0) return;
+  if ((await page.locator(".p3e-birth-card").count()) === 0) return;
+  await startLifeFromBirth(page);
+}
+
+/** 七個必要區塊都必須落在同一個 viewport 內。 */
+function layoutSnapshot(page) {
+  return page.evaluate(() => {
+    const height = window.innerHeight;
+    const targets = [
+      ["hud", ".p3e-hud"],
+      ["scene", ".p3e-scene"],
+      ["event_or_decision", ".p3e-story-card, .p3e-pending"],
+      ["stats", ".p3e-stat-dock"],
+      ["time_controls", ".p3e-time-controls"],
+      ["next_step", ".p3e-controls"],
+      ["bottom_nav", ".p3e-tabs"]
+    ];
+    const rects = {};
+    for (const [name, selector] of targets) {
+      const node = document.querySelector(selector);
+      if (node === null) {
+        rects[name] = null;
+        continue;
+      }
+      const rect = node.getBoundingClientRect();
+      rects[name] = {
+        top: Math.round(rect.top),
+        bottom: Math.round(rect.bottom),
+        height: Math.round(rect.height)
+      };
+    }
+    const statItems = document.querySelectorAll(".p3e-stat-dock .p3e-stat-item").length;
+    const fitted = Object.values(rects).every(
+      (rect) =>
+        rect !== null &&
+        rect.height > 0 &&
+        rect.top >= -2 &&
+        rect.bottom <= height + 2
+    );
+    return { ok: fitted && statItems === 4, height, statItems, rects };
+  });
+}
+
+/** 主要觸控區至少 44px（寬、高皆然）。 */
+function touchTargets(page) {
+  return page.evaluate(() => {
+    const selector = [
+      '[data-action="advance"]',
+      '[data-action="choose"]',
+      '[data-action="rebirth"]',
+      '[data-action="start-life"]',
+      '[data-action="reroll-birth"]',
+      ".p3e-time-controls button",
+      ".p3e-tab",
+      ".p3e-birth-actions button",
+      ".p3e-tools > summary"
+    ].join(", ");
+    const visible = [...document.querySelectorAll(selector)].filter((node) => {
+      const rect = node.getBoundingClientRect();
+      const style = getComputedStyle(node);
+      return rect.width > 0 && rect.height > 0 && style.display !== "none" && style.visibility !== "hidden";
+    });
+    const small = visible
+      .filter((node) => {
+        const rect = node.getBoundingClientRect();
+        return rect.height < 43.5 || rect.width < 43.5;
+      })
+      .map((node) => {
+        const rect = node.getBoundingClientRect();
+        return {
+          label: (node.textContent ?? "").trim().slice(0, 18),
+          width: Math.round(rect.width),
+          height: Math.round(rect.height)
+        };
+      });
+    return { ok: small.length === 0, checked: visible.length, small };
+  });
+}
+
+/* ------------------------------------------------------------------ */
 /* main                                                               */
 /* ------------------------------------------------------------------ */
 
@@ -246,20 +409,290 @@ async function main() {
   });
 
   const bootStarted = Date.now();
-  await page.goto(`${baseUrl}/`, { waitUntil: "networkidle" });
+  // 主線要跑官方 51 命令 golden：明確釘住 seed，不受首次開頁隨機 seed 影響。
+  await page.goto(`${baseUrl}/${GOLDEN_QUERY}`, { waitUntil: "networkidle" });
   await page.waitForSelector("[data-p3e-live='true']", { timeout: 30000 });
   const bootMs = Date.now() - bootStarted;
   const boot = await measureAssets([...bootRequests.keys()]);
 
-  // 1. 預設路徑是 real runtime，不是 fixture 文案
+  /* ---------------------------------------------------------------- */
+  /* 0. 出生畫面：啟動先看到出生卡，資料齐全、可重抽、可開始          */
+  /* ---------------------------------------------------------------- */
+
+  const bootBirth = await birthSnapshot(page);
+  const birthVisible = bootBirth !== null && (await page.locator(".p3e-birth-card").isVisible());
+  birthReport.boot_card_visible = birthVisible;
+  birthReport.boot_phase = bootBirth?.phase ?? null;
+  check(
+    "boot_shows_birth_card",
+    birthVisible,
+    bootBirth === null ? "birth card DOM missing" : `phase=${bootBirth.phase}`
+  );
+
+  const countryWords = /(國家|地區|出生地|出生國|country|region)/i;
+  const familyWords = /(家庭|家戶|父母|父|母|雙親|監護|居住|住|收入|經濟|城|鄉|宗教|姓名|性別|職業|年齡|壽命|分位)/;
+  const rerollCount = await page.locator('[data-action="reroll-birth"], [data-action="reroll"]').count();
+  const startCount = await page.locator('[data-action="start-life"], [data-action="begin-life"]').count();
+  const birthDataOk =
+    bootBirth !== null &&
+    bootBirth.country.length > 0 &&
+    bootBirth.gridItems >= 2 &&
+    bootBirth.gridText.replace(/\s/g, "").length >= 8 &&
+    (bootBirth.story.length > 0 || bootBirth.text.length >= 40) &&
+    rerollCount >= 1 &&
+    startCount >= 1 &&
+    (countryWords.test(bootBirth.text) && familyWords.test(bootBirth.text) || bootBirth.text.length >= 60);
+  check(
+    "birth_country_and_family_data_present",
+    birthDataOk,
+    bootBirth === null
+      ? "birth card DOM missing"
+      : `country=${bootBirth.country.slice(0, 18)} grid=${bootBirth.gridItems} actions=${bootBirth.actionCount} reroll=${rerollCount} start=${startCount} story=${bootBirth.story.length} text=${bootBirth.text.length}`
+  );
+
+  // 出生卡必須逐項顯示國家／姓名／性別／城鄉／收入／住房／宗教／父母／壽命／故事。
+  const birthLabels = await page.evaluate(() =>
+    [...document.querySelectorAll(".p3e-birth-grid dt")].map((node) =>
+      (node.textContent ?? "").trim()
+    )
+  );
+  const requiredBirthLabels = [
+    "姓名",
+    "性別",
+    "城鄉",
+    "收入",
+    "住房",
+    "宗教",
+    "母親",
+    "父親",
+    "預期壽命"
+  ];
+  const missingBirthLabels = requiredBirthLabels.filter((label) => !birthLabels.includes(label));
+  check(
+    "birth_card_shows_all_required_fields",
+    bootBirth !== null &&
+      bootBirth.country.length > 0 &&
+      bootBirth.story.length > 0 &&
+      birthLabels.length >= requiredBirthLabels.length &&
+      missingBirthLabels.length === 0,
+    bootBirth === null
+      ? "birth card DOM missing"
+      : `labels=${birthLabels.length} missing=[${missingBirthLabels.join(",")}] country=${bootBirth.country.slice(0, 12)} story=${bootBirth.story.length}`
+  );
+
+  // 出生卡在三個尺寸下也不得讓 document／body 捲動；超出的資訊只能卡內捲。
+  if (birthVisible) {
+    for (const viewport of [
+      { width: 390, height: 844 },
+      { width: 430, height: 932 },
+      { width: 320, height: 568 }
+    ]) {
+      await page.setViewportSize(viewport);
+      const overflow = await verticalOverflow(page);
+      const internal = await page.evaluate(() => {
+        const grid = document.querySelector(".p3e-birth-grid");
+        const card = document.querySelector(".p3e-birth-card");
+        return {
+          gridOverflowY: grid === null ? null : getComputedStyle(grid).overflowY,
+          cardOverflowY: card === null ? null : getComputedStyle(card).overflowY
+        };
+      });
+      const ok = overflow.documentOverflow <= 1 && overflow.bodyOverflow <= 1 && overflow.scrolled === 0;
+      check(
+        `birth_viewport_${viewport.width}x${viewport.height}_vertical_overflow_0`,
+        ok,
+        `doc=${overflow.documentOverflow} body=${overflow.bodyOverflow} scrolled=${overflow.scrolled} grid=${internal.gridOverflowY}`
+      );
+      birthReport[`${viewport.width}x${viewport.height}`] = { ...overflow, ...internal };
+      if (viewport.width === 320) {
+        const actions = await page.evaluate(() => {
+          const height = window.innerHeight;
+          const nodes = [...document.querySelectorAll(".p3e-birth-actions button")];
+          return nodes.map((node) => {
+            const rect = node.getBoundingClientRect();
+            return {
+              label: (node.textContent ?? "").trim().slice(0, 16),
+              width: Math.round(rect.width),
+              height: Math.round(rect.height),
+              inside: rect.top >= -2 && rect.bottom <= height + 2
+            };
+          });
+        });
+        check(
+          "birth_viewport_320x568_actions_visible_and_44px",
+          actions.length >= 2 && actions.every((item) => item.inside && item.width >= 43.5 && item.height >= 43.5),
+          JSON.stringify(actions)
+        );
+      }
+    }
+    await page.setViewportSize({ width: 390, height: 844 });
+  }
+
+  // 重新抽取在獨立分頁做，避免污染官方 51 命令的決定性路徑。
+  {
+    const rerollContext = await browser.newContext({
+      viewport: { width: 390, height: 844 },
+      deviceScaleFactor: 1,
+      isMobile: true,
+      hasTouch: true
+    });
+    const rerollPage = await rerollContext.newPage();
+    await rerollPage.goto(`${baseUrl}/`, { waitUntil: "domcontentloaded" });
+    await rerollPage.waitForSelector("[data-p3e-live='true']", { timeout: 30000 });
+    const before = await birthSnapshot(rerollPage);
+    const rerollButton = rerollPage.locator(
+      '[data-action="reroll-birth"], [data-action="reroll"]'
+    );
+    let changed = false;
+    let detail = "birth card DOM missing";
+    if (before !== null && (await rerollButton.count()) > 0) {
+      await rerollButton.first().click();
+      try {
+        await rerollPage.waitForFunction(
+          (previous) => {
+            const card = document.querySelector(".p3e-birth-card");
+            const live = document.querySelector("[data-p3e-live]");
+            const seed =
+              live?.getAttribute("data-p3e-birth-seed") ??
+              live?.getAttribute("data-p3e-seed") ??
+              live?.getAttribute("data-p3e-identity-hash") ??
+              live?.getAttribute("data-p3e-birth-hash") ??
+              live?.getAttribute("data-p3e-birth-certificate-hash") ??
+              live?.getAttribute("data-p3e-certificate-hash") ??
+              "";
+            return (card?.innerText ?? "").trim() !== previous.text || seed !== previous.seed;
+          },
+          { text: before.text, seed: before.seed },
+          { timeout: 20000 }
+        );
+      } catch {
+        // 由下面的最終比對決定成敗
+      }
+      const after = await birthSnapshot(rerollPage);
+      changed =
+        after !== null && (after.text !== before.text || after.seed !== before.seed);
+      detail = after === null
+        ? "birth card disappeared after reroll"
+        : `text_changed=${after.text !== before.text} seed_changed=${after.seed !== before.seed}`;
+      check(
+        "birth_card_still_visible_after_reroll",
+        after !== null && (await rerollPage.locator(".p3e-birth-card").isVisible())
+      );
+    }
+    check("reroll_changes_identity_or_seed", changed, detail);
+    birthReport.reroll_changed = changed;
+    await rerollContext.close();
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* 0b. 全新使用者首次開頁：安全隨機 seed；?seed= 固定可重現          */
+  /* ---------------------------------------------------------------- */
+  {
+    /** 讀出生卡的 seed／證書 hash，並確認出生階段沒有寫入 autosave。 */
+    const birthIdentity = (target) =>
+      target.evaluate(() => {
+        const live = document.querySelector("[data-p3e-live]");
+        let stored = false;
+        try {
+          stored = window.localStorage.getItem("life-sim:p3e:v6:autosave") !== null;
+        } catch {
+          stored = false;
+        }
+        return {
+          phase: live?.getAttribute("data-p3e-phase") ?? null,
+          seed: live?.getAttribute("data-p3e-birth-seed") ?? null,
+          hash: live?.getAttribute("data-p3e-birth-certificate-hash") ?? null,
+          identity: live?.getAttribute("data-p3e-birth-identity-hash") ?? null,
+          stored
+        };
+      });
+
+    /** 獨立的瀏覽器儲存環境（全新 context＝全新 localStorage／active seed）。 */
+    const openFreshBirth = async (query) => {
+      const freshContext = await browser.newContext({
+        viewport: { width: 390, height: 844 },
+        deviceScaleFactor: 1,
+        isMobile: true,
+        hasTouch: true
+      });
+      const freshPage = await freshContext.newPage();
+      await freshPage.goto(`${baseUrl}/${query}`, { waitUntil: "domcontentloaded" });
+      await freshPage.waitForSelector("[data-p3e-live='true']", { timeout: 30000 });
+      const info = await birthIdentity(freshPage);
+      await freshContext.close();
+      return info;
+    };
+
+    const isRandomSeed = (value) =>
+      typeof value === "string" && /^life-[0-9a-f]{20}$/.test(value) && value !== GOLDEN_SEED;
+
+    // 兩個獨立環境各開一次；極低機率的碰撞再多抽一次確認。
+    const first = await openFreshBirth("");
+    let second = await openFreshBirth("");
+    for (let attempt = 0; attempt < 2 && first.seed === second.seed; attempt += 1) {
+      second = await openFreshBirth("");
+    }
+    birthReport.clean_boot_seed_a = first.seed;
+    birthReport.clean_boot_seed_b = second.seed;
+
+    check(
+      "clean_boot_random_seed_differs_across_contexts",
+      isRandomSeed(first.seed) &&
+        isRandomSeed(second.seed) &&
+        first.seed !== second.seed &&
+        first.hash !== second.hash,
+      `a=${first.seed} b=${second.seed} hashDiffer=${first.hash !== second.hash}`
+    );
+    check(
+      "birth_preview_does_not_create_session",
+      first.phase === "birth" &&
+        second.phase === "birth" &&
+        !first.stored &&
+        !second.stored,
+      `phase=${first.phase}/${second.phase} stored=${first.stored}/${second.stored}`
+    );
+
+    const pinnedSeed = "gpt-0017-e-fixed-birth";
+    const pinnedQuery = `?seed=${encodeURIComponent(pinnedSeed)}`;
+    const pinnedA = await openFreshBirth(pinnedQuery);
+    const pinnedB = await openFreshBirth(pinnedQuery);
+    birthReport.pinned_seed = pinnedSeed;
+    birthReport.pinned_certificate_hash = pinnedA.hash;
+    check(
+      "pinned_seed_reproducible_birth",
+      pinnedA.phase === "birth" &&
+        pinnedB.phase === "birth" &&
+        pinnedA.seed === pinnedSeed &&
+        pinnedB.seed === pinnedSeed &&
+        pinnedA.hash !== null &&
+        pinnedA.hash === pinnedB.hash &&
+        pinnedA.identity === pinnedB.identity &&
+        pinnedA.hash !== first.hash,
+      `seed=${pinnedA.seed} hash=${String(pinnedA.hash).slice(0, 16)} reproducible=${pinnedA.hash === pinnedB.hash}`
+    );
+  }
+
+  // 開始人生 → 0 歲；沒有出生畫面時沿用原本的 age0 直接開局。
+  const startedFromBirth = await startLifeFromBirth(page);
+  birthReport.started_from_birth = startedFromBirth;
+  const phaseAfterStart = await phaseOf(page);
   const bodyText = (await page.locator("body").innerText()) ?? "";
+  check(
+    "birth_start_enters_age0",
+    (!birthVisible || startedFromBirth) &&
+      phaseAfterStart === "life" &&
+      (bodyText.includes("年齡 0") || bodyText.includes("0 歲")),
+    `birth_card=${birthVisible} start_clicked=${startedFromBirth} phase=${phaseAfterStart}`
+  );
+
+  // 1. 預設路徑是 real runtime，不是 fixture 文案
   check("default_is_real_not_fixture", !bodyText.includes("靜態選擇") && !bodyText.includes("固定後果"));
-  check("default_uses_real_session", (await phaseOf(page)) === "life");
+  check("default_uses_real_session", phaseAfterStart === "life");
 
   // 2. age 0 / life
   check(
     "age0_life_initial",
-    (bodyText.includes("年齡 0") || bodyText.includes("0 歲")) && (await phaseOf(page)) === "life"
+    (bodyText.includes("年齡 0") || bodyText.includes("0 歲")) && phaseAfterStart === "life"
   );
 
   // 3. controls 跟 phase
@@ -313,29 +746,106 @@ async function main() {
   check("final_state_hash", finalStateHash === EXPECTED_STATE_HASH, finalStateHash ?? "null");
   check("final_command_head", finalHead === EXPECTED_COMMAND_HEAD, finalHead ?? "null");
 
-  // 7. 重生
+  // 7. 重生（若重生回到出生卡，先按開始再驗證 0 歲）
   await page.locator('[data-action="rebirth"]').click();
-  await page.waitForSelector("[data-p3e-phase='life']", { timeout: 20000 });
+  await page.waitForFunction(
+    () =>
+      document.querySelector("[data-p3e-live]")?.getAttribute("data-p3e-phase") === "life" ||
+      document.querySelector(".p3e-birth-card") !== null,
+    undefined,
+    { timeout: 20000 }
+  );
+  await startLifeFromBirth(page);
   const rebirthText = (await page.locator("body").innerText()) ?? "";
   check(
     "rebirth_returns_age0",
     (rebirthText.includes("年齡 0") || rebirthText.includes("0 歲")) && (await commandCount(page)) === 0
   );
 
-  // 8. 三個窄幅 viewport 不得水平溢出
+  // 8. 三個手機尺寸：水平／垂直溢出皆為 0，七個區塊同屏、觸控區 >=44px
+  await ensurePlayable(page);
   for (const viewport of [
-    { width: 320, height: 568 },
     { width: 390, height: 844 },
-    { width: 430, height: 932 }
+    { width: 430, height: 932 },
+    { width: 320, height: 568 }
   ]) {
     await page.setViewportSize(viewport);
+    const label = `${viewport.width}x${viewport.height}`;
     const overflow = await horizontalOverflow(page);
     check(
-      `viewport_${viewport.width}x${viewport.height}_no_horizontal_overflow`,
+      `viewport_${label}_no_horizontal_overflow`,
       overflow <= 1,
       `overflow=${overflow}`
     );
+
+    const vertical = await verticalOverflow(page);
+    const verticalOk =
+      vertical.documentOverflow <= 1 && vertical.bodyOverflow <= 1 && vertical.scrolled === 0;
+    check(
+      `viewport_${label}_vertical_overflow_0`,
+      verticalOk,
+      `doc=${vertical.documentOverflow} body=${vertical.bodyOverflow} scrolled=${vertical.scrolled} docOverflowY=${vertical.docOverflowY} bodyOverflowY=${vertical.bodyOverflowY}`
+    );
+
+    const layout = await layoutSnapshot(page);
+    check(
+      `viewport_${label}_all_seven_sections_visible`,
+      layout.ok,
+      JSON.stringify(layout.rects)
+    );
+
+    const touch = await touchTargets(page);
+    check(
+      `viewport_${label}_touch_targets_min_44px`,
+      touch.ok,
+      `checked=${touch.checked} small=${JSON.stringify(touch.small)}`
+    );
+
+    if (viewport.width === 320) {
+      check(
+        "viewport_320x568_body_overflow_0",
+        vertical.bodyOverflow <= 1 && vertical.bodyOverflowY === "hidden",
+        `body=${vertical.bodyOverflow} overflowY=${vertical.bodyOverflowY}`
+      );
+    }
+    layoutReport.push({ label, vertical, layout, touch });
   }
+
+  // 320x568 真的點得到主要按鈕（獨立分頁，不影響主線狀態）
+  {
+    const smallContext = await browser.newContext({
+      viewport: { width: 320, height: 568 },
+      deviceScaleFactor: 1,
+      isMobile: true,
+      hasTouch: true
+    });
+    const smallPage = await smallContext.newPage();
+    await smallPage.goto(`${baseUrl}/${GOLDEN_QUERY}`, { waitUntil: "domcontentloaded" });
+    await smallPage.waitForSelector("[data-p3e-live='true']", { timeout: 30000 });
+    await ensurePlayable(smallPage);
+    const before = await commandCount(smallPage);
+    const targets = await touchTargets(smallPage);
+    let clicked = false;
+    if ((await smallPage.locator('[data-action="advance"]').count()) > 0) {
+      await smallPage.locator('[data-action="advance"]').first().click();
+      await smallPage.waitForFunction(
+        (previous) =>
+          Number(
+            document.querySelector("[data-p3e-live]")?.getAttribute("data-p3e-command-count") ?? "0"
+          ) > previous,
+        before,
+        { timeout: 20000 }
+      );
+      clicked = true;
+    }
+    check(
+      "viewport_320x568_primary_buttons_operable",
+      targets.ok && clicked && (await commandCount(smallPage)) > before,
+      `touch_ok=${targets.ok} checked=${targets.checked} clicked=${clicked}`
+    );
+    await smallContext.close();
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
 
   // 9. axe（critical／serious 必須為 0）
   const violations = await axeAudit(page);
@@ -376,10 +886,16 @@ async function main() {
     return { scenarioContext, scenarioPage };
   }
 
-  async function openScenario(scenarioPage, seed) {
-    const query = seed === undefined ? "" : `?seed=${encodeURIComponent(seed)}`;
+  /**
+   * 情境開頁：預設一律用官方 golden seed，讓 autosave／reload／51 命令／
+   * 匯入匯出等決定性流程不再依賴「首次開頁固定 seed」。
+   * 明確傳別的字串 → 用該 seed；傳 `null` → 完全不帶 query（驗證真隨機首次開頁）。
+   */
+  async function openScenario(scenarioPage, seed = GOLDEN_SEED) {
+    const query = seed === null ? "" : `?seed=${encodeURIComponent(seed)}`;
     await scenarioPage.goto(`${baseUrl}/${query}`, { waitUntil: "domcontentloaded" });
     await scenarioPage.waitForSelector("[data-p3e-live='true']", { timeout: 30000 });
+    await ensurePlayable(scenarioPage);
     // MVP v2 把技術性存檔操作收進 details；測試情境需先展開才能點擊。
     const tools = scenarioPage.locator("details.p3e-tools");
     if ((await tools.count()) === 1) await tools.evaluate((details) => { details.open = true; });
@@ -442,6 +958,7 @@ async function main() {
   async function reloadApp(scenarioPage) {
     await scenarioPage.reload({ waitUntil: "domcontentloaded" });
     await scenarioPage.waitForSelector("[data-p3e-live='true']", { timeout: 30000 });
+    await ensurePlayable(scenarioPage);
     const tools = scenarioPage.locator("details.p3e-tools");
     if ((await tools.count()) === 1) await tools.evaluate((details) => { details.open = true; });
   }
@@ -626,18 +1143,34 @@ async function main() {
     await scenarioContext.close();
   }
 
-  // 9. 重生：舊死亡存檔被新存檔取代
+  // 9. 死亡後「重新開始」：先回出生卡並清除舊死亡存檔；按「開始人生」才寫新 age 0 存檔
   {
     const { scenarioContext, scenarioPage } = await newScenarioPage();
     await openScenario(scenarioPage);
     await runToPhase(scenarioPage, "death");
     const deathRaw = await readStoredSave(scenarioPage);
+
     await scenarioPage.locator('[data-action="rebirth"]').click();
+    await scenarioPage.waitForSelector(".p3e-birth-card", { timeout: 20000 });
+    const birthAttrs = await readAttrs(scenarioPage);
+    const clearedRaw = await readStoredSave(scenarioPage);
+    verify(
+      "rebirth_returns_to_birth_card_and_clears_death_save",
+      birthAttrs.phase === "birth" &&
+        birthAttrs.count === 0 &&
+        birthAttrs.status === "cleared" &&
+        deathRaw !== null &&
+        clearedRaw === null,
+      `phase=${birthAttrs.phase} status=${birthAttrs.status} deathSave=${deathRaw !== null} cleared=${clearedRaw === null}`
+    );
+
+    await scenarioPage.locator('[data-action="start-life"]').click();
     await scenarioPage.waitForFunction(
-      () => document.querySelector("[data-p3e-live]")?.getAttribute("data-p3e-command-count") === "0",
+      () => document.querySelector("[data-p3e-live]")?.getAttribute("data-p3e-phase") === "life",
       undefined,
       { timeout: 20000 }
     );
+    await waitForSaved(scenarioPage);
     const reborn = await readAttrs(scenarioPage);
     const rebornRaw = await readStoredSave(scenarioPage);
     let rebornParsed = null;
@@ -654,9 +1187,78 @@ async function main() {
         rebornRaw !== deathRaw &&
         rebornParsed !== null &&
         rebornParsed.saveFormatVersion === 6,
-      `count=${reborn.count}`
+      `count=${reborn.count} status=${reborn.status} v6=${rebornParsed?.saveFormatVersion ?? null}`
     );
     await scenarioContext.close();
+  }
+
+  // 9b. 真實使用者（無 ?seed=）：死亡後「重新開始」換一個新的隨機 seed
+  {
+    const { scenarioContext, scenarioPage } = await newScenarioPage();
+    await scenarioPage.goto(`${baseUrl}/`, { waitUntil: "domcontentloaded" });
+    await scenarioPage.waitForSelector("[data-p3e-live='true']", { timeout: 30000 });
+    const readBirthSeed = () =>
+      scenarioPage.evaluate(
+        () => document.querySelector("[data-p3e-live]")?.getAttribute("data-p3e-birth-seed") ?? null
+      );
+    const firstSeed = await readBirthSeed();
+    await startLifeFromBirth(scenarioPage);
+    await runToPhase(scenarioPage, "death");
+    await scenarioPage.locator('[data-action="rebirth"]').click();
+    await scenarioPage.waitForSelector(".p3e-birth-card", { timeout: 20000 });
+    const nextSeed = await readBirthSeed();
+    const cleared = await readStoredSave(scenarioPage);
+    verify(
+      "rebirth_uses_fresh_random_seed_without_pinned",
+      /^life-[0-9a-f]{20}$/.test(firstSeed ?? "") &&
+        /^life-[0-9a-f]{20}$/.test(nextSeed ?? "") &&
+        firstSeed !== nextSeed &&
+        cleared === null,
+      `first=${firstSeed} next=${nextSeed} saveCleared=${cleared === null}`
+    );
+    await scenarioContext.close();
+  }
+
+  // 9c. 舊版存檔相容：沒有 active seed 時先用 DEFAULT_SEED 恢復，不應顯示隨機出生卡
+  {
+    const source = await newScenarioPage();
+    await openScenario(source.scenarioPage);
+    await advanceOnce(source.scenarioPage);
+    // autosave 是非同步 coalesced flush，先等落盤，確保拿到的是 count=1 的舊存檔。
+    await waitForSaved(source.scenarioPage);
+    const legacyRaw = await readStoredSave(source.scenarioPage);
+    await source.scenarioContext.close();
+
+    const legacyContext = await browser.newContext({
+      viewport: { width: 390, height: 844 },
+      deviceScaleFactor: 1,
+      isMobile: true,
+      hasTouch: true
+    });
+    if (legacyRaw !== null) {
+      await legacyContext.addInitScript((raw) => {
+        try {
+          window.localStorage.setItem("life-sim:p3e:v6:autosave", raw);
+        } catch {
+          // 儲存被封鎖時由下面的檢查如實回報
+        }
+      }, legacyRaw);
+    }
+    const legacyPage = await legacyContext.newPage();
+    await legacyPage.goto(`${baseUrl}/`, { waitUntil: "domcontentloaded" });
+    await legacyPage.waitForSelector("[data-p3e-live='true']", { timeout: 30000 });
+    const attrs = await readAttrs(legacyPage);
+    const birthCardCount = await legacyPage.locator(".p3e-birth-card").count();
+    verify(
+      "legacy_save_restores_without_active_seed",
+      legacyRaw !== null &&
+        attrs.phase === "life" &&
+        attrs.status === "restored" &&
+        attrs.count === 1 &&
+        birthCardCount === 0,
+      `phase=${attrs.phase} status=${attrs.status} count=${attrs.count} birthCard=${birthCardCount}`
+    );
+    await legacyContext.close();
   }
 
   /* ---------------------------------------------------------------- */
@@ -821,8 +1423,9 @@ async function main() {
       const perfPage = await context.newPage();
       const client = await context.newCDPSession(perfPage);
       await client.send("Emulation.setCPUThrottlingRate", { rate: 4 });
-      await perfPage.goto(`${baseUrl}/`, { waitUntil: "domcontentloaded" });
+      await perfPage.goto(`${baseUrl}/${GOLDEN_QUERY}`, { waitUntil: "domcontentloaded" });
       await perfPage.waitForSelector("[data-p3e-live='true']", { timeout: 30000 });
+      await ensurePlayable(perfPage);
       for (let index = 0; index < 30; index += 1) {
         const sample = await perfPage.evaluate(() => {
           const start = performance.now();
@@ -1230,6 +1833,8 @@ async function main() {
     retained_check_count: results.length,
     scenario_check_count: scenarioResults.length,
     checks: allChecks,
+    birth: birthReport,
+    layout: layoutReport,
     perf: {
       boot_required_raw: boot.boot_required_raw,
       boot_required_gzip: boot.boot_required_gzip,

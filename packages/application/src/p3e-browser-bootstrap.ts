@@ -7,6 +7,7 @@ import {
 } from "@life-sim/birth";
 import { validateEventPack } from "@life-sim/engine";
 import { P3EError } from "@life-sim/simulation";
+import { buildP3EBirthPreview, type P3EBrowserBirthPreview } from "./p3e-birth-preview";
 import {
   createP3EPlaySession,
   restoreP3EPlaySessionPayload,
@@ -15,11 +16,13 @@ import {
 
 /**
  * P3-E.1b-2p／2w：瀏覽器用的 world bootstrap（H5-CTO-176-A／H5-CTO-186-A）。
+ * GPT-DEEPSEEK-0017：新增正式出生預覽入口 `previewP3EBrowserBirth`（唯讀）。
  *
- * 瀏覽器不能直接把「原始 pack JSON」交給 session；本模組提供三個入口：
+ * 瀏覽器不能直接把「原始 pack JSON」交給 session；本模組提供四個入口：
  *
  * ```ts
  * prepareP3EBrowserWorld(rawPacks: unknown): P3EBrowserWorld
+ * previewP3EBrowserBirth({ world, masterSeed }: unknown): P3EBrowserBirthPreview
  * createP3EBrowserSession({ world, masterSeed }: unknown): P3EPlaySession
  * restoreP3EBrowserSession({ world, masterSeed, payload }: unknown): P3EPlaySession
  * ```
@@ -32,14 +35,18 @@ import {
  *   **沒有任何 pack 欄位**、不可序列化、深層凍結；
  * - `createP3EBrowserSession` 每條命只做 `buildPeerGroup` → `createBirthCertificate`
  *   → `createP3EPlaySession`，**重用**已驗證的 pack，不重新驗證大型資料；
+ * - `previewP3EBrowserBirth` 走**完全相同**的 `buildPeerGroup` →
+ *   `createBirthCertificate`（同 seed／同 `playerSexPolicy: "random"`），再把證書
+ *   彙整成可安全顯示的出生卡；它**不建立 session**、不改任何狀態，
+ *   因此同 seed 的 preview 與正式 session 的 identity 逐位元一致；
  * - `restoreP3EBrowserSession` 用同一個 world 重建 peer group／certificate，
  *   再呼叫正式 `restoreP3EPlaySessionPayload`（decode → seed 比對 → replay →
  *   canonical 逐位元比對 → seal）；payload 宣稱的 final state 不被信任。
  *
  * ## 信任邊界
  *
- * - 三個入口都只讀 descriptor：getter 永不執行；非 exact-object／陣列／symbol／
- *   額外欄位一律 `E_P3E_ARGUMENT`；
+ * - 四個入口（prepare／preview／create／restore）都只讀 descriptor：getter 永不執行；
+ *   非 exact-object／陣列／symbol／額外欄位一律 `E_P3E_ARGUMENT`；
  * - 偽造或 `structuredClone` 的 world 不在私有 `WeakMap` 內，一律拒絕
  *   （`E_P3E_ARGUMENT at p3eBrowser.world`）。
  */
@@ -71,10 +78,12 @@ const PACKS_BY_WORLD = new WeakMap<object, PreparedBrowserPacks>();
 
 const RAW_WORLD_KEYS = ["base", "identity", "events", "death"] as const;
 const CREATE_KEYS = ["world", "masterSeed"] as const;
+const PREVIEW_KEYS = ["world", "masterSeed"] as const;
 const RESTORE_KEYS = ["world", "masterSeed", "payload"] as const;
 
 const PATH_WORLD_INPUT = "p3eBrowser.world";
 const PATH_CREATE_INPUT = "p3eBrowser.create.input";
+const PATH_PREVIEW_INPUT = "p3eBrowser.preview.input";
 const PATH_RESTORE_INPUT = "p3eBrowser.restore.input";
 const PATH_CREATE_WORLD = "p3eBrowser.world";
 const PATH_SEED = "p3eBrowser.masterSeed";
@@ -150,7 +159,59 @@ export function prepareP3EBrowserWorld(rawPacks: unknown): P3EBrowserWorld {
 }
 
 /* ------------------------------------------------------------------ */
-/* 入口二：createP3EBrowserSession                                     */
+/* 入口二：previewP3EBrowserBirth（正式出生預覽）                        */
+/* ------------------------------------------------------------------ */
+
+/**
+ * 用已驗證 world 預覽「這個 seed 會出生誰」，**不建立 session**。
+ *
+ * input 必須是 descriptor-only exact-object 兩欄：`world`（本模組準備並認證的
+ * handle）、`masterSeed`（字串）；getter 永不執行。
+ *
+ * ## 與正式開局的一致性（本入口的核心保證）
+ *
+ * 這裡呼叫的 `buildPeerGroup`（`playerSexPolicy: "random"`）與
+ * `createBirthCertificate` 與 `createP3EBrowserSession` **完全相同、同一個順序**，
+ * 因此同一 world＋同一個 seed 得到的證書逐位元相同；preview 的
+ * `certificateId`／`certificateHash`／`playerIdentityHash`／`country.regionCode`／
+ * `sex`／`birthYear` 與正式 session 的 `state.identity` 一致。
+ *
+ * ## 回傳值
+ *
+ * 只有可安全顯示的出生卡資料（`P3EBrowserBirthPreview`）：證書 id／hash、
+ * 繁中地區名稱＋regionCode、姓名、性別、城市／鄉村、收入五分之一、住房、
+ * 父母年齡與職業、宗教、預期壽命與出生故事。**不含**任何 pack／dataset／
+ * manifest／抽選表，也不含 session、payload 或 ledger；深層凍結、可 JSON 序列化。
+ *
+ * 本入口是唯讀的：不抽新的隨機值、不改 pack、不改任何模擬規則、不寫入儲存。
+ * 錯誤與 `createP3EBrowserSession` 一致（偽造 world → `E_P3E_ARGUMENT at
+ * p3eBrowser.world`；非字串 seed → `E_P3E_ARGUMENT at p3eBrowser.masterSeed`；
+ * 其餘資料錯誤原樣外傳）。
+ */
+export function previewP3EBrowserBirth(input: unknown): P3EBrowserBirthPreview {
+  const raw = readExactObject(input, PREVIEW_KEYS, PATH_PREVIEW_INPUT);
+
+  const world = raw.world;
+  const packs =
+    typeof world === "object" && world !== null
+      ? PACKS_BY_WORLD.get(world as object)
+      : undefined;
+  if (packs === undefined) throw new P3EError("E_P3E_ARGUMENT", PATH_CREATE_WORLD);
+
+  const masterSeed = raw.masterSeed;
+  if (typeof masterSeed !== "string") throw new P3EError("E_P3E_ARGUMENT", PATH_SEED);
+
+  const peerGroup = buildPeerGroup(packs.base, packs.identity, {
+    seed: masterSeed,
+    playerSexPolicy: "random"
+  } as never);
+  const certificate = createBirthCertificate(packs.base, packs.identity, peerGroup, masterSeed);
+
+  return buildP3EBirthPreview(certificate);
+}
+
+/* ------------------------------------------------------------------ */
+/* 入口三：createP3EBrowserSession                                     */
 /* ------------------------------------------------------------------ */
 
 /**
@@ -189,7 +250,7 @@ export function createP3EBrowserSession(input: unknown): P3EPlaySession {
 }
 
 /* ------------------------------------------------------------------ */
-/* 入口三：restoreP3EBrowserSession（2w 新增）                          */
+/* 入口四：restoreP3EBrowserSession（2w 新增）                          */
 /* ------------------------------------------------------------------ */
 
 /**

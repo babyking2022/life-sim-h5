@@ -3302,3 +3302,541 @@ blockquote {
     animation-iteration-count: 1 !important;
   }
 }
+
+/* ==================================================================
+   H5 Life-Sim MVP v3 — true one-screen portrait flow + birth card
+   ------------------------------------------------------------------
+   Placed last on purpose: it supersedes the v2 "scene-first" layout
+   without deleting the older styles used by fixture previews. The
+   document never scrolls; only the event card / birth card scroll
+   internally. Scene is capped at ~220-250px so HUD, scene, event,
+   4 stats, time controls, next step and bottom nav share one screen.
+   ================================================================== */
+
+html:has(:is(.p3e-game-shell, .p3e-birth-screen)),
+body:has(:is(.p3e-game-shell, .p3e-birth-screen)) {
+  width: 100%;
+  height: 100dvh;
+  min-height: 0;
+  max-height: 100dvh;
+  overflow: hidden;
+  overscroll-behavior: none;
+}
+
+#app:has(> :is(.p3e-game-shell, .p3e-birth-screen)) {
+  height: 100dvh;
+  min-height: 0;
+  max-height: 100dvh;
+  overflow: hidden;
+}
+
+.p3e-shell.p3e-game-shell,
+.p3e-game-shell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 455px);
+  height: 100dvh;
+  min-height: 0;
+  max-height: 100dvh;
+  margin: 0 auto;
+  padding: max(8px, env(safe-area-inset-top)) 8px max(8px, env(safe-area-inset-bottom));
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+/* Keep the framed desktop preview, but still pin it to one viewport. */
+@media (min-width: 456px) {
+  .p3e-shell.p3e-game-shell,
+  .p3e-game-shell {
+    height: calc(100dvh - 24px);
+    max-height: calc(100dvh - 24px);
+    margin-top: 12px;
+    margin-bottom: 12px;
+    border: 1px solid rgba(74, 54, 31, 0.3);
+    border-radius: 18px;
+    box-shadow: 0 18px 50px rgba(41, 48, 37, 0.22);
+  }
+}
+
+.p3e-game-shell > .p3e-hud,
+.p3e-game-shell > .p3e-alert,
+.p3e-game-shell > .p3e-tabs {
+  flex: 0 0 auto;
+}
+
+/* [hidden] must win over the authored .p3e-alert box rules. */
+.p3e-game-shell > .p3e-alert[hidden] {
+  display: none;
+}
+
+.p3e-game-shell > .p3e-content {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  overscroll-behavior: contain;
+}
+
+.p3e-game-shell .p3e-life {
+  display: grid;
+  grid-template-rows: clamp(200px, 27dvh, 246px) minmax(0, 1fr) auto auto auto;
+  flex: 1 1 auto;
+  gap: 5px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* --- scene: ~228px on 390x844, ~246px on 430x932, never half a screen --- */
+.p3e-game-shell .p3e-scene {
+  height: 100%;
+  min-height: 0;
+  max-height: 250px;
+  overflow: hidden;
+}
+
+.p3e-game-shell .p3e-scene-copy {
+  width: min(84%, 325px);
+  max-height: 46%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+.p3e-game-shell .p3e-character-stage {
+  margin-bottom: 3px;
+}
+
+/* --- event / decision card: the only in-game scroll container --- */
+.p3e-game-shell .p3e-story-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+.p3e-game-shell .p3e-story-card > h2 {
+  position: sticky;
+  z-index: 2;
+  top: 0;
+  flex: 0 0 auto;
+  padding-top: 7px;
+  padding-bottom: 7px;
+}
+
+.p3e-game-shell .p3e-story-card p {
+  margin-top: 6px;
+  margin-bottom: 6px;
+  font-size: 0.86rem;
+  line-height: 1.4;
+}
+
+.p3e-game-shell .p3e-pending,
+.p3e-game-shell .p3e-death {
+  min-height: 0;
+}
+
+/* --- HUD / stats: keep text readable, do not shrink to fit --- */
+.p3e-game-shell .p3e-hud {
+  min-height: 54px;
+  margin-bottom: 5px;
+}
+
+/* 年份／年齡／資產／年收入已在 HUD 顯示；這行 polite status 只留給
+   輔助技術，避免它把 HUD 撐成第二列、壓縮 320x568 的事件卡高度。 */
+.p3e-game-shell .p3e-status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.p3e-game-shell .p3e-hud-item span,
+.p3e-game-shell .p3e-hud-item small {
+  font-size: clamp(0.66rem, 2.5vw, 0.76rem);
+}
+
+.p3e-game-shell .p3e-hud-item strong {
+  font-size: clamp(0.78rem, 3.2vw, 0.95rem);
+}
+
+.p3e-game-shell .p3e-hud-menu > summary {
+  display: grid;
+  min-width: 44px;
+  min-height: 44px;
+  place-items: center;
+  padding: 0;
+  cursor: pointer;
+  list-style: none;
+}
+
+.p3e-game-shell .p3e-stat-dock {
+  min-height: 48px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+
+.p3e-game-shell .p3e-stat-item {
+  min-height: 40px;
+  font-size: clamp(0.75rem, 3.1vw, 0.86rem);
+}
+
+/* --- time controls, next step, bottom nav: >=44px touch targets --- */
+.p3e-game-shell .p3e-time-controls {
+  min-height: 44px;
+  padding: 0;
+}
+
+.p3e-game-shell .p3e-time-controls button {
+  min-width: 44px;
+  min-height: 44px;
+  font-size: 0.78rem;
+}
+
+.p3e-game-shell .p3e-controls {
+  min-height: 50px;
+}
+
+.p3e-game-shell .p3e-primary[data-action="advance"],
+.p3e-game-shell .p3e-primary.p3e-next,
+.p3e-game-shell [data-action="next-decision"] {
+  min-height: 50px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  font-size: 1.05rem;
+}
+
+.p3e-game-shell .p3e-tabs {
+  position: static;
+  bottom: auto;
+  z-index: 12;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 5px;
+  order: 99;
+  margin: 5px 0 0;
+  padding: 4px;
+}
+
+.p3e-game-shell .p3e-tab {
+  min-height: 48px;
+  font-size: 0.8rem;
+}
+
+.p3e-game-shell .p3e-placeholder {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Diagnostics become a 44px floating tool button, so they consume no
+   gameplay height. The expanded panel keeps its own scroll area. */
+.p3e-game-shell > .p3e-tools {
+  position: absolute;
+  z-index: 30;
+  top: max(8px, env(safe-area-inset-top));
+  right: 58px;
+  width: 44px;
+  max-height: min(78dvh, 560px);
+  margin: 0;
+  overflow: visible;
+  border: 0;
+  background: transparent;
+}
+
+.p3e-game-shell > .p3e-tools > summary {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  place-items: center;
+  overflow: hidden;
+  border: 2px solid #4d5b67;
+  border-radius: 9px;
+  padding: 0;
+  color: transparent;
+  background: linear-gradient(#60798d, #394e61);
+  font-size: 0;
+  list-style: none;
+  cursor: pointer;
+}
+
+.p3e-game-shell > .p3e-tools > summary::-webkit-details-marker {
+  display: none;
+}
+
+.p3e-game-shell > .p3e-tools > summary::before {
+  content: "⚙";
+  color: #fff;
+  font-size: 1.2rem;
+}
+
+.p3e-game-shell > .p3e-tools[open] {
+  width: min(88vw, 360px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border: 2px solid #665033;
+  border-radius: 11px;
+  padding: 5px;
+  background: rgba(255, 249, 226, 0.98);
+  box-shadow: 0 10px 32px rgba(40, 29, 18, 0.35);
+}
+
+.p3e-game-shell > .p3e-tools[open] > summary {
+  margin-left: auto;
+}
+
+/* ==================================================================
+   Birth certificate card
+   ------------------------------------------------------------------
+   One screen from top to bottom. When the identity / family data is
+   taller than the card, .p3e-birth-grid (and .p3e-birth-story) scroll
+   internally; the document stays fixed at 100dvh.
+   ================================================================== */
+
+.p3e-birth-screen {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  flex: 1 1 auto;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  padding: 4px;
+}
+
+#app > .p3e-birth-screen {
+  height: 100dvh;
+  padding: max(8px, env(safe-area-inset-top)) 8px max(8px, env(safe-area-inset-bottom));
+}
+
+.p3e-birth-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  max-height: 100%;
+  overflow: hidden;
+  border: 3px solid var(--game-paper-edge, #8b6b3d);
+  border-radius: 15px;
+  color: var(--game-ink, #342719);
+  background: var(--game-paper, #fff6dc);
+  box-shadow: 0 4px 0 rgba(76, 49, 22, 0.35), inset 0 0 0 2px rgba(255, 255, 255, 0.54);
+}
+
+.p3e-game-shell > .p3e-birth-card {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.p3e-birth-hero {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 104px;
+  padding: 12px 14px;
+  color: #fff;
+  background:
+    linear-gradient(180deg, rgba(18, 72, 108, 0.12), rgba(31, 70, 47, 0.72)),
+    url("../../../assets/generated/life-sim-village-mvp.webp") center 42% / cover;
+  text-shadow: 0 2px 2px rgba(25, 24, 17, 0.75);
+}
+
+.p3e-birth-country {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0;
+  font-size: clamp(1.15rem, 5vw, 1.55rem);
+  font-weight: 900;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.p3e-birth-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 12px;
+  flex: 1 1 auto;
+  min-height: 0;
+  margin: 9px 12px 0;
+  padding-bottom: 6px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+.p3e-birth-grid > * {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.p3e-birth-grid dt,
+.p3e-birth-grid small,
+.p3e-birth-grid .p3e-birth-label,
+.p3e-birth-grid .p3e-kv dt {
+  color: var(--game-muted, #705f48);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.p3e-birth-grid dd,
+.p3e-birth-grid strong,
+.p3e-birth-grid .p3e-kv dd {
+  margin: 1px 0 0;
+  font-size: 0.84rem;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.p3e-birth-grid .p3e-kv {
+  grid-column: 1 / -1;
+}
+
+.p3e-birth-story {
+  flex: 0 1 auto;
+  min-height: 0;
+  max-height: 5.1em;
+  margin: 5px 12px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  color: #594329;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  scrollbar-width: thin;
+}
+
+.p3e-birth-actions {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.4fr);
+  gap: 7px;
+  flex: 0 0 auto;
+  padding: 8px 10px 10px;
+  border-top: 1px solid rgba(112, 82, 47, 0.28);
+  background: rgba(255, 246, 220, 0.98);
+}
+
+.p3e-birth-actions button {
+  min-width: 44px;
+  min-height: 48px;
+  border: 2px solid #665033;
+  border-radius: 10px;
+  padding: 6px 9px;
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.p3e-birth-actions [data-action="reroll-birth"] {
+  color: #3d3020;
+  background: linear-gradient(#fff7dc, #e7c992);
+}
+
+.p3e-birth-actions [data-action="start-life"] {
+  color: #fffdf0;
+  border-color: var(--game-orange-dark, #a84b05);
+  background: linear-gradient(180deg, #ffac25, var(--game-orange, #f58b13));
+}
+
+/* --- short screens (320x568): compress gaps, keep readable text --- */
+@media (max-height: 700px) {
+  .p3e-game-shell .p3e-life {
+    grid-template-rows: clamp(140px, 26dvh, 175px) minmax(46px, 1fr) auto auto auto;
+    gap: 3px;
+  }
+
+  .p3e-game-shell .p3e-scene {
+    max-height: 180px;
+  }
+
+  .p3e-game-shell .p3e-hud {
+    min-height: 50px;
+    margin-bottom: 3px;
+  }
+
+  .p3e-game-shell .p3e-story-card > h2 {
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+
+  .p3e-game-shell .p3e-story-card p {
+    font-size: 0.82rem;
+    line-height: 1.35;
+  }
+
+  .p3e-game-shell .p3e-option,
+  .p3e-choice-list .p3e-option {
+    min-height: 48px;
+  }
+
+  .p3e-game-shell .p3e-stat-dock {
+    min-height: 44px;
+  }
+
+  .p3e-game-shell .p3e-stat-item {
+    min-height: 36px;
+  }
+
+  .p3e-game-shell .p3e-primary[data-action="advance"] {
+    min-height: 46px;
+    font-size: 1rem;
+  }
+
+  .p3e-game-shell .p3e-tab {
+    min-height: 44px;
+  }
+
+  .p3e-birth-hero {
+    min-height: 76px;
+    padding: 9px 12px;
+  }
+
+  .p3e-birth-country {
+    font-size: 1.1rem;
+  }
+
+  .p3e-birth-grid {
+    margin-top: 6px;
+    gap: 4px 9px;
+  }
+
+  .p3e-birth-story {
+    max-height: 3.2em;
+    font-size: 0.78rem;
+  }
+
+  .p3e-birth-actions {
+    padding-top: 5px;
+    padding-bottom: 6px;
+  }
+
+  .p3e-birth-actions button {
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 379px) {
+  .p3e-shell.p3e-game-shell,
+  .p3e-game-shell {
+    padding-right: 5px;
+    padding-left: 5px;
+  }
+
+  .p3e-birth-grid {
+    gap: 5px 8px;
+  }
+}

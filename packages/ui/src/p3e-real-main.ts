@@ -3,30 +3,54 @@ import {
   createP3EBrowserSession,
   exportP3EBrowserPortableSave,
   prepareP3EBrowserWorld,
+  previewP3EBrowserBirth,
   restoreP3EBrowserAutosaveSession,
   restoreP3EBrowserPortableSave,
   runP3EPlaySessionCommand,
   saveP3EBrowserAutosaveSession,
+  type P3EBrowserBirthPreview,
   type P3EBrowserWorld,
   type P3EPlaySession
 } from "@life-sim/application";
 import { createLifeClock, type Speed } from "./p3e-time-controller.js";
 
 /**
- * H5-CTO-176-A／H5-CTO-188-A：真實 P3-E runtime 的瀏覽器垂直切片＋autosave。
+ * H5-CTO-176-A／H5-CTO-188-A／GPT-0017-D：真實 P3-E runtime 的瀏覽器垂直切片。
  *
- * 預設路徑（沒有 `?preview=fixture`）就是這支程式：用**正式的 application
- * session／view** 玩一條命，從出生、逐年推進、待決策選擇，到死亡與重生；
- * 每一次成功命令之後都會把正式 raw V6 envelope 寫進 `window.localStorage`，
- * 重新整理後由正式 orchestrator restore（decode → replay → canonical 比對）。
+ * 預設路徑（沒有 `?preview=fixture`）就是這支程式：
+ *
+ * 1. **出生卡**：先用正式 application 的
+ *    `previewP3EBrowserBirth({ world, masterSeed })` 顯示這條命會出生在誰家
+ *    （國旗／繁中國名、姓名、性別、城鄉、收入、住房、父母年齡與職業、宗教、
+ *    預期壽命、出生故事），**不建立 session**，clock 暫停；
+ * 2. **開始人生**才用同一個 seed 呼叫 `createP3EBrowserSession` 建立 age 0
+ *    session 並寫入 autosave（preview 與 session 的 certificateId／hash／
+ *    regionCode／sex／birthYear 因此逐位元一致）；
+ * 3. 之後逐年推進、待決策選擇、死亡；死亡後按「重新開始」回到出生卡（新 seed）。
+ *
+ * ## seed 規則（訂單第 2、7、8 項）
+ *
+ * - `?seed=` 合法時一律以它為準（固定測試／官方 golden 走這條）；
+ * - 其次讀 UI 自有 key `life-sim:p3e:active-seed`，reload 會回到同一段人生；
+ *   出生卡階段就立刻寫入，所以重新整理看到的是同一張卡；
+ * - 都沒有 active seed 時，先用舊常數 `DEFAULT_SEED` 嘗試恢復上一版存檔，
+ *   成功就補寫 active seed（相容舊玩家）；
+ * - **只有確認沒有任何舊存檔**，才用 `crypto.getRandomValues` 產生真正隨機的
+ *   seed（`life-` 開頭）建立出生預覽；全新使用者不會被固定在 `DEFAULT_SEED`
+ *   的同一個國家／家庭／身分。需要 golden 決定性時一律用 `?seed=` 開頁；
+ * - 「重新抽取」與死亡後的「重新開始」同樣換一個新的隨機 seed。
+ *
+ * ## 其他
  *
  * - 所有 pack 只驗證一次（`prepareP3EBrowserWorld`），每條命重用已驗證 pack；
- * - 遊戲狀態只存在本模組的 `session` 變數（沒有全域 current state、沒有假造事件）；
- * - 畫面只從 `session.view` 渲染；金錢維持 base10 字串，不轉 number；
- * - seed 固定常數或 `?seed=` 驗證後的值，不使用 Date／Math.random／crypto；
- * - localStorage 只在 UI 取得且包在 try/catch；存取失敗一律降級為
- *   ephemeral（可玩、不中斷）並顯示非阻塞警告；
- * - 壞存檔／錯 seed 不靜默刪除，一律顯示恢復動作（由使用者明確清除）。
+ * - 遊戲狀態只存在本模組的 `session` 變數；畫面只從 `session.view` 或出生預覽渲染；
+ * - 金錢維持 base10 字串，不轉 number；
+ * - localStorage 只在 UI 取得且包在 try/catch；存取失敗一律降級為 ephemeral
+ *   （可預覽、可玩、不中斷）並顯示非阻塞警告；
+ * - 壞存檔／錯 seed 不靜默刪除，一律顯示恢復動作（由使用者明確清除）；
+ * - 資料包文案是簡中：UI **只在顯示層**把已知標籤（城鄉／五分之一／住房／宗教／
+ *   職業）與出生故事的固定片語轉繁中；姓名、地名等資料值原樣呈現，`fixtures/`、
+ *   資料包與 engine 完全不動。
  */
 
 /* ------------------------------------------------------------------ */
@@ -60,6 +84,307 @@ const PACK_URLS = {
 
 const DEFAULT_SEED = "p3e-166-playable-runtime-v4";
 const SEED_PATTERN = /^[A-Za-z0-9._-]{1,64}$/;
+/** UI 自有的 active seed key（與 application autosave 的 `life-sim:p3e:v6:autosave` 分開）。 */
+const ACTIVE_SEED_KEY = "life-sim:p3e:active-seed";
+
+/* ------------------------------------------------------------------ */
+/* 顯示層繁中對照（只影響畫面；不改資料包、不改 fixtures）                 */
+/* ------------------------------------------------------------------ */
+
+/** 資料包已知標籤 → 繁中（字典比對；未收錄者原樣顯示）。 */
+const HANT_LABELS: Readonly<Record<string, string>> = {
+  农民: "農民",
+  工厂工人: "工廠工人",
+  服务业员工: "服務業員工",
+  教师: "教師",
+  店主: "店主",
+  无宗教: "無宗教",
+  佛教: "佛教",
+  基督教: "基督教",
+  民间信仰: "民間信仰",
+  印度教: "印度教",
+  伊斯兰教: "伊斯蘭教",
+  自有住房: "自有住房",
+  租住: "租住",
+  与亲属合住: "與親屬合住",
+  非正规住所: "非正規住所",
+  城市: "城市",
+  农村: "鄉村",
+  最低五分之一: "最低五分之一",
+  次低五分之一: "次低五分之一",
+  中间五分之一: "中間五分之一",
+  次高五分之一: "次高五分之一",
+  最高五分之一: "最高五分之一"
+};
+
+/** 出生故事的固定片語 → 繁中（長字串優先；未收錄的樣板原樣顯示）。 */
+const HANT_STORY_PHRASES: readonly (readonly [string, string])[] = [
+  ["的习惯迎接这个孩子，也记住了这一天的天气。", "的習慣迎接這個孩子，也記住了這一天的天氣。"],
+  ["的传统，也保留着对未来的小心愿。", "的傳統，也保留著對未來的小心願。"],
+  ["的日子里慢慢安顿下来。", "的日子裡慢慢安頓下來。"],
+  ["没有人知道以后会发生什么，但", "沒有人知道以後會發生什麼，但"],
+  ["的这一年，从这里开始。", "的這一年，從這裡開始。"],
+  ["家庭多了一个孩子：", "家庭多了一個孩子："],
+  ["出生。家里属于", "出生。家裡屬於"],
+  ["，父亲是", "，父親是"],
+  ["，母亲是", "，母親是"],
+  ["这一年，", "這一年，"],
+  ["的一个", "的一個"],
+  ["家里保留着", "家裡保留著"],
+  ["母亲", "母親"],
+  ["、父亲", "、父親"]
+];
+
+/** 資料包的大洲代碼 → 繁中（故事內的 `（europe）` 之類）。 */
+const CONTINENT_LABELS: Readonly<Record<string, string>> = {
+  africa: "非洲",
+  americas: "美洲",
+  asia: "亞洲",
+  europe: "歐洲",
+  oceania: "大洋洲"
+};
+
+/**
+ * regionCode（P2-A 的 ISO3）→ ISO2，只為了在出生卡算國旗 emoji。
+ * 這是呈現層對照表：不是資料包、不影響抽選與任何規則；未收錄者顯示地球符號。
+ * 三個敏感地區沿用資料包審核過的正式名稱，旗幟呈現也保守處理：
+ * HKG／MAC 用特別行政區旗，TWN 不給 ISO2（顯示中性地球符號）。
+ */
+const ISO2_BY_REGION: Readonly<Record<string, string>> = {
+  AFG: "AF",
+  AGO: "AO",
+  ALB: "AL",
+  ARE: "AE",
+  ARG: "AR",
+  ARM: "AM",
+  AUS: "AU",
+  AUT: "AT",
+  AZE: "AZ",
+  BDI: "BI",
+  BEL: "BE",
+  BEN: "BJ",
+  BFA: "BF",
+  BGD: "BD",
+  BGR: "BG",
+  BHR: "BH",
+  BIH: "BA",
+  BLR: "BY",
+  BOL: "BO",
+  BRA: "BR",
+  BRN: "BN",
+  BWA: "BW",
+  CAF: "CF",
+  CAN: "CA",
+  CHE: "CH",
+  CHL: "CL",
+  CHN: "CN",
+  CIV: "CI",
+  CMR: "CM",
+  COD: "CD",
+  COG: "CG",
+  COL: "CO",
+  CPV: "CV",
+  CRI: "CR",
+  CUB: "CU",
+  CYP: "CY",
+  CZE: "CZ",
+  DEU: "DE",
+  DJI: "DJ",
+  DNK: "DK",
+  DOM: "DO",
+  DZA: "DZ",
+  ECU: "EC",
+  EGY: "EG",
+  ERI: "ER",
+  ESP: "ES",
+  EST: "EE",
+  ETH: "ET",
+  FIN: "FI",
+  FJI: "FJ",
+  FRA: "FR",
+  GAB: "GA",
+  GBR: "GB",
+  GEO: "GE",
+  GHA: "GH",
+  GIN: "GN",
+  GMB: "GM",
+  GNB: "GW",
+  GNQ: "GQ",
+  GRC: "GR",
+  GTM: "GT",
+  GUY: "GY",
+  HKG: "HK",
+  HND: "HN",
+  HRV: "HR",
+  HTI: "HT",
+  HUN: "HU",
+  IDN: "ID",
+  IND: "IN",
+  IRL: "IE",
+  IRN: "IR",
+  IRQ: "IQ",
+  ISL: "IS",
+  ISR: "IL",
+  ITA: "IT",
+  JAM: "JM",
+  JOR: "JO",
+  JPN: "JP",
+  KAZ: "KZ",
+  KEN: "KE",
+  KGZ: "KG",
+  KHM: "KH",
+  KOR: "KR",
+  KWT: "KW",
+  LAO: "LA",
+  LBN: "LB",
+  LBR: "LR",
+  LBY: "LY",
+  LKA: "LK",
+  LSO: "LS",
+  LTU: "LT",
+  LUX: "LU",
+  LVA: "LV",
+  MAC: "MO",
+  MAR: "MA",
+  MDA: "MD",
+  MDG: "MG",
+  MEX: "MX",
+  MKD: "MK",
+  MLI: "ML",
+  MLT: "MT",
+  MMR: "MM",
+  MNE: "ME",
+  MNG: "MN",
+  MOZ: "MZ",
+  MRT: "MR",
+  MUS: "MU",
+  MWI: "MW",
+  MYS: "MY",
+  NAM: "NA",
+  NER: "NE",
+  NGA: "NG",
+  NIC: "NI",
+  NLD: "NL",
+  NOR: "NO",
+  NPL: "NP",
+  NZL: "NZ",
+  OMN: "OM",
+  PAK: "PK",
+  PAN: "PA",
+  PER: "PE",
+  PHL: "PH",
+  PNG: "PG",
+  POL: "PL",
+  PRK: "KP",
+  PRT: "PT",
+  PRY: "PY",
+  PSE: "PS",
+  QAT: "QA",
+  ROU: "RO",
+  RUS: "RU",
+  RWA: "RW",
+  SAU: "SA",
+  SDN: "SD",
+  SEN: "SN",
+  SGP: "SG",
+  SLB: "SB",
+  SLE: "SL",
+  SLV: "SV",
+  SOM: "SO",
+  SRB: "RS",
+  SSD: "SS",
+  SUR: "SR",
+  SVK: "SK",
+  SVN: "SI",
+  SWE: "SE",
+  SWZ: "SZ",
+  SYR: "SY",
+  TCD: "TD",
+  TGO: "TG",
+  THA: "TH",
+  TJK: "TJ",
+  TKM: "TM",
+  TLS: "TL",
+  TON: "TO",
+  TUN: "TN",
+  TUR: "TR",
+  TZA: "TZ",
+  UGA: "UG",
+  UKR: "UA",
+  URY: "UY",
+  USA: "US",
+  UZB: "UZ",
+  VEN: "VE",
+  VNM: "VN",
+  VUT: "VU",
+  WSM: "WS",
+  YEM: "YE",
+  ZAF: "ZA",
+  ZMB: "ZM",
+  ZWE: "ZW"
+};
+
+/** 資料包標籤 → 繁中；未收錄者原樣顯示（不改資料）。 */
+function toHantLabel(value: string): string {
+  return HANT_LABELS[value] ?? value;
+}
+
+/** 國旗 emoji（未收錄地區或非 ISO2 一律回地球符號）。 */
+function flagOf(regionCode: string): string {
+  const iso2 = ISO2_BY_REGION[regionCode];
+  if (iso2 === undefined || iso2.length !== 2) return "🌐";
+  return String.fromCodePoint(
+    0x1f1e6 + (iso2.charCodeAt(0) - 65),
+    0x1f1e6 + (iso2.charCodeAt(1) - 65)
+  );
+}
+
+/** 城鄉／性別的人話。 */
+function settlementText(birth: P3EBrowserBirthPreview): string {
+  return toHantLabel(birth.settlementLabel);
+}
+
+function sexText(birth: P3EBrowserBirthPreview): string {
+  return birth.sex === "female" ? "女" : "男";
+}
+
+/**
+ * 出生故事的**顯示層**繁中化。
+ *
+ * 資料包給的是已代入的簡中段落（含姓名、地名、職業、宗教、國家名）。這裡：
+ * 1. 先把姓名整段保護起來（姓名是資料，不在 UI 轉換）；
+ * 2. 只替換固定片語（已知樣板）與已知標籤／國名／大洲代碼；
+ * 3. 未收錄的樣板或標籤原樣顯示，永不猜測。
+ */
+function localizeStory(paragraphs: readonly string[], birth: P3EBrowserBirthPreview): string[] {
+  const name = birth.name.fullName;
+  const guard = "\u0000name\u0000";
+  const continent = CONTINENT_LABELS[birth.country.region] ?? birth.country.region;
+  const settlement = birth.settlementLabel;
+  const place = settlement.length > 0 ? `${settlement}（${birth.country.region}）` : "";
+  const localizedPlace = settlement.length > 0 ? `${toHantLabel(settlement)}（${continent}）` : "";
+  const labelPairs: readonly (readonly [string, string])[] = [
+    [birth.incomeLabel, toHantLabel(birth.incomeLabel)],
+    [birth.religion.label, toHantLabel(birth.religion.label)],
+    [birth.parents.motherOccupationLabel, toHantLabel(birth.parents.motherOccupationLabel)],
+    [birth.parents.fatherOccupationLabel, toHantLabel(birth.parents.fatherOccupationLabel)],
+    [settlement, toHantLabel(settlement)],
+    [birth.country.nameZhHans, birth.country.nameZhHant]
+  ];
+
+  return paragraphs.map((paragraph) => {
+    let text = paragraph;
+    if (name.length > 0) text = text.split(name).join(guard);
+    for (const [from, to] of HANT_STORY_PHRASES) {
+      if (from !== to) text = text.split(from).join(to);
+    }
+    if (place.length > 0) text = text.split(place).join(localizedPlace);
+    for (const [from, to] of labelPairs) {
+      if (from.length > 0 && from !== to) text = text.split(from).join(to);
+    }
+    return text.split(guard).join(name);
+  });
+}
 
 type TabKey = "life" | "family" | "work" | "map";
 
@@ -85,6 +410,12 @@ let activeTab: TabKey = "life";
 let busy = false;
 let focusAdvanceAfterRender = false;
 let fastForwarding = false;
+
+/** 這條命的 seed（`?seed=` > active seed > DEFAULT_SEED）。出生卡階段就已確定。 */
+let activeSeed: string | null = null;
+/** 出生卡階段的 seed／預覽；session 建立後清空。 */
+let birthSeed: string | null = null;
+let birthPreview: P3EBrowserBirthPreview | null = null;
 
 /** UI 取得的最小儲存能力；null 代表不可用（ephemeral 模式）。 */
 let storage: Storage | null = null;
@@ -143,9 +474,62 @@ function element<K extends keyof HTMLElementTagNameMap>(
   return node;
 }
 
-function readSeed(): string {
+/** `?seed=` 的固定測試能力：合法才採用，其餘一律忽略。 */
+function readPinnedSeed(): string | null {
   const raw = new URLSearchParams(window.location.search).get("seed");
-  return raw !== null && SEED_PATTERN.test(raw) ? raw : DEFAULT_SEED;
+  return raw !== null && SEED_PATTERN.test(raw) ? raw : null;
+}
+
+/**
+ * 真正隨機的 birth seed：`crypto.getRandomValues` 取 10 bytes → 20 hex。
+ *
+ * 用於「全新使用者的第一次開頁」、「重新抽取」與死亡後的「重新開始」；
+ * 只有 `?seed=` 釘住、既有 active seed 或成功還原的舊存檔才走決定性路徑
+ * （官方 golden 統一以 `?seed=p3e-166-playable-runtime-v4` 開頁）。
+ */
+function randomSeed(): string {
+  const bytes = new Uint8Array(10);
+  const source = window.crypto;
+  if (typeof source === "object" && source !== null && typeof source.getRandomValues === "function") {
+    source.getRandomValues(bytes);
+  } else {
+    for (let index = 0; index < bytes.length; index += 1) {
+      bytes[index] = Math.floor(Math.random() * 256);
+    }
+  }
+  let hex = "";
+  for (const byte of bytes) hex += byte.toString(16).padStart(2, "0");
+  return `life-${hex}`;
+}
+
+/** UI 自有 active seed（reload 恢復同一段人生）；失敗一律視為沒有。 */
+function readActiveSeed(): string | null {
+  if (storage === null) return null;
+  try {
+    const raw = storage.getItem(ACTIVE_SEED_KEY);
+    return raw !== null && SEED_PATTERN.test(raw) ? raw : null;
+  } catch {
+    return null;
+  }
+}
+
+/** 寫入 active seed；儲存不可用時靜默略過（只是 UX 便利，不影響遊戲）。 */
+function writeActiveSeed(seed: string): void {
+  if (storage === null) return;
+  try {
+    storage.setItem(ACTIVE_SEED_KEY, seed);
+  } catch {
+    // 配額／權限問題：不中斷遊戲，下次開頁就退回舊常數或出生卡。
+  }
+}
+
+/**
+ * 目前這段人生的 seed：`?seed=` > active seed > `DEFAULT_SEED`。
+ * 最後一層只是防線：正常流程在 `boot()`／`showBirth()` 就已寫入 activeSeed；
+ * 全新開頁的隨機 seed 也由 `showBirth()` 立即寫入，不會退回舊常數。
+ */
+function readSeed(): string {
+  return readPinnedSeed() ?? activeSeed ?? DEFAULT_SEED;
 }
 
 function describeError(error: unknown): string {
@@ -457,6 +841,156 @@ function startLife(seed: string): P3EPlaySession {
 }
 
 /* ------------------------------------------------------------------ */
+/* 出生卡（GPT-0017-D）                                                  */
+/* ------------------------------------------------------------------ */
+
+/**
+ * 顯示出生卡：用正式 `previewP3EBrowserBirth` 產生資料，**不建立 session**，
+ * clock 保持暫停。seed 會立刻寫進 UI 自有 active seed key，reload 回到同一張卡。
+ */
+function showBirth(seed: string): void {
+  const currentWorld = world;
+  if (currentWorld === null) throw new Error("world not ready");
+  birthSeed = seed;
+  activeSeed = seed;
+  writeActiveSeed(seed);
+  birthPreview = previewP3EBrowserBirth({ world: currentWorld, masterSeed: seed });
+  session = null;
+  lifeClock.pause();
+  renderBirth();
+}
+
+/** 重新抽取：換一個真正隨機的 seed，出生資料（國名／姓名／家庭）一起更新。 */
+function rerollBirth(): void {
+  if (busy || world === null) return;
+  busy = true;
+  try {
+    alertText = null;
+    showBirth(randomSeed());
+  } catch (error) {
+    showAlert(describeError(error));
+    renderBirth();
+  } finally {
+    busy = false;
+  }
+}
+
+/** 開始人生：才建立正式 age 0 session（與 preview 同一個 seed）並寫入 autosave。 */
+function startLifeFromCard(): void {
+  const seed = birthSeed;
+  if (busy || seed === null || world === null) return;
+  busy = true;
+  try {
+    session = startLife(seed);
+    birthSeed = null;
+    birthPreview = null;
+    activeSeed = seed;
+    writeActiveSeed(seed);
+    alertText = null;
+    recoveryNeeded = false;
+    persistenceEnabled = true;
+    persistenceGeneration += 1;
+    if (storage === null) {
+      // 沒有儲存能力：可玩但只存在記憶體（ephemeral）。
+      persistenceStatus = "ephemeral";
+      persistenceEnabled = false;
+    } else {
+      persistCurrentSession();
+    }
+    focusAdvanceAfterRender = true;
+    if (session.view.controls.canAdvanceYear) lifeClock.resume();
+    else lifeClock.pause();
+  } catch (error) {
+    showAlert(describeError(error));
+  } finally {
+    busy = false;
+    render();
+  }
+}
+
+/**
+ * 出生卡：一個畫面、卡片內局部捲動。
+ *
+ * class／`data-action`／`data-p3e-*` 全部依既定契約（style.css 與 smoke）：
+ * `.p3e-birth-screen/card/hero/country/grid/story/actions`、
+ * `data-action="reroll-birth"`、`data-action="start-life"`，並在畫面根節點掛
+ * `data-p3e-live`／`data-p3e-phase`／`data-p3e-birth-seed` 等診斷屬性。
+ */
+function renderBirth(): void {
+  const birth = birthPreview;
+  const seed = birthSeed;
+  if (birth === null || seed === null) return;
+
+  const screen = element("main", "p3e-birth-screen");
+  screen.dataset["p3eLive"] = "true";
+  screen.dataset["p3ePhase"] = "birth";
+  screen.dataset["p3eBirthSeed"] = seed;
+  screen.dataset["p3eBirthCertificateHash"] = birth.certificateHash;
+  screen.dataset["p3eBirthIdentityHash"] = birth.playerIdentityHash;
+  screen.dataset["p3eCommandCount"] = "0";
+  screen.dataset["p3ePersistenceStatus"] = persistenceStatus;
+  screen.dataset["p3ePersistenceError"] = persistenceError ?? "";
+
+  const card = element("article", "p3e-birth-card");
+  card.setAttribute("aria-labelledby", "p3e-birth-country");
+
+  const hero = element("header", "p3e-birth-hero");
+  const country = element("h1", "p3e-birth-country");
+  country.id = "p3e-birth-country";
+  const flag = element("span", "p3e-birth-flag", flagOf(birth.country.regionCode));
+  flag.setAttribute("aria-hidden", "true");
+  country.append(flag, element("span", undefined, birth.country.nameZhHant));
+  const headline = element(
+    "p",
+    "p3e-birth-headline",
+    `${birth.name.fullName} · ${sexText(birth)} · ${birth.birthYear} 年`
+  );
+  hero.append(element("p", "p3e-birth-caption", "出生地"), country, headline);
+
+  const grid = element("dl", "p3e-birth-grid");
+  grid.setAttribute("aria-label", "出生資料");
+  // 卡片內局部捲動（CSS overflow-y:auto）：鍵盤也要能捲動，否則 axe 會報
+  // scrollable-region-focusable（serious）。
+  grid.tabIndex = 0;
+  const rows: readonly (readonly [string, string])[] = [
+    ["姓名", birth.name.fullName],
+    ["性別", sexText(birth)],
+    ["城鄉", settlementText(birth)],
+    ["收入", toHantLabel(birth.incomeLabel)],
+    ["住房", toHantLabel(birth.housing.label)],
+    ["宗教", toHantLabel(birth.religion.label)],
+    ["母親", `${birth.parents.motherAge} 歲 · ${toHantLabel(birth.parents.motherOccupationLabel)}`],
+    ["父親", `${birth.parents.fatherAge} 歲 · ${toHantLabel(birth.parents.fatherOccupationLabel)}`],
+    ["預期壽命", `${birth.lifeExpectancyYears} 年`]
+  ];
+  for (const [label, value] of rows) {
+    grid.append(element("dt", undefined, label), element("dd", undefined, value));
+  }
+
+  const story = element("div", "p3e-birth-story");
+  story.setAttribute("aria-label", "出生故事");
+  story.tabIndex = 0;
+  for (const paragraph of localizeStory(birth.story.paragraphs, birth)) {
+    story.append(element("p", undefined, paragraph));
+  }
+
+  const actions = element("div", "p3e-birth-actions");
+  const reroll = element("button", "p3e-primary", "重新抽取");
+  reroll.type = "button";
+  reroll.dataset["action"] = "reroll-birth";
+  reroll.addEventListener("click", rerollBirth);
+  const start = element("button", "p3e-primary", "開始人生");
+  start.type = "button";
+  start.dataset["action"] = "start-life";
+  start.addEventListener("click", startLifeFromCard);
+  actions.append(reroll, start);
+
+  card.append(hero, grid, story, actions);
+  screen.append(card);
+  app.replaceChildren(screen);
+}
+
+/* ------------------------------------------------------------------ */
 /* 命令                                                                */
 /* ------------------------------------------------------------------ */
 
@@ -508,13 +1042,20 @@ function chooseOption(optionId: string): void {
   if (session?.view.controls.canAdvanceYear === true) lifeClock.resume();
 }
 
+/**
+ * 死亡後的「重新開始」：清掉上一條命的 autosave，回到出生卡（新的隨機 seed）。
+ *
+ * 依訂單第 10 項：死亡後重新開始回出生卡；出生階段 clock 暫停，使用者按
+ * 「開始人生」才建立新的 age 0 session（`startLifeFromCard`）。
+ * `?seed=` 固定測試時仍沿用被釘住的 seed，維持可重播性。
+ */
 function rebirth(): void {
   if (busy) return;
   busy = true;
   try {
     cancelScheduledSave();
     if (storage !== null && persistenceEnabled) {
-      // 重生順序：先清掉上一條命的 autosave，再開新命、再存檔。
+      // 順序：先清掉上一條命的 autosave，再回出生卡；新命開始時才寫新存檔。
       try {
         clearAutosave();
       } catch (error) {
@@ -524,17 +1065,16 @@ function rebirth(): void {
       }
     }
     persistenceEnabled = true;
-    session = startLife(readSeed());
-    lifeClock.resume();
+    recoveryNeeded = false;
     persistenceGeneration += 1;
     persistenceStatus = "cleared";
-    persistCurrentSession();
+    session = null;
+    showBirth(readPinnedSeed() ?? randomSeed());
   } catch (error) {
     showAlert(describeError(error));
+    render();
   } finally {
     busy = false;
-    if (session !== null && !session.view.controls.canAdvanceYear) lifeClock.pause();
-    render();
   }
 }
 
@@ -907,45 +1447,102 @@ function renderBootError(message: string): void {
   app.replaceChildren(shell);
 }
 
+/**
+ * 啟動：先決定 seed，再決定「恢復存檔」或「出生卡」。
+ *
+ * 順序（訂單第 1、2、7、8、9 項）：
+ *
+ * 1. `?seed=` → 固定測試；
+ * 2. UI 自有 active seed → reload 回到同一段人生；
+ * 3. 都沒有 → 先用 `DEFAULT_SEED` 嘗試恢復上一版存檔，成功就補寫 active seed；
+ * 4. 仍然沒有存檔 → 出生卡（新的安全隨機 seed），不建立 session；
+ *    golden 決定性流程請用 `?seed=p3e-166-playable-runtime-v4` 開頁；
+ * 5. 有存檔 → 正式 restore（degrade：壞存檔不刪、顯示恢復動作）。
+ *
+ * 任何 restore 失敗都沿用既有保護：`persistenceEnabled = false`，不覆寫原存檔，
+ * 並顯示「清除存檔並重新開始」；儲存不可用時全程 ephemeral。
+ */
 async function boot(): Promise<void> {
   try {
     world = await loadWorld();
-    const seed = readSeed();
     storage = acquireStorage();
+    const pinned = readPinnedSeed();
+    const stored = readActiveSeed();
+    const knownSeed = pinned ?? stored;
+
     if (storage === null) {
-      // 儲存不可用：可玩的暫時性命＋非阻塞警告。
+      // 儲存不可用：可預覽、可玩的暫時性命＋非阻塞警告（ephemeral）。
       persistenceStatus = "unavailable";
       persistenceEnabled = false;
-      session = startLife(seed);
+      showBirth(knownSeed ?? randomSeed());
+      return;
+    }
+
+    if (knownSeed === null) {
+      // 沒有 active seed：先嘗試用舊常數恢復上一版存檔（相容舊玩家）。
+      let restored: P3EPlaySession | null = null;
+      try {
+        restored = restoreP3EBrowserAutosaveSession({ storage, world, masterSeed: DEFAULT_SEED });
+      } catch (error) {
+        persistenceStatus = "restore-error";
+        persistenceError = describeError(error);
+        recoveryNeeded = true;
+        persistenceEnabled = false;
+        activeSeed = DEFAULT_SEED;
+        session = startLife(DEFAULT_SEED);
+        persistenceGeneration += 1;
+        if (session.view.controls.canAdvanceYear) lifeClock.resume();
+        else lifeClock.pause();
+        render();
+        return;
+      }
+      if (restored === null) {
+        // 確認沒有舊存檔：全新使用者用安全隨機 seed 建立出生預覽
+        // （只有預覽，不建立 age 0 session、不寫 autosave）。
+        persistenceStatus = "missing";
+        showBirth(randomSeed());
+        return;
+      }
+      activeSeed = DEFAULT_SEED;
+      writeActiveSeed(DEFAULT_SEED);
+      session = restored;
       persistenceGeneration += 1;
-      persistenceStatus = "ephemeral";
-      lifeClock.resume();
+      savedGeneration = persistenceGeneration;
+      persistenceStatus = "restored";
+      if (session.view.controls.canAdvanceYear) lifeClock.resume();
+      else lifeClock.pause();
       render();
       return;
     }
+
+    activeSeed = knownSeed;
+    writeActiveSeed(knownSeed);
     try {
-      const restored = restoreP3EBrowserAutosaveSession({ storage, world, masterSeed: seed });
+      const restored = restoreP3EBrowserAutosaveSession({
+        storage,
+        world,
+        masterSeed: knownSeed
+      });
       if (restored === null) {
+        // 有 active seed 但還沒有存檔（例如出生卡階段 reload）：回到同一張卡。
         persistenceStatus = "missing";
-        session = startLife(seed);
-        persistenceGeneration += 1;
-        persistCurrentSession();
-      } else {
-        session = restored;
-        persistenceGeneration += 1;
-        savedGeneration = persistenceGeneration;
-        persistenceStatus = "restored";
+        showBirth(knownSeed);
+        return;
       }
+      session = restored;
+      persistenceGeneration += 1;
+      savedGeneration = persistenceGeneration;
+      persistenceStatus = "restored";
     } catch (error) {
       // 壞存檔／版本／seed／replay 不符：不刪除、不覆寫，要求明確恢復。
       persistenceStatus = "restore-error";
       persistenceError = describeError(error);
       recoveryNeeded = true;
       persistenceEnabled = false;
-      session = startLife(seed);
+      session = startLife(knownSeed);
       persistenceGeneration += 1;
     }
-    if (session !== null && session.view.controls.canAdvanceYear) lifeClock.resume();
+    if (session.view.controls.canAdvanceYear) lifeClock.resume();
     else lifeClock.pause();
     render();
   } catch (error) {
