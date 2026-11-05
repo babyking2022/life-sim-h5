@@ -1,14 +1,14 @@
 {
   "schemaVersion": "p3b-1",
   "eventSpecVersion": "1.0.0",
-  "contentPackVersion": "1.0.0",
+  "contentPackVersion": "1.1.0",
   "packs": [
     {
       "packId": "p3b-synthetic-events-v1",
       "manifestFile": "manifest.v1.json",
       "eventsFile": "events.v1.json",
-      "packChecksum": "6c9a25319b0afa93b6a9c6d71bcb6d102cc602fc21e1770be34693e58b2049c5",
-      "datasetChecksum": "f065580ab2edb89803e6b10d0258e993df322cc895f239b320c3c6f9bbc9851f",
+      "packChecksum": "b3b9e179bf8543f7d2d88f62159fe53710d1848301ed71be6a4e117079ee9e64",
+      "datasetChecksum": "c90dc9f0c323faf2d5efea375861c71db93d9460c8b3fe599bddc71af39aa03a",
       "cases": [
         {
           "id": "case-01-infant-standard",
@@ -55,7 +55,7 @@
             1029,
             25165824
           ],
-          "selectionHash": "9be2b373c2d7f553dbdff9a876e97619ff9ec617a0d8a41fc039d611de80a553"
+          "selectionHash": "0bf452ea04a20bc26fcedf2292cb97e32116c91566123f3709fd52444e764489"
         },
         {
           "id": "case-02-infant-guardian",
@@ -102,7 +102,7 @@
             1033,
             58728448
           ],
-          "selectionHash": "6a570245c816d33748c61adae6f3b163d2f1b5f0f03cc34dbbc1e39448b66e43"
+          "selectionHash": "86cd78bcaf91da7f2662ff4e60d714eb9277d133a185d0d8bf225ef997d2c23a"
         },
         {
           "id": "case-03-school-decision",
@@ -136,12 +136,16 @@
           "candidateIds": [
             "ev.any.setback",
             "ev.any.small-win",
+            "ev.child.first-friend",
+            "ev.child.interest-seed",
             "ev.child.playground",
             "ev.child.school-choice",
+            "ev.child.screen-time",
             "ev.child.sibling-arrives",
+            "ev.child.sleep-routine",
             "ev.child.tantrum"
           ],
-          "selectedEventId": "ev.child.tantrum",
+          "selectedEventId": "ev.child.sleep-routine",
           "reason": "weighted",
           "drawsUsed": 2,
           "rngStateAfter": [
@@ -150,7 +154,7 @@
             1037,
             25182208
           ],
-          "selectionHash": "404f024be90fa540a21c6333255c8cbdee1c6ecc0716bb3776bfd317df3e9bad"
+          "selectionHash": "059ab2f0c26c4e9730f43cb2d7a2faceeb73b532078503e36c3e5a690c8a4519"
         },
         {
           "id": "case-04-school-decision-guardian",
@@ -184,12 +188,16 @@
           "candidateIds": [
             "ev.any.setback",
             "ev.any.small-win",
+            "ev.child.first-friend",
+            "ev.child.interest-seed",
             "ev.child.playground",
             "ev.child.school-choice",
+            "ev.child.screen-time",
             "ev.child.sibling-arrives",
+            "ev.child.sleep-routine",
             "ev.guardian.calm"
           ],
-          "selectedEventId": "ev.any.small-win",
+          "selectedEventId": "ev.child.playground",
           "reason": "weighted",
           "drawsUsed": 2,
           "rngStateAfter": [
@@ -198,7 +206,7 @@
             1041,
             125853696
           ],
-          "selectionHash": "d02342f25c3aa1cd96160c1825828f7e83f866b49d8a3e29ce4acfa28ec7c789"
+          "selectionHash": "37f09bef65612f97a48cebcff680b27c91d397699064829d8c9c462807657dfd"
         },
         {
           "id": "case-05-sibling-flag",
@@ -234,7 +242,12 @@
           "candidateIds": [
             "ev.any.setback",
             "ev.any.small-win",
-            "ev.child.playground"
+            "ev.child.chores",
+            "ev.child.family-move",
+            "ev.child.friend-conflict",
+            "ev.child.playground",
+            "ev.child.sport-team",
+            "ev.child.study-habit"
           ],
           "selectedEventId": "ev.any.small-win",
           "reason": "weighted",
@@ -245,7 +258,7 @@
             1045,
             25198592
           ],
-          "selectionHash": "785cf17f8512e0458fa1d0d54734a551d9b06a8b46caaf236c671364ab464a34"
+          "selectionHash": "d263317be912bcad904f9931bde2eb198b77219721bdd94b052d74505bd95b98"
         },
         {
           "id": "case-06-teen-standard",
@@ -279,9 +292,13 @@
           "candidateIds": [
             "ev.any.setback",
             "ev.any.small-win",
-            "ev.teen.friendship"
+            "ev.teen.club",
+            "ev.teen.friendship",
+            "ev.teen.online-life",
+            "ev.teen.study-plan",
+            "ev.teen.talent"
           ],
-          "selectedEventId": "ev.any.small-win",
+          "selectedEventId": "ev.any.setback",
           "reason": "weighted",
           "drawsUsed": 2,
           "rngStateAfter": [
@@ -290,7 +307,7 @@
             1049,
             58761216
           ],
-          "selectionHash": "98f10b6f2754b699484714d737a6816f7bf7529bd7dcd841a35e2c75cdc72d7a"
+          "selectionHash": "3df6d77dc03aa64307ccedb9c691ade63d9d1d32cf73cc3a31e34f50fc89df89"
         },
         {
           "id": "case-07-teen-negative-balance",
@@ -326,11 +343,18 @@
           "candidateIds": [
             "ev.any.setback",
             "ev.any.small-win",
+            "ev.teen.club",
+            "ev.teen.family-duty",
+            "ev.teen.first-love",
             "ev.teen.friendship",
+            "ev.teen.online-life",
+            "ev.teen.part-time",
             "ev.teen.part-time-job",
-            "ev.teen.risk-experiment"
+            "ev.teen.risk-experiment",
+            "ev.teen.risk-invite",
+            "ev.teen.talent"
           ],
-          "selectedEventId": "ev.teen.friendship",
+          "selectedEventId": "ev.teen.club",
           "reason": "weighted",
           "drawsUsed": 2,
           "rngStateAfter": [
@@ -339,7 +363,7 @@
             1053,
             25214976
           ],
-          "selectionHash": "bc2c8e43b1208ddf9d566e70b3366e22214dd1a4d2b6d1b8c5c2fb19ba7fb773"
+          "selectionHash": "1bc5fb6a35cbd586331c39b5c5eb89bba130eeaede0d3fdaeef970c31a8efb26"
         },
         {
           "id": "case-08-exams-year",
@@ -372,9 +396,13 @@
           ],
           "candidateIds": [
             "ev.any.setback",
-            "ev.any.small-win"
+            "ev.any.small-win",
+            "ev.child.bullying",
+            "ev.child.competition",
+            "ev.child.family-move",
+            "ev.child.pocket-money"
           ],
-          "selectedEventId": "ev.any.small-win",
+          "selectedEventId": "ev.child.family-move",
           "reason": "weighted",
           "drawsUsed": 2,
           "rngStateAfter": [
@@ -383,7 +411,7 @@
             1057,
             260104192
           ],
-          "selectionHash": "1229af6b6879c7f36cadde58da65f3165c065f0a755bbcb3faaf92d7180f1b18"
+          "selectionHash": "de565db07bf31431691bc7025a7d42c7e6f21060a5244dfd28a63f3ae0f65d4d"
         },
         {
           "id": "case-09-adult-employed",
@@ -423,12 +451,18 @@
             36
           ],
           "candidateIds": [
+            "ev.adult.finance-start",
+            "ev.adult.friend-circle",
+            "ev.adult.further-study",
             "ev.adult.housing-choice",
+            "ev.adult.move-city",
             "ev.adult.promotion",
+            "ev.adult.relationship",
+            "ev.adult.side-project",
             "ev.any.setback",
             "ev.any.small-win"
           ],
-          "selectedEventId": "ev.any.setback",
+          "selectedEventId": "ev.adult.finance-start",
           "reason": "weighted",
           "drawsUsed": 2,
           "rngStateAfter": [
@@ -437,7 +471,7 @@
             1061,
             25231360
           ],
-          "selectionHash": "731ed2edf5f3340d439dbfaa491f595c2880511ca405712abfc7de31fded6d29"
+          "selectionHash": "32e333989668f7651d42ba8fc18516dc8842e749d72215cfd6cea6aec5d1609c"
         },
         {
           "id": "case-10-adult-guardian",
@@ -471,13 +505,19 @@
             40
           ],
           "candidateIds": [
+            "ev.adult.finance-start",
+            "ev.adult.friend-circle",
+            "ev.adult.further-study",
             "ev.adult.housing-choice",
+            "ev.adult.move-city",
             "ev.adult.promotion",
+            "ev.adult.relationship",
+            "ev.adult.side-project",
             "ev.any.setback",
             "ev.any.small-win",
             "ev.guardian.calm"
           ],
-          "selectedEventId": "ev.any.small-win",
+          "selectedEventId": "ev.adult.relationship",
           "reason": "weighted",
           "drawsUsed": 2,
           "rngStateAfter": [
@@ -486,7 +526,7 @@
             1065,
             58793984
           ],
-          "selectionHash": "d2cbf7d8684a5c56ad9ddeebf7a7ccc76d7b4f3e10d77f5a65f0e8ec04484e39"
+          "selectionHash": "7e0cc51069e4957ffe13093fce50fe7251022f4a7560dca73d096f1c8a05bc46"
         },
         {
           "id": "case-11-low-happiness",
@@ -521,12 +561,17 @@
           ],
           "candidateIds": [
             "ev.adult.burnout",
+            "ev.adult.finance-start",
+            "ev.adult.friend-circle",
+            "ev.adult.further-study",
             "ev.adult.housing-choice",
             "ev.adult.promotion",
+            "ev.adult.relationship",
+            "ev.adult.side-project",
             "ev.any.setback",
             "ev.any.small-win"
           ],
-          "selectedEventId": "ev.any.setback",
+          "selectedEventId": "ev.any.small-win",
           "reason": "weighted",
           "drawsUsed": 2,
           "rngStateAfter": [
@@ -535,7 +580,7 @@
             1069,
             25247744
           ],
-          "selectionHash": "6dc87ccb41d6cff059a9171c7fc469f5cc81ffe9600a55d5065c8a7e7ec957aa"
+          "selectionHash": "57989ffb0189744ce62856abb5ab074a2d6195fcf603006a58f74e270f5198c1"
         },
         {
           "id": "case-12-promotion-cooldown",
@@ -575,11 +620,16 @@
             48
           ],
           "candidateIds": [
+            "ev.adult.finance-start",
+            "ev.adult.friend-circle",
+            "ev.adult.further-study",
             "ev.adult.housing-choice",
+            "ev.adult.relationship",
+            "ev.adult.side-project",
             "ev.any.setback",
             "ev.any.small-win"
           ],
-          "selectedEventId": "ev.any.setback",
+          "selectedEventId": "ev.adult.finance-start",
           "reason": "weighted",
           "drawsUsed": 2,
           "rngStateAfter": [
@@ -588,7 +638,7 @@
             1073,
             125919232
           ],
-          "selectionHash": "49d9891a0e99acffee413bf0bbd40f93f8e42d678e87f44f6bc608f96b279ef3"
+          "selectionHash": "c75b46d7de8dbede83b6c00e484d753b289c47649eb25796edf405c6a6144bff"
         },
         {
           "id": "case-13-community-flag",
@@ -622,12 +672,17 @@
             52
           ],
           "candidateIds": [
+            "ev.adult.finance-start",
+            "ev.adult.friend-circle",
+            "ev.adult.further-study",
             "ev.adult.housing-choice",
+            "ev.adult.relationship",
+            "ev.adult.side-project",
             "ev.adult.volunteer",
             "ev.any.setback",
             "ev.any.small-win"
           ],
-          "selectedEventId": "ev.any.small-win",
+          "selectedEventId": "ev.adult.friend-circle",
           "reason": "weighted",
           "drawsUsed": 2,
           "rngStateAfter": [
@@ -636,7 +691,7 @@
             1077,
             25264128
           ],
-          "selectionHash": "0b3cd743549cbee1fa736ce3187623af8a15661a4de381c266cf775feeff2a1c"
+          "selectionHash": "f20856ec6d818e6bc500389b7d697eb2ce492193094b8edff39185b58a32376e"
         },
         {
           "id": "case-14-setback-cooldown",
@@ -674,10 +729,18 @@
             56
           ],
           "candidateIds": [
+            "ev.adult.career-pivot",
+            "ev.adult.children",
+            "ev.adult.elder-care",
+            "ev.adult.health-checkup",
+            "ev.adult.housing-buy",
             "ev.adult.housing-choice",
+            "ev.adult.investment",
+            "ev.adult.network",
+            "ev.adult.startup",
             "ev.any.quiet-year"
           ],
-          "selectedEventId": "ev.any.quiet-year",
+          "selectedEventId": "ev.adult.elder-care",
           "reason": "weighted",
           "drawsUsed": 2,
           "rngStateAfter": [
@@ -686,7 +749,7 @@
             1081,
             58826752
           ],
-          "selectionHash": "2a85756e5da2fd174d852d393fded0ed44e3fd188f68b699ab2d6eb10bd0c312"
+          "selectionHash": "44451bddaf1a2c427d2c7678ee9bf3cc78a275f5255338ff24b2cc09e556500b"
         },
         {
           "id": "case-15-debt",
@@ -718,7 +781,9 @@
             60
           ],
           "candidateIds": [
+            "ev.adult.after-school",
             "ev.adult.debt-scare",
+            "ev.adult.first-job",
             "ev.any.setback",
             "ev.any.small-win"
           ],
@@ -731,7 +796,7 @@
             1085,
             25280512
           ],
-          "selectionHash": "63ee8036871d48f23dedcf85d8444ff96b0c23c557710c2ed15874cb046175ad"
+          "selectionHash": "341c23a6036465a7140b18708dcf969d7fa28a7b72e55797bdea8d6dd454abd4"
         },
         {
           "id": "case-16-senior-standard",
@@ -765,10 +830,16 @@
           "candidateIds": [
             "ev.any.setback",
             "ev.any.small-win",
+            "ev.senior.daily-health",
             "ev.senior.health-check",
-            "ev.senior.reflection"
+            "ev.senior.housing",
+            "ev.senior.legacy",
+            "ev.senior.medical",
+            "ev.senior.reflection",
+            "ev.senior.retirement",
+            "ev.senior.social"
           ],
-          "selectedEventId": "ev.any.small-win",
+          "selectedEventId": "ev.senior.legacy",
           "reason": "weighted",
           "drawsUsed": 2,
           "rngStateAfter": [
@@ -777,7 +848,7 @@
             1089,
             528605184
           ],
-          "selectionHash": "99a2cd621a90316e9fa421e9a214784465a683f9470f7d3fd457b165af3cb475"
+          "selectionHash": "dc5fdbaa95e28a2241a08ffb68a772cd2fe1fb5a64b9381a14f0094031567218"
         },
         {
           "id": "case-17-senior-guardian",
@@ -812,10 +883,16 @@
             "ev.any.setback",
             "ev.any.small-win",
             "ev.guardian.calm",
+            "ev.senior.daily-health",
             "ev.senior.health-check",
-            "ev.senior.reflection"
+            "ev.senior.housing",
+            "ev.senior.legacy",
+            "ev.senior.medical",
+            "ev.senior.reflection",
+            "ev.senior.retirement",
+            "ev.senior.social"
           ],
-          "selectedEventId": "ev.guardian.calm",
+          "selectedEventId": "ev.senior.health-check",
           "reason": "weighted",
           "drawsUsed": 2,
           "rngStateAfter": [
@@ -824,7 +901,7 @@
             1093,
             25296896
           ],
-          "selectionHash": "958eb4ea30384436df64a8b8b785f437a3a7076e43d8ad3c7febe81792cd778e"
+          "selectionHash": "33b2bbb49802f68293c7e28858455e4997a7044b1c578277bd07313386cd93b0"
         },
         {
           "id": "case-18-late-life-100",
@@ -858,10 +935,13 @@
           "candidateIds": [
             "ev.any.setback",
             "ev.any.small-win",
+            "ev.senior.daily-health",
             "ev.senior.health-check",
-            "ev.senior.reflection"
+            "ev.senior.medical",
+            "ev.senior.reflection",
+            "ev.senior.social"
           ],
-          "selectedEventId": "ev.senior.health-check",
+          "selectedEventId": "ev.any.small-win",
           "reason": "weighted",
           "drawsUsed": 2,
           "rngStateAfter": [
@@ -870,7 +950,7 @@
             1097,
             58859520
           ],
-          "selectionHash": "53de3a46043f27ffae033d7b34f612cc786d369fbe2d4022b296d08aa729a60f"
+          "selectionHash": "abee6fa5bb695a5e189e182b81781b1c708b4dc92b83a0d7b33e4b115225389e"
         },
         {
           "id": "case-19-exams-taken",
@@ -909,9 +989,13 @@
           ],
           "candidateIds": [
             "ev.any.setback",
-            "ev.any.small-win"
+            "ev.any.small-win",
+            "ev.child.bullying",
+            "ev.child.competition",
+            "ev.child.family-move",
+            "ev.child.pocket-money"
           ],
-          "selectedEventId": "ev.any.small-win",
+          "selectedEventId": "ev.any.setback",
           "reason": "weighted",
           "drawsUsed": 2,
           "rngStateAfter": [
@@ -920,7 +1004,7 @@
             1101,
             25313280
           ],
-          "selectionHash": "0eab67f95ed8d96338d69690e99b2e852f36d6d3f55af37c23e44318ce32df71"
+          "selectionHash": "01ad4de3210b489f165e0653900713016f789bc967c61e131e683b96f1e77816"
         },
         {
           "id": "case-20-no-promotion-knowledge",
@@ -954,10 +1038,17 @@
             80
           ],
           "candidateIds": [
+            "ev.adult.elder-care",
+            "ev.adult.health-checkup",
+            "ev.adult.housing-buy",
+            "ev.adult.investment",
+            "ev.adult.midlife-review",
+            "ev.adult.network",
+            "ev.adult.startup",
             "ev.any.setback",
             "ev.any.small-win"
           ],
-          "selectedEventId": "ev.any.small-win",
+          "selectedEventId": "ev.any.setback",
           "reason": "weighted",
           "drawsUsed": 2,
           "rngStateAfter": [
@@ -966,7 +1057,7 @@
             1105,
             125984768
           ],
-          "selectionHash": "c40a1d87768843f1cc01f2fbeb31011a12e83121132fe8a346399d7b29cf54a0"
+          "selectionHash": "3c939e7d97e1e24ab43876f867280cf9d4e4568d2965475e84efa64c1716c06e"
         },
         {
           "id": "case-21-all-zero-rng",
@@ -1000,11 +1091,15 @@
           "candidateIds": [
             "ev.any.setback",
             "ev.any.small-win",
+            "ev.child.care-arrangement",
             "ev.child.first-word",
+            "ev.child.picky-eating",
+            "ev.child.screen-time",
             "ev.child.sibling-arrives",
+            "ev.child.sleep-routine",
             "ev.child.tantrum"
           ],
-          "selectedEventId": "ev.any.setback",
+          "selectedEventId": "ev.child.care-arrangement",
           "reason": "weighted",
           "drawsUsed": 2,
           "rngStateAfter": [
@@ -1013,7 +1108,7 @@
             3777114885,
             1407991002
           ],
-          "selectionHash": "cdffbb4ab4d8b7423e36c51e96e2f346cd4b253a6452d938992667e02547c137"
+          "selectionHash": "6041c8c7adb1ea25853e6169116976b428de93b3cb5b7bd86faed00a2ffd2dea"
         },
         {
           "id": "case-22-high-happiness",
@@ -1051,9 +1146,15 @@
             "ev.adult.promotion",
             "ev.adult.volunteer",
             "ev.any.setback",
-            "ev.any.small-win"
+            "ev.any.small-win",
+            "ev.late.career-change",
+            "ev.late.chronic-care",
+            "ev.late.elder-care",
+            "ev.late.family-time",
+            "ev.late.new-hobby",
+            "ev.late.pension"
           ],
-          "selectedEventId": "ev.any.small-win",
+          "selectedEventId": "ev.late.pension",
           "reason": "weighted",
           "drawsUsed": 2,
           "rngStateAfter": [
@@ -1062,7 +1163,7 @@
             1109,
             25329664
           ],
-          "selectionHash": "116f98570ac78ef7c699ec047df014f67941f2b035c98ccd8bf7ea01045066b2"
+          "selectionHash": "9aba57937716593a2e315f9918cedc96c05ff9d10136b1886ca37175afcfc12b"
         },
         {
           "id": "case-23-guardian-teen",
@@ -1097,10 +1198,17 @@
             "ev.any.setback",
             "ev.any.small-win",
             "ev.guardian.calm",
+            "ev.teen.club",
+            "ev.teen.family-duty",
+            "ev.teen.first-love",
             "ev.teen.friendship",
-            "ev.teen.part-time-job"
+            "ev.teen.online-life",
+            "ev.teen.part-time-job",
+            "ev.teen.risk-invite",
+            "ev.teen.study-plan",
+            "ev.teen.talent"
           ],
-          "selectedEventId": "ev.teen.friendship",
+          "selectedEventId": "ev.any.small-win",
           "reason": "weighted",
           "drawsUsed": 2,
           "rngStateAfter": [
@@ -1109,7 +1217,7 @@
             1113,
             58892288
           ],
-          "selectionHash": "1c625a9cc100bc9e70efe05c8277a139365bc215b2197c58f850aaf58114ea64"
+          "selectionHash": "d2528fd04fb4e247dad1d5fc8ec408125b10c28a931caf10ed949ad3500e16c7"
         },
         {
           "id": "case-24-tantrum-age",
@@ -1143,11 +1251,18 @@
           "candidateIds": [
             "ev.any.setback",
             "ev.any.small-win",
+            "ev.child.care-arrangement",
+            "ev.child.first-friend",
+            "ev.child.interest-seed",
+            "ev.child.kindergarten",
+            "ev.child.picky-eating",
             "ev.child.playground",
+            "ev.child.screen-time",
             "ev.child.sibling-arrives",
+            "ev.child.sleep-routine",
             "ev.child.tantrum"
           ],
-          "selectedEventId": "ev.any.small-win",
+          "selectedEventId": "ev.child.playground",
           "reason": "weighted",
           "drawsUsed": 2,
           "rngStateAfter": [
@@ -1156,7 +1271,7 @@
             1117,
             25346048
           ],
-          "selectionHash": "70fbd4f33539e321cf66a586d04529982343a18588d00cd8ee52daaf45d33093"
+          "selectionHash": "2765890a9799186962de837b00a50c5e60e9aa7ee40277e2409062a40bc2d95c"
         }
       ]
     },

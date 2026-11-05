@@ -616,31 +616,31 @@ describe("H5-CTO-182-A Session Payload Codec V1：正向", () => {
     const genesisInput = genesisInputOf(eventPackOfficial, deathPack, SEED_OFFICIAL);
     const genesisProduct = createP3EGenesis(genesisInput);
     const commands = productPathCommands(genesisProduct, eventPackOfficial, deathPack);
-    expect(commands.length).toBe(51);
-    expect(commands.filter((command) => command.type === "CHOOSE_DECISION").length).toBe(1);
+    expect(commands.length).toBe(78);
+    expect(commands.filter((command) => command.type === "CHOOSE_DECISION").length).toBe(28);
 
     const built = buildHistory(genesisProduct, eventPackOfficial, deathPack, commands);
 
-    // 工作單固定期望值：51 命令、1 決策、age 50 死亡（year 2074）＋四個 hash。
+    // 期望值（GPT-0025-A 抉擇包）：78 命令、28 個決策、age 50 死亡（year 2074）＋四個 hash。
     expect(built.finalState.phase).toBe("death");
     expect(built.finalState.age).toBe(50);
     expect(built.finalState.currentYear).toBe(2074);
     expect(built.finalState.stateHash).toBe(
-      "9418bd66908eed8abaae458ccf914af43cbca730eb0b9fb73937f9232480eb48"
+      "e3c69dc08cc2c26808141cf20972283b36ec780b29d57c1f590c9cefe622a7b8"
     );
     expect(built.finalState.commandLog.headHash).toBe(
-      "cf0cc74720628ad5aa5fd367241b8b43b530802187ad2f5ff12a57a00b28b60f"
+      "9c7f87e83da055f6887cec66e71698c4afdc4e02f225fa81e4823887e85d3baf"
     );
     expect(built.finalState.heads.hashChain).toBe(
-      "75e557e08b2e27de0f78a533b1e30cd1ac5a4a57d0de0ee0494df4b2232bfc80"
+      "7e56ba257fe6a2c3f7a9c7f7182f7fd76a761ad3a24a60744424971788072f50"
     );
     const builtRecords = (built.ledger as { records: unknown[] }).records as Dict[];
-    expect(builtRecords.length).toBe(51);
-    expect(((builtRecords[50] as Dict).commandRecord as P3ECommandRecord).entryHash).toBe(
-      "18c5efcae5d83d6fc05302ea122a69d5032a6beccd75ca83f926ab8231369bb4"
+    expect(builtRecords.length).toBe(78);
+    expect(((builtRecords[builtRecords.length - 1] as Dict).commandRecord as P3ECommandRecord).entryHash).toBe(
+      "1fdf6ed52a914137ab3b437031f85f1f6258cd9b1b9366583887f26c2bf94d17"
     );
-    expect(((builtRecords[50] as Dict).yearRecord as Dict).entryHash).toBe(
-      "18c5efcae5d83d6fc05302ea122a69d5032a6beccd75ca83f926ab8231369bb4"
+    expect(((builtRecords[builtRecords.length - 1] as Dict).yearRecord as Dict).entryHash).toBe(
+      "1fdf6ed52a914137ab3b437031f85f1f6258cd9b1b9366583887f26c2bf94d17"
     );
 
     const wire = encodeP3ESessionPayload({
@@ -653,10 +653,10 @@ describe("H5-CTO-182-A Session Payload Codec V1：正向", () => {
     expect(payload.masterSeed).toBe(SEED_OFFICIAL);
     expect(stable(payload.state)).toBe(stable(built.finalState));
     expect(stable(payload.history)).toBe(stable(built.ledger));
-    expect((payload.history.records as unknown[]).length).toBe(51);
+    expect((payload.history.records as unknown[]).length).toBe(78);
     const decodedRecords = payload.history.records as unknown as Dict[];
-    expect(((decodedRecords[50] as Dict).yearRecord as Dict).entryHash).toBe(
-      "18c5efcae5d83d6fc05302ea122a69d5032a6beccd75ca83f926ab8231369bb4"
+    expect(((decodedRecords[decodedRecords.length - 1] as Dict).yearRecord as Dict).entryHash).toBe(
+      "1fdf6ed52a914137ab3b437031f85f1f6258cd9b1b9366583887f26c2bf94d17"
     );
     // byte-identical roundtrip（含 1 個 CHOOSE_DECISION 命令的 canonical 投影）。
     expect(
@@ -1092,7 +1092,7 @@ describe("H5-CTO-182-A Session Payload Codec V1：scale", () => {
     for (let step = 0; step < 51; step += 1) commands.push({ ...ADVANCE });
     const built = buildHistory(genesisOfficial, packNoCandidates, deathPackOfficial51, commands);
     const s51 = built.finalState;
-    const realTailPair = ((built.ledger as { records: unknown[] }).records[50] as unknown as Dict);
+    const realTailPair = ((built.ledger as { records: unknown[] }).records[(built.ledger as { records: unknown[] }).records.length - 1] as unknown as Dict);
     const realTailCommand = realTailPair.commandRecord as P3ECommandRecord;
     const realTailYear = realTailPair.yearRecord as Dict;
 

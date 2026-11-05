@@ -537,9 +537,9 @@ describe("H5-CTO-184-A Save Envelope V6：正向", () => {
     expect(official.finalState.age).toBe(50);
     expect(official.finalState.currentYear).toBe(2074);
     expect(official.finalState.stateHash).toBe(
-      "9418bd66908eed8abaae458ccf914af43cbca730eb0b9fb73937f9232480eb48"
+      "e3c69dc08cc2c26808141cf20972283b36ec780b29d57c1f590c9cefe622a7b8"
     );
-    expect(((official.ledger as { records: unknown[] }).records).length).toBe(51);
+    expect(((official.ledger as { records: unknown[] }).records).length).toBe(78);
 
     for (const transport of [
       encodeP3ESaveEnvelopeV6(envOf(official.wire)),
@@ -551,7 +551,7 @@ describe("H5-CTO-184-A Save Envelope V6：正向", () => {
       expect(payload.masterSeed).toBe(SEED_OFFICIAL);
       expect(stable(payload.state)).toBe(stable(official.finalState));
       expect(stable(payload.history)).toBe(stable(official.ledger));
-      expect((payload.history.records as unknown[]).length).toBe(51);
+      expect((payload.history.records as unknown[]).length).toBe(78);
     }
   });
 

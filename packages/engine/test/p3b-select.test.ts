@@ -109,9 +109,11 @@ describe("P3-B selection：RNG draws 會計", () => {
     // 這裡改用 4096 筆來跨越上限。
     expect(overflow.events).toHaveLength(3);
 
+    // 大量事件必須用「沒有 decision」的樣板複製，否則會先撞到 decisionId 重複。
+    const template = raw.events.find((event) => event.kind !== "decision") as P3BEventRecord;
     const many: P3BEventRecord[] = [];
     for (let index = 0; index < 2100; index += 1) {
-      const copy = clone(raw.events[0] as P3BEventRecord);
+      const copy = clone(template);
       many.push({ ...copy, eventId: `ev.bulk.weight.${index}`, weight: Number.MAX_SAFE_INTEGER, once: false, cooldownYears: 0, conditions: null, exclusiveGroup: null, ageMin: 0, ageMax: 120 });
     }
     const heavy = validate(makePack(many));
@@ -160,12 +162,25 @@ describe("P3-B selection：once／cooldown／exclusiveGroup", () => {
   });
 
   it("respects the exclusive group among two decision events", () => {
+    // GPT-0025-A 之後主 pack 有很多「沒有 exclusiveGroup」的抉擇事件；
+    // 這個測試要守的是「同一個 exclusiveGroup 最多只留一個候選」。
     const { candidates } = buildCandidates(input({ state: { ...BASE_STATE, age: 30 } }));
-    const decisionIds = candidates
-      .map((candidate) => pack.events.find((event) => event.eventId === candidate.eventId))
-      .filter((event) => event !== undefined && event.kind === "decision")
-      .map((event) => event?.eventId);
-    expect(decisionIds.length).toBeLessThanOrEqual(1);
+    const grouped = new Map<string, string[]>();
+    let ungroupedDecisions = 0;
+    for (const candidate of candidates) {
+      const record = pack.events.find((event) => event.eventId === candidate.eventId);
+      if (record === undefined || record.kind !== "decision") continue;
+      if (record.exclusiveGroup === null) {
+        ungroupedDecisions += 1;
+        continue;
+      }
+      const list = grouped.get(record.exclusiveGroup) ?? [];
+      list.push(record.eventId);
+      grouped.set(record.exclusiveGroup, list);
+    }
+    for (const [, ids] of grouped) expect(ids).toHaveLength(1);
+    // 沒有 exclusiveGroup 的抉擇事件可以同時是候選（各自競爭權重）。
+    expect(ungroupedDecisions).toBeGreaterThanOrEqual(1);
   });
 });
 

@@ -3840,3 +3840,399 @@ body:has(:is(.p3e-game-shell, .p3e-birth-screen)) {
     gap: 5px 8px;
   }
 }
+
+/* ==================================================================
+   GPT-0025-B — portrait-only game surface (H5 mobile UI rework)
+   ------------------------------------------------------------------
+   The playable game is a portrait single-column experience at EVERY
+   viewport width and zoom level. The technical P3-E diagnostics /
+   fixture preview rule `@media (min-width: 720px) { .p3e-life {
+   grid-template-columns: repeat(2, …) } }` above used to leak a
+   two-column grid into `.p3e-game-shell`, which produced the screenshot
+   problem (scene next to event card, giant empty status panel, clipped
+   speed buttons). This final block pins the game shell to one column
+   without deleting the older preview styles.
+   ================================================================== */
+
+/* 1. 單欄，永遠單欄 ------------------------------------------------ */
+.p3e-shell.p3e-game-shell .p3e-life,
+.p3e-game-shell .p3e-life {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-auto-flow: row;
+  grid-template-rows:
+    clamp(200px, 27dvh, 246px)
+    minmax(0, 1fr)
+    auto auto auto;
+  gap: 5px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* 2. 緊湊 HUD：標題 + 年份／年齡／資產／年收入 + 選單，全寬度都一列 */
+.p3e-game-shell .p3e-hud {
+  grid-template-columns:
+    minmax(0, 0.9fr)
+    minmax(0, 0.8fr)
+    minmax(0, 0.7fr)
+    minmax(0, 1.1fr)
+    minmax(0, 1.1fr)
+    44px;
+  min-height: 54px;
+  margin-bottom: 5px;
+  padding: 4px;
+}
+
+.p3e-game-shell .p3e-hud > .p3e-game-title {
+  align-self: center;
+  margin: 0;
+  padding: 0 3px;
+  overflow: hidden;
+  color: #49331c;
+  font-size: clamp(0.72rem, 2.4vw, 0.86rem);
+  font-weight: 900;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.p3e-game-shell .p3e-hud-item strong {
+  overflow: hidden;
+  font-size: clamp(0.82rem, 3.2vw, 0.98rem);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.p3e-game-shell .p3e-hud-item span,
+.p3e-game-shell .p3e-hud-item small {
+  font-size: clamp(0.68rem, 2.5vw, 0.78rem);
+}
+
+/* 3. 橫向場景圖片：固定約 25–30% 高，不再吃掉半個畫面 */
+.p3e-game-shell .p3e-scene {
+  height: 100%;
+  min-height: 0;
+  max-height: min(250px, 30dvh);
+  overflow: hidden;
+}
+
+/* 4. 當年訊息／決策卡：唯一遊戲內捲動區，字級維持可讀 */
+.p3e-game-shell .p3e-story-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scroll-padding-top: 44px;
+  scrollbar-width: thin;
+  padding-bottom: 4px;
+}
+
+/* sticky 標題只是在視覺上跟著捲動，不能擋住下方的選項按鈕 */
+.p3e-game-shell .p3e-story-card > h2 {
+  position: sticky;
+  z-index: 2;
+  top: 0;
+  flex: 0 0 auto;
+  pointer-events: none;
+  padding-top: 7px;
+  padding-bottom: 7px;
+}
+
+.p3e-game-shell .p3e-story-card p,
+.p3e-game-shell .p3e-story-card .p3e-death p {
+  margin-top: 6px;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.p3e-game-shell .p3e-event-name {
+  font-size: 1rem;
+}
+
+.p3e-game-shell .p3e-hint {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.35;
+}
+
+.p3e-game-shell .p3e-story-card > .p3e-pending {
+  flex: 0 0 auto;
+  margin: 8px 9px 10px;
+  border-width: 2px;
+}
+
+/* 5. 2–4 個大面積選項卡；決策時必須比播放控制更醒目 */
+.p3e-game-shell .p3e-option {
+  font-size: 0.9rem;
+  scroll-margin-top: 44px;
+}
+
+.p3e-game-shell .p3e-life:has(.p3e-pending) .p3e-option {
+  min-height: 58px;
+  border: 3px solid #c07a18;
+  border-radius: 11px;
+  padding: 9px 34px 9px 12px;
+  color: #3b2810;
+  background: linear-gradient(180deg, #fffdf2, #ffe9b0);
+  box-shadow: 0 3px 0 #9b6413, inset 0 1px 0 #fff;
+  font-size: 0.95rem;
+  font-weight: 900;
+}
+
+.p3e-game-shell .p3e-life:has(.p3e-pending) .p3e-time-controls {
+  opacity: 0.82;
+  filter: saturate(0.72);
+}
+
+/* 6. 四項狀態壓成一列，不得長成高大空白面板 */
+.p3e-game-shell .p3e-stat-dock {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-content: center;
+  min-height: 44px;
+  max-height: 66px;
+  padding: 3px;
+  overflow: hidden;
+}
+
+.p3e-game-shell .p3e-stat-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto 6px;
+  align-content: center;
+  gap: 1px 2px;
+  min-height: 44px;
+  padding: 2px 3px;
+  font-size: 0.75rem;
+  line-height: 1.2;
+}
+
+.p3e-game-shell .p3e-stat-label {
+  overflow: hidden;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.p3e-game-shell .p3e-stat-item strong {
+  font-size: 0.86rem;
+}
+
+.p3e-game-shell .p3e-stat-meter {
+  grid-column: 1 / -1;
+  display: block;
+  height: 6px;
+  overflow: hidden;
+  border: 1px solid #70522f;
+  border-radius: 999px;
+  background: #d8c9a9;
+}
+
+.p3e-game-shell .p3e-stat-meter > i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #3dbd78, #7cd69b);
+}
+
+/* 7. 時間控制改成 4 欄 × 2 列：7 顆按鈕全部完整顯示、全部 >=44px */
+.p3e-game-shell .p3e-time-controls {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 3px;
+  min-height: 0;
+  padding: 0;
+  overflow: visible;
+}
+
+.p3e-game-shell .p3e-time-controls button {
+  min-width: 0;
+  min-height: 44px;
+  padding: 2px 1px;
+  overflow: hidden;
+  font-size: 0.75rem;
+  line-height: 1.15;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.p3e-game-shell .p3e-time-controls .p3e-jump-button {
+  grid-column: span 2;
+  font-size: 0.8rem;
+  font-weight: 900;
+}
+
+.p3e-game-shell .p3e-time-controls button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* 8. 死亡畫面：場景 → 人生終點摘要 → 重新開始，垂直排列；
+      不再顯示無用的大空白狀態面板與被截斷的播放倍率。 */
+.p3e-game-shell .p3e-life:has(.p3e-scene-death) {
+  grid-template-rows:
+    clamp(180px, 26dvh, 246px)
+    minmax(0, 1fr)
+    auto;
+  gap: 6px;
+}
+
+.p3e-game-shell .p3e-life:has(.p3e-scene-death) .p3e-stat-dock,
+.p3e-game-shell .p3e-life:has(.p3e-scene-death) .p3e-time-controls,
+.p3e-game-shell .p3e-life:has(.p3e-scene-death) .p3e-controls {
+  display: none;
+}
+
+/* 死亡時移除「大張空白筆記紙」：摘要卡直接浮在場景下方並垂直置中。 */
+.p3e-game-shell .p3e-story-card:has(> .p3e-death) {
+  justify-content: safe center;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.p3e-game-shell .p3e-story-card:has(> .p3e-death) > h2 {
+  display: none;
+}
+
+.p3e-game-shell .p3e-story-card:has(> .p3e-death) > :not(h2):not(.p3e-death) {
+  text-align: center;
+}
+
+.p3e-game-shell .p3e-story-card > .p3e-death {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  gap: 9px;
+  margin: 10px 0 12px;
+  padding: 12px;
+  border: 2px solid #b9863f;
+  border-radius: 12px;
+  background: linear-gradient(180deg, #fffdf3, #fff3d6);
+  box-shadow: 0 8px 22px rgba(41, 48, 37, 0.22), inset 0 0 0 2px rgba(255, 255, 255, 0.6);
+}
+
+.p3e-game-shell .p3e-story-card > .p3e-death > h3 {
+  margin: 0;
+  color: #7a3d12;
+  font-size: 1.05rem;
+  line-height: 1.3;
+}
+
+.p3e-game-shell .p3e-story-card > .p3e-death > p {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.p3e-game-shell .p3e-story-card > .p3e-death > [data-action="rebirth"] {
+  min-height: 52px;
+  border: 3px solid #a84b05;
+  border-radius: 12px;
+  padding: 8px 14px;
+  color: #fffdf0;
+  background: linear-gradient(180deg, #ffac25, #f58b13);
+  box-shadow: 0 4px 0 #743c09;
+  font-size: 1.05rem;
+  font-weight: 900;
+}
+
+/* 決策中沒有「下一步」可按（只剩提示文字），把空間讓給選項卡；
+   「下一個決定 »」仍保留在時間控制列，不會消失。 */
+.p3e-game-shell .p3e-life:has(.p3e-pending) .p3e-controls {
+  display: none;
+}
+
+/* 9. 短螢幕：再壓一點固定區塊，但正文仍 >=14px、觸控區仍 >=44px */
+@media (max-height: 700px) {
+  .p3e-shell.p3e-game-shell .p3e-life,
+  .p3e-game-shell .p3e-life {
+    grid-template-rows:
+      clamp(118px, 22dvh, 160px)
+      minmax(46px, 1fr)
+      auto auto auto;
+    gap: 3px;
+  }
+
+  .p3e-game-shell .p3e-life:has(.p3e-scene-death) {
+    grid-template-rows:
+      clamp(118px, 22dvh, 160px)
+      minmax(46px, 1fr)
+      auto;
+    gap: 4px;
+  }
+
+  .p3e-game-shell .p3e-hud {
+    min-height: 50px;
+    margin-bottom: 3px;
+  }
+
+  .p3e-game-shell .p3e-story-card p,
+  .p3e-game-shell .p3e-story-card .p3e-death p {
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+
+  .p3e-game-shell .p3e-story-card > h2 {
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+
+  .p3e-game-shell .p3e-tab {
+    min-height: 44px;
+  }
+
+  .p3e-game-shell .p3e-primary[data-action="advance"],
+  .p3e-game-shell .p3e-primary.p3e-next,
+  .p3e-game-shell [data-action="next-decision"] {
+    min-height: 46px;
+    font-size: 1rem;
+  }
+
+  /* 320x568 決策：場景再縮成橫幅、標題與內距收緊，讓第一個選項完整露出。 */
+  .p3e-shell.p3e-game-shell .p3e-life:has(.p3e-pending),
+  .p3e-game-shell .p3e-life:has(.p3e-pending) {
+    grid-template-rows:
+      clamp(88px, 16dvh, 118px)
+      minmax(46px, 1fr)
+      auto auto auto;
+    gap: 3px;
+  }
+
+  .p3e-game-shell .p3e-story-card:has(.p3e-pending) > h2 {
+    padding-top: 4px;
+    padding-bottom: 4px;
+    font-size: 0.9rem;
+  }
+
+  .p3e-game-shell .p3e-story-card:has(.p3e-pending) > p {
+    margin-top: 3px;
+    margin-bottom: 3px;
+  }
+
+  /* 320x568 決策卡：年份已在 HUD、事件名與決策標題重複，
+     收掉這兩行讓第一個大選項卡完整露出（資訊層級去重，不是縮字）。 */
+  .p3e-game-shell .p3e-story-card:has(.p3e-pending) > p,
+  .p3e-game-shell .p3e-story-card:has(.p3e-pending) > .p3e-event-name {
+    display: none;
+  }
+
+  .p3e-game-shell .p3e-story-card:has(.p3e-pending) > .p3e-pending {
+    margin-top: 4px;
+    margin-bottom: 6px;
+  }
+
+  .p3e-game-shell .p3e-story-card:has(.p3e-pending) .p3e-choice-list {
+    padding-top: 4px;
+    padding-bottom: 6px;
+  }
+
+  .p3e-game-shell .p3e-life:has(.p3e-pending) .p3e-option {
+    min-height: 54px;
+    padding-top: 7px;
+    padding-bottom: 7px;
+  }
+}

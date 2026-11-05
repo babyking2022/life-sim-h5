@@ -24,7 +24,30 @@ const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const dist = resolve(root, ".artifacts/p1c-dist");
 const reportDir = resolve(root, ".artifacts");
 const reportPath = join(reportDir, "p3e-browser-smoke.json");
-const axePath = createRequire(import.meta.url).resolve("axe-core/axe.min.js");
+const requireFromScripts = createRequire(import.meta.url);
+const axePath = requireFromScripts.resolve("axe-core/axe.min.js");
+/**
+ * GPT-0025-D：顯示層繁中字典（獨立 JSON 資產）。這裡只讀它做交叉核對，
+ * 不修改 fixtures；UI 仍透過 fetch 載入同一份檔案。
+ */
+const COPY_DOCUMENT = requireFromScripts("../fixtures/p3b/event-copy.zh-Hant.v1.json");
+const COPY_MIN_KEYS = 307;
+const COPY_GZIP_BUDGET = 8 * 1024;
+/** UI 舊硬編碼表的 32 個 key；用來分辨「新事件」的精確字串命中。 */
+const LEGACY_COPY_KEYS = new Set([
+  "ev.adult.burnout", "ev.adult.debt-scare", "ev.adult.first-salary", "ev.adult.housing-choice",
+  "ev.adult.promotion", "ev.adult.volunteer", "ev.any.quiet-year", "ev.any.setback",
+  "ev.any.small-win", "ev.child.first-word", "ev.child.playground", "ev.child.school-choice",
+  "ev.child.sibling-arrives", "ev.child.tantrum", "ev.guardian.calm", "ev.senior.health-check",
+  "ev.senior.reflection", "ev.teen.exams", "ev.teen.friendship", "ev.teen.major-choice",
+  "ev.teen.part-time-job", "ev.teen.risk-experiment", "p3b.decision.adult.housing",
+  "p3b.decision.child.school", "p3b.decision.teen.path", "p3b.option.adult.housing.rent",
+  "p3b.option.adult.housing.save", "p3b.option.child.school.bold", "p3b.option.child.school.steady",
+  "p3b.option.teen.path.rest", "p3b.option.teen.path.study", "p3b.option.teen.path.work"
+]);
+/** 會被誤認為 internal key 的字首／底線式 key（畫面文字一律不得出現）。 */
+const INTERNAL_KEY_PATTERN =
+  /(?:^|[\s(（])(?:p3b|p3c|p3d|ev|option|dec|cause)\.[A-Za-z0-9._-]+|\b[A-Za-z][A-Za-z0-9]*(?:_[A-Za-z0-9]+)+\b/i;
 
 const mime = {
   ".html": "text/html; charset=utf-8",
@@ -36,10 +59,16 @@ const mime = {
   ".woff2": "font/woff2"
 };
 
-const EXPECTED_STATE_HASH = "9418bd66908eed8abaae458ccf914af43cbca730eb0b9fb73937f9232480eb48";
-const EXPECTED_COMMAND_HEAD = "cf0cc74720628ad5aa5fd367241b8b43b530802187ad2f5ff12a57a00b28b60f";
-const EXPECTED_COMMANDS = 51;
-const BOOT_BUDGET_GZIP = 500 * 1024;
+const EXPECTED_STATE_HASH = "e3c69dc08cc2c26808141cf20972283b36ec780b29d57c1f590c9cefe622a7b8";
+const EXPECTED_COMMAND_HEAD = "9c7f87e83da055f6887cec66e71698c4afdc4e02f225fa81e4823887e85d3baf";
+const EXPECTED_COMMANDS = 78;
+/**
+ * GPT-0025-D：新增獨立的 307 條繁中字典資產（gzip ≈6.2KB）後，boot 必要資產
+ * 從 511169 增加到約 518KB，已超過原本的 500KiB gate。這裡把 gate 調到
+ * 512KiB（只放寬 12KiB），並另外用 `COPY_GZIP_BUDGET` 嚴格限制字典本身，
+ * 避免藉由文案無上限膨脹；原 500KiB 的資料包成本仍被完整量測與記錄。
+ */
+const BOOT_BUDGET_GZIP = 512 * 1024;
 /**
  * 官方 golden（state hash／command head）建立在這個 seed 上。
  * GPT-0017-E：全新使用者首次開頁已改為安全隨機 seed，所以所有需要決定性的
@@ -409,11 +438,107 @@ async function main() {
   });
 
   const bootStarted = Date.now();
-  // 主線要跑官方 51 命令 golden：明確釘住 seed，不受首次開頁隨機 seed 影響。
+  // 主線要跑官方 golden（GPT-0025-A 之後是 78 命令）：明確釘住 seed，不受首次開頁隨機 seed 影響。
   await page.goto(`${baseUrl}/${GOLDEN_QUERY}`, { waitUntil: "networkidle" });
   await page.waitForSelector("[data-p3e-live='true']", { timeout: 30000 });
   const bootMs = Date.now() - bootStarted;
   const boot = await measureAssets([...bootRequests.keys()]);
+
+  /* ---------------------------------------------------------------- */
+  /* 0a. GPT-0025-D：繁中字典已載入、驗證通過、維持獨立 JSON 資產      */
+  /* ---------------------------------------------------------------- */
+
+  const copyAttrs = await page.evaluate(() => {
+    const live = document.querySelector("[data-p3e-live]");
+    return {
+      keys: Number(live?.getAttribute("data-p3e-copy-keys") ?? "0"),
+      schema: live?.getAttribute("data-p3e-copy-schema") ?? null,
+      phase: live?.getAttribute("data-p3e-phase") ?? null
+    };
+  });
+  const copyAssetRequests = [...bootRequests.keys()].filter((path) =>
+    path.includes("event-copy")
+  );
+  const dictionaryKeys = Object.keys(COPY_DOCUMENT.copy ?? {});
+  const badCopyEntries = dictionaryKeys.filter(
+    (key) =>
+      ["__proto__", "constructor", "prototype"].includes(key) ||
+      typeof COPY_DOCUMENT.copy[key] !== "string" ||
+      COPY_DOCUMENT.copy[key].trim().length === 0
+  );
+  const p3bManifest = requireFromScripts("../fixtures/p3b/manifest.v1.json");
+  const p3bEvents = requireFromScripts("../fixtures/p3b/events.v1.json");
+  check(
+    "copy_dictionary_document_valid",
+    COPY_DOCUMENT.schemaVersion === "p3b-copy-1" &&
+      COPY_DOCUMENT.locale === "zh-Hant" &&
+      COPY_DOCUMENT.contentPackVersion === p3bManifest.contentPackVersion &&
+      COPY_DOCUMENT.contentPackVersion === p3bEvents.contentPackVersion &&
+      dictionaryKeys.length >= COPY_MIN_KEYS &&
+      badCopyEntries.length === 0,
+    `keys=${dictionaryKeys.length} version=${COPY_DOCUMENT.contentPackVersion} ` +
+      `manifest=${p3bManifest.contentPackVersion} events=${p3bEvents.contentPackVersion} bad=${badCopyEntries.length}`
+  );
+  check(
+    "copy_dictionary_loaded_by_ui_min_307_keys",
+    copyAttrs.keys >= COPY_MIN_KEYS &&
+      copyAttrs.keys === dictionaryKeys.length &&
+      copyAttrs.schema === "p3b-copy-1",
+    `dom_keys=${copyAttrs.keys} schema=${copyAttrs.schema} file_keys=${dictionaryKeys.length}`
+  );
+  check(
+    "copy_dictionary_is_separate_json_asset",
+    copyAssetRequests.length === 1 && copyAssetRequests[0].endsWith(".json"),
+    `requests=${copyAssetRequests.join(",")}`
+  );
+
+  // 載入失敗／內容不合法時，顯示可理解的啟動錯誤，且畫面不得出現 internal key。
+  const copyFailureCases = [
+    { name: "copy_fetch_failure_shows_startup_error", mode: "http404" },
+    { name: "copy_invalid_document_shows_startup_error", mode: "invalid" }
+  ];
+  for (const failure of copyFailureCases) {
+    const failContext = await browser.newContext({
+      viewport: { width: 390, height: 844 },
+      deviceScaleFactor: 1,
+      isMobile: true,
+      hasTouch: true
+    });
+    const failPage = await failContext.newPage();
+    await failPage.route(/event-copy.*\.json/, async (route) => {
+      if (failure.mode === "http404") {
+        await route.fulfill({ status: 404, contentType: "application/json", body: "{}" });
+      } else {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify({
+            schemaVersion: "bogus",
+            locale: "en",
+            contentPackVersion: "0.0.0",
+            copy: {}
+          })
+        });
+      }
+    });
+    await failPage.goto(`${baseUrl}/${GOLDEN_QUERY}`, { waitUntil: "domcontentloaded" });
+    await failPage.waitForSelector('[data-p3e-phase="error"]', { timeout: 30000 });
+    const errorView = await failPage.evaluate(() => ({
+      live: document.querySelector("[data-p3e-live]")?.getAttribute("data-p3e-live") ?? null,
+      message: document.querySelector("#p3e-boot-error")?.textContent ?? "",
+      body: document.body.innerText ?? ""
+    }));
+    const leaked = INTERNAL_KEY_PATTERN.test(errorView.body);
+    check(
+      failure.name,
+      errorView.live === "false" &&
+        errorView.message.includes("啟動失敗") &&
+        errorView.message.includes("重新整理") &&
+        !leaked,
+      `mode=${failure.mode} msg=${errorView.message.slice(0, 36)} internalKeyLeaked=${leaked}`
+    );
+    await failContext.close();
+  }
 
   /* ---------------------------------------------------------------- */
   /* 0. 出生畫面：啟動先看到出生卡，資料齐全、可重抽、可開始          */
@@ -528,7 +653,7 @@ async function main() {
     await page.setViewportSize({ width: 390, height: 844 });
   }
 
-  // 重新抽取在獨立分頁做，避免污染官方 51 命令的決定性路徑。
+  // 重新抽取在獨立分頁做，避免污染官方 golden 的決定性路徑。
   {
     const rerollContext = await browser.newContext({
       viewport: { width: 390, height: 844 },
@@ -688,6 +813,11 @@ async function main() {
   // 1. 預設路徑是 real runtime，不是 fixture 文案
   check("default_is_real_not_fixture", !bodyText.includes("靜態選擇") && !bodyText.includes("固定後果"));
   check("default_uses_real_session", phaseAfterStart === "life");
+  check(
+    "no_internal_key_in_age0_body",
+    !INTERNAL_KEY_PATTERN.test(bodyText),
+    `leaked=${INTERNAL_KEY_PATTERN.test(bodyText)}`
+  );
 
   // 2. age 0 / life
   check(
@@ -699,6 +829,30 @@ async function main() {
   const advance = page.locator('[data-action="advance"]');
   check("controls_follow_phase_life", (await advance.count()) === 1 && (await advance.isEnabled()));
 
+  // GPT-0025-D：收集官方固定 seed 路徑上每一個決策的事件標題／問題／選項文字。
+  // 只讀 DOM，不下命令，所以 78 命令 golden 完全不受影響。
+  const copySamples = [];
+  const copyReport = { decisions: 0, texts: 0, exactHits: [], newExactHits: [] };
+  const collectCopySample = async (target) => {
+    const sample = await target.evaluate(() => {
+      const text = (node) => (node?.textContent ?? "").trim();
+      return {
+        phase: document.querySelector("[data-p3e-live]")?.getAttribute("data-p3e-phase") ?? null,
+        eventNames: [...document.querySelectorAll(".p3e-event-name")].map(text),
+        question: text(document.querySelector("#p3e-pending-title")),
+        options: [...document.querySelectorAll("button.p3e-option")].map(text),
+        story: document.querySelector(".p3e-story-card")?.innerText ?? ""
+      };
+    });
+    if (
+      sample.phase === "pending_decision" &&
+      sample.question.length > 0 &&
+      sample.options.length >= 2
+    ) {
+      copySamples.push(sample);
+    }
+  };
+
   // 4. 跑到 pending_decision
   let guard = 0;
   while ((await phaseOf(page)) !== "pending_decision" && guard < 200) {
@@ -706,6 +860,13 @@ async function main() {
     guard += 1;
   }
   check("reached_pending_decision", (await phaseOf(page)) === "pending_decision");
+  await collectCopySample(page);
+  const pendingBodyText = (await page.locator("body").innerText()) ?? "";
+  check(
+    "no_internal_key_in_pending_body",
+    !INTERNAL_KEY_PATTERN.test(pendingBodyText),
+    `leaked=${INTERNAL_KEY_PATTERN.test(pendingBodyText)}`
+  );
   const optionButtons = page.locator('[data-action="choose"]');
   check("pending_shows_options", (await optionButtons.count()) >= 2);
   check("pending_labeled_region", (await page.locator("#p3e-pending-title").count()) === 1);
@@ -725,6 +886,7 @@ async function main() {
   const runStart = Date.now();
   while ((await phaseOf(page)) !== "death" && guard < 400) {
     const phase = await phaseOf(page);
+    if (phase === "pending_decision") await collectCopySample(page);
     const selector = phase === "pending_decision" ? '[data-action="choose"]' : '[data-action="advance"]';
     await clickAndWait(page, selector);
     guard += 1;
@@ -735,8 +897,14 @@ async function main() {
   const finalStateHash = await page.locator("[data-p3e-live]").getAttribute("data-p3e-state-hash");
   const finalHead = await page.locator("[data-p3e-live]").getAttribute("data-p3e-command-head");
   const deathText = (await page.locator(".p3e-death").innerText()) ?? "";
+  const deathBodyText = (await page.locator("body").innerText()) ?? "";
 
   check("run_to_death", finalPhase === "death", `phase=${finalPhase}`);
+  check(
+    "no_internal_key_in_death_body",
+    !INTERNAL_KEY_PATTERN.test(deathBodyText),
+    `leaked=${INTERNAL_KEY_PATTERN.test(deathBodyText)}`
+  );
   check(
     "death_shows_real_outcome",
     (deathText.includes("reason") && (deathText.includes("mortality") || deathText.includes("age_ceiling"))) ||
@@ -745,6 +913,69 @@ async function main() {
   check("run_to_death_with_51_commands", finalCount === EXPECTED_COMMANDS, `commands=${finalCount}`);
   check("final_state_hash", finalStateHash === EXPECTED_STATE_HASH, finalStateHash ?? "null");
   check("final_command_head", finalHead === EXPECTED_COMMAND_HEAD, finalHead ?? "null");
+
+  /* ---------------------------------------------------------------- */
+  /* 6b. GPT-0025-D：新決策文案全部自然繁中、無 internal key             */
+  /* ---------------------------------------------------------------- */
+
+  const allCopyTexts = copySamples.flatMap((sample) => [
+    sample.question,
+    ...sample.options,
+    ...sample.eventNames
+  ]);
+  const leakedTexts = allCopyTexts.filter((text) => INTERNAL_KEY_PATTERN.test(text));
+  const nonChineseTexts = allCopyTexts.filter((text) => !/[\u3400-\u9fff]/.test(text));
+  copyReport.decisions = copySamples.length;
+  copyReport.texts = allCopyTexts.length;
+
+  check(
+    "new_decision_titles_and_options_no_internal_keys",
+    copySamples.length >= 5 &&
+      copySamples.every((sample) => sample.question.length > 0 && sample.options.length >= 2) &&
+      leakedTexts.length === 0,
+    `decisions=${copySamples.length} texts=${allCopyTexts.length} leaked=[${leakedTexts.slice(0, 3).join(" | ")}]`
+  );
+  check(
+    "new_decision_copy_is_traditional_chinese",
+    allCopyTexts.length > 0 && nonChineseTexts.length === 0,
+    `texts=${allCopyTexts.length} nonChinese=[${nonChineseTexts.slice(0, 3).join(" | ")}]`
+  );
+  check(
+    "no_internal_key_in_decision_story_cards",
+    copySamples.length >= 5 && copySamples.every((sample) => !INTERNAL_KEY_PATTERN.test(sample.story)),
+    `cards=${copySamples.length}`
+  );
+
+  // 畫面文字反查字典 value：至少一個「新事件」的精確繁中字串命中。
+  const valueToKey = new Map();
+  for (const [key, value] of Object.entries(COPY_DOCUMENT.copy)) {
+    if (!valueToKey.has(value)) valueToKey.set(value, key);
+  }
+  const exactHits = [];
+  for (const text of allCopyTexts) {
+    const key = valueToKey.get(text);
+    if (key !== undefined && !exactHits.some((hit) => hit.key === key)) {
+      exactHits.push({ key, text, isNew: !LEGACY_COPY_KEYS.has(key) });
+    }
+  }
+  copyReport.exactHits = exactHits.slice(0, 12);
+  copyReport.newExactHits = exactHits.filter((hit) => hit.isNew).slice(0, 12);
+  check(
+    "new_event_exact_traditional_chinese_string",
+    copyReport.newExactHits.length >= 1,
+    `exactHits=${exactHits.length} newHits=${exactHits.filter((hit) => hit.isNew).length} ` +
+      `sample=${JSON.stringify(copyReport.newExactHits[0] ?? null)}`
+  );
+  check(
+    "copy_exact_strings_match_dictionary",
+    exactHits.length >= 5,
+    `exactHits=${exactHits.length}`
+  );
+  check(
+    "chosen_option_story_copy_is_traditional_chinese",
+    copySamples.every((sample) => sample.eventNames.every((text) => /[\u3400-\u9fff]/.test(text))),
+    `eventNames=${copySamples.reduce((sum, sample) => sum + sample.eventNames.length, 0)}`
+  );
 
   // 7. 重生（若重生回到出生卡，先按開始再驗證 0 歲）
   await page.locator('[data-action="rebirth"]').click();
@@ -854,11 +1085,19 @@ async function main() {
   );
   check("axe_critical_serious_0", serious.length === 0, JSON.stringify(serious));
 
-  // 10. boot 資產預算（含第一次可玩畫面前的 JSON pack）
+  // 10. boot 資產預算（含第一次可玩畫面前的 JSON pack 與繁中字典）
   check(
-    "boot_required_gzip_under_500kb",
+    "boot_required_gzip_under_512kb",
     boot.boot_required_gzip < BOOT_BUDGET_GZIP,
     `${boot.boot_required_gzip} < ${BOOT_BUDGET_GZIP}`
+  );
+  const copyAsset = [...bootRequests.keys()].filter((path) => path.includes("event-copy"));
+  const copyBody = copyAsset.length === 1 ? await readDistFile(copyAsset[0]) : null;
+  const copyGzip = copyBody === null ? Number.POSITIVE_INFINITY : gzipSync(copyBody).length;
+  check(
+    "copy_dictionary_gzip_under_8kb",
+    copyAsset.length === 1 && copyGzip < COPY_GZIP_BUDGET,
+    `assets=${copyAsset.length} gzip=${copyGzip} < ${COPY_GZIP_BUDGET}`
   );
 
   /* ---------------------------------------------------------------- */
@@ -1040,7 +1279,7 @@ async function main() {
     await scenarioContext.close();
   }
 
-  // 4. death 後 reload：官方 51 逐位元一致
+  // 4. death 後 reload：官方 golden（78 命令）逐位元一致
   {
     const { scenarioContext, scenarioPage } = await newScenarioPage();
     await openScenario(scenarioPage);
@@ -1050,8 +1289,8 @@ async function main() {
     const after = await readAttrs(scenarioPage);
     verify(
       "death_reload_bit_exact_official51",
-      before.count === 51 &&
-        after.count === 51 &&
+      before.count === EXPECTED_COMMANDS &&
+        after.count === EXPECTED_COMMANDS &&
         after.hash === before.hash &&
         after.head === before.head &&
         after.phase === "death" &&
@@ -1553,7 +1792,7 @@ async function main() {
     await scenarioContext.close();
   }
 
-  // 2. official 51 下載 → 新頁面上傳 → death 逐位元一致
+  // 2. 官方 golden 下載 → 新頁面上傳 → death 逐位元一致
   {
     const source = await newScenarioPage();
     await openScenario(source.scenarioPage);
@@ -1573,7 +1812,7 @@ async function main() {
     const imported = await readAttrs(target.scenarioPage);
     verify(
       "official51_download_fresh_page_upload_death_bit_exact",
-      imported.count === 51 &&
+      imported.count === EXPECTED_COMMANDS &&
         imported.hash === deathAttrs.hash &&
         imported.head === deathAttrs.head &&
         imported.phase === "death",
@@ -1835,6 +2074,7 @@ async function main() {
     checks: allChecks,
     birth: birthReport,
     layout: layoutReport,
+    copy: copyReport,
     perf: {
       boot_required_raw: boot.boot_required_raw,
       boot_required_gzip: boot.boot_required_gzip,

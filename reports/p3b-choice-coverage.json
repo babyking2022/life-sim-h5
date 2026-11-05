@@ -1,0 +1,319 @@
+{
+  "generatedBy": "scripts/p3b-choice-coverage.ts",
+  "lives": 100,
+  "seedPattern": "p3b-choice-000 … p3b-choice-099",
+  "pack": {
+    "events": 77,
+    "decisionEvents": 58,
+    "totalDecisionOptions": 172
+  },
+  "totals": {
+    "commands": 6452,
+    "decisions": 2273,
+    "years": 4179,
+    "yearsPerDecision": 1.839,
+    "averageDecisionsPerLife": 22.73,
+    "averageDeathAge": 41.79
+  },
+  "coverage": {
+    "decisionEventsSeen": 54,
+    "decisionEventsTotal": 58,
+    "decisionEventCoverage": 0.931,
+    "uncoveredDecisionEvents": [
+      "ev.child.school-choice",
+      "ev.senior.housing",
+      "ev.senior.medical",
+      "ev.teen.major-choice"
+    ],
+    "decisionOptionsSeen": 150,
+    "decisionOptionsTotal": 172,
+    "decisionOptionCoverage": 0.872
+  },
+  "reachability": {
+    "census": "0–119 歲逐年建候選（flags=[] 與 flags=全部條件旗標 兩輪）",
+    "reachableDecisionEvents": 58,
+    "reachableWithFlagsOff": 56,
+    "reachableWithFlagsOn": 55,
+    "unreachableDecisionEvents": [],
+    "firstReachableAge": {
+      "ev.adult.after-school": 19,
+      "ev.adult.career-pivot": 31,
+      "ev.adult.children": 31,
+      "ev.adult.elder-care": 40,
+      "ev.adult.finance-start": 23,
+      "ev.adult.first-job": 20,
+      "ev.adult.friend-circle": 23,
+      "ev.adult.further-study": 25,
+      "ev.adult.health-checkup": 35,
+      "ev.adult.housing-buy": 33,
+      "ev.adult.housing-choice": 25,
+      "ev.adult.investment": 31,
+      "ev.adult.kids-school": 36,
+      "ev.adult.midlife-review": 41,
+      "ev.adult.move-city": 21,
+      "ev.adult.network": 31,
+      "ev.adult.relationship": 22,
+      "ev.adult.side-project": 24,
+      "ev.adult.startup": 32,
+      "ev.child.bullying": 10,
+      "ev.child.care-arrangement": 3,
+      "ev.child.chores": 7,
+      "ev.child.competition": 10,
+      "ev.child.family-move": 7,
+      "ev.child.first-friend": 4,
+      "ev.child.friend-conflict": 8,
+      "ev.child.interest-seed": 4,
+      "ev.child.kindergarten": 4,
+      "ev.child.picky-eating": 3,
+      "ev.child.pocket-money": 9,
+      "ev.child.school-choice": 6,
+      "ev.child.screen-time": 3,
+      "ev.child.sleep-routine": 3,
+      "ev.child.sport-team": 8,
+      "ev.child.study-habit": 7,
+      "ev.late.career-change": 51,
+      "ev.late.chronic-care": 51,
+      "ev.late.elder-care": 51,
+      "ev.late.family-time": 51,
+      "ev.late.new-hobby": 55,
+      "ev.late.pension": 51,
+      "ev.senior.daily-health": 66,
+      "ev.senior.grandchildren": 66,
+      "ev.senior.housing": 66,
+      "ev.senior.legacy": 68,
+      "ev.senior.medical": 66,
+      "ev.senior.retirement": 65,
+      "ev.senior.social": 66,
+      "ev.teen.club": 13,
+      "ev.teen.exam-strategy": 17,
+      "ev.teen.family-duty": 14,
+      "ev.teen.first-love": 15,
+      "ev.teen.major-choice": 18,
+      "ev.teen.online-life": 13,
+      "ev.teen.part-time": 16,
+      "ev.teen.risk-invite": 15,
+      "ev.teen.study-plan": 13,
+      "ev.teen.talent": 13
+    },
+    "inconsistentWindows": [],
+    "referencedFlags": [
+      "business:owner",
+      "house:owner",
+      "parent:adopt",
+      "parent:own"
+    ]
+  },
+  "stageDecisions": {
+    "perStageTotals": {
+      "childhood": 494,
+      "adolescence": 242,
+      "adulthood": 1531,
+      "later_life": 6
+    },
+    "averagePerLife": {
+      "childhood": 4.94,
+      "adolescence": 2.42,
+      "adulthood": 15.31,
+      "later_life": 0.06
+    },
+    "decisionEventsPerStage": {
+      "childhood": 16,
+      "adolescence": 10,
+      "adulthood": 26,
+      "later_life": 7
+    }
+  },
+  "gaps": {
+    "yearsBetweenDecisions": [
+      {
+        "years": 1,
+        "count": 1222
+      },
+      {
+        "years": 2,
+        "count": 614
+      },
+      {
+        "years": 3,
+        "count": 225
+      },
+      {
+        "years": 4,
+        "count": 68
+      },
+      {
+        "years": 5,
+        "count": 30
+      },
+      {
+        "years": 6,
+        "count": 9
+      },
+      {
+        "years": 7,
+        "count": 6
+      },
+      {
+        "years": 8,
+        "count": 2
+      }
+    ]
+  },
+  "noDeadEnd": {
+    "proof": [
+      "每個 pending decision 都由 pack 的 decision.options 產生（2–5 個選項），選項沒有條件、也沒有 openDecision 巢狀",
+      "每次 CHOOSE_DECISION 後 phase 必須回到 life 或 death；任何其他 phase 都記為問題",
+      "每條人生都必須在 P3E_MAX_COMMANDS 內抵達 death"
+    ],
+    "problems": []
+  },
+  "ok": true,
+  "samples": [
+    {
+      "seed": "p3b-choice-000",
+      "commands": 35,
+      "decisions": 12,
+      "deathAge": 23,
+      "stageDecisions": {
+        "childhood": 5,
+        "adolescence": 4,
+        "adulthood": 3,
+        "later_life": 0
+      },
+      "decisionsSeen": [
+        "ev.child.picky-eating",
+        "ev.child.chores",
+        "ev.child.pocket-money",
+        "ev.child.friend-conflict",
+        "ev.child.bullying",
+        "ev.teen.club",
+        "ev.teen.family-duty",
+        "ev.teen.online-life",
+        "ev.teen.talent",
+        "ev.adult.after-school",
+        "ev.adult.first-job",
+        "ev.adult.relationship"
+      ]
+    },
+    {
+      "seed": "p3b-choice-001",
+      "commands": 49,
+      "decisions": 16,
+      "deathAge": 33,
+      "stageDecisions": {
+        "childhood": 4,
+        "adolescence": 3,
+        "adulthood": 9,
+        "later_life": 0
+      },
+      "decisionsSeen": [
+        "ev.child.sleep-routine",
+        "ev.child.first-friend",
+        "ev.child.sport-team",
+        "ev.child.bullying",
+        "ev.teen.club",
+        "ev.teen.online-life",
+        "ev.teen.talent",
+        "ev.adult.after-school",
+        "ev.adult.first-job",
+        "ev.adult.relationship",
+        "ev.adult.finance-start",
+        "ev.adult.move-city",
+        "ev.adult.friend-circle",
+        "ev.adult.side-project",
+        "ev.adult.children",
+        "ev.adult.career-pivot"
+      ]
+    },
+    {
+      "seed": "p3b-choice-002",
+      "commands": 15,
+      "decisions": 4,
+      "deathAge": 11,
+      "stageDecisions": {
+        "childhood": 4,
+        "adolescence": 0,
+        "adulthood": 0,
+        "later_life": 0
+      },
+      "decisionsSeen": [
+        "ev.child.interest-seed",
+        "ev.child.chores",
+        "ev.child.family-move",
+        "ev.child.chores"
+      ]
+    },
+    {
+      "seed": "p3b-choice-003",
+      "commands": 40,
+      "decisions": 11,
+      "deathAge": 29,
+      "stageDecisions": {
+        "childhood": 4,
+        "adolescence": 1,
+        "adulthood": 6,
+        "later_life": 0
+      },
+      "decisionsSeen": [
+        "ev.child.kindergarten",
+        "ev.child.family-move",
+        "ev.child.chores",
+        "ev.child.pocket-money",
+        "ev.teen.talent",
+        "ev.adult.after-school",
+        "ev.adult.move-city",
+        "ev.adult.first-job",
+        "ev.adult.friend-circle",
+        "ev.adult.further-study",
+        "ev.adult.finance-start"
+      ]
+    },
+    {
+      "seed": "p3b-choice-004",
+      "commands": 89,
+      "decisions": 33,
+      "deathAge": 56,
+      "stageDecisions": {
+        "childhood": 4,
+        "adolescence": 4,
+        "adulthood": 25,
+        "later_life": 0
+      },
+      "decisionsSeen": [
+        "ev.child.picky-eating",
+        "ev.child.first-friend",
+        "ev.child.sport-team",
+        "ev.child.competition",
+        "ev.teen.talent",
+        "ev.teen.study-plan",
+        "ev.teen.online-life",
+        "ev.teen.family-duty",
+        "ev.adult.after-school",
+        "ev.adult.first-job",
+        "ev.adult.move-city",
+        "ev.adult.relationship",
+        "ev.adult.finance-start",
+        "ev.adult.further-study",
+        "ev.adult.side-project",
+        "ev.adult.friend-circle",
+        "ev.adult.children",
+        "ev.adult.career-pivot",
+        "ev.adult.health-checkup",
+        "ev.adult.housing-buy",
+        "ev.adult.startup",
+        "ev.adult.network",
+        "ev.adult.health-checkup",
+        "ev.adult.children",
+        "ev.adult.kids-school",
+        "ev.adult.health-checkup",
+        "ev.adult.elder-care",
+        "ev.adult.midlife-review",
+        "ev.adult.network",
+        "ev.adult.investment",
+        "ev.late.elder-care",
+        "ev.late.career-change",
+        "ev.late.chronic-care"
+      ]
+    }
+  ]
+}

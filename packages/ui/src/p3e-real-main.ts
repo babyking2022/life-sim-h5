@@ -51,6 +51,11 @@ import { createLifeClock, type Speed } from "./p3e-time-controller.js";
  * - 資料包文案是簡中：UI **只在顯示層**把已知標籤（城鄉／五分之一／住房／宗教／
  *   職業）與出生故事的固定片語轉繁中；姓名、地名等資料值原樣呈現，`fixtures/`、
  *   資料包與 engine 完全不動。
+ * - GPT-0025-D：事件標題／決策問題／選項按鈕的繁中文字由獨立 JSON 資產
+ *   `fixtures/p3b/event-copy.zh-Hant.v1.json`（307 keys）提供，與其他 pack 同批
+ *   `fetch` 載入、驗證通過後才合併進顯示層查表；字典優先於舊 `DISPLAY_TEXT`。
+ *   查不到對照時顯示中性中文而非 internal key；字典載入或驗證失敗則直接顯示
+ *   可理解的啟動錯誤並停在錯誤頁，不讓玩家看到內部代碼。
  */
 
 /* ------------------------------------------------------------------ */
@@ -74,6 +79,9 @@ const PACK_URLS = {
   p2bLineage: new URL("../../../fixtures/p2b/lineage.v1.json", import.meta.url).href,
   p3bManifest: new URL("../../../fixtures/p3b/manifest.v1.json", import.meta.url).href,
   p3bEvents: new URL("../../../fixtures/p3b/events.v1.json", import.meta.url).href,
+  // GPT-0025-D：顯示層繁中字典維持獨立 JSON 資產（new URL + fetch），
+  // 不靜態 import 進主 JS，也不進 P3-B 事件 checksum。
+  p3bEventCopy: new URL("../../../fixtures/p3b/event-copy.zh-Hant.v1.json", import.meta.url).href,
   p3dManifest: new URL("../../../fixtures/p3d/manifest.v1.json", import.meta.url).href,
   p3dCauseRegistry: new URL("../../../fixtures/p3d/cause-registry.v1.json", import.meta.url).href,
   p3dCauseWeights: new URL("../../../fixtures/p3d/cause-weights.v1.json", import.meta.url).href,
@@ -406,6 +414,13 @@ type PersistenceStatus =
 
 let world: P3EBrowserWorld | null = null;
 let session: P3EPlaySession | null = null;
+/**
+ * GPT-0025-D：驗證過的顯示層繁中字典（null-prototype，避免 `__proto__` 之類
+ * 的 key 透過原型鏈查到非字串值）。`loadWorld()` 成功後才有值；
+ * 驗證失敗會直接讓 boot 顯示啟動錯誤，不會默默降到 internal key。
+ */
+let eventCopy: Readonly<Record<string, string>> | null = null;
+let eventCopyKeys = 0;
 let activeTab: TabKey = "life";
 let busy = false;
 let focusAdvanceAfterRender = false;
@@ -562,6 +577,85 @@ function ageStage(age: number): { label: string; icon: string } {
   return { label: "晚年", icon: "🧓" };
 }
 
+/* ------------------------------------------------------------------ */
+/* GPT-0025-D：顯示層文案字典（舊表的補充／覆蓋來源）                      */
+/* ------------------------------------------------------------------ */
+
+const COPY_SCHEMA_VERSION = "p3b-copy-1";
+const COPY_LOCALE = "zh-Hant";
+/** 字典 key 的安全下限：77 個事件 + 58 個問題 + 172 個選項。 */
+const COPY_MIN_KEYS = 307;
+/** 會透過原型鏈污染查表的危險鍵（JSON.parse 仍可能帶進來）。 */
+const DANGEROUS_COPY_KEYS = new Set(["__proto__", "constructor", "prototype"]);
+
+/** 死因 id → 繁中（顯示層對照；資料包與引擎不動）。 */
+const DEATH_CAUSE_TEXT: Readonly<Record<string, string>> = {
+  "cause.neutral.circulatory": "心血管相關疾病",
+  "cause.neutral.respiratory": "呼吸系統相關疾病",
+  "cause.neutral.infection": "感染性疾病",
+  "cause.neutral.neoplasm": "腫瘤相關疾病",
+  "cause.neutral.neurological": "神經系統相關疾病",
+  "cause.neutral.digestive": "消化系統相關疾病",
+  "cause.neutral.external": "意外與外在因素",
+  "cause.neutral.other": "其他健康因素"
+};
+
+function friendlyDeathCause(causeId: string): string {
+  if (Object.prototype.hasOwnProperty.call(DEATH_CAUSE_TEXT, causeId)) {
+    return DEATH_CAUSE_TEXT[causeId] ?? "其他健康因素";
+  }
+  return "其他健康因素";
+}
+
+/** JSON.parse 的結果也須確認是普通物件，不接受陣列／自訂原型。 */
+function isPlainRecord(value: unknown): value is Record<string, unknown> {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) return false;
+  const proto: unknown = Object.getPrototypeOf(value);
+  return proto === Object.prototype || proto === null;
+}
+
+/**
+ * 使用字典前的最小驗證（GPT-0025-D 第 2 項）。任何一項不符就 throw，
+ * 由 `boot()` 統一轉成可理解的啟動錯誤，**不會**讓畫面顯示 internal key。
+ */
+function validateEventCopy(raw: unknown, expectedPackVersion: string): Record<string, string> {
+  if (!isPlainRecord(raw)) {
+    throw new Error("E_P3E_COPY_DOCUMENT：事件文案檔格式錯誤，請重新整理頁面。");
+  }
+  if (raw["schemaVersion"] !== COPY_SCHEMA_VERSION) {
+    throw new Error("E_P3E_COPY_SCHEMA：事件文案版本不相容，請重新整理頁面。");
+  }
+  if (raw["locale"] !== COPY_LOCALE) {
+    throw new Error("E_P3E_COPY_LOCALE：事件文案語系不符，請重新整理頁面。");
+  }
+  if (raw["contentPackVersion"] !== expectedPackVersion) {
+    throw new Error("E_P3E_COPY_PACK：事件文案與事件包版本不符，請重新整理頁面。");
+  }
+  const table: unknown = raw["copy"];
+  if (!isPlainRecord(table)) {
+    throw new Error("E_P3E_COPY_TABLE：事件文案表格式錯誤，請重新整理頁面。");
+  }
+  // null-prototype：查表時 `copy["__proto__"]` 不會命中 Object.prototype。
+  const validated: Record<string, string> = Object.create(null) as Record<string, string>;
+  for (const [key, value] of Object.entries(table)) {
+    if (
+      DANGEROUS_COPY_KEYS.has(key) ||
+      key.length === 0 ||
+      key !== key.trim() ||
+      typeof value !== "string" ||
+      value.trim().length === 0
+    ) {
+      throw new Error("E_P3E_COPY_ENTRY：事件文案含無效欄位，請重新整理頁面。");
+    }
+    validated[key] = value;
+  }
+  if (Object.keys(validated).length < COPY_MIN_KEYS) {
+    throw new Error("E_P3E_COPY_INCOMPLETE：事件文案不完整，請重新整理頁面。");
+  }
+  return validated;
+}
+
+/** 舊的少數硬編碼；字典優先覆蓋／補充，這裡保留作為降級保險。 */
 const DISPLAY_TEXT: Readonly<Record<string, string>> = {
   "ev.adult.burnout": "工作帶來了倦怠感",
   "ev.adult.debt-scare": "債務壓力突然逼近",
@@ -597,10 +691,38 @@ const DISPLAY_TEXT: Readonly<Record<string, string>> = {
   "p3b.option.teen.path.work": "開始工作，累積實務經驗"
 };
 
+/**
+ * 顯示層查表：驗證過的字典 > 舊硬編碼表。
+ *
+ * 字典是 null-prototype，舊表則用 hasOwnProperty 明確檢查，兩者都不會讓
+ * `__proto__`／`constructor` 之類的 key 查到原型鏈上的非字串值。
+ */
 function friendlyKey(value: string): string {
-  const translated = DISPLAY_TEXT[value];
-  if (translated !== undefined) return translated;
-  return value.replace(/^event[._-]?/i, "").replace(/[._-]+/g, " ").trim() || "平凡的一年";
+  const fromCopy = eventCopy === null ? undefined : eventCopy[value];
+  if (typeof fromCopy === "string" && fromCopy.length > 0) return fromCopy;
+  if (Object.prototype.hasOwnProperty.call(DISPLAY_TEXT, value)) {
+    const legacy = DISPLAY_TEXT[value];
+    if (typeof legacy === "string" && legacy.length > 0) return legacy;
+  }
+  const trimmed = value.trim();
+  if (trimmed === "") return "平凡的一年";
+  // 找不到對照時也不把 internal key 外洩到畫面（p3b.／ev.／option.／底線式…）。
+  if (/^[A-Za-z0-9._:-]+$/.test(trimmed)) return "人生的一段插曲";
+  return trimmed.replace(/^event[._-]?/i, "").trim() || "平凡的一年";
+}
+
+/**
+ * CHOOSE_DECISION 的 outcome 只有 `eventId` + `selectedOptionId`，
+ * 但字典的 key 是 `p3b.option.<eventId 去掉 ev.>.<optionId>`；
+ * 這裡純在顯示層組回 labelKey，讓「你已經做出了選擇」也顯示自然繁中。
+ */
+function friendlyChosenOption(outcome: {
+  readonly eventId: string;
+  readonly selectedOptionId: string;
+}): string {
+  const suffix = outcome.eventId.replace(/^ev\./, "");
+  const label = friendlyKey(`p3b.option.${suffix}.${outcome.selectedOptionId}`);
+  return label === "人生的一段插曲" ? "做出了當時的選擇" : label;
 }
 
 /* ------------------------------------------------------------------ */
@@ -797,7 +919,24 @@ async function loadWorld(): Promise<P3EBrowserWorld> {
     data[key] = loaded[index];
   });
 
-  const events = data["p3bEvents"] as { records: unknown[] };
+  const events = data["p3bEvents"] as { records: unknown[]; contentPackVersion?: unknown };
+  const p3bManifest = data["p3bManifest"] as { contentPackVersion?: unknown };
+
+  // GPT-0025-D：同一批載入的繁中字典必須與 P3-B events／manifest 的
+  // contentPackVersion 完全一致，且通過最小驗證後才寫進模組狀態。
+  // 驗證失敗會 throw → boot() 顯示啟動錯誤，不會降到 internal key。
+  const packVersion = p3bManifest?.contentPackVersion;
+  if (
+    typeof packVersion !== "string" ||
+    packVersion.length === 0 ||
+    events?.contentPackVersion !== packVersion
+  ) {
+    throw new Error("E_P3E_COPY_PACK：事件包與 manifest 版本不一致，請重新整理頁面。");
+  }
+  const validatedCopy = validateEventCopy(data["p3bEventCopy"], packVersion);
+  eventCopy = validatedCopy;
+  eventCopyKeys = Object.keys(validatedCopy).length;
+
   return prepareP3EBrowserWorld({
     base: {
       manifest: data["p2aManifest"],
@@ -924,6 +1063,8 @@ function renderBirth(): void {
   const screen = element("main", "p3e-birth-screen");
   screen.dataset["p3eLive"] = "true";
   screen.dataset["p3ePhase"] = "birth";
+  screen.dataset["p3eCopyKeys"] = String(eventCopyKeys);
+  screen.dataset["p3eCopySchema"] = COPY_SCHEMA_VERSION;
   screen.dataset["p3eBirthSeed"] = seed;
   screen.dataset["p3eBirthCertificateHash"] = birth.certificateHash;
   screen.dataset["p3eBirthIdentityHash"] = birth.playerIdentityHash;
@@ -1103,6 +1244,8 @@ function render(): void {
   shell.setAttribute("aria-labelledby", "p3e-title");
   shell.dataset["p3eLive"] = "true";
   shell.dataset["p3ePhase"] = view.phase;
+  shell.dataset["p3eCopyKeys"] = String(eventCopyKeys);
+  shell.dataset["p3eCopySchema"] = COPY_SCHEMA_VERSION;
   shell.dataset["p3eStateHash"] = session.state.stateHash;
   shell.dataset["p3eCommandCount"] = String(session.state.commandLog.count);
   shell.dataset["p3eCommandHead"] = session.state.commandLog.headHash;
@@ -1317,7 +1460,7 @@ function renderLife(view: P3EPlaySession["view"], current: P3EPlaySession): HTML
     story.append(element("strong", "p3e-event-name", eventName));
   } else {
     story.append(element("p", undefined, "你已經做出了選擇。"));
-    story.append(element("strong", "p3e-event-name", friendlyKey(last.selectedOptionId)));
+    story.append(element("strong", "p3e-event-name", friendlyChosenOption(last)));
   }
 
   if (view.phase === "pending_decision" && view.pendingDecision !== null) {
@@ -1328,7 +1471,11 @@ function renderLife(view: P3EPlaySession["view"], current: P3EPlaySession): HTML
     const death = element("div", "p3e-death");
     death.append(element("h3", undefined, "這段人生走到了終點"));
     const deathOutcome = last !== null && last.kind === "advance_year" ? last.death : null;
-    death.append(element("p", undefined, `你活了 ${view.age} 年。${deathOutcome?.causeId === null || deathOutcome?.causeId === undefined ? "" : ` 原因：${friendlyKey(deathOutcome.causeId)}`}`));
+    const causeText =
+      deathOutcome?.causeId === null || deathOutcome?.causeId === undefined
+        ? ""
+        : ` 原因：${friendlyDeathCause(deathOutcome.causeId)}`;
+    death.append(element("p", undefined, `你活了 ${view.age} 年。${causeText}`));
     const again = element("button", "p3e-primary", "重新開始");
     again.type = "button";
     again.dataset["action"] = "rebirth";
@@ -1440,10 +1587,24 @@ function renderBootError(message: string): void {
   const shell = element("main", "p3e-shell");
   shell.dataset["p3eLive"] = "false";
   shell.dataset["p3ePhase"] = "error";
-  const alert = element("p", "p3e-alert", message);
-  alert.setAttribute("role", "alert");
-  alert.setAttribute("aria-live", "assertive");
-  shell.append(element("h1", undefined, "人生模擬"), alert);
+  shell.dataset["p3eCopyKeys"] = String(eventCopyKeys);
+  // GPT-0025-D：文案字典驗證失敗時，明確告訴玩家發生什麼事，
+  // 且停在這裡不進遊戲，避免任何 internal key 被當成文字顯示。
+  const heading = element("p", "p3e-alert", "遊戲啟動失敗：必要的事件文案載入或驗證未通過。為了不讓畫面出現內部代碼，人生還沒有開始。請重新整理頁面再試一次。");
+  heading.id = "p3e-boot-error";
+  heading.setAttribute("role", "alert");
+  heading.setAttribute("aria-live", "assertive");
+  // 詳細資訊也轉成口語中文：不把 E_XXX 或 HTTP 狀態這類技術代碼丟給玩家。
+  const friendlyDetail = message
+    .replace(/^E_[A-Z0-9_]+[:：]\s*/, "")
+    .replace(/^fixture fetch failed:\s*\d+/i, "資料下載失敗")
+    .trim();
+  const detail = element(
+    "p",
+    "p3e-boot-error-detail",
+    friendlyDetail === "" ? "請檢查網路連線後再試一次。" : friendlyDetail
+  );
+  shell.append(element("h1", undefined, "人生模擬"), heading, detail);
   app.replaceChildren(shell);
 }
 

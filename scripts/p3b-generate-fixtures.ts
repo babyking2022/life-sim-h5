@@ -1,6 +1,14 @@
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import type { P3BEventPackManifest, P3BEventRecord, P3BLicenseRecord, P3BLineageRecord } from "@life-sim/contracts";
+import type {
+  P3BCondition,
+  P3BEffect,
+  P3BEventPackManifest,
+  P3BEventRecord,
+  P3BLicenseRecord,
+  P3BLineageRecord,
+  P3BLifeStage
+} from "@life-sim/contracts";
 import {
   P3B_ENGINE_VERSION,
   P3B_EVENT_SPEC_VERSION,
@@ -25,6 +33,8 @@ const OUT_DIR = join(ROOT, "fixtures", "p3b");
 const CREATED_AT = "2026-10-27T00:00:00.000Z";
 const GENERATED_AT = "2026-10-27T00:00:00.000Z";
 const CONTENT_PACK_VERSION = "1.0.0";
+/** 主 pack 在 GPT-0025-A 加入 56 個抉擇事件，內容版本升到 1.1.0（edge pack 不變）。 */
+const MAIN_CONTENT_PACK_VERSION = "1.1.0";
 
 const sourceIdOf = (packId: string) => `${packId}-source`;
 
@@ -380,8 +390,1086 @@ function buildMainEvents(): P3BEventRecord[] {
       contentMode: "guardian",
       conditions: { op: "contentMode", mode: "guardian" },
       effects: [stat("happiness", 1)]
-    })
+    }),
+    /* GPT-0025-A：56 個現實人生抉擇事件（168 個選項）。 */
+    ...buildChoiceEvents()
   ];
+}
+
+/* ------------------------------------------------------------------ */
+/* GPT-0025-A：現實人生抉擇包（choice pack v1）                         */
+/* ------------------------------------------------------------------ */
+
+/**
+ * 56 個現實人生抉擇事件（168 個選項），覆蓋 3–6 歲到 66 歲以上。
+ *
+ * 設計原則：
+ * - 每個選項都必須有**不同的實際後果**（四項屬性、金錢、flags 至少一項不同）；
+ * - 一律 `kind: "decision"`＋`openDecision`，選項效果在 CHOOSE_DECISION 套用；
+ * - `cooldownYears >= 3`（同一事件不會連續刷出），少數人生節點用 `once`；
+ * - `flags` 會影響後續事件是否出現（例如 `business:owner` 之後不再問創業）；
+ * - 權重讓正常遊玩平均每 1–3 年遇到一次選擇（100 條人生實測見結果文件）。
+ *
+ * 文案全部走 `localizationKey`（P3-B 契約禁止把文字寫進事件）；繁中標題／問題／
+ * 按鈕文字寫在獨立的內容映射檔 `fixtures/p3b/event-copy.zh-Hant.v1.json`。
+ */
+
+interface ChoiceOptionSpec {
+  readonly id: string;
+  readonly label: string;
+  readonly effects: readonly P3BEffect[];
+}
+
+interface ChoiceSpec {
+  readonly group: "child" | "teen" | "adult" | "late" | "senior";
+  readonly slug: string;
+  readonly title: string;
+  readonly prompt: string;
+  readonly ageMin: number;
+  readonly ageMax: number;
+  readonly stages: readonly P3BLifeStage[];
+  readonly weight: number;
+  readonly cooldownYears: number;
+  readonly once?: boolean;
+  readonly priority?: number;
+  readonly exclusiveGroup?: string | null;
+  readonly conditions?: P3BCondition | null;
+  readonly options: readonly ChoiceOptionSpec[];
+}
+
+const opt = (id: string, label: string, effects: readonly P3BEffect[]): ChoiceOptionSpec => ({ id, label, effects });
+
+const CHOICE_EVENTS: readonly ChoiceSpec[] = [
+  /* ---------------- 3–6 歲：家庭照顧、幼兒園、興趣啟蒙 ---------------- */
+  {
+    group: "child",
+    slug: "care-arrangement",
+    title: "白天由誰照顧",
+    prompt: "孩子白天主要由誰照顧？",
+    ageMin: 3,
+    ageMax: 4,
+    stages: ["childhood"],
+    weight: 55,
+    cooldownYears: 4,
+    options: [
+      opt("grandparent", "交給祖父母照顧", [stat("relationships", 4), stat("happiness", 1), flag("care:grandparent", "add")]),
+      opt("daycare", "送去托嬰中心", [stat("knowledge", 3), stat("happiness", 1), money("annualExpenseMicroUsd", "6000000000")]),
+      opt("nanny", "請保母到家裡", [stat("happiness", 2), stat("relationships", 1), money("balanceMicroUsd", "-8000000000")])
+    ]
+  },
+  {
+    group: "child",
+    slug: "kindergarten",
+    title: "幼兒園選擇",
+    prompt: "要送孩子去哪一種幼兒園？",
+    ageMin: 4,
+    ageMax: 5,
+    stages: ["childhood"],
+    weight: 60,
+    cooldownYears: 6,
+    options: [
+      opt("public", "離家最近的公立幼兒園", [stat("knowledge", 2), stat("relationships", 2), stat("happiness", 1)]),
+      opt("private", "雙語私立幼兒園", [stat("knowledge", 5), stat("happiness", -1), money("balanceMicroUsd", "-12000000000")]),
+      opt("home", "留在家裡自己帶", [stat("relationships", 3), stat("knowledge", 1), stat("happiness", 2)])
+    ]
+  },
+  {
+    group: "child",
+    slug: "interest-seed",
+    title: "興趣啟蒙",
+    prompt: "想讓孩子先接觸哪一種興趣？",
+    ageMin: 4,
+    ageMax: 6,
+    stages: ["childhood"],
+    weight: 50,
+    cooldownYears: 4,
+    options: [
+      opt("music", "學音樂", [stat("knowledge", 4), stat("happiness", 2), money("balanceMicroUsd", "-6000000000"), flag("hobby:music", "add")]),
+      opt("sport", "學游泳", [stat("health", 5), stat("relationships", 1), flag("hobby:sport", "add")]),
+      opt("free", "讓他自由玩耍", [stat("happiness", 4), stat("health", 1)])
+    ]
+  },
+  {
+    group: "child",
+    slug: "sleep-routine",
+    title: "作息安排",
+    prompt: "孩子的睡覺時間怎麼安排？",
+    ageMin: 3,
+    ageMax: 6,
+    stages: ["childhood"],
+    weight: 45,
+    cooldownYears: 4,
+    options: [
+      opt("early", "固定時間早睡", [stat("health", 5), stat("happiness", 1), flag("habit:sleep", "add")]),
+      opt("play", "陪他玩到想睡", [stat("happiness", 3), stat("health", -3)]),
+      opt("flexible", "看當天狀況調整", [stat("happiness", 1), stat("health", 1), stat("relationships", 1)])
+    ]
+  },
+  {
+    group: "child",
+    slug: "picky-eating",
+    title: "偏食問題",
+    prompt: "孩子挑食的時候，你會怎麼做？",
+    ageMin: 3,
+    ageMax: 5,
+    stages: ["childhood"],
+    weight: 45,
+    cooldownYears: 4,
+    options: [
+      opt("guide", "慢慢引導他嘗試", [stat("health", 3), stat("happiness", 1), stat("relationships", 1)]),
+      opt("force", "規定一定要吃完", [stat("health", 2), stat("happiness", -3), stat("relationships", -1)]),
+      opt("free", "想吃什麼就給他", [stat("happiness", 3), stat("health", -2)])
+    ]
+  },
+  {
+    group: "child",
+    slug: "first-friend",
+    title: "第一個朋友",
+    prompt: "孩子交到第一個朋友，你會怎麼做？",
+    ageMin: 4,
+    ageMax: 6,
+    stages: ["childhood"],
+    weight: 45,
+    cooldownYears: 3,
+    options: [
+      opt("invite", "邀請對方來家裡玩", [stat("relationships", 5), stat("happiness", 2)]),
+      opt("observe", "讓他自己摸索", [stat("knowledge", 2), stat("happiness", -1)]),
+      opt("join", "陪他們一起玩", [stat("relationships", 3), stat("health", 1), stat("happiness", 1)])
+    ]
+  },
+  {
+    group: "child",
+    slug: "screen-time",
+    title: "螢幕時間",
+    prompt: "孩子想看螢幕時，你會怎麼處理？",
+    ageMin: 3,
+    ageMax: 6,
+    stages: ["childhood"],
+    weight: 45,
+    cooldownYears: 3,
+    options: [
+      opt("limited", "訂好每天的時間上限", [stat("health", 3), stat("knowledge", 2), stat("happiness", -1)]),
+      opt("free", "讓他自己看", [stat("happiness", 3), stat("health", -2), stat("knowledge", -1)]),
+      opt("together", "陪他一起看", [stat("relationships", 3), stat("knowledge", 1), stat("happiness", 1)])
+    ]
+  },
+
+  /* ---------------- 7–12 歲：學習、朋友、運動、家庭責任 ---------------- */
+  {
+    group: "child",
+    slug: "study-habit",
+    title: "讀書習慣",
+    prompt: "孩子的讀書習慣要怎麼建立？",
+    ageMin: 7,
+    ageMax: 9,
+    stages: ["childhood"],
+    weight: 50,
+    cooldownYears: 3,
+    options: [
+      opt("daily", "每天固定時間讀書", [stat("knowledge", 6), stat("happiness", -1), flag("habit:study", "add")]),
+      opt("exam", "只在考試前衝刺", [stat("knowledge", 2), stat("happiness", 1)]),
+      opt("play", "邊玩邊學", [stat("knowledge", 3), stat("happiness", 2)])
+    ]
+  },
+  {
+    group: "child",
+    slug: "friend-conflict",
+    title: "朋友吵架",
+    prompt: "孩子跟好朋友吵架了，你會建議他怎麼做？",
+    ageMin: 8,
+    ageMax: 10,
+    stages: ["childhood"],
+    weight: 50,
+    cooldownYears: 3,
+    options: [
+      opt("apologize", "主動道歉", [stat("relationships", 5), stat("happiness", 1)]),
+      opt("ignore", "先冷靜一陣子", [stat("happiness", -2), stat("relationships", -2)]),
+      opt("adult", "找老師和家長幫忙", [stat("relationships", 2), stat("knowledge", 1), stat("happiness", -1)])
+    ]
+  },
+  {
+    group: "child",
+    slug: "sport-team",
+    title: "運動隊",
+    prompt: "要不要讓孩子加入學校的運動隊？",
+    ageMin: 8,
+    ageMax: 11,
+    stages: ["childhood"],
+    weight: 50,
+    cooldownYears: 4,
+    options: [
+      opt("team", "加入球隊", [stat("health", 5), stat("relationships", 3), stat("happiness", 1), money("balanceMicroUsd", "-3000000000")]),
+      opt("solo", "自己練跑就好", [stat("health", 4), stat("happiness", 1)]),
+      opt("none", "不想運動", [stat("happiness", 2), stat("health", -3)])
+    ]
+  },
+  {
+    group: "child",
+    slug: "chores",
+    title: "家事分工",
+    prompt: "家裡的家事要怎麼分配給孩子？",
+    ageMin: 7,
+    ageMax: 11,
+    stages: ["childhood"],
+    weight: 45,
+    cooldownYears: 3,
+    options: [
+      opt("fixed", "固定分擔一部分家事", [stat("relationships", 3), stat("knowledge", 1), stat("happiness", 1)]),
+      opt("paid", "用零用錢交換家事", [stat("relationships", 1), stat("happiness", 1), money("balanceMicroUsd", "1500000000")]),
+      opt("refuse", "讓他專心念書", [stat("knowledge", 2), stat("relationships", -2), stat("happiness", 1)])
+    ]
+  },
+  {
+    group: "child",
+    slug: "pocket-money",
+    title: "零用錢",
+    prompt: "拿到零用錢之後，孩子該怎麼用？",
+    ageMin: 9,
+    ageMax: 12,
+    stages: ["childhood"],
+    weight: 45,
+    cooldownYears: 3,
+    options: [
+      opt("save", "全部存起來", [money("balanceMicroUsd", "4000000000"), stat("knowledge", 2), stat("happiness", -1)]),
+      opt("spend", "買自己想要的東西", [stat("happiness", 4), money("balanceMicroUsd", "-2000000000")]),
+      opt("treat", "請朋友吃東西", [stat("relationships", 4), stat("happiness", 1), money("balanceMicroUsd", "-3000000000")])
+    ]
+  },
+  {
+    group: "child",
+    slug: "competition",
+    title: "比賽機會",
+    prompt: "學校有一個比賽，孩子要參加嗎？",
+    ageMin: 10,
+    ageMax: 12,
+    stages: ["childhood"],
+    weight: 45,
+    cooldownYears: 3,
+    options: [
+      opt("enter", "報名挑戰看看", [stat("knowledge", 3), stat("happiness", 2), stat("health", -1)]),
+      opt("skip", "這次先放棄", [stat("happiness", -3), stat("relationships", -1)]),
+      opt("watch", "當觀眾觀摩", [stat("knowledge", 1), stat("relationships", 2)])
+    ]
+  },
+  {
+    group: "child",
+    slug: "bullying",
+    title: "被同學排擠",
+    prompt: "孩子在學校被同學排擠，你會怎麼做？",
+    ageMin: 10,
+    ageMax: 12,
+    stages: ["childhood"],
+    weight: 40,
+    cooldownYears: 4,
+    options: [
+      opt("tell", "陪他告訴老師和家長", [stat("relationships", 3), stat("happiness", 2), stat("knowledge", 1)]),
+      opt("endure", "要他自己忍下來", [stat("happiness", -5), stat("health", -1)]),
+      opt("fight", "教他直接反擊", [stat("happiness", 1), stat("relationships", -3), stat("health", -1)])
+    ]
+  },
+  {
+    group: "child",
+    slug: "family-move",
+    title: "搬家轉學",
+    prompt: "家裡要搬到別的城市，孩子的學校怎麼安排？",
+    ageMin: 7,
+    ageMax: 12,
+    stages: ["childhood"],
+    weight: 30,
+    cooldownYears: 6,
+    options: [
+      opt("transfer", "跟著一起轉學", [stat("relationships", -3), stat("knowledge", 1), stat("happiness", -1)]),
+      opt("commute", "通勤留在原校", [stat("relationships", 3), stat("health", -2), money("annualExpenseMicroUsd", "4000000000")]),
+      opt("relative", "留在親戚家住", [stat("relationships", -1), stat("happiness", -2), stat("knowledge", 1)])
+    ]
+  },
+
+  /* ---------------- 13–18 歲：升學、社交、風險行為、專長 ---------------- */
+  {
+    group: "teen",
+    slug: "study-plan",
+    title: "讀書計畫",
+    prompt: "國中之後的讀書方式，你想怎麼安排？",
+    ageMin: 13,
+    ageMax: 15,
+    stages: ["adolescence"],
+    weight: 60,
+    cooldownYears: 3,
+    options: [
+      opt("cram", "去補習班跟著進度", [stat("knowledge", 6), stat("happiness", -2), money("annualExpenseMicroUsd", "12000000000")]),
+      opt("self", "自己安排讀書進度", [stat("knowledge", 4), stat("happiness", 1), flag("study:self", "add")]),
+      opt("coast", "先放鬆再說", [stat("knowledge", -2), stat("happiness", 4)])
+    ]
+  },
+  {
+    group: "teen",
+    slug: "club",
+    title: "社團選擇",
+    prompt: "高中社團你想參加哪一個？",
+    ageMin: 13,
+    ageMax: 16,
+    stages: ["adolescence"],
+    weight: 55,
+    cooldownYears: 4,
+    options: [
+      opt("music", "熱音社", [stat("happiness", 4), stat("relationships", 3), flag("club:music", "add")]),
+      opt("code", "程式研究社", [stat("knowledge", 5), stat("happiness", 1), flag("club:code", "add")]),
+      opt("none", "不參加社團", [stat("happiness", -1), stat("knowledge", 1)])
+    ]
+  },
+  {
+    group: "teen",
+    slug: "first-love",
+    title: "初戀",
+    prompt: "你對同班同學心動了，要怎麼做？",
+    ageMin: 15,
+    ageMax: 17,
+    stages: ["adolescence"],
+    weight: 55,
+    cooldownYears: 5,
+    options: [
+      opt("date", "告白，交往看看", [stat("happiness", 5), stat("relationships", 2), stat("knowledge", -1), flag("teen:partner", "add")]),
+      opt("focus", "把心思放回課業", [stat("knowledge", 4), stat("happiness", -2)]),
+      opt("secret", "放在心裡不說", [stat("happiness", 2), stat("knowledge", 1)])
+    ]
+  },
+  {
+    group: "teen",
+    slug: "part-time",
+    title: "打工",
+    prompt: "課餘時間要不要去打工？",
+    ageMin: 16,
+    ageMax: 18,
+    stages: ["adolescence"],
+    weight: 50,
+    cooldownYears: 3,
+    options: [
+      opt("store", "到便利商店打工", [money("balanceMicroUsd", "6000000000"), stat("knowledge", 1), stat("health", -1), flag("teen:earned", "add")]),
+      opt("tutor", "接家教", [money("balanceMicroUsd", "9000000000"), stat("knowledge", 2), stat("happiness", -1)]),
+      opt("none", "專心當學生", [stat("happiness", 2), stat("knowledge", 1)])
+    ]
+  },
+  {
+    group: "teen",
+    slug: "risk-invite",
+    title: "冒險邀約",
+    prompt: "朋友找你去嘗試危險的挑戰，你會怎麼做？",
+    ageMin: 15,
+    ageMax: 18,
+    stages: ["adolescence"],
+    weight: 45,
+    cooldownYears: 4,
+    options: [
+      opt("try", "跟著一起嘗試", [stat("happiness", 5), stat("health", -6), stat("relationships", 2), flag("teen:risky", "add")]),
+      opt("refuse", "直接拒絕", [stat("relationships", -2), stat("health", 2), stat("happiness", -1)]),
+      opt("stop", "勸朋友一起收手", [stat("relationships", 3), stat("happiness", 2), stat("knowledge", 1)])
+    ]
+  },
+  {
+    group: "teen",
+    slug: "exam-strategy",
+    title: "大考策略",
+    prompt: "大考將近，你打算怎麼準備？",
+    ageMin: 17,
+    ageMax: 18,
+    stages: ["adolescence"],
+    weight: 60,
+    cooldownYears: 6,
+    options: [
+      opt("sprint", "全力衝刺", [stat("knowledge", 7), stat("health", -4), stat("happiness", -1)]),
+      opt("balance", "維持作息、穩定複習", [stat("knowledge", 4), stat("health", 1), stat("happiness", 2)]),
+      opt("give-up", "放棄這次大考", [stat("happiness", 3), stat("knowledge", -4)])
+    ]
+  },
+  {
+    group: "teen",
+    slug: "talent",
+    title: "專長養成",
+    prompt: "課外時間你想把力氣放在哪裡？",
+    ageMin: 13,
+    ageMax: 18,
+    stages: ["adolescence"],
+    weight: 50,
+    cooldownYears: 4,
+    options: [
+      opt("instrument", "練樂器", [stat("knowledge", 3), stat("happiness", 3), flag("talent:music", "add")]),
+      opt("sport", "練球", [stat("health", 5), stat("relationships", 2), flag("talent:sport", "add")]),
+      opt("writing", "練寫作", [stat("knowledge", 5), stat("happiness", 1), flag("talent:writing", "add")])
+    ]
+  },
+  {
+    group: "teen",
+    slug: "family-duty",
+    title: "家庭責任",
+    prompt: "家裡需要人手，你會怎麼做？",
+    ageMin: 14,
+    ageMax: 18,
+    stages: ["adolescence"],
+    weight: 45,
+    cooldownYears: 3,
+    options: [
+      opt("siblings", "接下照顧弟妹的工作", [stat("relationships", 5), stat("happiness", -1), stat("health", -1)]),
+      opt("chores", "分擔家事", [stat("relationships", 3), stat("health", -1), stat("happiness", 1)]),
+      opt("self", "先專心自己的事", [stat("happiness", 2), stat("relationships", -3)])
+    ]
+  },
+  {
+    group: "teen",
+    slug: "online-life",
+    title: "網路世界",
+    prompt: "網路上的時間你想怎麼用？",
+    ageMin: 13,
+    ageMax: 17,
+    stages: ["adolescence"],
+    weight: 45,
+    cooldownYears: 3,
+    options: [
+      opt("create", "學剪片和寫作", [stat("knowledge", 5), stat("happiness", 2), flag("online:creator", "add")]),
+      opt("game", "打遊戲放鬆", [stat("happiness", 4), stat("health", -2)]),
+      opt("scroll", "只看別人分享", [stat("happiness", 1), stat("knowledge", 1), stat("health", -1)])
+    ]
+  },
+
+  /* ---------------- 19–30 歲：大學／職訓、求職、搬遷、感情、理財 ---------------- */
+  {
+    group: "adult",
+    slug: "after-school",
+    title: "畢業之後",
+    prompt: "高中畢業後，你想先做什麼？",
+    ageMin: 19,
+    ageMax: 20,
+    stages: ["adulthood"],
+    weight: 70,
+    cooldownYears: 8,
+    options: [
+      opt("university", "繼續升學", [stat("knowledge", 6), money("annualExpenseMicroUsd", "20000000000"), flag("edu:university", "add")]),
+      opt("work", "先出社會工作", [money("annualIncomeMicroUsd", "8000000000"), money("balanceMicroUsd", "4000000000"), stat("knowledge", 1), flag("job:early", "add")]),
+      opt("gap", "給自己一年的空檔", [stat("happiness", 6), stat("knowledge", 2), money("balanceMicroUsd", "-20000000000")])
+    ]
+  },
+  {
+    group: "adult",
+    slug: "first-job",
+    title: "第一份工作",
+    prompt: "第一份正職工作，你會選哪一種？",
+    ageMin: 20,
+    ageMax: 24,
+    stages: ["adulthood"],
+    weight: 65,
+    cooldownYears: 6,
+    options: [
+      opt("corp", "進制度完整的大公司", [money("annualIncomeMicroUsd", "24000000000"), stat("health", -2), flag("job:corp", "add")]),
+      opt("startup", "加入新創團隊", [stat("knowledge", 4), stat("happiness", 1), money("annualIncomeMicroUsd", "12000000000"), flag("job:startup", "add")]),
+      opt("family", "回家裡幫忙", [stat("relationships", 3), stat("happiness", 2), money("annualIncomeMicroUsd", "6000000000"), flag("job:family", "add")])
+    ]
+  },
+  {
+    group: "adult",
+    slug: "move-city",
+    title: "搬到城市",
+    prompt: "工作機會在大城市，你要搬嗎？",
+    ageMin: 21,
+    ageMax: 27,
+    stages: ["adulthood"],
+    weight: 55,
+    cooldownYears: 6,
+    options: [
+      opt("move", "搬到大城市", [money("annualIncomeMicroUsd", "16000000000"), stat("health", -2), stat("happiness", 2), flag("city:moved", "add")]),
+      opt("stay", "留在家鄉", [stat("relationships", 4), stat("health", 1), stat("happiness", 1)]),
+      opt("commute", "通勤兩邊跑", [stat("health", -3), stat("happiness", -1), money("annualIncomeMicroUsd", "6000000000")])
+    ]
+  },
+  {
+    group: "adult",
+    slug: "relationship",
+    title: "感情的下一步",
+    prompt: "交往一段時間了，接下來呢？",
+    ageMin: 22,
+    ageMax: 30,
+    stages: ["adulthood"],
+    weight: 55,
+    cooldownYears: 6,
+    options: [
+      opt("cohabit", "先同居看看", [stat("happiness", 4), stat("relationships", 3), money("annualExpenseMicroUsd", "6000000000"), flag("partner:cohabit", "add")]),
+      opt("marry", "結婚", [stat("relationships", 5), stat("happiness", 4), money("balanceMicroUsd", "-30000000000"), flag("partner:married", "add")]),
+      opt("single", "保持單身", [stat("happiness", 2), money("balanceMicroUsd", "10000000000")])
+    ]
+  },
+  {
+    group: "adult",
+    slug: "finance-start",
+    title: "開始理財",
+    prompt: "有了穩定收入之後，錢要怎麼安排？",
+    ageMin: 23,
+    ageMax: 30,
+    stages: ["adulthood"],
+    weight: 55,
+    cooldownYears: 4,
+    options: [
+      opt("save", "每月固定存錢", [money("balanceMicroUsd", "12000000000"), stat("knowledge", 3), stat("happiness", -1)]),
+      opt("invest", "開始學習投資", [money("balanceMicroUsd", "6000000000"), stat("knowledge", 4), stat("happiness", 1), flag("finance:invest", "add")]),
+      opt("spend", "先享受生活", [stat("happiness", 5), money("balanceMicroUsd", "-8000000000")])
+    ]
+  },
+  {
+    group: "adult",
+    slug: "side-project",
+    title: "副業",
+    prompt: "下班後的時間要拿來做副業嗎？",
+    ageMin: 24,
+    ageMax: 30,
+    stages: ["adulthood"],
+    weight: 50,
+    cooldownYears: 5,
+    options: [
+      opt("launch", "開始經營副業", [money("annualIncomeMicroUsd", "8000000000"), stat("health", -2), stat("happiness", 3), flag("side:business", "add")]),
+      opt("focus", "專注本業", [money("annualIncomeMicroUsd", "6000000000"), stat("knowledge", 3)]),
+      opt("rest", "好好休息", [stat("health", 4), stat("happiness", 3)])
+    ]
+  },
+  {
+    group: "adult",
+    slug: "further-study",
+    title: "進修",
+    prompt: "工作幾年之後，要不要再進修？",
+    ageMin: 25,
+    ageMax: 30,
+    stages: ["adulthood"],
+    weight: 45,
+    cooldownYears: 8,
+    options: [
+      opt("master", "去讀研究所", [stat("knowledge", 7), money("balanceMicroUsd", "-25000000000"), flag("edu:master", "add")]),
+      opt("online", "上線上課程", [stat("knowledge", 4), money("balanceMicroUsd", "-3000000000")]),
+      opt("none", "先不進修", [stat("happiness", 2), money("balanceMicroUsd", "2000000000")])
+    ]
+  },
+  {
+    group: "adult",
+    slug: "friend-circle",
+    title: "朋友圈",
+    prompt: "出社會之後，朋友關係要怎麼維持？",
+    ageMin: 23,
+    ageMax: 30,
+    stages: ["adulthood"],
+    weight: 45,
+    cooldownYears: 3,
+    options: [
+      opt("regular", "固定聚會", [stat("relationships", 5), stat("happiness", 2), money("balanceMicroUsd", "-2000000000")]),
+      opt("busy", "各忙各的", [stat("happiness", -2), stat("relationships", -2), money("balanceMicroUsd", "1000000000")]),
+      opt("club", "參加社團認識新朋友", [stat("relationships", 4), stat("knowledge", 1), stat("happiness", 1)])
+    ]
+  },
+
+  /* ---------------- 31–50 歲：職涯、創業、家庭、住房、健康 ---------------- */
+  {
+    group: "adult",
+    slug: "career-pivot",
+    title: "轉職",
+    prompt: "同一個領域做久了，要轉職嗎？",
+    ageMin: 31,
+    ageMax: 40,
+    stages: ["adulthood"],
+    weight: 60,
+    cooldownYears: 6,
+    options: [
+      opt("pivot", "轉行重新開始", [stat("knowledge", 4), stat("happiness", 2), money("annualIncomeMicroUsd", "8000000000"), flag("career:pivot", "add")]),
+      opt("stay", "留在原職", [money("annualIncomeMicroUsd", "10000000000"), stat("happiness", -2), stat("health", -1)]),
+      opt("wait", "先觀察一年", [stat("knowledge", 2), stat("happiness", 1)])
+    ]
+  },
+  {
+    group: "adult",
+    slug: "startup",
+    title: "創業",
+    prompt: "有人找你一起創業，你要加入嗎？",
+    ageMin: 32,
+    ageMax: 45,
+    stages: ["adulthood"],
+    weight: 55,
+    cooldownYears: 8,
+    conditions: { op: "not", condition: { op: "flag", flag: "business:owner", present: true } },
+    options: [
+      opt("start", "自己出來創業", [money("annualIncomeMicroUsd", "20000000000"), money("balanceMicroUsd", "-40000000000"), stat("health", -4), stat("happiness", 3), flag("business:owner", "add")]),
+      opt("partner", "跟朋友合夥", [money("annualIncomeMicroUsd", "12000000000"), stat("relationships", -2), stat("happiness", 2), flag("business:partner", "add")]),
+      opt("none", "留在原本的工作", [money("annualIncomeMicroUsd", "4000000000"), stat("happiness", 1)])
+    ]
+  },
+  {
+    group: "adult",
+    slug: "children",
+    title: "生養孩子",
+    prompt: "要不要有孩子？",
+    ageMin: 31,
+    ageMax: 42,
+    stages: ["adulthood"],
+    weight: 55,
+    cooldownYears: 10,
+    conditions: {
+      op: "not",
+      condition: { op: "any", conditions: [{ op: "flag", flag: "parent:own", present: true }, { op: "flag", flag: "parent:adopt", present: true }] }
+    },
+    options: [
+      opt("own", "生一個孩子", [stat("relationships", 6), stat("happiness", 4), money("annualExpenseMicroUsd", "15000000000"), flag("parent:own", "add")]),
+      opt("adopt", "領養孩子", [stat("relationships", 5), stat("happiness", 4), money("annualExpenseMicroUsd", "10000000000"), flag("parent:adopt", "add")]),
+      opt("none", "不生小孩", [stat("happiness", 2), money("balanceMicroUsd", "20000000000")])
+    ]
+  },
+  {
+    group: "adult",
+    slug: "housing-buy",
+    title: "買房",
+    prompt: "存到一筆錢了，要買房嗎？",
+    ageMin: 33,
+    ageMax: 45,
+    stages: ["adulthood"],
+    weight: 55,
+    cooldownYears: 10,
+    conditions: { op: "not", condition: { op: "flag", flag: "house:owner", present: true } },
+    options: [
+      opt("buy", "貸款買房", [money("balanceMicroUsd", "-150000000000"), stat("happiness", 5), stat("health", -2), flag("house:owner", "add")]),
+      opt("rent", "繼續租屋", [stat("happiness", -1), money("balanceMicroUsd", "30000000000")]),
+      opt("suburb", "搬到郊區", [stat("health", 2), stat("happiness", 3), money("balanceMicroUsd", "-6000000000"), flag("house:suburb", "add")])
+    ]
+  },
+  {
+    group: "adult",
+    slug: "health-checkup",
+    title: "健康檢查",
+    prompt: "身體開始出現小毛病，要怎麼處理？",
+    ageMin: 35,
+    ageMax: 50,
+    stages: ["adulthood"],
+    weight: 50,
+    cooldownYears: 4,
+    options: [
+      opt("regular", "每年定期檢查", [stat("health", 6), money("balanceMicroUsd", "-5000000000"), flag("health:checked", "add")]),
+      opt("symptom", "不舒服才去看醫生", [stat("health", -1), stat("happiness", 1), money("balanceMicroUsd", "1000000000")]),
+      opt("never", "完全不做檢查", [stat("health", -4), stat("happiness", 2)])
+    ]
+  },
+  {
+    group: "adult",
+    slug: "elder-care",
+    title: "照顧長輩",
+    prompt: "父母年紀大了，照顧方式怎麼安排？",
+    ageMin: 40,
+    ageMax: 50,
+    stages: ["adulthood"],
+    weight: 50,
+    cooldownYears: 6,
+    options: [
+      opt("live", "接來一起住", [stat("relationships", 5), stat("health", -3), stat("happiness", -1), money("annualExpenseMicroUsd", "6000000000")]),
+      opt("nurse", "請看護協助", [money("balanceMicroUsd", "-15000000000"), stat("relationships", 2), stat("health", 1)]),
+      opt("share", "兄弟姊妹輪流照顧", [stat("relationships", 3), money("balanceMicroUsd", "-4000000000"), stat("happiness", 1)])
+    ]
+  },
+  {
+    group: "adult",
+    slug: "kids-school",
+    title: "孩子上學",
+    prompt: "孩子上學之後，學習要怎麼安排？",
+    ageMin: 36,
+    ageMax: 48,
+    stages: ["adulthood"],
+    weight: 45,
+    cooldownYears: 5,
+    conditions: {
+      op: "any",
+      conditions: [{ op: "flag", flag: "parent:own", present: true }, { op: "flag", flag: "parent:adopt", present: true }]
+    },
+    options: [
+      opt("tutor", "送去補習", [stat("knowledge", 2), money("balanceMicroUsd", "-8000000000"), stat("happiness", -1), stat("relationships", 1)]),
+      opt("accompany", "陪著一起學習", [stat("relationships", 5), stat("happiness", 3), stat("knowledge", 2)]),
+      opt("free", "讓他自己摸索", [stat("happiness", 1), stat("relationships", -2), stat("knowledge", 1)])
+    ]
+  },
+  {
+    group: "adult",
+    slug: "midlife-review",
+    title: "中年檢視",
+    prompt: "工作與生活開始拉扯，你要怎麼調整？",
+    ageMin: 41,
+    ageMax: 50,
+    stages: ["adulthood"],
+    weight: 50,
+    cooldownYears: 6,
+    options: [
+      opt("reduce", "減少工時", [stat("health", 4), stat("happiness", 4), money("balanceMicroUsd", "-12000000000")]),
+      opt("push", "再拚一次升遷", [money("annualIncomeMicroUsd", "16000000000"), stat("health", -4), stat("happiness", -1)]),
+      opt("keep", "維持現狀", [stat("happiness", 1), stat("health", -1)])
+    ]
+  },
+  {
+    group: "adult",
+    slug: "investment",
+    title: "投資方式",
+    prompt: "手上有一筆閒錢，要怎麼投資？",
+    ageMin: 31,
+    ageMax: 50,
+    stages: ["adulthood"],
+    weight: 45,
+    cooldownYears: 5,
+    options: [
+      opt("dollar", "定期定額", [money("balanceMicroUsd", "20000000000"), stat("knowledge", 4)]),
+      opt("leverage", "槓桿操作", [money("balanceMicroUsd", "-30000000000"), stat("happiness", 3), stat("health", -2)]),
+      opt("none", "只放定存", [money("balanceMicroUsd", "10000000000"), stat("happiness", -1)])
+    ]
+  },
+  {
+    group: "adult",
+    slug: "network",
+    title: "人脈經營",
+    prompt: "同事邀你参加產業聚會，你要去嗎？",
+    ageMin: 31,
+    ageMax: 50,
+    stages: ["adulthood"],
+    weight: 45,
+    cooldownYears: 4,
+    options: [
+      opt("invest", "花時間經營人脈", [stat("relationships", 5), stat("knowledge", 2), money("balanceMicroUsd", "-4000000000")]),
+      opt("close", "只跟知己往來", [stat("relationships", 3), stat("happiness", 2)]),
+      opt("alone", "不特別社交", [stat("relationships", -3), stat("happiness", -1), stat("knowledge", 1)])
+    ]
+  },
+
+  /* ---------------- 51–64 歲：照顧家人、轉職、投資、健康 ---------------- */
+  {
+    group: "late",
+    slug: "career-change",
+    title: "轉換跑道",
+    prompt: "接近退休，還想換一次跑道嗎？",
+    ageMin: 51,
+    ageMax: 64,
+    stages: ["adulthood"],
+    weight: 50,
+    cooldownYears: 8,
+    options: [
+      opt("change", "換去做真正喜歡的事", [stat("knowledge", 3), stat("happiness", 4), money("balanceMicroUsd", "-9000000000")]),
+      opt("stay", "撐到退休", [money("annualIncomeMicroUsd", "8000000000"), stat("health", -3), stat("happiness", -2)]),
+      opt("semi", "轉成兼職", [stat("health", 3), stat("happiness", 3), money("balanceMicroUsd", "-12000000000")])
+    ]
+  },
+  {
+    group: "late",
+    slug: "elder-care",
+    title: "長輩照護",
+    prompt: "長輩的狀況變差了，照護怎麼安排？",
+    ageMin: 51,
+    ageMax: 64,
+    stages: ["adulthood"],
+    weight: 50,
+    cooldownYears: 6,
+    options: [
+      opt("self", "親自照顧", [stat("relationships", 5), stat("health", -4), stat("happiness", -1)]),
+      opt("hire", "請外籍看護", [money("balanceMicroUsd", "-20000000000"), stat("relationships", 3), stat("health", 1)]),
+      opt("facility", "送到安養機構", [money("balanceMicroUsd", "-15000000000"), stat("relationships", 1), stat("happiness", -2)])
+    ]
+  },
+  {
+    group: "late",
+    slug: "pension",
+    title: "退休金準備",
+    prompt: "退休金要怎麼準備？",
+    ageMin: 51,
+    ageMax: 64,
+    stages: ["adulthood"],
+    weight: 50,
+    cooldownYears: 6,
+    options: [
+      opt("safe", "保守存退休金", [money("balanceMicroUsd", "30000000000"), stat("health", 1), flag("pension:safe", "add")]),
+      opt("risky", "積極投資", [money("balanceMicroUsd", "15000000000"), stat("happiness", 2), stat("health", -3)]),
+      opt("none", "走一步算一步", [stat("happiness", 3), money("balanceMicroUsd", "-20000000000")])
+    ]
+  },
+  {
+    group: "late",
+    slug: "chronic-care",
+    title: "慢性病",
+    prompt: "檢查出慢性病，你會怎麼面對？",
+    ageMin: 51,
+    ageMax: 64,
+    stages: ["adulthood"],
+    weight: 50,
+    cooldownYears: 5,
+    options: [
+      opt("treat", "規律回診治療", [stat("health", 5), money("balanceMicroUsd", "-8000000000")]),
+      opt("folk", "試試親友介紹的偏方", [stat("health", -4), stat("happiness", 2), money("balanceMicroUsd", "-3000000000")]),
+      opt("ignore", "當作沒事", [stat("health", -6), stat("happiness", -1)])
+    ]
+  },
+  {
+    group: "late",
+    slug: "family-time",
+    title: "家庭時間",
+    prompt: "工作與家人時間衝突，你要怎麼選？",
+    ageMin: 51,
+    ageMax: 64,
+    stages: ["adulthood"],
+    weight: 45,
+    cooldownYears: 4,
+    options: [
+      opt("more", "多陪家人", [stat("relationships", 6), stat("happiness", 4), money("balanceMicroUsd", "-7500000000")]),
+      opt("overtime", "繼續加班", [money("annualIncomeMicroUsd", "10000000000"), stat("health", -3), stat("relationships", -2)]),
+      opt("separate", "各過各的", [stat("happiness", -2), stat("relationships", -3)])
+    ]
+  },
+  {
+    group: "late",
+    slug: "new-hobby",
+    title: "新的興趣",
+    prompt: "空出來的時間想做什麼？",
+    ageMin: 55,
+    ageMax: 64,
+    stages: ["adulthood"],
+    weight: 45,
+    cooldownYears: 4,
+    options: [
+      opt("learn", "學一項新技能", [stat("knowledge", 5), stat("happiness", 3), money("balanceMicroUsd", "-4000000000")]),
+      opt("travel", "到處旅行", [stat("happiness", 5), stat("health", 1), money("balanceMicroUsd", "-12000000000")]),
+      opt("home", "待在家裡", [stat("health", 1), stat("happiness", -2)])
+    ]
+  },
+
+  /* ---------------- 66 歲以上：退休、居住、醫療、傳承與社交 ---------------- */
+  {
+    group: "senior",
+    slug: "retirement",
+    title: "退休決定",
+    prompt: "什麼時候要真正退休？",
+    ageMin: 65,
+    ageMax: 75,
+    stages: ["later_life"],
+    weight: 55,
+    cooldownYears: 12,
+    options: [
+      opt("full", "完全退休", [stat("health", 4), stat("happiness", 3), money("balanceMicroUsd", "-9000000000"), flag("retired", "add")]),
+      opt("keep", "繼續工作", [money("annualIncomeMicroUsd", "8000000000"), stat("health", -4), flag("working:senior", "add")]),
+      opt("part", "轉成兼職", [money("annualIncomeMicroUsd", "3000000000"), stat("happiness", 2), stat("health", 1)])
+    ]
+  },
+  {
+    group: "senior",
+    slug: "housing",
+    title: "老後居住",
+    prompt: "年紀大了，居住安排怎麼選？",
+    ageMin: 66,
+    ageMax: 85,
+    stages: ["later_life"],
+    weight: 50,
+    cooldownYears: 8,
+    options: [
+      opt("care", "住進養護機構", [stat("health", 3), stat("relationships", 2), money("balanceMicroUsd", "-20000000000"), flag("senior:care", "add")]),
+      opt("family", "與子女同住", [stat("relationships", 4), stat("happiness", 2), flag("senior:family", "add")]),
+      opt("alone", "維持獨居", [stat("happiness", -2), stat("health", -2), money("balanceMicroUsd", "5000000000")])
+    ]
+  },
+  {
+    group: "senior",
+    slug: "medical",
+    title: "醫療選擇",
+    prompt: "醫生說需要長期治療，你要怎麼決定？",
+    ageMin: 66,
+    ageMax: 100,
+    stages: ["later_life"],
+    weight: 50,
+    cooldownYears: 5,
+    options: [
+      opt("aggressive", "積極治療", [stat("health", 4), money("balanceMicroUsd", "-15000000000")]),
+      opt("hospice", "選擇安寧照護", [stat("happiness", 3), stat("health", -2)]),
+      opt("natural", "順其自然", [stat("happiness", 1), stat("health", -3)])
+    ]
+  },
+  {
+    group: "senior",
+    slug: "legacy",
+    title: "傳承安排",
+    prompt: "身後的事，你想怎麼安排？",
+    ageMin: 68,
+    ageMax: 95,
+    stages: ["later_life"],
+    weight: 45,
+    cooldownYears: 10,
+    options: [
+      opt("will", "立好遺囑", [stat("relationships", 4), stat("happiness", 3), stat("knowledge", 2)]),
+      opt("talk", "跟家人交代後事", [stat("relationships", 3), stat("happiness", 2)]),
+      opt("avoid", "避而不談", [stat("happiness", -2), stat("relationships", -1)])
+    ]
+  },
+  {
+    group: "senior",
+    slug: "social",
+    title: "社交生活",
+    prompt: "退休後的社交生活要怎麼安排？",
+    ageMin: 66,
+    ageMax: 100,
+    stages: ["later_life"],
+    weight: 45,
+    cooldownYears: 4,
+    options: [
+      opt("community", "參加社區活動", [stat("relationships", 5), stat("happiness", 3), stat("health", 1)]),
+      opt("old-friends", "跟老朋友聚會", [stat("relationships", 4), stat("happiness", 2)]),
+      opt("alone", "享受獨處", [stat("happiness", 2), stat("relationships", -3)])
+    ]
+  },
+  {
+    group: "senior",
+    slug: "grandchildren",
+    title: "孫輩陪伴",
+    prompt: "子女希望你幫忙帶孫子，你的想法是？",
+    ageMin: 66,
+    ageMax: 90,
+    stages: ["later_life"],
+    weight: 45,
+    cooldownYears: 5,
+    conditions: {
+      op: "any",
+      conditions: [{ op: "flag", flag: "parent:own", present: true }, { op: "flag", flag: "parent:adopt", present: true }]
+    },
+    options: [
+      opt("often", "常常幫忙帶", [stat("relationships", 5), stat("happiness", 2), stat("health", -3)]),
+      opt("sometimes", "偶爾幫忙", [stat("relationships", 3), stat("happiness", 2)]),
+      opt("decline", "不插手", [stat("happiness", 1), stat("relationships", -2)])
+    ]
+  },
+  {
+    group: "senior",
+    slug: "daily-health",    title: "日常保健",
+    prompt: "每天的體力要怎麼維持？",
+    ageMin: 66,
+    ageMax: 110,
+    stages: ["later_life"],
+    weight: 45,
+    cooldownYears: 3,
+    options: [
+      opt("walk", "每天散步", [stat("health", 5), stat("happiness", 1)]),
+      opt("gym", "上健身房", [stat("health", 4), money("balanceMicroUsd", "-6000000000")]),
+      opt("still", "能不動就不動", [stat("health", -3), stat("happiness", 2)])
+    ]
+  }
+];
+
+/** 既有 22 個事件的繁中文案（與 `packages/ui/src/p3e-real-main.ts` 目前的對照一致）。 */
+const LEGACY_COPY: Readonly<Record<string, string>> = {
+  "ev.adult.burnout": "工作帶來了倦怠感",
+  "ev.adult.debt-scare": "債務壓力突然逼近",
+  "ev.adult.first-salary": "領到人生第一份薪水",
+  "ev.adult.housing-choice": "面臨居住安排的重要選擇",
+  "ev.adult.promotion": "在工作上獲得晉升",
+  "ev.adult.volunteer": "參加了一次志工活動",
+  "ev.any.quiet-year": "平靜地度過了一年",
+  "ev.any.setback": "遇到了一次挫折",
+  "ev.any.small-win": "收穫了一個小小的成功",
+  "ev.child.first-word": "說出了人生第一句話",
+  "ev.child.playground": "在遊樂場交到了新朋友",
+  "ev.child.school-choice": "面臨入學方式的選擇",
+  "ev.child.sibling-arrives": "家裡迎來了新的手足",
+  "ev.child.tantrum": "因為不順心而大哭了一場",
+  "ev.guardian.calm": "在家人的照顧下平靜成長",
+  "ev.senior.health-check": "完成了一次健康檢查",
+  "ev.senior.reflection": "回望自己走過的人生",
+  "ev.teen.exams": "迎來了一場重要考試",
+  "ev.teen.friendship": "交到了一位知心朋友",
+  "ev.teen.major-choice": "面臨未來方向的重要選擇",
+  "ev.teen.part-time-job": "開始了人生第一份打工",
+  "ev.teen.risk-experiment": "嘗試了一次冒險",
+  "p3b.decision.adult.housing": "你要怎麼安排接下來的住處？",
+  "p3b.decision.child.school": "你希望選擇哪一種學習方式？",
+  "p3b.decision.teen.path": "高中階段結束了，下一步要怎麼走？",
+  "p3b.option.adult.housing.rent": "先租房，換取自己的生活空間",
+  "p3b.option.adult.housing.save": "暫時不搬，把錢存下來",
+  "p3b.option.child.school.bold": "選擇更多元、充滿挑戰的學習環境",
+  "p3b.option.child.school.steady": "選擇穩定、按部就班的學習環境",
+  "p3b.option.teen.path.rest": "先休息一年，重新思考方向",
+  "p3b.option.teen.path.study": "繼續升學，累積知識",
+  "p3b.option.teen.path.work": "開始工作，累積實務經驗"
+};
+
+/** 事件 id／localizationKey 的固定推導（generator 與內容映射檔共用）。 */
+function choiceIds(spec: ChoiceSpec): {
+  readonly eventId: string;
+  readonly decisionId: string;
+  readonly localizationKey: string;
+  readonly promptKey: string;
+  readonly optionKeys: readonly string[];
+} {
+  const base = `${spec.group}.${spec.slug}`;
+  return {
+    eventId: `ev.${base}`,
+    decisionId: `dec.${base}`,
+    localizationKey: `p3b.event.${spec.group}.${spec.slug.replaceAll("-", "_")}`,
+    promptKey: `p3b.decision.${base}`,
+    optionKeys: spec.options.map((option) => `p3b.option.${base}.${option.id}`)
+  };
+}
+
+function buildChoiceEvents(): P3BEventRecord[] {
+  const sourceId = sourceIdOf("p3b-synthetic-events-v1");
+  const event = makeEventFactory(sourceId);
+  return CHOICE_EVENTS.map((spec) => {
+    const ids = choiceIds(spec);
+    return event({
+      eventId: ids.eventId,
+      kind: "decision",
+      localizationKey: ids.localizationKey,
+      ageMin: spec.ageMin,
+      ageMax: spec.ageMax,
+      lifeStages: spec.stages,
+      weight: spec.weight,
+      priority: spec.priority ?? 0,
+      once: spec.once ?? false,
+      cooldownYears: spec.cooldownYears,
+      exclusiveGroup: spec.exclusiveGroup ?? null,
+      conditions: spec.conditions ?? null,
+      contentMode: "guardian",
+      effects: [{ type: "openDecision", decisionId: ids.decisionId }],
+      decision: {
+        decisionId: ids.decisionId,
+        promptKey: ids.promptKey,
+        options: spec.options.map((option, index) => ({
+          optionId: option.id,
+          labelKey: ids.optionKeys[index] as string,
+          effects: [...option.effects]
+        }))
+      }
+    });
+  });
+}
+
+/** 內容映射檔：locale → { key → 可顯示文字 }；key 與 UI 既有的 DISPLAY_TEXT 完全同構。 */
+function buildCopyDocument(): {
+  readonly schemaVersion: string;
+  readonly locale: string;
+  readonly contentPackVersion: string;
+  readonly note: string;
+  readonly eventCount: number;
+  readonly decisionCount: number;
+  readonly optionCount: number;
+  readonly copy: Readonly<Record<string, string>>;
+} {
+  const copy: Record<string, string> = { ...LEGACY_COPY };
+  let optionCount = Object.keys(LEGACY_COPY).filter((key) => key.startsWith("p3b.option.")).length;
+  for (const spec of CHOICE_EVENTS) {
+    const ids = choiceIds(spec);
+    copy[ids.eventId] = spec.title;
+    copy[ids.promptKey] = spec.prompt;
+    ids.optionKeys.forEach((key, index) => {
+      copy[key] = spec.options[index]?.label as string;
+      optionCount += 1;
+    });
+  }
+  const sorted: Record<string, string> = {};
+  for (const key of Object.keys(copy).sort()) sorted[key] = copy[key] as string;
+  return {
+    schemaVersion: "p3b-copy-1",
+    locale: "zh-Hant",
+    contentPackVersion: MAIN_CONTENT_PACK_VERSION,
+    note:
+      "顯示層文案對照（不是事件包資料、不進 events checksum）。UI 可把它當成 DISPLAY_TEXT 的完整替代：key 是 eventId／promptKey／labelKey。",
+    eventCount: CHOICE_EVENTS.length,
+    decisionCount: CHOICE_EVENTS.length,
+    optionCount,
+    copy: sorted
+  };
 }
 
 interface BuiltPack {
@@ -392,8 +1480,17 @@ interface BuiltPack {
   readonly events: readonly P3BEventRecord[];
 }
 
-function buildPack(packId: string, manifestFileName: string, eventsFileName: string, events: readonly P3BEventRecord[]): BuiltPack {
-  const sorted = [...events].sort((left, right) => (left.eventId < right.eventId ? -1 : left.eventId > right.eventId ? 1 : 0));
+function buildPack(
+  packId: string,
+  manifestFileName: string,
+  eventsFileName: string,
+  events: readonly P3BEventRecord[],
+  contentVersion: string
+): BuiltPack {
+  const sorted = [...events]
+    .sort((left, right) => (left.eventId < right.eventId ? -1 : left.eventId > right.eventId ? 1 : 0))
+    // 每筆事件的 contentPackVersion 必須等於 manifest 的；作者程式只寫 1.0.0，這裡統一蓋章。
+    .map((event) => ({ ...event, contentPackVersion: contentVersion }));
   const eventsChecksum = computeEventsChecksum(sorted);
   const sourceId = sourceIdOf(packId);
   const license: P3BLicenseRecord = {
@@ -403,7 +1500,7 @@ function buildPack(packId: string, manifestFileName: string, eventsFileName: str
     sourceKind: "synthetic",
     sourceName: "life-sim synthetic generator",
     sourceUrl: null,
-    version: CONTENT_PACK_VERSION,
+    version: contentVersion,
     retrievedAt: CREATED_AT,
     license: "granted",
     licenseId: "synthetic-generated",
@@ -429,7 +1526,7 @@ function buildPack(packId: string, manifestFileName: string, eventsFileName: str
   const manifestWithoutChecksum: P3BEventPackManifest = {
     schemaVersion: P3B_SCHEMA_VERSION,
     eventSpecVersion: P3B_EVENT_SPEC_VERSION,
-    contentPackVersion: CONTENT_PACK_VERSION,
+    contentPackVersion: contentVersion,
     eventPackId: packId,
     packKind: "synthetic",
     createdAt: CREATED_AT,
@@ -451,7 +1548,12 @@ function writePack(pack: BuiltPack): void {
   writeFileSync(
     join(OUT_DIR, pack.eventsFileName),
     `${JSON.stringify(
-      { schemaVersion: P3B_SCHEMA_VERSION, contentPackVersion: CONTENT_PACK_VERSION, dataset: "events", records: pack.events },
+      {
+        schemaVersion: P3B_SCHEMA_VERSION,
+        contentPackVersion: pack.manifest.contentPackVersion,
+        dataset: "events",
+        records: pack.events
+      },
       null,
       2
     )}\n`,
@@ -461,17 +1563,49 @@ function writePack(pack: BuiltPack): void {
 
 function main(): void {
   mkdirSync(OUT_DIR, { recursive: true });
-  const main = buildPack("p3b-synthetic-events-v1", "manifest.v1.json", "events.v1.json", buildMainEvents());
-  const edge = buildPack("p3b-synthetic-edges-v1", "edge-manifest.v1.json", "edge-events.v1.json", buildEdgeEvents());
+  const main = buildPack(
+    "p3b-synthetic-events-v1",
+    "manifest.v1.json",
+    "events.v1.json",
+    buildMainEvents(),
+    MAIN_CONTENT_PACK_VERSION
+  );
+  const edge = buildPack(
+    "p3b-synthetic-edges-v1",
+    "edge-manifest.v1.json",
+    "edge-events.v1.json",
+    buildEdgeEvents(),
+    CONTENT_PACK_VERSION
+  );
   writePack(main);
   writePack(edge);
+
+  // 顯示層文案映射檔（不是事件包資料，不進 checksum；UI 整合介面見結果文件）。
+  const copyDocument = buildCopyDocument();
+  writeFileSync(join(OUT_DIR, "event-copy.zh-Hant.v1.json"), `${JSON.stringify(copyDocument, null, 2)}\n`, "utf8");
 
   const reloaded = JSON.parse(readFileSync(join(OUT_DIR, "manifest.v1.json"), "utf8")) as P3BEventPackManifest;
   if (reloaded.packChecksum !== main.manifest.packChecksum) throw new Error("manifest roundtrip mismatch");
   const eventsFile = JSON.parse(readFileSync(join(OUT_DIR, "events.v1.json"), "utf8")) as { records: unknown[] };
   if (eventsFile.records.length !== main.events.length) throw new Error("events file mismatch");
+  const copyReloaded = JSON.parse(readFileSync(join(OUT_DIR, "event-copy.zh-Hant.v1.json"), "utf8")) as {
+    copy: Record<string, string>;
+  };
+  const decisionCount = main.events.filter((event) => event.kind === "decision").length;
+  const optionCount = main.events.reduce((sum, event) => sum + (event.decision?.options.length ?? 0), 0);
+  const missingCopy: string[] = [];
+  for (const event of main.events) {
+    if (copyReloaded.copy[event.eventId] === undefined) missingCopy.push(event.eventId);
+    if (event.decision === null) continue;
+    if (copyReloaded.copy[event.decision.promptKey] === undefined) missingCopy.push(event.decision.promptKey);
+    for (const option of event.decision.options) {
+      if (copyReloaded.copy[option.labelKey] === undefined) missingCopy.push(option.labelKey);
+    }
+  }
+  if (missingCopy.length > 0) throw new Error(`copy file missing ${missingCopy.length} keys: ${missingCopy.slice(0, 3).join(", ")}`);
   console.log(
-    `P3B-FIXTURES-OK main=${main.events.length} edge=${edge.events.length} ` +
+    `P3B-FIXTURES-OK main=${main.events.length} decisions=${decisionCount} options=${optionCount} ` +
+      `edge=${edge.events.length} copyKeys=${Object.keys(copyReloaded.copy).length} ` +
       `mainChecksum=${main.manifest.packChecksum.slice(0, 12)}… edgeChecksum=${edge.manifest.packChecksum.slice(0, 12)}…`
   );
 }
