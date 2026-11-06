@@ -617,7 +617,9 @@ describe("H5-CTO-127-B 決策路徑（V1 行為保留）", () => {
     expect(draft.stats).toEqual(stage.stats);
     expect(draft.assets).toEqual(stage.assets);
     expect(draft.flags).toEqual(stage.flags);
-    expect(draft.assets.annualExpenseMicroUsd).toBe(pendingState.assets.annualExpenseMicroUsd + 9_000_000n);
+    // GPT-0032-A：這是兒童（age 1）的決策，個人財務一律 0，rent 的 +9,000,000 不會進帳。
+    expect(pendingState.age).toBeLessThan(16);
+    expect(draft.assets).toEqual({ balanceMicroUsd: 0n, annualIncomeMicroUsd: 0n, annualExpenseMicroUsd: 0n });
   });
 
   it("反例：previous 不是 pending_decision phase", () => {

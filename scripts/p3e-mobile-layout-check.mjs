@@ -41,6 +41,7 @@ const LONGEST_COPY = {
 
 const viewports = [
   { width: 320, height: 568 },
+  { width: 360, height: 640 },
   { width: 390, height: 844 },
   { width: 430, height: 932 },
   { width: 537, height: 976 },
@@ -54,6 +55,8 @@ const mime = {
   ".json": "application/json; charset=utf-8",
   ".png": "image/png",
   ".webp": "image/webp",
+  ".avif": "image/avif",
+  ".mp3": "audio/mpeg",
   ".svg": "image/svg+xml",
   ".woff2": "font/woff2"
 };
@@ -88,7 +91,7 @@ function listen(server) {
 /* page-side measurement                                              */
 /* ------------------------------------------------------------------ */
 
-function pageSnapshot() {
+async function pageSnapshot() {
   const doc = document.documentElement;
   const body = document.body;
   const q = (s) => document.querySelector(s);
@@ -110,6 +113,77 @@ function pageSnapshot() {
     return style.display !== "none" && style.visibility !== "hidden" && box(node).height > 0;
   };
   const fontOf = (node) => (node === null ? null : parseFloat(getComputedStyle(node).fontSize));
+
+  /* GPT-0032-B：真正把場景資產 decode 到與容器同尺寸的 canvas，依 computed
+     background-size／position 繪製，再逐列統計「不是底色」的像素。
+     contain 的直立圖只會得到約 1/3 覆蓋率，因此這不是選擇器字串檢查。 */
+  const measureSceneAsset = async () => {
+    const node = document.querySelector(".p3e-scene");
+    if (node === null) return null;
+    const style = getComputedStyle(node);
+    const rect = node.getBoundingClientRect();
+    const cw = Math.max(1, Math.round(rect.width));
+    const ch = Math.max(1, Math.round(rect.height));
+    const found = /url\((?:"|')?([^"')]+)(?:"|')?\)/.exec(style.backgroundImage);
+    const empty = {
+      loaded: false, url: found?.[1] ?? null, width: 0, height: 0, aspect: 0,
+      coverage: 0, renderedWidth: 0, containerWidth: cw, styleSize: style.backgroundSize
+    };
+    if (found === null) return empty;
+    try {
+      const response = await fetch(found[1]);
+      if (!response.ok) return empty;
+      const bitmap = await createImageBitmap(await response.blob());
+      const size = (style.backgroundSize.split(",")[0] ?? "").trim();
+      const scale = size === "cover"
+        ? Math.max(cw / bitmap.width, ch / bitmap.height)
+        : size === "contain"
+          ? Math.min(cw / bitmap.width, ch / bitmap.height)
+          : cw / bitmap.width;
+      const dw = bitmap.width * scale;
+      const dh = bitmap.height * scale;
+      const canvas = document.createElement("canvas");
+      canvas.width = cw;
+      canvas.height = ch;
+      const ctx = canvas.getContext("2d", { willReadFrequently: true });
+      if (ctx === null) return empty;
+      ctx.fillStyle = style.backgroundColor || "rgb(142, 209, 237)";
+      ctx.fillRect(0, 0, cw, ch);
+      const bg = ctx.getImageData(0, 0, 1, 1).data;
+      const pos = (style.backgroundPosition.split(",")[0] ?? "center").trim().split(/\s+/);
+      const place = (token, container, image) => {
+        if (token === "center") return (container - image) / 2;
+        if (token.endsWith("%")) return (parseFloat(token) / 100) * (container - image);
+        const px = parseFloat(token);
+        return Number.isFinite(px) ? px : (container - image) / 2;
+      };
+      ctx.drawImage(
+        bitmap,
+        place(pos[0] ?? "center", cw, dw),
+        place(pos[1] ?? "center", ch, dh),
+        dw,
+        dh
+      );
+      const pixels = ctx.getImageData(0, 0, cw, ch).data;
+      let filled = 0;
+      for (let x = 0; x < cw; x += 1) {
+        for (let y = 0; y < ch; y += 3) {
+          const i = (y * cw + x) * 4;
+          const diff = Math.abs(pixels[i] - bg[0]) +
+            Math.abs(pixels[i + 1] - bg[1]) + Math.abs(pixels[i + 2] - bg[2]);
+          if (diff > 30) { filled += 1; break; }
+        }
+      }
+      return {
+        loaded: true, url: found[1], width: bitmap.width, height: bitmap.height,
+        aspect: bitmap.width / bitmap.height, coverage: filled / cw,
+        renderedWidth: dw, containerWidth: cw, styleSize: style.backgroundSize
+      };
+    } catch {
+      return empty;
+    }
+  };
+  const sceneAsset = await measureSceneAsset();
 
   window.scrollTo(0, 99999);
   const scrolled = window.scrollY;
@@ -135,7 +209,6 @@ function pageSnapshot() {
     statDock: box(q(".p3e-stat-dock")),
     timeControls: box(q(".p3e-time-controls")),
     controls: box(q(".p3e-controls")),
-    tabs: box(q(".p3e-tabs")),
     death: box(q(".p3e-death")),
     rebirth: box(q('[data-action="rebirth"]'))
   };
@@ -172,14 +245,67 @@ function pageSnapshot() {
     '[data-action="choose"]',
     '[data-action="rebirth"]',
     ".p3e-time-controls button",
-    ".p3e-tab",
-    ".p3e-hud-menu > summary",
-    ".p3e-tools > summary"
+    '[data-action="toggle-nature-sound"]',
+    ".p3e-hud-menu > summary"
   ].join(", ");
   const visibleTargets = [...document.querySelectorAll(touchSelector)]
     .filter(shown)
     .map((node) => ({ label: (node.textContent ?? "").trim().slice(0, 14), ...box(node) }));
   const smallTargets = visibleTargets.filter((t) => t.width < 43.5 || t.height < 43.5);
+
+  /* GPT-0031-B：移除齒輪／底部 tabs、HUD 順序、完整主圖、人生紀錄捲動區。 */
+  const hudNode = q(".p3e-hud");
+  const hudItems = hudNode === null
+    ? []
+    : [...hudNode.querySelectorAll(":scope > .p3e-hud-item")].map((node) => ({
+      label: node.querySelector("span")?.textContent ?? "",
+      value: node.querySelector("strong")?.textContent ?? ""
+    }));
+  const soundNode = q('[data-action="toggle-nature-sound"]');
+  const menuNode = q(".p3e-hud-menu > summary");
+  const sceneNode = q(".p3e-scene");
+  const sceneStyle = sceneNode === null ? null : getComputedStyle(sceneNode);
+  const sceneText = (sceneNode?.textContent ?? "").replace(/\s+/g, "").trim();
+  const lifeLogNode = q(".p3e-life-log");
+  const storyNode = q(".p3e-story-card");
+  const incomeNode = q(".p3e-hud-income");
+  const soundBox = box(soundNode);
+  const menuBox = box(menuNode);
+  const incomeBox = box(incomeNode);
+  const chrome = {
+    removedDom: document.querySelectorAll(
+      ".p3e-tools, .p3e-tab, .p3e-tabs, .p3e-game-title"
+    ).length,
+    hudLabels: hudItems.map((item) => item.label),
+    hudValues: hudItems.map((item) => item.value),
+    minorFinance: hudNode === null
+      ? 0
+      : [...hudNode.querySelectorAll(".p3e-hud-item")].filter(
+        (node) => node.getAttribute("data-p3e-minor-finance") === "true"
+      ).length,
+    minorNote: q(".p3e-hud .p3e-sr-only")?.textContent ?? null,
+    soundLabel: soundNode?.getAttribute("aria-label") ?? null,
+    soundBox,
+    menuBox,
+    soundIsRightOfIncome: soundBox !== null && incomeBox !== null && soundBox.left >= incomeBox.right - 2,
+    menuIsRightOfSound: menuBox !== null && soundBox !== null &&
+      menuBox.left >= soundBox.left + soundBox.width - 2,
+    sceneFit: sceneNode?.dataset.p3eSceneFit ?? null,
+    sceneAssetId: sceneNode?.dataset.p3eSceneAsset ?? null,
+    sceneAsset,
+    hudLabelFont: fontOf(hudNode?.querySelector(".p3e-hud-item span") ?? null),
+    hudValueFont: fontOf(hudNode?.querySelector(".p3e-hud-item strong") ?? null),
+    sceneBackgroundSize: sceneStyle?.backgroundSize ?? null,
+    sceneBackgroundRepeat: sceneStyle?.backgroundRepeat ?? null,
+    sceneChildren: sceneNode?.children.length ?? -1,
+    sceneText,
+    sceneEmoji: /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u.test(sceneText),
+    lifeLogCount: Number(lifeLogNode?.dataset.p3eLifeLogCount ?? "-1"),
+    lifeLogSource: lifeLogNode?.dataset.p3eLifeLogSource ?? null,
+    storyOverflowY: storyNode === null ? null : getComputedStyle(storyNode).overflowY,
+    storyScrollable: storyNode === null ? false : storyNode.scrollHeight > storyNode.clientHeight + 1,
+    storyBox: box(storyNode)
+  };
 
   const vh = window.innerHeight;
   const vw = window.innerWidth;
@@ -212,7 +338,6 @@ function pageSnapshot() {
       statDock: shown(statDock) && inViewport(parts.statDock),
       timeControls: shown(tc) && inViewport(parts.timeControls),
       controls: shown(q(".p3e-controls")) && inViewport(parts.controls),
-      tabs: inViewport(parts.tabs),
       death: shown(q(".p3e-death")),
       rebirth: inViewport(parts.rebirth)
     },
@@ -245,7 +370,8 @@ function pageSnapshot() {
       hint: fontOf(q(".p3e-hint")),
       option: optionFont
     },
-    touch: { checked: visibleTargets.length, small: smallTargets }
+    touch: { checked: visibleTargets.length, small: smallTargets },
+    chrome
   };
 }
 
@@ -501,11 +627,58 @@ function evaluate(label, phase, s) {
   check(`${prefix}_single_column`, s.life.oneColumn, `display=${s.life.display} cols=${JSON.stringify(s.life.columns)}`);
   check(`${prefix}_scene_under_30pct`, s.sceneRatio !== null && s.sceneRatio <= 30, `scene=${s.parts.scene?.height}px ${s.sceneRatio}%`);
   check(
-    `${prefix}_hud_scene_story_tabs_visible`,
-    s.sectionsVisible.hud && s.sectionsVisible.scene && s.sectionsVisible.story && s.sectionsVisible.tabs,
+    `${prefix}_hud_scene_story_visible`,
+    s.sectionsVisible.hud && s.sectionsVisible.scene && s.sectionsVisible.story,
     JSON.stringify(s.sectionsVisible)
   );
   check(`${prefix}_touch_targets_44px`, s.touch.small.length === 0, `checked=${s.touch.checked} small=${JSON.stringify(s.touch.small)}`);
+
+  /* GPT-0031-B：四個尺寸 × 三階段都檢查新版頂部列、主圖與人生紀錄。 */
+  const c = s.chrome;
+  check(
+    `${prefix}_gear_and_bottom_tabs_absent`,
+    c.removedDom === 0,
+    `removedDom=${c.removedDom}`
+  );
+  check(
+    `${prefix}_hud_order_and_right_controls`,
+    JSON.stringify(c.hudLabels) === JSON.stringify(["年份", "年齡", "資產", "年收入"]) &&
+      c.soundIsRightOfIncome && c.menuIsRightOfSound &&
+      c.soundBox !== null && c.menuBox !== null &&
+      c.soundBox.width >= 43.5 && c.soundBox.height >= 43.5 &&
+      c.menuBox.width >= 43.5 && c.menuBox.height >= 43.5 &&
+      typeof c.soundLabel === "string" && c.soundLabel.length > 0,
+    `labels=${JSON.stringify(c.hudLabels)} soundRight=${c.soundIsRightOfIncome} menuRight=${c.menuIsRightOfSound} sound=${JSON.stringify(c.soundBox)}`
+  );
+  // GPT-0032-B：不再要求 contain；改成驗證專用 landscape 資產真的載入，
+  // 且逐列像素量測的有效前景寬占比 >= 80%，杜絕「中央窄條」假綠。
+  check(
+    `${prefix}_scene_landscape_asset_fills_width_without_overlay`,
+    c.sceneFit === "cover" &&
+      c.sceneAssetId === "life-sim-village-landscape.avif" &&
+      (c.sceneBackgroundSize ?? "").split(",")[0].trim() === "cover" &&
+      (c.sceneBackgroundRepeat ?? "").startsWith("no-repeat") &&
+      c.sceneChildren === 0 && c.sceneText === "" && !c.sceneEmoji &&
+      c.sceneAsset !== null && c.sceneAsset.loaded === true &&
+      /life-sim-village-landscape[^/]*\.avif/.test(c.sceneAsset.url ?? "") &&
+      c.sceneAsset.aspect >= 1.6 &&
+      c.sceneAsset.coverage >= 0.8,
+    `fit=${c.sceneFit} size=${c.sceneBackgroundSize} repeat=${c.sceneBackgroundRepeat} ` +
+      `asset=${c.sceneAssetId} url=${c.sceneAsset?.url} loaded=${c.sceneAsset?.loaded} ` +
+      `dims=${c.sceneAsset?.width}x${c.sceneAsset?.height} aspect=${c.sceneAsset?.aspect} ` +
+      `coverage=${c.sceneAsset?.coverage} children=${c.sceneChildren} text="${c.sceneText}" emoji=${c.sceneEmoji}`
+  );
+  check(
+    `${prefix}_hud_font_sizes_readable`,
+    c.hudLabelFont !== null && c.hudLabelFont >= 11 &&
+      c.hudValueFont !== null && c.hudValueFont >= 13,
+    `label=${c.hudLabelFont}px value=${c.hudValueFont}px`
+  );
+  check(
+    `${prefix}_life_log_inside_scrolling_card`,
+    c.lifeLogCount >= 1 && c.storyOverflowY === "auto" && c.storyBox !== null,
+    `count=${c.lifeLogCount} source=${c.lifeLogSource} overflowY=${c.storyOverflowY} scrollable=${c.storyScrollable}`
+  );
   check(
     `${prefix}_body_text_readable`,
     (s.fonts.storyP === null || s.fonts.storyP >= 13.9) && (s.fonts.hint === null || s.fonts.hint >= 13.9),
@@ -528,10 +701,10 @@ function evaluate(label, phase, s) {
     );
   } else {
     // 待決策時 .p3e-controls 只剩提示（沒有可按的「下一步」），
-    // 設計上讓位給選項卡；其餘六個區塊仍必須同屏。
+    // 設計上讓位給選項卡；底部 tabs 移除後其餘區塊仍必須同屏。
     const required = phase === "pending_decision"
-      ? ["hud", "scene", "story", "statDock", "timeControls", "tabs"]
-      : ["hud", "scene", "story", "statDock", "timeControls", "controls", "tabs"];
+      ? ["hud", "scene", "story", "statDock", "timeControls"]
+      : ["hud", "scene", "story", "statDock", "timeControls", "controls"];
     check(
       `${prefix}_main_sections_visible`,
       required.every((key) => s.sectionsVisible[key]),
@@ -554,6 +727,19 @@ function evaluate(label, phase, s) {
           s.options.minHeight >= s.options.speedHeight + 8 &&
           s.options.font >= s.options.speedFont + 1,
         `options=${s.options.count} visible=${s.options.visibleInCard} optH=${s.options.minHeight} speedH=${s.options.speedHeight} optFont=${s.options.font} speedFont=${s.options.speedFont}`
+      );
+      // GPT-0032-B：320x568 把場景加高後，最後一個選項可能不在初始可見區。
+      // 若如此，必須證明是「故事卡內部可捲動」而非整頁捲動，否則就是假綠。
+      const storyBox = s.parts.story;
+      const allInitiallyVisible = storyBox !== null && s.options.rects.every(
+        (b) => b.top >= storyBox.top - 1 && b.bottom <= storyBox.bottom + 1
+      );
+      check(
+        `${prefix}_all_decision_options_reachable`,
+        s.options.count >= 2 && s.options.minHeight >= 44 &&
+          (allInitiallyVisible || (c.storyOverflowY === "auto" && c.storyScrollable)),
+        `count=${s.options.count} allVisible=${allInitiallyVisible} ` +
+          `cardOverflow=${c.storyOverflowY} scrollable=${c.storyScrollable} minH=${s.options.minHeight}`
       );
     }
   }

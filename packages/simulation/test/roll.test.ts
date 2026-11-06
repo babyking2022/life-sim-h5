@@ -318,19 +318,51 @@ describe("P3-E.1a-2b 四狀態 clamp", () => {
 /* 四、收支                                                           */
 /* ------------------------------------------------------------------ */
 
-describe("P3-E.1a-2b 收支", () => {
-  it("age 0／1／120 的完整收支（餘額足夠）", () => {
-    const cases = [
-      { age: 0, income: 1_000_000n, expense: 600_000n },
-      { age: 1, income: 1_100_000n, expense: 650_000n },
-      { age: 120, income: 13_000_000n, expense: 6_600_000n }
-    ];
-    for (const item of cases) {
+describe("P3-E.1a-2b 收支（GPT-0031-A 個人經濟生命週期）", () => {
+  /**
+   * 手算的基準值（knowledge = 50、沒有任何教育／工作／退休旗標、重心未設定）：
+   *
+   * - 0–17 歲：收入 0、支出 0；
+   * - 18–22 歲：沒有工作旗標 → 收入 0、生活支出 7,000 美元；
+   * - 23–64 歲：預設就業，(18,000 + 50 × 150) = 25,500 美元，
+   *   再依職涯階段 0.85／1.15／1.05 調整；支出 12,000 + 50 × 40 = 14,000 美元；
+   * - 65 歲以上：退休金 9,000 + min(50 × 25, 2,000) = 10,250 美元；支出 9,500 美元。
+   */
+  const BASE = [
+    { age: 0, income: 0n, expense: 0n },
+    { age: 5, income: 0n, expense: 0n },
+    { age: 15, income: 0n, expense: 0n },
+    { age: 16, income: 0n, expense: 0n },
+    { age: 17, income: 0n, expense: 0n },
+    { age: 18, income: 0n, expense: 7_000_000_000n },
+    { age: 22, income: 0n, expense: 7_000_000_000n },
+    { age: 23, income: 21_675_000_000n, expense: 14_000_000_000n },
+    { age: 30, income: 29_325_000_000n, expense: 14_000_000_000n },
+    { age: 49, income: 29_325_000_000n, expense: 14_000_000_000n },
+    { age: 50, income: 26_775_000_000n, expense: 14_000_000_000n },
+    { age: 64, income: 26_775_000_000n, expense: 14_000_000_000n },
+    { age: 65, income: 10_250_000_000n, expense: 9_500_000_000n },
+    { age: 120, income: 10_250_000_000n, expense: 9_500_000_000n }
+  ] as const;
+
+  it("0／5／15 歲：個人收入、支出、資產全部為 0（舊線性公式的兒童收入已移除）", () => {
+    for (const age of [0, 5, 15]) {
+      const result = resolveP3ERoll(baseInput({ age, balanceMicroUsd: 9_999_999n }));
+      expect(result.assets.annualIncomeMicroUsd, `income age ${age}`).toBe(0n);
+      expect(result.assets.annualExpenseMicroUsd, `expense age ${age}`).toBe(0n);
+      expect(result.assets.balanceMicroUsd, `balance age ${age}`).toBe(0n);
+    }
+  });
+
+  it("各年齡段的基準收支（手算值，含 16／17、18–22、23–64、65+）", () => {
+    for (const item of BASE) {
       const previous = 5_000_000n;
       const result = resolveP3ERoll(baseInput({ age: item.age, balanceMicroUsd: previous }));
       expect(result.assets.annualIncomeMicroUsd, `income age ${item.age}`).toBe(item.income);
       expect(result.assets.annualExpenseMicroUsd, `expense age ${item.age}`).toBe(item.expense);
-      expect(result.assets.balanceMicroUsd, `balance age ${item.age}`).toBe(previous + item.income - item.expense);
+      // 0–15 歲連餘額都歸零（個人資產不是家庭財富）。
+      const net = item.age < 16 ? 0n : previous + item.income - item.expense;
+      expect(result.assets.balanceMicroUsd, `balance age ${item.age}`).toBe(net < 0n ? 0n : net);
     }
   });
 
@@ -341,45 +373,39 @@ describe("P3-E.1a-2b 收支", () => {
     expect(typeof result.assets.annualExpenseMicroUsd).toBe("bigint");
   });
 
-  it("非負餘額：clamp 不會觸發（balance = previous + net）", () => {
-    for (let age = 0; age <= 120; age += 1) {
-      const income = 1_000_000n + BigInt(age) * 100_000n;
-      const expense = 600_000n + BigInt(age) * 50_000n;
-      expect(income - expense, `age ${age}`).toBe(400_000n + BigInt(age) * 50_000n);
-      expect(income - expense > 0n).toBe(true);
-      for (const previous of [0n, 1n, 5_000_000n]) {
-        const result = resolveP3ERoll(baseInput({ age, balanceMicroUsd: previous }));
-        expect(result.assets.balanceMicroUsd).toBe(previous + income - expense);
-        expect(result.assets.balanceMicroUsd >= previous).toBe(true);
-      }
+  it("非負餘額：balance = previous + net（不會被 clamp）", () => {
+    for (const item of BASE) {
+      const previous = 5_000_000n;
+      const result = resolveP3ERoll(baseInput({ age: item.age, balanceMicroUsd: previous }));
+      const net = item.age < 16 ? 0n : previous + item.income - item.expense;
+      expect(result.assets.balanceMicroUsd, `age ${item.age}`).toBe(net < 0n ? 0n : net);
     }
   });
 
   it("負餘額（淨負債）：net < 0 一律截到 0n，剛好清償也是 0n，多 1 microUSD 才是 1n", () => {
-    for (let age = 0; age <= 120; age += 1) {
-      const net = 400_000n + BigInt(age) * 50_000n; // income − expense
-      const broke = resolveP3ERoll(baseInput({ age, balanceMicroUsd: -net - 1n }));
-      expect(broke.assets.balanceMicroUsd, `broke age ${age}`).toBe(0n);
-      const exact = resolveP3ERoll(baseInput({ age, balanceMicroUsd: -net }));
-      expect(exact.assets.balanceMicroUsd, `exact age ${age}`).toBe(0n);
-      const surplus = resolveP3ERoll(baseInput({ age, balanceMicroUsd: -net + 1n }));
-      expect(surplus.assets.balanceMicroUsd, `surplus age ${age}`).toBe(1n);
+    for (const item of [{ age: 30, net: 15_325_000_000n }, { age: 60, net: 12_775_000_000n }, { age: 120, net: 750_000_000n }]) {
+      const broke = resolveP3ERoll(baseInput({ age: item.age, balanceMicroUsd: -item.net - 1n }));
+      expect(broke.assets.balanceMicroUsd, `broke age ${item.age}`).toBe(0n);
+      const exact = resolveP3ERoll(baseInput({ age: item.age, balanceMicroUsd: -item.net }));
+      expect(exact.assets.balanceMicroUsd, `exact age ${item.age}`).toBe(0n);
+      const surplus = resolveP3ERoll(baseInput({ age: item.age, balanceMicroUsd: -item.net + 1n }));
+      expect(surplus.assets.balanceMicroUsd, `surplus age ${item.age}`).toBe(1n);
     }
   });
 
-  it("負餘額時支出仍保留完整公式值（不被改寫成實際可扣金額）", () => {
+  it("負餘額時支出仍保留完整結算值（不被改寫成實際可扣金額）", () => {
     const age = 120;
-    const result = resolveP3ERoll(baseInput({ age, balanceMicroUsd: -100_000_000n }));
-    expect(result.assets.annualIncomeMicroUsd).toBe(13_000_000n);
-    expect(result.assets.annualExpenseMicroUsd).toBe(6_600_000n);
+    const result = resolveP3ERoll(baseInput({ age, balanceMicroUsd: -50_000_000_000n }));
+    expect(result.assets.annualIncomeMicroUsd).toBe(10_250_000_000n);
+    expect(result.assets.annualExpenseMicroUsd).toBe(9_500_000_000n);
     expect(result.assets.balanceMicroUsd).toBe(0n);
-    expect(result.assets.annualExpenseMicroUsd).not.toBe(6_600_000n - 100_000_000n);
+    expect(result.assets.annualExpenseMicroUsd).not.toBe(9_500_000_000n - 50_000_000_000n);
   });
 
   it("負 balance 可以經正式 resolveP3ERoll 進入，且收支仍不消耗 RNG", () => {
     const negative = resolveP3ERoll(baseInput({ balanceMicroUsd: -1n }));
     const positive = resolveP3ERoll(baseInput({ balanceMicroUsd: 1n }));
-    expect(negative.assets.balanceMicroUsd).toBe(-1n + 1_900_000n);
+    expect(negative.assets.balanceMicroUsd).toBe(-1n + 15_325_000_000n);
     expect(negative.lifeRng).toEqual(positive.lifeRng);
     expect(negative.stats).toEqual(positive.stats);
   });
@@ -387,45 +413,21 @@ describe("P3-E.1a-2b 收支", () => {
   it("MIN_MONEY_PPP_MICRO 輸入合法，結算後為 0n", () => {
     const result = resolveP3ERoll(baseInput({ balanceMicroUsd: MIN_MONEY_PPP_MICRO }));
     expect(result.assets.balanceMicroUsd).toBe(0n);
-    expect(result.assets.annualIncomeMicroUsd).toBe(4_000_000n);
-    expect(result.assets.annualExpenseMicroUsd).toBe(2_100_000n);
+    expect(result.assets.annualIncomeMicroUsd).toBe(29_325_000_000n);
+    expect(result.assets.annualExpenseMicroUsd).toBe(14_000_000_000n);
   });
 
   it("恰好不超過 MAX_MONEY_PPP_MICRO 的輸出合法（邊界逐 microUSD）", () => {
-    for (const age of [0, 30, 120]) {
-      const net = 400_000n + BigInt(age) * 50_000n;
-      const previous = MAX_MONEY_PPP_MICRO - net;
-      const ok = resolveP3ERoll(baseInput({ age, balanceMicroUsd: previous }));
-      expect(ok.assets.balanceMicroUsd, `age ${age}`).toBe(MAX_MONEY_PPP_MICRO);
-      // 多 1 microUSD 就會超過上界
+    for (const item of [{ age: 30, net: 15_325_000_000n }, { age: 60, net: 12_775_000_000n }, { age: 120, net: 750_000_000n }]) {
+      const previous = MAX_MONEY_PPP_MICRO - item.net;
+      const ok = resolveP3ERoll(baseInput({ age: item.age, balanceMicroUsd: previous }));
+      expect(ok.assets.balanceMicroUsd, `age ${item.age}`).toBe(MAX_MONEY_PPP_MICRO);
       expectP3EError(
-        () => resolveP3ERoll(baseInput({ age, balanceMicroUsd: previous + 1n })),
+        () => resolveP3ERoll(baseInput({ age: item.age, balanceMicroUsd: previous + 1n })),
         "E_P3E_MONEY",
         "assets.balanceMicroUsd"
       );
     }
-  });
-
-  it("balance 低於 Money 最小值固定失敗（E_P3E_MONEY at balanceMicroUsd）", () => {
-    expectP3EError(
-      () => resolveP3ERoll(baseInput({ balanceMicroUsd: MIN_MONEY_PPP_MICRO - 1n })),
-      "E_P3E_MONEY",
-      "balanceMicroUsd"
-    );
-  });
-
-  it("balance 高於 Money 最大值固定失敗（E_P3E_MONEY at balanceMicroUsd）", () => {
-    expectP3EError(
-      () => resolveP3ERoll(baseInput({ balanceMicroUsd: MAX_MONEY_PPP_MICRO + 1n })),
-      "E_P3E_MONEY",
-      "balanceMicroUsd"
-    );
-    // 剛好等於上界是合法的（但結算後必然超過，見上一條）
-    expectP3EError(
-      () => resolveP3ERoll(baseInput({ balanceMicroUsd: MAX_MONEY_PPP_MICRO })),
-      "E_P3E_MONEY",
-      "assets.balanceMicroUsd"
-    );
   });
 
   it("Money 上界與 engine 公開常數一致（不是自己寫死的數字）", () => {
@@ -434,15 +436,16 @@ describe("P3-E.1a-2b 收支", () => {
   });
 
   it("內部公式函式與公開入口的結果一致（負餘額與上界也一樣）", () => {
-    const direct = computeP3ERollAssets(120, -100_000_000n);
+    const direct = computeP3ERollAssets(120, 50, -100_000_000n);
     const viaEntry = resolveP3ERoll(baseInput({ age: 120, balanceMicroUsd: -100_000_000n }));
     expect(direct).toEqual(viaEntry.assets);
 
-    const directOk = computeP3ERollAssets(0, MAX_MONEY_PPP_MICRO - 400_000n);
+    const net = 15_325_000_000n;
+    const directOk = computeP3ERollAssets(30, 50, MAX_MONEY_PPP_MICRO - net);
     expect(directOk.balanceMicroUsd).toBe(MAX_MONEY_PPP_MICRO);
     let caught: unknown;
     try {
-      computeP3ERollAssets(0, MAX_MONEY_PPP_MICRO);
+      computeP3ERollAssets(30, 50, MAX_MONEY_PPP_MICRO - net + 1n);
     } catch (error) {
       caught = error;
     }
@@ -463,7 +466,7 @@ describe("P3-E.1a-2b 收支", () => {
     const a = resolveP3ERoll(baseInput({ age: 60, balanceMicroUsd: 7n }));
     const b = resolveP3ERoll(baseInput({ age: 60, balanceMicroUsd: 7n }));
     expect(a.assets).toEqual(b.assets);
-    expect(a.assets.balanceMicroUsd).toBe(7n + 7_000_000n - 3_600_000n);
+    expect(a.assets.balanceMicroUsd).toBe(7n + 26_775_000_000n - 14_000_000_000n);
   });
 });
 
@@ -696,8 +699,8 @@ describe("P3-E.1a-2b age 驗證", () => {
   });
 
   it("age 邊界 0 與 120 合法", () => {
-    expect(resolveP3ERoll(baseInput({ age: 0 })).assets.annualIncomeMicroUsd).toBe(1_000_000n);
-    expect(resolveP3ERoll(baseInput({ age: 120 })).assets.annualExpenseMicroUsd).toBe(6_600_000n);
+    expect(resolveP3ERoll(baseInput({ age: 0 })).assets.annualIncomeMicroUsd).toBe(0n);
+    expect(resolveP3ERoll(baseInput({ age: 120 })).assets.annualExpenseMicroUsd).toBe(9_500_000_000n);
   });
 });
 
@@ -761,7 +764,7 @@ describe("P3-E.1a-2b.1 balance 驗證（允許負值，但受 Money 上下界限
 
   it("負 bigint 合法（−1n 不再是錯誤）", () => {
     expect(() => resolveP3ERoll(baseInput({ balanceMicroUsd: -1n }))).not.toThrow();
-    expect(resolveP3ERoll(baseInput({ age: 0, balanceMicroUsd: -1n })).assets.balanceMicroUsd).toBe(399_999n);
+    expect(resolveP3ERoll(baseInput({ age: 0, balanceMicroUsd: -1n })).assets.balanceMicroUsd).toBe(0n);
   });
 
   it("超出 Money 上下界一律 E_P3E_MONEY at balanceMicroUsd", () => {
@@ -776,9 +779,9 @@ describe("P3-E.1a-2b.1 balance 驗證（允許負值，但受 Money 上下界限
 
   it("balance 0n 合法", () => {
     const zero = resolveP3ERoll(baseInput({ age: 0, balanceMicroUsd: 0n }));
-    expect(zero.assets.balanceMicroUsd).toBe(400_000n);
+    expect(zero.assets.balanceMicroUsd).toBe(0n);
     const aged = resolveP3ERoll(baseInput({ age: 30, balanceMicroUsd: 0n }));
-    expect(aged.assets.balanceMicroUsd).toBe(1_900_000n);
+    expect(aged.assets.balanceMicroUsd).toBe(15_325_000_000n);
   });
 });
 

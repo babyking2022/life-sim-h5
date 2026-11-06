@@ -480,7 +480,8 @@ describe("H5-CTO-147-B Ledger Append V1：正向案例", () => {
   });
 
   it("CHOOSE_DECISION → life：year／age／RNG 全部不變", () => {
-    const choicePrevious = stateAt(5, { pack: packDecision });
+    // GPT-0032-A：0–15 歲的個人財務一律 0，money-effect 測試改用成年 state。
+    const choicePrevious = stateAt(30, { pack: packDecision });
     const pendingState = pendingStateFromAnnual(
       choicePrevious,
       resolveP3EAnnualPendingDecision({
@@ -755,7 +756,8 @@ describe("H5-CTO-147-B Ledger Append V1：錯誤路徑", () => {
   });
 
   it("command 與 phase 不合法（previous 是 pending_decision 卻發 ADVANCE_YEAR）→ Continuity 擋下", () => {
-    const choicePrevious = stateAt(5, { pack: packDecision });
+    // GPT-0032-A：0–15 歲的個人財務一律 0，money-effect 測試改用成年 state。
+    const choicePrevious = stateAt(30, { pack: packDecision });
     const pendingState = pendingStateFromAnnual(
       choicePrevious,
       resolveP3EAnnualPendingDecision({
@@ -786,7 +788,8 @@ describe("H5-CTO-147-B Ledger Append V1：錯誤路徑", () => {
   });
 
   it("optionId 不在 pending 清單 → Continuity 擋下", () => {
-    const choicePrevious = stateAt(5, { pack: packDecision });
+    // GPT-0032-A：0–15 歲的個人財務一律 0，money-effect 測試改用成年 state。
+    const choicePrevious = stateAt(30, { pack: packDecision });
     const pendingState = pendingStateFromAnnual(
       choicePrevious,
       resolveP3EAnnualPendingDecision({
@@ -1134,7 +1137,8 @@ describe("P3-E.1b-2j money-effects 真實管線回歸", () => {
   it("A. 決策選項 rent 改動 annualExpenseMicroUsd → 完整 append 成功且保留 +9,000,000", () => {
     // 全程走正式原語：pending State → resolveP3EDecisionChoice(rent)
     // → assembleP3EDecisionStateCoreDraft → appendP3ELedgerTransition
-    const choicePrevious = stateAt(5, { pack: packDecision });
+    // GPT-0032-A：0–15 歲的個人財務一律 0，money-effect 測試改用成年 state。
+    const choicePrevious = stateAt(30, { pack: packDecision });
     const pendingState = pendingStateFromAnnual(
       choicePrevious,
       resolveP3EAnnualPendingDecision({
@@ -1146,8 +1150,13 @@ describe("P3-E.1b-2j money-effects 真實管線回歸", () => {
     );
     const draft = decisionDraft(pendingState, packDecision, "rent");
 
-    const baseExpense =
-      contracts.P3E_EXPENSE_BASE_MICRO_USD + BigInt(pendingState.age) * contracts.P3E_EXPENSE_PER_YEAR_MICRO_USD;
+    // GPT-0032-A：薪資／支出依「年初知識」結算，因此基準要用 roll 前的 knowledge。
+    const baseExpense = contracts.computeP3EBaseEconomy(
+      pendingState.age,
+      choicePrevious.stats.knowledge,
+      choicePrevious.flags,
+      null
+    ).annualExpenseMicroUsd;
     expect(pendingState.assets.annualExpenseMicroUsd).toBe(baseExpense);
     expect(draft.assets.annualExpenseMicroUsd).toBe(baseExpense + 9_000_000n);
 
@@ -1183,12 +1192,17 @@ describe("P3-E.1b-2j money-effects 真實管線回歸", () => {
         effects: [{ type: "money", field: "annualIncomeMicroUsd", deltaMicroUsd: "5000000" }]
       }
     ]);
-    const previous = stateAt(5, { pack: packIncomeEffect });
+    const previous = stateAt(30, { pack: packIncomeEffect });
     // 走正式年度流程：annual stage → assembleP3EAnnualStateCoreDraft → append
     const draft = annualDraft(previous, packIncomeEffect);
 
     const baseIncome =
-      contracts.P3E_INCOME_BASE_MICRO_USD + BigInt(draft.age) * contracts.P3E_INCOME_PER_YEAR_MICRO_USD;
+      contracts.computeP3EBaseEconomy(
+        draft.age,
+        previous.stats.knowledge,
+        previous.flags,
+        null
+      ).annualIncomeMicroUsd;
     expect(draft.assets.annualIncomeMicroUsd).toBe(baseIncome + 5_000_000n);
 
     const result = appendP3ELedgerTransition(previous, ADVANCE, draft);

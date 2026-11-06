@@ -472,7 +472,8 @@ describe("H5-CTO-163-A Command Executor V1：正向流程", () => {
   });
 
   it("CHOOSE_DECISION rent：annualExpenseMicroUsd +9,000,000 且三項輸出建立（2g 收支語意）", () => {
-    const pending = pendingState(stateAt(5, { pack: packDecision }), packDecision);
+    // GPT-0032-A：0–15 歲的個人財務一律 0，因此 money-effect 測試改用成年 state。
+    const pending = pendingState(stateAt(30, { pack: packDecision }), packDecision);
     const result = execute(pending, { type: "CHOOSE_DECISION", optionId: "rent" }, packDecision);
 
     expect(result.state.phase).toBe("life");
@@ -484,8 +485,8 @@ describe("H5-CTO-163-A Command Executor V1：正向流程", () => {
   });
 
   it("年度 money effect：事件改 annualIncomeMicroUsd，final State 保留 effect 後值", () => {
-    const withoutMoney = execute(stateAt(5, { pack: packPlain }), { ...ADVANCE }, packPlain);
-    const withMoney = execute(stateAt(5, { pack: packMoneyIncome }), { ...ADVANCE }, packMoneyIncome);
+    const withoutMoney = execute(stateAt(30, { pack: packPlain }), { ...ADVANCE }, packPlain);
+    const withMoney = execute(stateAt(30, { pack: packMoneyIncome }), { ...ADVANCE }, packMoneyIncome);
 
     // 差分斷言：同一 state／RNG，唯一差別是事件的 money effect 欄位。
     expect(withMoney.state.phase).toBe(withoutMoney.state.phase);
@@ -495,11 +496,9 @@ describe("H5-CTO-163-A Command Executor V1：正向流程", () => {
     expect(withMoney.state.assets.annualExpenseMicroUsd).toBe(
       withoutMoney.state.assets.annualExpenseMicroUsd
     );
-    // 保留 effect 後值：不等於基準公式在新 age 的值。
-    const formula =
-      contracts.P3E_INCOME_BASE_MICRO_USD +
-      6n * contracts.P3E_INCOME_PER_YEAR_MICRO_USD;
-    expect(withMoney.state.assets.annualIncomeMicroUsd).not.toBe(formula);
+    // 保留 effect 後值：比新狀態的基準值多了 500,000 micro-USD。
+    const baseline = contracts.computeP3EBaseEconomy(31, 40, [], null);
+    expect(withMoney.state.assets.annualIncomeMicroUsd).toBe(baseline.annualIncomeMicroUsd + 500_000n);
   });
 
   it("guardian contentMode：命令完整執行並記錄在 Command Record", () => {

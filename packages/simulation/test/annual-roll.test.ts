@@ -135,6 +135,24 @@ function advance(initial: readonly [number, number, number, number], draws: numb
   return toWords(rng.state);
 }
 
+/**
+ * GPT-0031-A：state 的 assets 必須符合新的個人經濟基準，否則「事件加成」會被
+ * 誤判成 premium（測試就會與 roll 層不一致）。這裡用契約的純函式算基準值。
+ */
+function stateAssetsAt(
+  age: number,
+  stats: contracts.P3EStats,
+  flags: readonly string[],
+  balanceMicroUsd: bigint
+): contracts.P3EAssets {
+  const base = contracts.computeP3EBaseEconomy(age, stats.knowledge, flags, null);
+  return {
+    balanceMicroUsd: age < 16 ? 0n : balanceMicroUsd,
+    annualIncomeMicroUsd: base.annualIncomeMicroUsd,
+    annualExpenseMicroUsd: base.annualExpenseMicroUsd
+  };
+}
+
 interface StateOptions {
   readonly phase?: contracts.P3EPhase;
   readonly pendingDecision?: contracts.P3EPendingDecisionSummary | null;
@@ -146,7 +164,6 @@ interface StateOptions {
 function stateAt(age: number, options: StateOptions = {}): contracts.P3ELifeState {
   const phase = options.phase ?? (age >= contracts.P3E_MAX_AGE ? "death" : "life");
   const birthYear = genesisState.identity.birthYear;
-  const years = BigInt(age);
   const eventInitial = toWords(deriveEventRngState(LIFE_INITIAL, birthYear));
   const draft = {
     ...genesisState,
@@ -155,13 +172,12 @@ function stateAt(age: number, options: StateOptions = {}): contracts.P3ELifeStat
     phase,
     pendingDecision: options.pendingDecision ?? null,
     stats: options.stats ?? { health: 60, happiness: 55, knowledge: 40, relationships: 35 },
-    assets: {
-      balanceMicroUsd: options.balance ?? 1_900_000n,
-      annualIncomeMicroUsd:
-        age === 0 ? 0n : contracts.P3E_INCOME_BASE_MICRO_USD + years * contracts.P3E_INCOME_PER_YEAR_MICRO_USD,
-      annualExpenseMicroUsd:
-        age === 0 ? 0n : contracts.P3E_EXPENSE_BASE_MICRO_USD + years * contracts.P3E_EXPENSE_PER_YEAR_MICRO_USD
-    },
+    assets: stateAssetsAt(
+      age,
+      options.stats ?? { health: 60, happiness: 55, knowledge: 40, relationships: 35 },
+      age === 0 ? [] : ["p3e:flag-a"],
+      options.balance ?? 1_900_000n
+    ),
     flags: age === 0 ? [] : ["p3e:flag-a"],
     occurrences: age === 0 ? [] : [{ eventId: "ev-a", count: 1, lastYear: birthYear + 1 }],
     rng: {
@@ -299,29 +315,31 @@ describe("P3-E.1b-1b 合法年度 roll", () => {
     expect(result.ageAfter).toBe(120);
     expect(result.yearAfter).toBe(state.currentYear + 1);
     expect(result.statsAfter).toEqual(expectedRoll(state).stats);
-    // 收支用 targetAge=120 的公式
-    expect(result.assetsAfter.annualIncomeMicroUsd).toBe(
-      contracts.P3E_INCOME_BASE_MICRO_USD + 120n * contracts.P3E_INCOME_PER_YEAR_MICRO_USD
-    );
-    expect(result.assetsAfter.annualExpenseMicroUsd).toBe(
-      contracts.P3E_EXPENSE_BASE_MICRO_USD + 120n * contracts.P3E_EXPENSE_PER_YEAR_MICRO_USD
-    );
+    // 收支用 targetAge=120 的個人經濟：65 歲以上一律退休金（不再隨年齡線性成長）。
+    const base120 = contracts.computeP3EBaseEconomy(120, state.stats.knowledge, state.flags, null);
+    expect(result.assetsAfter.annualIncomeMicroUsd).toBe(base120.annualIncomeMicroUsd);
+    expect(result.assetsAfter.annualExpenseMicroUsd).toBe(base120.annualExpenseMicroUsd);
+    expect(base120.status).toBe("retired");
   });
 
-  it("收支公式用 targetAge（不是交易前的 age）", () => {
+  it("收支依 targetAge 的年齡階段（不是交易前的 age）", () => {
     for (const state of [AGE_1_INPUT, AGE_30, AGE_119]) {
       const targetAge = state.age + 1;
       const result = resolveP3EAnnualRoll({ state });
-      expect(result.assetsAfter.annualIncomeMicroUsd).toBe(
-        contracts.P3E_INCOME_BASE_MICRO_USD + BigInt(targetAge) * contracts.P3E_INCOME_PER_YEAR_MICRO_USD
-      );
-      expect(result.assetsAfter.annualExpenseMicroUsd).toBe(
-        contracts.P3E_EXPENSE_BASE_MICRO_USD + BigInt(targetAge) * contracts.P3E_EXPENSE_PER_YEAR_MICRO_USD
-      );
-      // 明確排除「用交易前 age」的算法
-      const wrongIncome = contracts.P3E_INCOME_BASE_MICRO_USD + BigInt(state.age) * contracts.P3E_INCOME_PER_YEAR_MICRO_USD;
-      expect(result.assetsAfter.annualIncomeMicroUsd).not.toBe(wrongIncome);
+      const base = contracts.computeP3EBaseEconomy(targetAge, state.stats.knowledge, state.flags, null);
+      expect(result.assetsAfter.annualIncomeMicroUsd, `targetAge ${targetAge}`).toBe(base.annualIncomeMicroUsd);
+      expect(result.assetsAfter.annualExpenseMicroUsd, `targetAge ${targetAge}`).toBe(base.annualExpenseMicroUsd);
+      // 明確排除「用交易前 age」的算法（18–22 與 23+ 的階段界線會直接改變收入）。
+      const wrong = contracts.computeP3EBaseEconomy(state.age, state.stats.knowledge, state.flags, null);
+      if (wrong.annualIncomeMicroUsd !== base.annualIncomeMicroUsd) {
+        expect(result.assetsAfter.annualIncomeMicroUsd).not.toBe(wrong.annualIncomeMicroUsd);
+      }
     }
+    // 17 → 18（在學／未就業）收入仍是 0；22 → 23 進入職涯階段才有薪水。
+    const at17 = resolveP3EAnnualRoll({ state: stateAt(17) });
+    const at22 = resolveP3EAnnualRoll({ state: stateAt(22) });
+    expect(at17.assetsAfter.annualIncomeMicroUsd).toBe(0n);
+    expect(at22.assetsAfter.annualIncomeMicroUsd).toBeGreaterThan(0n);
   });
 
   it("RNG 精確轉移：4 次抽樣、semanticDraws +4、initialState 不變", () => {

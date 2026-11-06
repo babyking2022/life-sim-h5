@@ -93,6 +93,14 @@ export interface P3EReplayResult {
    * 不是 payload 宣稱值；application 只用它在 restore 後還原 `lastOutcome`。
    */
   readonly lastOutcome: P3ECommandOutcome | null;
+  /**
+   * 逐命令的權威 outcome（順序與 History 相同；GPT-0031-A）。
+   *
+   * 只用於 application 的 presentation projection（`lifeLog`）：重播時每一年的
+   * 事件 id／決策／重心／死因都必須與即時遊玩完全相同，因此由同一條重執行路徑
+   * 產生，而不是另外再跑一次。
+   */
+  readonly outcomes: readonly P3ECommandOutcome[];
 }
 
 /** divergence 詳情（`expected`／`actual` 為欄位值的 JSON digest 字串）。 */
@@ -373,6 +381,7 @@ export function replayP3ELedgerHistory(input: unknown): P3EReplayResult {
   // 6–8. 逐 Pair 重執行 + 全欄位比較（停在第一個 divergence）
   let state: P3ELifeState = genesis;
   let lastOutcome: P3ECommandOutcome | null = null;
+  const outcomes: P3ECommandOutcome[] = [];
   for (const pair of ledger.records) {
     const actual = executeP3ECommand({
       state,
@@ -383,6 +392,7 @@ export function replayP3ELedgerHistory(input: unknown): P3EReplayResult {
     comparePair(pair, actual);
     state = actual.state;
     lastOutcome = actual.outcome;
+    outcomes.push(actual.outcome);
   }
 
   // 9. deep frozen 結果（state／history 已由原語深層凍結；補凍結容器）
@@ -390,7 +400,8 @@ export function replayP3ELedgerHistory(input: unknown): P3EReplayResult {
     state,
     history: ledger,
     commandsConsumed: ledger.records.length,
-    lastOutcome
+    lastOutcome,
+    outcomes: Object.freeze(outcomes)
   });
 }
 

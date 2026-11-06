@@ -12,6 +12,7 @@ import {
   type P3EIdentityBinding,
   type P3ELifeRngState,
   type P3ELifeState,
+  normalizeP3EAssetsForAge,
   type P3EPackBindings,
   type P3EPendingDecisionSummary,
   type P3EPhase,
@@ -383,7 +384,8 @@ export function assembleP3EAnnualStateCoreDraft(
     phase: annualPhase(annualDeath.diedThisYear, summary),
     pendingDecision: copyPendingSummary(summary),
     stats: copyStats(annualDeath.effects.stats),
-    assets: copyAssets(annualDeath.effects.assets),
+    // GPT-0032-A：0–15 歲的個人財務必須是 0（effects 之後、封存之前的最後一道）。
+    assets: copyAssets(normalizeP3EAssetsForAge(roll.ageAfter, annualDeath.effects.assets)),
     flags: copyFlags(annualDeath.effects.flags),
     occurrences: copyOccurrences(annualDeath.effects.occurrences),
     rng: Object.freeze({

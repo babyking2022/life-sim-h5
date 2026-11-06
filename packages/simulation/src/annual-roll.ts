@@ -1,5 +1,6 @@
 import {
   applyP3ELifeFocusAnnualStats,
+  computeP3EAnnualEconomy,
   readP3ELifeFocus,
   type P3EAssets,
   type P3EErrorCode,
@@ -7,6 +8,7 @@ import {
   type P3EStats,
   type P3EWordTuple
 } from "@life-sim/contracts";
+import { MAX_MONEY_PPP_MICRO } from "@life-sim/engine";
 import { P3EError } from "./errors";
 import { resolveP3ERoll } from "./roll";
 import { readP3EState } from "./state-invariants";
@@ -30,6 +32,13 @@ import { readP3EState } from "./state-invariants";
  * - **不複製**四次抽樣、clamp 或收支公式（`resolveP3ERoll` 是唯一實作）；
  * - 不修改、不 seal、不重新簽署 `P3ELifeState`；不處理 event／death／ledger／command／replay；
  * - 不判定死亡（119 → 120 只是完成 roll，死亡由後續 Death 階段決定）；
+ *
+ * ## 個人經濟（GPT-0031-A）
+ *
+ * roll 層只算「沒有旗標、沒有事件加成」的基準收支；這一層看得到完整 state，
+ * 因此用 `computeP3EAnnualEconomy` 把**教育／工作／退休旗標、人生重心、年齡階段**
+ * 與「上一年的事件加成」一起算進去，並以它覆寫 roll 的 `assetsAfter`。
+ * 0～15 歲的個人收入／支出／資產一律歸零（舊存檔的錯值會在這一層被修正）。
  * - 消耗 RNG 之後才可能成功，被拒絕的呼叫完全不消耗。
  *
  * ## 為什麼 `age` 邊界不需要另一支檢查
@@ -199,6 +208,17 @@ export function resolveP3EAnnualRoll(input: unknown): P3EAnnualRollResult {
   const focus = readP3ELifeFocus(state.flags);
   const statsAfter = focus === null ? roll.stats : applyP3ELifeFocusAnnualStats(roll.stats, focus.focusId);
 
+  // 6b. GPT-0031-A：權威的個人經濟結算（階段 × 教育 × 知識 × 重心 ＋ 事件加成）。
+  const assetsAfter = computeP3EAnnualEconomy({
+    age: targetAge,
+    // 薪資依「年初知識」結算，roll 層（只有 age／stats）才會得到完全相同的基準值。
+    knowledge: state.stats.knowledge,
+    flags: state.flags,
+    lifeFocusId: focus === null ? null : focus.focusId,
+    previousBalanceMicroUsd: state.assets.balanceMicroUsd
+  });
+  if (assetsAfter.balanceMicroUsd > MAX_MONEY_PPP_MICRO) fail("E_P3E_MONEY", "assets.balanceMicroUsd");
+
   // 7. 獨立、深層凍結的結果
   return Object.freeze({
     rollSpecVersion: roll.rollSpecVersion,
@@ -209,7 +229,7 @@ export function resolveP3EAnnualRoll(input: unknown): P3EAnnualRollResult {
     statsBefore: copyStats(state.stats),
     statsAfter: copyStats(statsAfter),
     assetsBefore: copyAssets(state.assets),
-    assetsAfter: copyAssets(roll.assets),
+    assetsAfter: copyAssets(assetsAfter),
     lifeRngBefore: copyLifeRng(state.rng.life),
     lifeRngAfter: copyLifeRng(roll.lifeRng),
     semanticDrawsUsed: roll.semanticDrawsUsed

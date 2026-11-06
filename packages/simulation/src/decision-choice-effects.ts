@@ -1,4 +1,6 @@
 import {
+  applyP3EMoneyModifierDeltaForAge,
+  normalizeP3EAssetsForAge,
   type P3BDecisionSpec,
   type P3BEffect,
   type P3CYearEventOutcome,
@@ -268,13 +270,17 @@ export function resolveP3EDecisionChoice(input: unknown): P3EDecisionChoiceStage
   );
 
   // 8. 深層凍結的結果
+  // GPT-0032-A：決策選項的持續性 money effects 一樣寫成 modifier 旗標，
+  // 且 0–15 歲的個人財務在正式 transition 邊界歸零。
+  // GPT-0033-A：兒童（0–15 歲）的決策 money effects 不寫個人 modifier。
+  const flagsAfter = applyP3EMoneyModifierDeltaForAge(state.age, application.flags, application.outcome.moneyDelta);
   return Object.freeze({
     eventId: pending.eventId,
     decisionId: pending.decisionId,
     selectedOptionId: optionId,
     stats: copyStats(application.stats),
-    assets: copyAssets(application.assets),
-    flags: Object.freeze([...application.flags]),
+    assets: copyAssets(normalizeP3EAssetsForAge(state.age, application.assets)),
+    flags: Object.freeze([...flagsAfter]),
     changes: copyOutcome(application.outcome),
     informational: application.informational,
     pendingDecisionAfter: null,

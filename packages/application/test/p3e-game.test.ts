@@ -369,7 +369,8 @@ describe("H5-CTO-166-A 可玩 façade：基本行為", () => {
   });
 
   it("rent money effect 保留：annualExpenseMicroUsd +9,000,000n", () => {
-    const pending = pendingState(stateAt(5, { pack: packDecision }), packDecision);
+    // GPT-0032-A：0–15 歲的個人財務一律 0，money-effect 測試改用成年 state。
+    const pending = pendingState(stateAt(30, { pack: packDecision }), packDecision);
     const result = run(pending, { type: "CHOOSE_DECISION", optionId: "rent" }, packDecision);
     expect(result.state.assets.annualExpenseMicroUsd).toBe(
       pending.assets.annualExpenseMicroUsd + 9_000_000n
@@ -377,14 +378,13 @@ describe("H5-CTO-166-A 可玩 façade：基本行為", () => {
   });
 
   it("年度事件 money effect 保留：annualIncomeMicroUsd +500,000n 且不等於基準公式", () => {
-    const withoutMoney = run(stateAt(5, { pack: packPlain }), { ...ADVANCE }, packPlain);
-    const withMoney = run(stateAt(5, { pack: packMoneyIncome }), { ...ADVANCE }, packMoneyIncome);
+    const withoutMoney = run(stateAt(30, { pack: packPlain }), { ...ADVANCE }, packPlain);
+    const withMoney = run(stateAt(30, { pack: packMoneyIncome }), { ...ADVANCE }, packMoneyIncome);
     expect(
       withMoney.state.assets.annualIncomeMicroUsd - withoutMoney.state.assets.annualIncomeMicroUsd
     ).toBe(500_000n);
-    const formula =
-      contracts.P3E_INCOME_BASE_MICRO_USD + 6n * contracts.P3E_INCOME_PER_YEAR_MICRO_USD;
-    expect(withMoney.state.assets.annualIncomeMicroUsd).not.toBe(formula);
+    const baseline = contracts.computeP3EBaseEconomy(31, 40, [], null);
+    expect(withMoney.state.assets.annualIncomeMicroUsd).toBe(baseline.annualIncomeMicroUsd + 500_000n);
   });
 
   it("guardian contentMode：命令完整執行並記錄在 Command Record", () => {

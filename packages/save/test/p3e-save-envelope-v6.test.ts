@@ -59,7 +59,7 @@ import { computeDeathDatasetChecksum, computeDeathPackChecksum } from "../../bir
  *
  * - **empty**：`genesisZero`（packNoCandidates＋zero-hazard 死亡包）＋空 History；
  * - **official 51**：正式 product path（seed `p3e-166-playable-runtime-v4`、
- *   untouched 官方 packs、105 命令、38 決策、age 67 死亡 2091）；
+ *   untouched 官方 packs、106 命令、39 決策、age 67 死亡 2091）；
  * - **scale 4096**：51 真實 Pair＋合成 Pair 至 4096（HEX_C 鏈＋無循環回填
  *   的合成尾端）——canonical wire 約 9.5 MiB，作為 raw＋gzip 的 transport
  *   scale（壓縮後約 0.4 倍，低於 5 MiB 上限）。
@@ -537,9 +537,9 @@ describe("H5-CTO-184-A Save Envelope V6：正向", () => {
     expect(official.finalState.age).toBe(67);
     expect(official.finalState.currentYear).toBe(2091);
     expect(official.finalState.stateHash).toBe(
-      "85ef17166e7bfe0aa6bb3f3ecba792d83f7bc3dbeeb402ae00734c9fe002c0e4"
+      "14d594f9c31ad9b3eb7fee86015aec983511ea3bb93361427f6bb0cadb8531d8"
     );
-    expect(((official.ledger as { records: unknown[] }).records).length).toBe(105);
+    expect(((official.ledger as { records: unknown[] }).records).length).toBe(106);
 
     for (const transport of [
       encodeP3ESaveEnvelopeV6(envOf(official.wire)),
@@ -551,7 +551,7 @@ describe("H5-CTO-184-A Save Envelope V6：正向", () => {
       expect(payload.masterSeed).toBe(SEED_OFFICIAL);
       expect(stable(payload.state)).toBe(stable(official.finalState));
       expect(stable(payload.history)).toBe(stable(official.ledger));
-      expect((payload.history.records as unknown[]).length).toBe(105);
+      expect((payload.history.records as unknown[]).length).toBe(106);
     }
   });
 

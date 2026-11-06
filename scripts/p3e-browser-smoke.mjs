@@ -55,13 +55,16 @@ const mime = {
   ".css": "text/css; charset=utf-8",
   ".json": "application/json; charset=utf-8",
   ".png": "image/png",
+  ".webp": "image/webp",
+  ".avif": "image/avif",
+  ".mp3": "audio/mpeg",
   ".svg": "image/svg+xml",
   ".woff2": "font/woff2"
 };
 
-const EXPECTED_STATE_HASH = "85ef17166e7bfe0aa6bb3f3ecba792d83f7bc3dbeeb402ae00734c9fe002c0e4";
-const EXPECTED_COMMAND_HEAD = "ce744bf48ba2e5f9e6eea88a7aa411e64bbfc4d92e386cb201a93bc3caa35a07";
-const EXPECTED_COMMANDS = 105;
+const EXPECTED_STATE_HASH = "14d594f9c31ad9b3eb7fee86015aec983511ea3bb93361427f6bb0cadb8531d8";
+const EXPECTED_COMMAND_HEAD = "347184ff2bed0eae76ee4c49a87a01d502fbf4ceb294e30549430bf69a635652";
+const EXPECTED_COMMANDS = 106;
 /**
  * GPT-0025-D：新增獨立的 307 條繁中字典資產（gzip ≈6.2KB）後，boot 必要資產
  * 從 511169 增加到約 518KB，已超過原本的 500KiB gate。這裡把 gate 調到
@@ -363,8 +366,7 @@ function layoutSnapshot(page) {
       ["event_or_decision", ".p3e-story-card, .p3e-pending"],
       ["stats", ".p3e-stat-dock"],
       ["time_controls", ".p3e-time-controls"],
-      ["next_step", ".p3e-controls"],
-      ["bottom_nav", ".p3e-tabs"]
+      ["next_step", ".p3e-controls"]
     ];
     const rects = {};
     for (const [name, selector] of targets) {
@@ -388,7 +390,11 @@ function layoutSnapshot(page) {
         rect.top >= -2 &&
         rect.bottom <= height + 2
     );
-    return { ok: fitted && statItems === 4, height, statItems, rects };
+    // GPT-0031-B：底部四 tabs 已移除，因此同屏必要區塊由七個改為六個。
+    const removedChrome = document.querySelectorAll(
+      ".p3e-tabs, .p3e-tab, .p3e-tools, .p3e-game-title"
+    ).length;
+    return { ok: fitted && statItems === 4 && removedChrome === 0, height, statItems, rects, removedChrome };
   });
 }
 
@@ -401,10 +407,10 @@ function touchTargets(page) {
       '[data-action="rebirth"]',
       '[data-action="start-life"]',
       '[data-action="reroll-birth"]',
+      '[data-action="toggle-nature-sound"]',
       ".p3e-time-controls button",
-      ".p3e-tab",
       ".p3e-birth-actions button",
-      ".p3e-tools > summary"
+      ".p3e-hud-menu > summary"
     ].join(", ");
     const visible = [...document.querySelectorAll(selector)].filter((node) => {
       const rect = node.getBoundingClientRect();
@@ -453,7 +459,7 @@ async function main() {
   });
 
   const bootStarted = Date.now();
-  // 主線要跑官方 golden（GPT-0029-A 之後是 105 命令）：明確釘住 seed，不受首次開頁隨機 seed 影響。
+  // 主線要跑官方 golden（GPT-0031-A 之後是 106 命令）：明確釘住 seed，不受首次開頁隨機 seed 影響。
   await page.goto(`${baseUrl}/${GOLDEN_QUERY}`, { waitUntil: "networkidle" });
   await page.waitForSelector("[data-p3e-live='true']", { timeout: 30000 });
   const bootMs = Date.now() - bootStarted;
@@ -620,11 +626,12 @@ async function main() {
       : `labels=${birthLabels.length} missing=[${missingBirthLabels.join(",")}] country=${bootBirth.country.slice(0, 12)} story=${bootBirth.story.length}`
   );
 
-  // 出生卡在三個尺寸下也不得讓 document／body 捲動；超出的資訊只能卡內捲。
+  // 出生卡在四個尺寸下也不得讓 document／body 捲動；超出的資訊只能卡內捲。
   if (birthVisible) {
     for (const viewport of [
       { width: 390, height: 844 },
       { width: 430, height: 932 },
+      { width: 360, height: 640 },
       { width: 320, height: 568 }
     ]) {
       await page.setViewportSize(viewport);
@@ -853,7 +860,11 @@ async function main() {
       const text = (node) => (node?.textContent ?? "").trim();
       return {
         phase: document.querySelector("[data-p3e-live]")?.getAttribute("data-p3e-phase") ?? null,
-        eventNames: [...document.querySelectorAll(".p3e-event-name")].map(text),
+        // GPT-0031-B：當年訊息改成人生紀錄後，事件名稱落在 .p3e-life-log-text。
+        eventNames: [
+          ...[...document.querySelectorAll(".p3e-event-name")].map(text),
+          ...[...document.querySelectorAll(".p3e-life-log-text")].map(text)
+        ],
         question: text(document.querySelector("#p3e-pending-title")),
         options: [...document.querySelectorAll("button.p3e-option")].map(text),
         story: document.querySelector(".p3e-story-card")?.innerText ?? ""
@@ -913,6 +924,31 @@ async function main() {
   const finalHead = await page.locator("[data-p3e-live]").getAttribute("data-p3e-command-head");
   const deathText = (await page.locator(".p3e-death").innerText()) ?? "";
   const deathBodyText = (await page.locator("body").innerText()) ?? "";
+
+  // GPT-0031-B：成年後資產／年收入必須改用 application view 的真實數值。
+  // GPT-0032-B：320px HUD 字級提高後以萬／億縮寫顯示，完整數值仍須保留在
+  // data-p3e-finance-full／title／aria-label，不能為了放大字體把資訊刪掉。
+  const adultHud = await page.evaluate(() => {
+    const hud = document.querySelector(".p3e-hud");
+    return {
+      values: [...(hud?.querySelectorAll(".p3e-hud-item strong") ?? [])].map(
+        (node) => node.textContent ?? ""
+      ),
+      full: [...(hud?.querySelectorAll(".p3e-hud-assets, .p3e-hud-income") ?? [])].map(
+        (node) => node.getAttribute("data-p3e-finance-full") ?? ""
+      ),
+      minorCount: hud?.querySelectorAll('[data-p3e-minor-finance="true"]').length ?? -1
+    };
+  });
+  check(
+    "adult_finance_shows_application_view_values",
+    adultHud.minorCount === 0 &&
+      adultHud.values[2] !== "—" && adultHud.values[3] !== "—" &&
+      /\$/.test(adultHud.values[2]) && /\$/.test(adultHud.values[3]) &&
+      adultHud.full.length === 2 &&
+      adultHud.full.every((value) => /^-?\$[\d,]+\.\d{2}$/.test(value)),
+    `values=${JSON.stringify(adultHud.values)} full=${JSON.stringify(adultHud.full)} minor=${adultHud.minorCount}`
+  );
 
   check("run_to_death", finalPhase === "death", `phase=${finalPhase}`);
   check(
@@ -1008,11 +1044,13 @@ async function main() {
     (rebirthText.includes("年齡 0") || rebirthText.includes("0 歲")) && (await commandCount(page)) === 0
   );
 
-  // 8. 三個手機尺寸：水平／垂直溢出皆為 0，七個區塊同屏、觸控區 >=44px
+  // 8. GPT-0031-B：四個手機尺寸（含 360x640）：水平／垂直溢出皆為 0，
+  //    六個必要區塊同屏（底部 tabs 已移除）、觸控區 >=44px
   await ensurePlayable(page);
   for (const viewport of [
     { width: 390, height: 844 },
     { width: 430, height: 932 },
+    { width: 360, height: 640 },
     { width: 320, height: 568 }
   ]) {
     await page.setViewportSize(viewport);
@@ -1035,7 +1073,7 @@ async function main() {
 
     const layout = await layoutSnapshot(page);
     check(
-      `viewport_${label}_all_seven_sections_visible`,
+      `viewport_${label}_all_six_sections_visible`,
       layout.ok,
       JSON.stringify(layout.rects)
     );
@@ -1071,6 +1109,34 @@ async function main() {
     await ensurePlayable(smallPage);
     const before = await commandCount(smallPage);
     const targets = await touchTargets(smallPage);
+
+    // GPT-0032-B：320x568 的 HUD label >= 11px、value >= 13px，且四項資訊都在。
+    const smallHud = await smallPage.evaluate(() => {
+      const hud = document.querySelector(".p3e-hud");
+      const label = hud?.querySelector(".p3e-hud-item span") ?? null;
+      const value = hud?.querySelector(".p3e-hud-item strong") ?? null;
+      return {
+        // .p3e-sr-only 也是 span，但它只是幼兒財務的可存取說明，不是 HUD label。
+        labels: [...(hud?.querySelectorAll(".p3e-hud-item") ?? [])].map(
+          (item) => item.querySelector(":scope > span:not(.p3e-sr-only)")?.textContent ?? ""
+        ),
+        values: [...(hud?.querySelectorAll(".p3e-hud-item > strong") ?? [])].map(
+          (node) => node.textContent ?? ""
+        ),
+        labelFont: label === null ? null : parseFloat(getComputedStyle(label).fontSize),
+        valueFont: value === null ? null : parseFloat(getComputedStyle(value).fontSize)
+      };
+    });
+    check(
+      "hud_320x568_font_sizes_and_all_four_items",
+      smallHud.labelFont !== null && smallHud.labelFont >= 11 &&
+        smallHud.valueFont !== null && smallHud.valueFont >= 13 &&
+        JSON.stringify(smallHud.labels) === JSON.stringify(["年份", "年齡", "資產", "年收入"]) &&
+        smallHud.values.length === 4 && smallHud.values.every((text) => text.length > 0),
+      `label=${smallHud.labelFont}px value=${smallHud.valueFont}px ` +
+        `labels=${JSON.stringify(smallHud.labels)} values=${JSON.stringify(smallHud.values)}`
+    );
+
     let clicked = false;
     if ((await smallPage.locator('[data-action="advance"]').count()) > 0) {
       await smallPage.locator('[data-action="advance"]').first().click();
@@ -1115,6 +1181,20 @@ async function main() {
     `assets=${copyAsset.length} gzip=${copyGzip} < ${COPY_GZIP_BUDGET}`
   );
 
+  // GPT-0032-B：只請求一張專用 landscape 場景圖，舊直立圖不得再進首屏，
+  // 避免「新圖 + 舊 129KB 圖」雙份首屏資產把 512KiB gate 推得更紅。
+  const legacySceneRequests = [...bootRequests.keys()].filter((path) =>
+    path.includes("life-sim-village-mvp")
+  );
+  const landscapeSceneRequests = [...bootRequests.keys()].filter((path) =>
+    path.includes("life-sim-village-landscape")
+  );
+  check(
+    "scene_asset_single_landscape_no_legacy_portrait_in_boot",
+    legacySceneRequests.length === 0 && landscapeSceneRequests.length === 1,
+    `legacy=${JSON.stringify(legacySceneRequests)} landscape=${JSON.stringify(landscapeSceneRequests)}`
+  );
+
   /* ---------------------------------------------------------------- */
   /* 11. 真實 localStorage 的 autosave／reload 情境（H5-CTO-188-A）      */
   /* ---------------------------------------------------------------- */
@@ -1150,9 +1230,13 @@ async function main() {
     await scenarioPage.goto(`${baseUrl}/${query}`, { waitUntil: "domcontentloaded" });
     await scenarioPage.waitForSelector("[data-p3e-live='true']", { timeout: 30000 });
     await ensurePlayable(scenarioPage);
-    // MVP v2 把技術性存檔操作收進 details；測試情境需先展開才能點擊。
-    const tools = scenarioPage.locator("details.p3e-tools");
-    if ((await tools.count()) === 1) await tools.evaluate((details) => { details.open = true; });
+    // GPT-0031-B：存檔／診斷已收進漢堡選單。預設保持收合，避免前景面板
+    // 擋住決策卡；只有需要操作存檔按鈕的情境才呼叫 openHudMenu()。
+  }
+
+  async function openHudMenu(target) {
+    const menu = target.locator("details.p3e-hud-menu");
+    if ((await menu.count()) === 1) await menu.evaluate((details) => { details.open = true; });
   }
 
   function readAttrs(scenarioPage) {
@@ -1214,8 +1298,6 @@ async function main() {
     await scenarioPage.reload({ waitUntil: "domcontentloaded" });
     await scenarioPage.waitForSelector("[data-p3e-live='true']", { timeout: 30000 });
     await ensurePlayable(scenarioPage);
-    const tools = scenarioPage.locator("details.p3e-tools");
-    if ((await tools.count()) === 1) await tools.evaluate((details) => { details.open = true; });
   }
 
   // 1. clean boot 建新命並存檔
@@ -1329,7 +1411,8 @@ async function main() {
     await openScenario(scenarioPage);
     const broken = await readAttrs(scenarioPage);
     const stillStored = await readStoredSave(scenarioPage);
-    const recoverButton = await scenarioPage.locator('[data-action="recover"]').count();
+    await openHudMenu(scenarioPage);
+    const recoverButton = await scenarioPage.locator('[data-action="recover"]:visible').count();
     verify(
       "corrupt_save_shows_recovery_and_is_not_silently_deleted",
       broken.status === "restore-error" && stillStored === "not-a-valid-envelope" && recoverButton === 1,
@@ -1367,7 +1450,8 @@ async function main() {
     await openScenario(scenarioPage, "p3e-other-seed-777");
     const attrs = await readAttrs(scenarioPage);
     const rawAfter = await readStoredSave(scenarioPage);
-    const recoverButton = await scenarioPage.locator('[data-action="recover"]').count();
+    await openHudMenu(scenarioPage);
+    const recoverButton = await scenarioPage.locator('[data-action="recover"]:visible').count();
     verify(
       "wrong_seed_save_not_silently_deleted",
       attrs.status === "restore-error" && rawAfter === rawBefore && recoverButton === 1,
@@ -1739,8 +1823,7 @@ async function main() {
   /* ---------------------------------------------------------------- */
 
   async function exportSave(scenarioPage) {
-    const tools = scenarioPage.locator("details.p3e-tools");
-    if ((await tools.count()) === 1) await tools.evaluate((details) => { details.open = true; });
+    await openHudMenu(scenarioPage);
     const [download] = await Promise.all([
       scenarioPage.waitForEvent("download"),
       scenarioPage.locator('[data-action="export"]').first().click()
@@ -2075,6 +2158,417 @@ async function main() {
       `hash_match=${imported.hash === sourceAttrs.hash}`
     );
     await blocked.scenarioContext.close();
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* 14. GPT-0031-B：直立 HUD、完整主圖、人生紀錄、背景自然音          */
+  /* ---------------------------------------------------------------- */
+  {
+    const { scenarioContext, scenarioPage } = await newScenarioPage();
+    const audioRequests = [];
+    scenarioPage.on("request", (request) => {
+      const url = request.url();
+      if (new URL(url).pathname.endsWith(".mp3")) audioRequests.push(url);
+    });
+    await scenarioPage.goto(`${baseUrl}/${GOLDEN_QUERY}`, { waitUntil: "domcontentloaded" });
+    await scenarioPage.waitForSelector("[data-p3e-live='true']", { timeout: 30000 });
+
+    const readAudioState = () =>
+      scenarioPage.evaluate(() => {
+        const live = document.querySelector("[data-p3e-live]");
+        const button = document.querySelector('[data-action="toggle-nature-sound"]');
+        let stored = null;
+        try {
+          stored = window.localStorage.getItem("life-sim:p3e:v1:nature-sound");
+        } catch {
+          stored = "storage-error";
+        }
+        return {
+          phase: live?.getAttribute("data-p3e-phase") ?? null,
+          enabled: live?.getAttribute("data-p3e-audio-enabled") ?? null,
+          blocked: live?.getAttribute("data-p3e-audio-blocked") ?? null,
+          armed: live?.getAttribute("data-p3e-audio-armed") ?? null,
+          requested: live?.getAttribute("data-p3e-audio-requested") ?? null,
+          playing: live?.getAttribute("data-p3e-audio-playing") ?? null,
+          volume: live?.getAttribute("data-p3e-audio-volume") ?? null,
+          preload: live?.getAttribute("data-p3e-audio-preload") ?? null,
+          loop: live?.getAttribute("data-p3e-audio-loop") ?? null,
+          audioTime: live?.getAttribute("data-p3e-audio-time") ?? null,
+          src: live?.getAttribute("data-p3e-audio-src") ?? null,
+          stored,
+          buttonText: button?.textContent ?? null,
+          buttonLabel: button?.getAttribute("aria-label") ?? null,
+          buttonPressed: button?.getAttribute("aria-pressed") ?? null
+        };
+      });
+
+    // 14.1 出生卡：完全沒有建立 Audio／沒有任何 .mp3 請求，偏好預設 true。
+    const birthAudio = await readAudioState();
+    verify(
+      "audio_no_request_before_start_life",
+      birthAudio.phase === "birth" &&
+        birthAudio.requested === "false" &&
+        birthAudio.armed === "false" &&
+        birthAudio.enabled === "true" &&
+        birthAudio.src === "none" &&
+        birthAudio.stored === null &&
+        audioRequests.length === 0,
+      `phase=${birthAudio.phase} requested=${birthAudio.requested} requests=${audioRequests.length} stored=${birthAudio.stored}`
+    );
+
+    // 14.2 按「開始人生」後才允許請求本機音檔。
+    await startLifeFromBirth(scenarioPage);
+    await scenarioPage.locator('[data-action="toggle-time"]').first().click().catch(() => {});
+    await scenarioPage.waitForTimeout(600);
+    let armedState = await readAudioState();
+    if (armedState.blocked === "true" && audioRequests.length === 0) {
+      // 瀏覽器擋下自動播放時，按鈕會切到「可再按一次開啟」，明確再點一次。
+      await scenarioPage.locator('[data-action="toggle-nature-sound"]').first().click();
+      await scenarioPage.waitForTimeout(600);
+      armedState = await readAudioState();
+    }
+    verify(
+      "audio_requested_only_after_valid_action",
+      armedState.requested === "true" && audioRequests.length >= 1 &&
+        audioRequests.every((url) => url.startsWith(baseUrl)),
+      `requested=${armedState.requested} requests=${audioRequests.length} localOnly=${audioRequests.every((url) => url.startsWith(baseUrl))}`
+    );
+    verify(
+      "audio_default_on_low_volume_loop_preload_none",
+      armedState.enabled === "true" &&
+        Math.abs(Number(armedState.volume) - 0.15) < 0.001 &&
+        armedState.loop === "true" &&
+        armedState.preload === "none" &&
+        armedState.src === "local" &&
+        (armedState.buttonText === "🔊" || armedState.blocked === "true"),
+      `volume=${armedState.volume} loop=${armedState.loop} preload=${armedState.preload} blocked=${armedState.blocked}`
+    );
+
+    // 14.3 頂部資訊列：左起年份／年齡／資產／年收入，右側只有自然音與漢堡。
+    const hud = await scenarioPage.evaluate(() => {
+      const header = document.querySelector(".p3e-hud");
+      if (header === null) return null;
+      const items = [...header.querySelectorAll(":scope > .p3e-hud-item")].map((node) => ({
+        label: node.querySelector("span")?.textContent ?? "",
+        value: node.querySelector("strong")?.textContent ?? ""
+      }));
+      const sound = header.querySelector('[data-action="toggle-nature-sound"]');
+      const menu = header.querySelector("details.p3e-hud-menu");
+      const rect = (node) => (node === null ? null : node.getBoundingClientRect());
+      const sr = rect(sound);
+      const mr = rect(menu);
+      const ir = rect(header.querySelector(".p3e-hud-income"));
+      return {
+        labels: items.map((item) => item.label),
+        values: items.map((item) => item.value),
+        minorCount: [...header.querySelectorAll(".p3e-hud-item")].filter(
+          (node) => node.getAttribute("data-p3e-minor-finance") === "true"
+        ).length,
+        note: header.querySelector(".p3e-sr-only")?.textContent ?? null,
+        soundLabel: sound?.getAttribute("aria-label") ?? null,
+        soundRect: sr === null ? null : { w: sr.width, h: sr.height, left: sr.left },
+        menuRect: mr === null ? null : { w: mr.width, h: mr.height, left: mr.left },
+        incomeRight: ir === null ? null : ir.right,
+        removedChrome: document.querySelectorAll(
+          ".p3e-tools, .p3e-tab, .p3e-tabs, .p3e-game-title"
+        ).length,
+        gearGlyph: (header.textContent ?? "").includes("⚙"),
+        menuPersistence: header.querySelector(".p3e-hud-menu-panel .p3e-persistence") !== null,
+        menuExport: header.querySelector('.p3e-hud-menu-panel [data-action="export"]') !== null,
+        menuImport: header.querySelector('.p3e-hud-menu-panel input[data-role="import-input"]') !== null,
+        menuMeta: header.querySelector(".p3e-hud-menu-panel .p3e-meta") !== null
+      };
+    });
+    verify(
+      "hud_left_order_year_age_assets_income",
+      hud !== null && JSON.stringify(hud.labels) === JSON.stringify(["年份", "年齡", "資產", "年收入"]),
+      `labels=${JSON.stringify(hud?.labels)}`
+    );
+    verify(
+      "hud_right_only_sound_and_hamburger",
+      hud !== null &&
+        hud.soundRect !== null && hud.menuRect !== null &&
+        hud.soundRect.left >= hud.incomeRight - 2 &&
+        hud.menuRect.left >= hud.soundRect.left + hud.soundRect.w - 2 &&
+        hud.removedChrome === 0 && !hud.gearGlyph,
+      `soundLeft=${hud?.soundRect?.left} incomeRight=${hud?.incomeRight} menuLeft=${hud?.menuRect?.left} removed=${hud?.removedChrome}`
+    );
+    verify(
+      "gear_button_and_bottom_tabs_removed_from_dom",
+      hud !== null && hud.removedChrome === 0 && !hud.gearGlyph,
+      `removed=${hud?.removedChrome} gearGlyph=${hud?.gearGlyph}`
+    );
+    verify(
+      "hamburger_keeps_save_diagnostic_recovery",
+      hud !== null && hud.menuPersistence && hud.menuExport && hud.menuImport && hud.menuMeta,
+      `persistence=${hud?.menuPersistence} export=${hud?.menuExport} import=${hud?.menuImport} meta=${hud?.menuMeta}`
+    );
+    verify(
+      "hud_sound_and_menu_touch_44px",
+      hud !== null && hud.soundRect !== null && hud.menuRect !== null &&
+        hud.soundRect.w >= 43.5 && hud.soundRect.h >= 43.5 &&
+        hud.menuRect.w >= 43.5 && hud.menuRect.h >= 43.5 &&
+        typeof hud.soundLabel === "string" && hud.soundLabel.length > 0,
+      `sound=${JSON.stringify(hud?.soundRect)} menu=${JSON.stringify(hud?.menuRect)} label=${hud?.soundLabel}`
+    );
+    verify(
+      "minor_finance_shows_dash_with_accessible_note",
+      hud !== null && hud.values[2] === "—" && hud.values[3] === "—" &&
+        hud.minorCount === 2 && (hud.note ?? "").includes("尚未擁有個人資產／收入"),
+      `values=${JSON.stringify(hud?.values)} minor=${hud?.minorCount} note=${hud?.note}`
+    );
+
+    // 14.4 GPT-0032-B：不再檢查 contain 字串。改成真正 decode 場景資產，
+    // 依 computed background-size／position 繪到與容器同尺寸 canvas，
+    // 逐列量測有效前景寬占比；直立圖 contain 只會得到約 1/3，會直接 FAIL。
+    const scene = await scenarioPage.evaluate(async () => {
+      const node = document.querySelector(".p3e-scene");
+      if (node === null) return null;
+      const style = getComputedStyle(node);
+      const text = (node.textContent ?? "").replace(/\s+/g, "").trim();
+      const rect = node.getBoundingClientRect();
+      const cw = Math.max(1, Math.round(rect.width));
+      const ch = Math.max(1, Math.round(rect.height));
+      const found = /url\((?:"|')?([^"')]+)(?:"|')?\)/.exec(style.backgroundImage);
+      const asset = {
+        loaded: false, url: found?.[1] ?? null, width: 0, height: 0,
+        aspect: 0, coverage: 0, containerWidth: cw
+      };
+      if (found !== null) {
+        try {
+          const response = await fetch(found[1]);
+          if (response.ok) {
+            const bitmap = await createImageBitmap(await response.blob());
+            const size = (style.backgroundSize.split(",")[0] ?? "").trim();
+            const scale = size === "cover"
+              ? Math.max(cw / bitmap.width, ch / bitmap.height)
+              : size === "contain"
+                ? Math.min(cw / bitmap.width, ch / bitmap.height)
+                : cw / bitmap.width;
+            const dw = bitmap.width * scale;
+            const dh = bitmap.height * scale;
+            const canvas = document.createElement("canvas");
+            canvas.width = cw;
+            canvas.height = ch;
+            const ctx = canvas.getContext("2d", { willReadFrequently: true });
+            if (ctx !== null) {
+              ctx.fillStyle = style.backgroundColor || "rgb(142, 209, 237)";
+              ctx.fillRect(0, 0, cw, ch);
+              const bg = ctx.getImageData(0, 0, 1, 1).data;
+              const pos = (style.backgroundPosition.split(",")[0] ?? "center").trim().split(/\s+/);
+              const place = (token, container, image) => {
+                if (token === "center") return (container - image) / 2;
+                if (token.endsWith("%")) return (parseFloat(token) / 100) * (container - image);
+                const px = parseFloat(token);
+                return Number.isFinite(px) ? px : (container - image) / 2;
+              };
+              ctx.drawImage(bitmap, place(pos[0] ?? "center", cw, dw),
+                place(pos[1] ?? "center", ch, dh), dw, dh);
+              const pixels = ctx.getImageData(0, 0, cw, ch).data;
+              let filled = 0;
+              for (let x = 0; x < cw; x += 1) {
+                for (let y = 0; y < ch; y += 3) {
+                  const i = (y * cw + x) * 4;
+                  const diff = Math.abs(pixels[i] - bg[0]) +
+                    Math.abs(pixels[i + 1] - bg[1]) + Math.abs(pixels[i + 2] - bg[2]);
+                  if (diff > 30) { filled += 1; break; }
+                }
+              }
+              Object.assign(asset, {
+                loaded: true, width: bitmap.width, height: bitmap.height,
+                aspect: bitmap.width / bitmap.height, coverage: filled / cw
+              });
+            }
+          }
+        } catch { /* 保留 loaded=false，讓檢查如實 FAIL */ }
+      }
+      return {
+        fit: node.dataset.p3eSceneFit ?? null,
+        assetId: node.dataset.p3eSceneAsset ?? null,
+        backgroundSize: style.backgroundSize,
+        backgroundRepeat: style.backgroundRepeat,
+        children: node.children.length,
+        text,
+        emoji: /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u.test(text),
+        width: cw,
+        height: ch,
+        asset
+      };
+    });
+    verify(
+      "scene_landscape_asset_fills_width_no_overlay",
+      scene !== null && scene.fit === "cover" &&
+        scene.assetId === "life-sim-village-landscape.avif" &&
+        (scene.backgroundSize.split(",")[0] ?? "").trim() === "cover" &&
+        scene.backgroundRepeat.startsWith("no-repeat") &&
+        scene.children === 0 && scene.text === "" && !scene.emoji &&
+        scene.asset.loaded === true &&
+        /life-sim-village-landscape[^/]*\.avif/.test(scene.asset.url ?? "") &&
+        scene.asset.aspect >= 1.6 && scene.asset.coverage >= 0.8,
+      `fit=${scene?.fit} size=${scene?.backgroundSize} repeat=${scene?.backgroundRepeat} ` +
+        `asset=${scene?.assetId} url=${scene?.asset.url} loaded=${scene?.asset.loaded} ` +
+        `dims=${scene?.asset.width}x${scene?.asset.height} aspect=${scene?.asset.aspect} ` +
+        `coverage=${scene?.asset.coverage} children=${scene?.children} text="${scene?.text}"`
+    );
+
+    // 14.5 連續推進至少 5 年後檢查人生紀錄（projection 尚未落地時檢查相容回退）。
+    for (let step = 0; step < 6; step += 1) {
+      const phase = await phaseOf(scenarioPage);
+      if (phase === "death") break;
+      await clickAndWait(scenarioPage, phase === "pending_decision" ? '[data-action="choose"]' : '[data-action="advance"]');
+    }
+    const readLifeLogState = () =>
+      scenarioPage.evaluate(() => {
+        const section = document.querySelector(".p3e-life-log");
+        const card = document.querySelector(".p3e-story-card");
+        const entries = [...document.querySelectorAll(".p3e-life-log-entry")].map((node) => ({
+          year: Number(node.dataset.p3eLifeLogYear),
+          age: Number(node.dataset.p3eLifeLogAge),
+          text: node.dataset.p3eLifeLogText ?? "",
+          inner: (node.textContent ?? "").replace(/\s+/g, " ").trim()
+        }));
+        return {
+          source: section?.dataset.p3eLifeLogSource ?? null,
+          count: Number(section?.dataset.p3eLifeLogCount ?? "-1"),
+          entries,
+          cardOverflowY: card === null ? null : getComputedStyle(card).overflowY,
+          docY: document.documentElement.scrollHeight - document.documentElement.clientHeight,
+          bodyY: document.body.scrollHeight - document.body.clientHeight
+        };
+      });
+    const beforeReloadLog = await readLifeLogState();
+    const logFormatOk = beforeReloadLog.entries.every((entry) =>
+      /^\d{4} 年 · \d+ 歲｜.+$/.test(entry.inner) && entry.text.length > 0
+    );
+    const logNoInternalKeys = beforeReloadLog.entries.every(
+      (entry) => !INTERNAL_KEY_PATTERN.test(entry.text)
+    );
+    verify(
+      "life_log_zh_hant_format_and_no_internal_keys",
+      beforeReloadLog.entries.length > 0 && logFormatOk && logNoInternalKeys,
+      `source=${beforeReloadLog.source} count=${beforeReloadLog.count} sample="${beforeReloadLog.entries[0]?.inner ?? ""}"`
+    );
+    verify(
+      "life_log_scrolls_inside_card_not_page",
+      beforeReloadLog.cardOverflowY === "auto" &&
+        beforeReloadLog.docY <= 1 && beforeReloadLog.bodyY <= 1,
+      `cardOverflowY=${beforeReloadLog.cardOverflowY} docY=${beforeReloadLog.docY} bodyY=${beforeReloadLog.bodyY}`
+    );
+    // 只注入顯示層 DOM 做長歷史壓力測試，不改遊戲狀態、不下命令。
+    const longHistory = await scenarioPage.evaluate(() => {
+      const list = document.querySelector(".p3e-life-log-list");
+      const card = document.querySelector(".p3e-story-card");
+      const first = list?.querySelector(".p3e-life-log-entry") ?? null;
+      if (list === null || card === null || first === null) return null;
+      for (let index = 0; index < 60; index += 1) list.append(first.cloneNode(true));
+      const rect = card.getBoundingClientRect();
+      const visible = [...list.children].filter((node) => {
+        const item = node.getBoundingClientRect();
+        return item.top >= rect.top - 2 && item.bottom <= rect.bottom + 2;
+      }).length;
+      return {
+        entries: list.children.length,
+        visible,
+        scrollHeight: card.scrollHeight,
+        clientHeight: card.clientHeight,
+        overflowY: getComputedStyle(card).overflowY,
+        docY: document.documentElement.scrollHeight - document.documentElement.clientHeight,
+        bodyY: document.body.scrollHeight - document.body.clientHeight
+      };
+    });
+    verify(
+      "life_log_long_history_scrolls_locally_only",
+      longHistory !== null && longHistory.entries >= 60 && longHistory.visible >= 3 &&
+        longHistory.scrollHeight > longHistory.clientHeight &&
+        longHistory.overflowY === "auto" &&
+        longHistory.docY <= 1 && longHistory.bodyY <= 1,
+      `entries=${longHistory?.entries} visible=${longHistory?.visible} scroll=${longHistory?.scrollHeight}/${longHistory?.clientHeight} docY=${longHistory?.docY} bodyY=${longHistory?.bodyY}`
+    );
+    if (beforeReloadLog.source === "projection") {
+      verify(
+        "life_log_at_least_5_entries_after_5_years",
+        beforeReloadLog.count >= 5 && beforeReloadLog.entries.length >= 5,
+        `count=${beforeReloadLog.count} entries=${beforeReloadLog.entries.length}`
+      );
+      const years = beforeReloadLog.entries.map((entry) => entry.year);
+      verify(
+        "life_log_newest_first",
+        years.every((year, index) => index === 0 || years[index - 1] >= year),
+        `years=${JSON.stringify(years.slice(0, 8))}`
+      );
+      await reloadApp(scenarioPage);
+      const afterReloadLog = await readLifeLogState();
+      verify(
+        "life_log_rebuilt_after_reload",
+        afterReloadLog.source === "projection" &&
+          afterReloadLog.count >= beforeReloadLog.count &&
+          afterReloadLog.entries[0]?.inner === beforeReloadLog.entries[0]?.inner,
+        `before=${beforeReloadLog.count} after=${afterReloadLog.count} latest="${afterReloadLog.entries[0]?.inner ?? ""}"`
+      );
+    } else {
+      // GPT-0031-A 尚未提供 view.lifeLog：任務文件允許安全回退到 lastOutcome。
+      // 這裡嚴格驗證回退路径可用，projection 上線後上面兩項會自動生效。
+      verify(
+        "life_log_compatible_fallback_until_projection",
+        beforeReloadLog.count === 1 && beforeReloadLog.entries.length === 1 &&
+          beforeReloadLog.source === "fallback",
+        `source=${beforeReloadLog.source} count=${beforeReloadLog.count} (GPT-0031-A projection pending)`
+      );
+    }
+
+    // 14.6 關閉後立即 pause；再次開啟從原位置繼續；重載後偏好保留。
+    const soundToggle = scenarioPage.locator('[data-action="toggle-nature-sound"]').first();
+    let beforeOff = await readAudioState();
+    // 若瀏覽器擋下自動播放，按鈕會停在「可再按一次開啟」；先明確開啟再測關閉。
+    if (beforeOff.enabled !== "true" || beforeOff.blocked === "true") {
+      await soundToggle.click().catch(() => {});
+      beforeOff = await readAudioState();
+    }
+    await soundToggle.click().catch(() => {});
+    const offState = await readAudioState();
+    verify(
+      "audio_off_pauses_immediately_and_stores_preference",
+      offState.enabled === "false" && offState.playing === "false" &&
+        offState.stored === "off" && offState.buttonText === "🔇" &&
+        offState.buttonLabel === "開啟自然音" && offState.buttonPressed === "false",
+      `enabled=${offState.enabled} playing=${offState.playing} stored=${offState.stored} text=${offState.buttonText}`
+    );
+    await soundToggle.click().catch(() => {});
+    await scenarioPage.waitForTimeout(250);
+    const onAgain = await readAudioState();
+    verify(
+      "audio_resumes_from_previous_position",
+      onAgain.enabled === "true" && onAgain.stored === "on" &&
+        Number(onAgain.audioTime) >= Number(beforeOff.audioTime) - 0.5,
+      `before=${beforeOff.audioTime} after=${onAgain.audioTime} enabled=${onAgain.enabled}`
+    );
+    await scenarioPage.reload({ waitUntil: "domcontentloaded" });
+    await scenarioPage.waitForSelector("[data-p3e-live='true']", { timeout: 30000 });
+    const reloadedPref = await readAudioState();
+    verify(
+      "audio_on_preference_persists_after_reload",
+      reloadedPref.stored === "on" && reloadedPref.enabled === "true" &&
+        reloadedPref.buttonText === "🔊" && reloadedPref.requested === "false",
+      `stored=${reloadedPref.stored} enabled=${reloadedPref.enabled} text=${reloadedPref.buttonText} requested=${reloadedPref.requested}`
+    );
+    // 明確關掉後再重載，驗證「關閉」這個偏好也能被保留。
+    await soundToggle.click().catch(() => {});
+    let offAgain = await readAudioState();
+    if (offAgain.stored !== "off") {
+      await soundToggle.click().catch(() => {});
+      offAgain = await readAudioState();
+    }
+    await scenarioPage.reload({ waitUntil: "domcontentloaded" });
+    await scenarioPage.waitForSelector("[data-p3e-live='true']", { timeout: 30000 });
+    const finalPref = await readAudioState();
+    verify(
+      "audio_off_preference_persists_after_reload",
+      offAgain.stored === "off" && finalPref.stored === "off" &&
+        finalPref.enabled === "false" && finalPref.requested === "false" &&
+        finalPref.buttonText === "🔇",
+      `beforeReload=${offAgain.stored} stored=${finalPref.stored} enabled=${finalPref.enabled} requested=${finalPref.requested}`
+    );
+    await scenarioContext.close();
   }
 
   const allChecks = [...results, ...scenarioResults];

@@ -534,7 +534,8 @@ describe("P3-E.1b-2f 正式流程", () => {
   });
 
   it("決策選項（rent）合法改動 annualExpenseMicroUsd → 成功 seal 且保留完整 delta", () => {
-    const choicePrevious = stateAt(5, { pack: packDecision });
+    // GPT-0032-A：0–15 歲的個人財務一律 0，money-effect 測試改用成年 state。
+    const choicePrevious = stateAt(30, { pack: packDecision });
     const annual = annualStage(choicePrevious, packDecision);
     const pendingState = pendingStateFromAnnual(choicePrevious, annual);
     const stage = resolveP3EDecisionChoice({
@@ -546,8 +547,13 @@ describe("P3-E.1b-2f 正式流程", () => {
     const draft = assembleP3EDecisionStateCoreDraft(pendingState, stage);
 
     // rent 的效果是 annualExpenseMicroUsd +9,000,000（不是基準公式值）
-    const baseExpense =
-      contracts.P3E_EXPENSE_BASE_MICRO_USD + BigInt(pendingState.age) * contracts.P3E_EXPENSE_PER_YEAR_MICRO_USD;
+    // GPT-0032-A：薪資／支出依「年初知識」結算，因此基準要用 roll 前的 knowledge。
+    const baseExpense = contracts.computeP3EBaseEconomy(
+      pendingState.age,
+      choicePrevious.stats.knowledge,
+      choicePrevious.flags,
+      null
+    ).annualExpenseMicroUsd;
     expect(pendingState.assets.annualExpenseMicroUsd).toBe(baseExpense);
     expect(draft.assets.annualExpenseMicroUsd).toBe(baseExpense + 9_000_000n);
     expect(draft.assets.annualExpenseMicroUsd).not.toBe(baseExpense);
@@ -584,13 +590,18 @@ describe("P3-E.1b-2f 正式流程", () => {
         effects: [{ type: "money", field: "annualIncomeMicroUsd", deltaMicroUsd: "5000000" }]
       }
     ]);
-    const previous = stateAt(5, { pack: packIncomeEffect });
+    const previous = stateAt(30, { pack: packIncomeEffect });
     const stage = annualStage(previous, packIncomeEffect);
     expect(stage.annualDeath.effects.selectedEventId).toBe("ev.money.income-boost");
     const draft = assembleP3EAnnualStateCoreDraft(previous, stage);
 
     const baseIncome =
-      contracts.P3E_INCOME_BASE_MICRO_USD + BigInt(draft.age) * contracts.P3E_INCOME_PER_YEAR_MICRO_USD;
+      contracts.computeP3EBaseEconomy(
+        draft.age,
+        previous.stats.knowledge,
+        previous.flags,
+        null
+      ).annualIncomeMicroUsd;
     expect(draft.assets.annualIncomeMicroUsd).toBe(baseIncome + 5_000_000n);
 
     const material = materializeP3ETransition(previous, draft);

@@ -1,8 +1,5 @@
 import {
-  P3E_EXPENSE_BASE_MICRO_USD,
-  P3E_EXPENSE_PER_YEAR_MICRO_USD,
-  P3E_INCOME_BASE_MICRO_USD,
-  P3E_INCOME_PER_YEAR_MICRO_USD,
+  computeP3EBaseEconomy,
   P3E_LIFE_DOMAIN,
   P3E_MAX_AGE,
   P3E_MIN_AGE,
@@ -320,32 +317,44 @@ export function drawP3ERollDeltas(state: P3EWordTuple): P3ERollDraws {
 /* ------------------------------------------------------------------ */
 
 /**
- * `p3e-roll-1.0.0` 的收支（H5-CTO-054-A-R1 裁決版）：
+ * roll 層的個人經濟（GPT-0031-A；**只算基準值**）：
  *
  * ```text
- * income  = P3E_INCOME_BASE_MICRO_USD  + BigInt(age) × P3E_INCOME_PER_YEAR_MICRO_USD
- * expense = P3E_EXPENSE_BASE_MICRO_USD + BigInt(age) × P3E_EXPENSE_PER_YEAR_MICRO_USD
- * net     = previousBalance + income − expense
+ * base    = computeP3EBaseEconomy(age, knowledge, [], null)   // 無旗標、無重心
+ * net     = previousBalance + base.income − base.expense
  * balance = max(0n, net)
  * ```
  *
- * - `annualIncomeMicroUsd`／`annualExpenseMicroUsd` **永遠是完整公式值**；
- *   只有 `balanceMicroUsd` 會被截到 `0n`，支出不會被改寫成「實際可扣金額」。
- * - `previousBalance` **可以是負值**（淨負債）：`net < 0` 時輸出 `0n`。
- * - 結算結果不得超過 `MAX_MONEY_PPP_MICRO`，否則 `E_P3E_MONEY at assets.balanceMicroUsd`。
- *   （`balance` 恆為非負，因此不需要檢查下界。）
+ * 這一層刻意只給「還沒有任何教育／工作／退休旗標、也沒有事件加成」的基準值：
+ * `P3ERollInput` 的 exact-object 契約不含 `flags`／`lifeFocusId`／上一年資產，
+ * 因此真正的權威收支由 `resolveP3EAnnualRoll`（看得到完整 state）以
+ * `computeP3EAnnualEconomy` 算出來並覆寫。
  *
- * 本函式只做公式與輸出上界，不驗證 `age`／`previousBalance` 的型別——
- * 那些由公開入口的 `readAge`／`readBalance` 負責。
+ * 兩者共用同一份 `computeP3EBaseEconomy`：沒有旗標的角色，兩邊結果逐位元相同。
+ *
+ * - `annualIncomeMicroUsd`／`annualExpenseMicroUsd` 是完整結算值；
+ *   只有 `balanceMicroUsd` 會被截到 `0n`。
+ * - `previousBalance` 可以是負值（淨負債）：`net < 0` 時輸出 `0n`。
+ * - 結算結果不得超過 `MAX_MONEY_PPP_MICRO`，否則 `E_P3E_MONEY at assets.balanceMicroUsd`。
  */
-export function computeP3ERollAssets(age: number, previousBalanceMicroUsd: bigint): P3EAssets {
-  const years = BigInt(age);
-  const annualIncomeMicroUsd = P3E_INCOME_BASE_MICRO_USD + years * P3E_INCOME_PER_YEAR_MICRO_USD;
-  const annualExpenseMicroUsd = P3E_EXPENSE_BASE_MICRO_USD + years * P3E_EXPENSE_PER_YEAR_MICRO_USD;
-  const net = previousBalanceMicroUsd + annualIncomeMicroUsd - annualExpenseMicroUsd;
+export function computeP3ERollAssets(
+  age: number,
+  knowledge: number,
+  previousBalanceMicroUsd: bigint
+): P3EAssets {
+  const base = computeP3EBaseEconomy(age, knowledge, [], null);
+  // 0–15 歲：個人收入／支出／資產一律 0（與 `computeP3EAnnualEconomy` 完全一致）。
+  if (age < 16) {
+    return { balanceMicroUsd: 0n, annualIncomeMicroUsd: 0n, annualExpenseMicroUsd: 0n };
+  }
+  const net = previousBalanceMicroUsd + base.annualIncomeMicroUsd - base.annualExpenseMicroUsd;
   const balanceMicroUsd = net < 0n ? 0n : net;
   if (balanceMicroUsd > MAX_MONEY_PPP_MICRO) throw new P3EError("E_P3E_MONEY", PATH_ASSETS_BALANCE);
-  return { balanceMicroUsd, annualIncomeMicroUsd, annualExpenseMicroUsd };
+  return {
+    balanceMicroUsd,
+    annualIncomeMicroUsd: base.annualIncomeMicroUsd,
+    annualExpenseMicroUsd: base.annualExpenseMicroUsd
+  };
 }
 
 /* ------------------------------------------------------------------ */
@@ -378,7 +387,7 @@ export function resolveP3ERoll(input: P3ERollInput): P3ERollResult {
     knowledge: clampStat(stats.knowledge + draws.knowledge),
     relationships: clampStat(stats.relationships + draws.relationships)
   };
-  const nextAssets = computeP3ERollAssets(age, balanceMicroUsd);
+  const nextAssets = computeP3ERollAssets(age, stats.knowledge, balanceMicroUsd);
   const nextLifeRng: P3ELifeRngState = {
     domain: P3E_LIFE_DOMAIN,
     initialState: copyWords(lifeRng.initialState),

@@ -102,6 +102,24 @@ const SEED_PATTERN = /^[A-Za-z0-9._-]{1,64}$/;
 const ACTIVE_SEED_KEY = "life-sim:p3e:active-seed";
 
 /* ------------------------------------------------------------------ */
+/* GPT-0031-B：直立 HUD 與背景自然音                                    */
+/* ------------------------------------------------------------------ */
+
+/**
+ * 個人財務在 16 歲以前只做「呈現保護」：HUD 顯示 `—` 並附上可存取說明。
+ * 底層資料由 GPT-0031-A（application／simulation）修正，UI 不改任何公式。
+ */
+const PERSONAL_FINANCE_AGE = 16;
+/** 自然音偏好：獨立、版本化 key，不進存檔 wire、不複製人生歷史到 localStorage。 */
+const NATURE_SOUND_PREF_KEY = "life-sim:p3e:v1:nature-sound";
+const NATURE_SOUND_VOLUME = 0.15;
+/**
+ * 以 `new URL(..., import.meta.url)` 讓 Vite 把音檔包成本機 hashed asset，
+ * 執行期路徑永遠是本站，不會向 GitHub／Freesound 發請求。
+ */
+const NATURE_SOUND_URL = new URL("../../../assets/audio/birds.mp3", import.meta.url).href;
+
+/* ------------------------------------------------------------------ */
 /* 顯示層繁中對照（只影響畫面；不改資料包、不改 fixtures）                 */
 /* ------------------------------------------------------------------ */
 
@@ -400,8 +418,6 @@ function localizeStory(paragraphs: readonly string[], birth: P3EBrowserBirthPrev
   });
 }
 
-type TabKey = "life" | "family" | "work" | "map";
-
 /** autosave 狀態（對應 `data-p3e-persistence-status`）。 */
 type PersistenceStatus =
   | "restored"
@@ -427,7 +443,11 @@ let session: P3EPlaySession | null = null;
  */
 let eventCopy: Readonly<Record<string, string>> | null = null;
 let eventCopyKeys = 0;
-let activeTab: TabKey = "life";
+/**
+ * GPT-0031-B：漢堡選單開合是純 UI 呈現狀態，跨 render 保留，
+ * 讓「匯出／匯入存檔」與壞存檔復原在命令後仍可連續操作。
+ */
+let hudMenuOpen = false;
 /**
  * 重心選擇面板的呈現狀態（純 UI，不進存檔、不產生 command）：
  * null＝交給系統判斷（7 歲首次進入可操作階段時自動展開一次）、
@@ -462,6 +482,19 @@ let savedGeneration = -1;
 let lastExport: string | null = null;
 /** 最近一次 portable 匯入結果（ok／error／null；只作 UI 狀態）。 */
 let lastImport: "ok" | "error" | null = null;
+
+/**
+ * GPT-0031-B：自然音完全屬於 UI 呈現層，不進 session、不進存檔、不進 replay。
+ * - `enabled`：版本化 localStorage 偏好，第一次使用預設 true；
+ * - `armed`：玩家已按「開始人生」／做過有效操作（或親自按開關），才允許建立 Audio；
+ * - `blocked`：瀏覽器擋下自動播放時不報錯，按鈕改成「可再按一次開啟」；
+ * - `requested`：Audio 元素已建立並設好本機 src（供 headless 驗收請求時機）。
+ */
+let natureSoundEnabled = readNatureSoundPreference();
+let natureSoundArmed = false;
+let natureSoundBlocked = false;
+let natureSoundRequested = false;
+let natureSoundAudio: HTMLAudioElement | null = null;
 
 const PORTABLE_FILENAME = "life-sim-p3e-v6.json";
 const PORTABLE_MIME = "application/json";
@@ -580,13 +613,19 @@ function formatMicroUsd(value: string): string {
   return `${negative ? "-" : ""}$${whole}.${cents}`;
 }
 
-function ageStage(age: number): { label: string; icon: string } {
-  if (age <= 2) return { label: "嬰兒", icon: "👶" };
-  if (age <= 12) return { label: "童年", icon: "🧒" };
-  if (age <= 17) return { label: "少年", icon: "🧑" };
-  if (age <= 39) return { label: "青年", icon: "🧑" };
-  if (age <= 64) return { label: "中年", icon: "🧔" };
-  return { label: "晚年", icon: "🧓" };
+/* GPT-0032-B：320px HUD 的 value 必須至少 13px，完整金額會把欄位擠到省略號。
+   顯示層改用萬／億縮寫（量級不失真），完整數值仍放在 title／aria-label，
+   年份／年齡／資產／年收入四項資訊一個都沒有刪。 */
+function formatCompactMicroUsd(value: string): string {
+  const full = formatMicroUsd(value);
+  const matched = /^(-?)\$([\d,]+)\.\d{2}$/.exec(full);
+  if (matched === null) return full;
+  const sign = matched[1] ?? "";
+  const amount = Number((matched[2] ?? "0").replace(/,/g, ""));
+  if (!Number.isFinite(amount)) return full;
+  if (amount >= 100_000_000) return `${sign}$${(amount / 100_000_000).toFixed(1)}億`;
+  if (amount >= 10_000) return `${sign}$${(amount / 10_000).toFixed(1)}萬`;
+  return full;
 }
 
 /* ------------------------------------------------------------------ */
@@ -735,6 +774,300 @@ function friendlyChosenOption(outcome: {
   const suffix = outcome.eventId.replace(/^ev\./, "");
   const label = friendlyKey(`p3b.option.${suffix}.${outcome.selectedOptionId}`);
   return label === "人生的一段插曲" ? "做出了當時的選擇" : label;
+}
+
+/* ------------------------------------------------------------------ */
+/* GPT-0031-B｜背景自然音                                               */
+/* ------------------------------------------------------------------ */
+
+/** 第一次使用預設 true；localStorage 不可用也不影響遊戲。 */
+function readNatureSoundPreference(): boolean {
+  try {
+    const raw = window.localStorage.getItem(NATURE_SOUND_PREF_KEY);
+    if (raw === "off") return false;
+    if (raw === "on") return true;
+  } catch {
+    // 隱私模式／配額限制：偏好只降級成「每次預設開啟」，不報錯。
+  }
+  return true;
+}
+
+function writeNatureSoundPreference(enabled: boolean): void {
+  try {
+    window.localStorage.setItem(NATURE_SOUND_PREF_KEY, enabled ? "on" : "off");
+  } catch {
+    // 偏好保存失敗不影響自動存檔、遊戲時鐘或任何按鈕。
+  }
+}
+
+/** 「看起來是開啟」＝偏好開啟且沒有被瀏覽器擋下。 */
+function natureSoundOn(): boolean {
+  return natureSoundEnabled && !natureSoundBlocked;
+}
+
+/**
+ * 只在 `armed` 之後建立 Audio 元素並設定本機 src。
+ * `preload="none"` 讓首頁／出生卡完全不下載音檔；`loop` 直接沿用上游
+ * 已做好的無縫循環。
+ */
+function createNatureSoundAudio(): HTMLAudioElement {
+  const audio = new Audio();
+  audio.preload = "none";
+  audio.loop = true;
+  audio.volume = NATURE_SOUND_VOLUME;
+  audio.src = NATURE_SOUND_URL;
+  audio.addEventListener("play", syncNatureSoundDom);
+  audio.addEventListener("pause", syncNatureSoundDom);
+  natureSoundRequested = true;
+  natureSoundAudio = audio;
+  return audio;
+}
+
+/** 把音訊狀態寫到根節點，讓 headless 也能驗證狀態而不必真的輸出聲音。 */
+function writeNatureSoundDataset(shell: HTMLElement | null): void {
+  if (shell === null) return;
+  const audio = natureSoundAudio;
+  shell.dataset["p3eAudioEnabled"] = String(natureSoundEnabled);
+  shell.dataset["p3eAudioBlocked"] = String(natureSoundBlocked);
+  shell.dataset["p3eAudioArmed"] = String(natureSoundArmed);
+  shell.dataset["p3eAudioRequested"] = String(natureSoundRequested);
+  shell.dataset["p3eAudioPlaying"] = String(audio !== null && !audio.paused);
+  shell.dataset["p3eAudioVolume"] = String(audio?.volume ?? NATURE_SOUND_VOLUME);
+  shell.dataset["p3eAudioTime"] = String(audio?.currentTime ?? 0);
+  shell.dataset["p3eAudioPreload"] = audio?.preload ?? "none";
+  shell.dataset["p3eAudioLoop"] = String(audio?.loop ?? true);
+  shell.dataset["p3eAudioSrc"] = natureSoundRequested ? "local" : "none";
+}
+
+/** 只更新按鈕與 dataset，不重建整個畫面（避免昂貴的同步版面計算）。 */
+function syncNatureSoundDom(): void {
+  const shell = app.querySelector<HTMLElement>("[data-p3e-live]");
+  writeNatureSoundDataset(shell);
+  const button = shell?.querySelector<HTMLButtonElement>('[data-action="toggle-nature-sound"]') ?? null;
+  if (button === null) return;
+  const on = natureSoundOn();
+  const label = on ? "關閉自然音" : "開啟自然音";
+  button.textContent = on ? "🔊" : "🔇";
+  button.setAttribute("aria-label", label);
+  button.setAttribute("aria-pressed", String(on));
+  button.title = label;
+  button.dataset["p3eAudio"] = on ? "on" : "off";
+}
+
+function startNatureSound(): void {
+  if (!natureSoundArmed || !natureSoundEnabled) return;
+  natureSoundBlocked = false;
+  try {
+    const audio = natureSoundAudio ?? createNatureSoundAudio();
+    const pending = audio.play();
+    if (typeof pending?.catch === "function") {
+      void pending.catch(() => {
+        // 手機瀏覽器擋自動播放：不報錯、不卡住遊戲，按鈕改成可再按一次開啟。
+        natureSoundBlocked = true;
+        syncNatureSoundDom();
+      });
+    }
+  } catch {
+    natureSoundBlocked = true;
+  }
+  syncNatureSoundDom();
+}
+
+/** 玩家按「開始人生」或第一次有效操作後才允許載入／播放音檔。 */
+function armNatureSound(): void {
+  if (natureSoundArmed) return;
+  natureSoundArmed = true;
+  startNatureSound();
+}
+
+function pauseNatureSound(): void {
+  const audio = natureSoundAudio;
+  if (audio !== null) {
+    try {
+      audio.pause(); // 不重置 currentTime，再開啟時從剛才的位置繼續。
+    } catch {
+      // 音效失敗不影響任何遊戲行為。
+    }
+  }
+  syncNatureSoundDom();
+}
+
+function toggleNatureSound(): void {
+  if (natureSoundOn()) {
+    natureSoundEnabled = false;
+    writeNatureSoundPreference(false);
+    pauseNatureSound();
+  } else {
+    natureSoundEnabled = true;
+    natureSoundBlocked = false;
+    writeNatureSoundPreference(true);
+    natureSoundArmed = true;
+    startNatureSound();
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* GPT-0031-B｜人生紀錄（相容型 type guard，不修改 application 型別）    */
+/* ------------------------------------------------------------------ */
+
+interface LifeLogEntryLike {
+  readonly year: number;
+  readonly age: number;
+  readonly kind: string;
+  readonly ids: readonly string[];
+}
+
+/** projection 可能把公開 ID 放在不同欄位；全部以白名單讀取，絕不列印未知欄位。 */
+const LIFE_LOG_ID_KEYS = [
+  "eventId",
+  "selectedEventId",
+  "optionId",
+  "selectedOptionId",
+  "decisionId",
+  "focusId",
+  "causeId",
+  "publicId",
+  "labelKey",
+  "titleId",
+  "copyId",
+  "id"
+] as const;
+
+function isFiniteNumber(value: unknown): value is number {
+  return typeof value === "number" && Number.isFinite(value);
+}
+
+function readLifeLogEntry(raw: unknown): LifeLogEntryLike | null {
+  if (!isPlainRecord(raw)) return null;
+  const year = raw["year"];
+  const age = raw["age"];
+  if (!isFiniteNumber(year) || !isFiniteNumber(age)) return null;
+  const kind = typeof raw["kind"] === "string" ? raw["kind"] : "advance_year";
+  const ids: string[] = [];
+  for (const key of LIFE_LOG_ID_KEYS) {
+    const value = raw[key];
+    if (typeof value === "string" && value.length > 0 && !ids.includes(value)) ids.push(value);
+  }
+  const nested = raw["ids"];
+  if (Array.isArray(nested)) {
+    for (const value of nested) {
+      if (typeof value === "string" && value.length > 0 && !ids.includes(value)) ids.push(value);
+    }
+  }
+  return { year, age, kind, ids };
+}
+
+/**
+ * 安全讀取可選 `view.lifeLog`。GPT-0031-A 尚未落地時回傳 null，
+ * UI 會回退到最後一個 outcome；正式 projection 上線後不需改 UI。
+ */
+function readLifeLog(view: P3EPlaySession["view"]): readonly LifeLogEntryLike[] | null {
+  const source: unknown = (view as unknown as Record<string, unknown>)["lifeLog"];
+  if (!Array.isArray(source) || source.length === 0) return null;
+  const entries: LifeLogEntryLike[] = [];
+  for (const raw of source) {
+    const entry = readLifeLogEntry(raw);
+    if (entry !== null) entries.push(entry);
+  }
+  if (entries.length === 0) return null;
+  // 官方 projection 可「最新在前」或「明確順序」；這裡統一一律最新在上。
+  const first = entries[0];
+  const last = entries[entries.length - 1];
+  if (first !== undefined && last !== undefined && first.year < last.year) entries.reverse();
+  return entries.slice(0, 256);
+}
+
+/** 缺少 projection 的過渡期：用既有 lastOutcome 組出單條紀錄，仍不露內部 ID。 */
+function fallbackLifeLog(current: P3EPlaySession): readonly LifeLogEntryLike[] {
+  const last = current.lastOutcome;
+  if (last === null) return [];
+  const year = current.view.currentYear;
+  const age = current.view.age;
+  if (last.kind === "advance_year") {
+    if (last.death !== null) return [{ year, age, kind: "death", ids: [] }];
+    return [{ year, age, kind: "advance_year", ids: last.selectedEventId === null ? [] : [last.selectedEventId] }];
+  }
+  if (last.kind === "choose_decision") {
+    return [{ year, age, kind: "choose_decision", ids: [friendlyChosenOption(last)] }];
+  }
+  return [{ year, age, kind: "set_life_focus", ids: [last.focusId] }];
+}
+
+/** 只接受字典查得到的自然中文；查不到就回 null，絕不外洩 internal key。 */
+function firstFriendlyLabel(ids: readonly string[]): string | null {
+  for (const id of ids) {
+    const label = friendlyKey(id);
+    if (label !== "人生的一段插曲" && label !== "平凡的一年" && label.length > 0) return label;
+  }
+  return null;
+}
+
+/**
+ * 公開 ID → 專案既有繁中名稱。相容 GPT-0031-A 的
+ * `birth | year | event | decision | focus | death` 六種 kind，
+ * 也相容舊 `advance_year | choose_decision | set_life_focus` 命名。
+ */
+function lifeLogText(entry: LifeLogEntryLike): string {
+  const kind = entry.kind.toLowerCase();
+  // 過渡期回退會直接放入已翻譯好的中文（不是 internal key）。
+  const natural = entry.ids.find((id) => /[\u3400-\u9fff]/.test(id));
+  if (natural !== undefined) {
+    return kind.includes("decision") || kind.includes("choice") || kind.includes("option")
+      ? `做出了選擇：${natural}`
+      : natural;
+  }
+  if (kind.includes("death") || kind === "end") return "這段人生走到了終點";
+  if (kind === "birth") return "出生，人生故事正要開始";
+  if (kind === "year") return "平安的一年";
+  if (kind.includes("focus")) {
+    for (const id of entry.ids) {
+      if (isP3ELifeFocusId(id)) return `把人生重心放在${p3eLifeFocusLabel(id, entry.age)}`;
+    }
+    return "調整了人生重心";
+  }
+  if (kind.includes("decision") || kind.includes("choice") || kind.includes("option")) {
+    // 決策紀錄優先組回 `p3b.option.<event>.<option>` 的繁中選項名稱。
+    const eventId = entry.ids.find((id) => id.startsWith("ev."));
+    const optionId = entry.ids.find((id) => /^[a-z0-9][a-z0-9_-]{0,23}$/i.test(id));
+    if (eventId !== undefined && optionId !== undefined) {
+      const composed = `p3b.option.${eventId.replace(/^ev\./, "")}.${optionId}`;
+      const label = friendlyKey(composed);
+      if (label !== "人生的一段插曲" && label !== "平凡的一年") return `做出了選擇：${label}`;
+    }
+    const label = firstFriendlyLabel(entry.ids.filter((id) => id.startsWith("ev.")));
+    return label === null ? "做出了當時的選擇" : `做出了選擇：${label}`;
+  }
+  const eventIds = entry.ids.filter((id) => id.startsWith("ev."));
+  return firstFriendlyLabel(eventIds.length > 0 ? eventIds : entry.ids) ?? "平凡的一年";
+}
+
+function renderLifeLog(current: P3EPlaySession): HTMLElement {
+  const projection = readLifeLog(current.view);
+  const entries = projection ?? fallbackLifeLog(current);
+  const section = element("section", "p3e-life-log");
+  section.setAttribute("aria-label", "人生紀錄");
+  section.dataset["p3eLifeLogSource"] = projection === null ? "fallback" : "projection";
+  section.dataset["p3eLifeLogCount"] = String(entries.length);
+  if (entries.length === 0) {
+    section.append(element("p", "p3e-life-log-empty", `${current.view.currentYear} 年，你的人生故事正要開始。`));
+    return section;
+  }
+  const list = element("ol", "p3e-life-log-list");
+  for (const entry of entries) {
+    const text = lifeLogText(entry);
+    const item = element("li", "p3e-life-log-entry");
+    item.dataset["p3eLifeLogYear"] = String(entry.year);
+    item.dataset["p3eLifeLogAge"] = String(entry.age);
+    item.dataset["p3eLifeLogText"] = text;
+    item.append(
+      element("span", "p3e-life-log-when", `${entry.year} 年 · ${entry.age} 歲`),
+      element("span", "p3e-life-log-sep", "｜"),
+      element("span", "p3e-life-log-text", text)
+    );
+    list.append(item);
+  }
+  section.append(list);
+  return section;
 }
 
 /* ------------------------------------------------------------------ */
@@ -1049,6 +1382,8 @@ function startLifeFromCard(): void {
       persistCurrentSession();
     }
     focusAdvanceAfterRender = true;
+    // 明確的使用者手勢：現在才允許建立 Audio 並請求本機音檔。
+    armNatureSound();
     if (session.view.controls.canAdvanceYear) lifeClock.resume();
     else lifeClock.pause();
   } catch (error) {
@@ -1141,6 +1476,8 @@ function renderBirth(): void {
   card.append(hero, grid, story, actions);
   screen.append(card);
   app.replaceChildren(screen);
+  // 出生卡階段也可以觀察音訊狀態，但這裡完全不建立 Audio、不下載音檔。
+  writeNatureSoundDataset(screen);
 }
 
 /* ------------------------------------------------------------------ */
@@ -1154,6 +1491,8 @@ function runCommand(command: unknown): void {
   try {
     const result = runP3EPlaySessionCommand({ session, command });
     session = result.session;
+    // 從舊存檔直接進遊戲時，第一個成功命令也算「第一次有效操作」。
+    armNatureSound();
     if (!session.view.controls.canAdvanceYear) lifeClock.pause();
     persistenceGeneration += 1;
     if (storage !== null && persistenceEnabled) persistenceStatus = "saving";
@@ -1354,10 +1693,14 @@ function setControlsDisabled(disabled: boolean): void {
 function render(): void {
   if (session === null) return;
   const view = session.view;
+  // 直接讀取舊 DOM 的開合狀態，避免 `toggle` 事件尚未派送時重建把選單關掉。
+  const existingMenu = app.querySelector<HTMLDetailsElement>("details.p3e-hud-menu");
+  if (existingMenu !== null) hudMenuOpen = existingMenu.open;
 
   const shell = element("main", "p3e-shell p3e-game-shell");
   shell.id = "p3e-main";
-  shell.setAttribute("aria-labelledby", "p3e-title");
+  // GPT-0031-B：佔位標題移除後，改用 aria-label 保留可存取名稱。
+  shell.setAttribute("aria-label", "人生模擬");
   shell.dataset["p3eLive"] = "true";
   shell.dataset["p3ePhase"] = view.phase;
   shell.dataset["p3eCopyKeys"] = String(eventCopyKeys);
@@ -1373,26 +1716,75 @@ function render(): void {
   shell.dataset["p3eLastExport"] = lastExport ?? "";
   shell.dataset["p3eLastImport"] = lastImport ?? "";
 
+  /* GPT-0031-B：HUD 左起年份／年齡／資產／年收入，右側只有自然音與漢堡。
+     16 歲以前資產與年收入只做呈現保護（底層由 GPT-0031-A 修正）。 */
   const header = element("header", "p3e-hud");
-  const title = element("h1", "p3e-game-title", "人生模擬");
-  title.id = "p3e-title";
+  const minorFinance = view.age < PERSONAL_FINANCE_AGE;
   const year = element("div", "p3e-hud-item p3e-hud-year");
   year.append(element("span", undefined, "年份"), element("strong", undefined, String(view.currentYear)));
   const age = element("div", "p3e-hud-item p3e-hud-age");
   age.append(element("span", undefined, "年齡"), element("strong", undefined, `${view.age} 歲`));
+  const balanceFull = minorFinance ? "—" : formatMicroUsd(view.assets.balanceMicroUsd);
+  const incomeFull = minorFinance ? "—" : formatMicroUsd(view.assets.annualIncomeMicroUsd);
+  const balanceValue = minorFinance ? "—" : formatCompactMicroUsd(view.assets.balanceMicroUsd);
+  const incomeValue = minorFinance ? "—" : formatCompactMicroUsd(view.assets.annualIncomeMicroUsd);
   const balance = element("div", "p3e-hud-item p3e-hud-assets");
-  balance.append(element("span", undefined, "資產"), element("strong", undefined, formatMicroUsd(view.assets.balanceMicroUsd)));
+  balance.append(element("span", undefined, "資產"), element("strong", undefined, balanceValue));
+  balance.setAttribute("aria-label", `資產：${minorFinance ? "尚未擁有個人資產" : balanceFull}`);
+  balance.title = minorFinance ? "尚未擁有個人資產／收入" : `資產 ${balanceFull}`;
+  balance.dataset["p3eFinanceFull"] = balanceFull;
   const income = element("div", "p3e-hud-item p3e-hud-income");
-  income.append(element("span", undefined, "年收入"), element("strong", undefined, formatMicroUsd(view.assets.annualIncomeMicroUsd)));
+  income.append(element("span", undefined, "年收入"), element("strong", undefined, incomeValue));
+  income.setAttribute("aria-label", `年收入：${minorFinance ? "尚未擁有個人收入" : incomeFull}`);
+  income.title = minorFinance ? "尚未擁有個人資產／收入" : `年收入 ${incomeFull}`;
+  income.dataset["p3eFinanceFull"] = incomeFull;
+  if (minorFinance) {
+    for (const [item, label] of [[balance, "資產"], [income, "年收入"]] as const) {
+      item.dataset["p3eValue"] = "—";
+      item.dataset["p3eMinorFinance"] = "true";
+      item.setAttribute("aria-label", `${label}：尚未擁有個人資產／收入`);
+      item.title = "尚未擁有個人資產／收入";
+      item.append(element("span", "p3e-sr-only", "尚未擁有個人資產／收入"));
+    }
+  }
+
+  const soundButton = element("button", "p3e-hud-sound", "🔊");
+  soundButton.type = "button";
+  soundButton.dataset["action"] = "toggle-nature-sound";
+  soundButton.addEventListener("click", toggleNatureSound);
+
   const menu = element("details", "p3e-hud-menu");
+  menu.open = hudMenuOpen;
+  menu.addEventListener("toggle", () => {
+    hudMenuOpen = menu.open;
+  });
   const menuSummary = element("summary", undefined, "☰");
-  menuSummary.setAttribute("aria-label", "開啟選單");
-  menu.append(menuSummary, element("p", undefined, "公開測試版 · 進度自動儲存在本機"));
+  menuSummary.setAttribute("aria-label", "開啟存檔與診斷選單");
+  const notice = element(
+    "p",
+    "p3e-mvp-notice",
+    "MVP 公開測試版 · 遊戲內容使用虛構／合成資料，不代表真實人口統計。"
+  );
+  const technical = element(
+    "p",
+    "p3e-meta",
+    `seed=${readSeed()} · commands=${session.state.commandLog.count} · stateHash=${session.state.stateHash}`
+  );
+  const menuPanel = element("div", "p3e-hud-menu-panel");
+  menuPanel.setAttribute("aria-label", "存檔、診斷與復原");
+  menuPanel.append(
+    element("p", "p3e-menu-note", "公開測試版 · 進度自動儲存在本機"),
+    renderPersistence(),
+    notice,
+    technical
+  );
+  menu.append(menuSummary, menuPanel);
+
   const status = element("p", "p3e-status", `${view.currentYear} 年，${view.age} 歲`);
   status.id = "p3e-status";
   status.setAttribute("role", "status");
   status.setAttribute("aria-live", "polite");
-  header.append(title, year, age, balance, income, menu, status);
+  header.append(year, age, balance, income, soundButton, menu, status);
 
   const alert = element("p", "p3e-alert");
   alert.id = "p3e-alert";
@@ -1404,32 +1796,15 @@ function render(): void {
     status.textContent = `${status.textContent ?? ""} · 錯誤：${alertText}`;
   }
 
-  const tabs = renderTabs();
-
   const content = element("section", "p3e-content");
-  content.setAttribute("aria-label", "目前分頁內容");
-  if (activeTab === "life") {
-    content.append(renderLife(view, session));
-  } else {
-    content.append(renderPlaceholder(activeTab));
-  }
+  content.setAttribute("aria-label", "人生主畫面");
+  content.append(renderLife(view, session));
 
-  const tools = element("details", "p3e-tools");
-  const toolsSummary = element("summary", undefined, "存檔與測試資訊");
-  const notice = element(
-    "p",
-    "p3e-mvp-notice",
-    "MVP 公開測試版 · 遊戲內容使用虛構／合成資料，不代表真實人口統計。"
-  );
-  const technical = element(
-    "p",
-    "p3e-meta",
-    `seed=${readSeed()} · commands=${session.state.commandLog.count} · stateHash=${session.state.stateHash}`
-  );
-  tools.append(toolsSummary, notice, renderPersistence(), technical);
-
-  shell.append(header, alert, content, tools, tabs);
+  // 底部四個 tabs 與獨立齒輪（.p3e-tools）已完全移除；存檔／診斷／復原
+  // 全部收進上面的漢堡選單，保留壞存檔的明確復原能力。
+  shell.append(header, alert, content);
   app.replaceChildren(shell);
+  syncNatureSoundDom();
 
   const advance = shell.querySelector<HTMLButtonElement>('[data-action="advance"]');
   if (focusAdvanceAfterRender && advance !== null) {
@@ -1521,82 +1896,24 @@ function updatePersistenceDom(): void {
   if (old !== null) old.replaceWith(renderPersistence());
 }
 
-function renderTabs(): HTMLElement {  const nav = element("nav", "p3e-tabs");
-  nav.setAttribute("aria-label", "分頁");
-  const tabs: { key: TabKey; label: string }[] = [
-    { key: "life", label: "人生" },
-    { key: "family", label: "家族" },
-    { key: "work", label: "工作" },
-    { key: "map", label: "地圖" }
-  ];
-  for (const tab of tabs) {
-    const button = element("button", "p3e-tab", tab.label);
-    button.type = "button";
-    button.dataset["tab"] = tab.key;
-    button.setAttribute("aria-current", tab.key === activeTab ? "page" : "false");
-    button.addEventListener("click", () => {
-      activeTab = tab.key;
-      render();
-    });
-    nav.append(button);
-  }
-  return nav;
-}
-
-function renderPlaceholder(tab: TabKey): HTMLElement {
-  const labels: Record<Exclude<TabKey, "life">, string> = {
-    family: "家族",
-    work: "工作",
-    map: "地圖"
-  };
-  const section = element("section", "p3e-placeholder");
-  section.append(
-    element("h2", undefined, labels[tab as Exclude<TabKey, "life">] ?? tab),
-    element("p", undefined, "尚未接入正式資料")
-  );
-  return section;
-}
-
 function renderLife(view: P3EPlaySession["view"], current: P3EPlaySession): HTMLElement {
   const root = element("div", "p3e-life");
-  const stage = ageStage(view.age);
+  /* GPT-0032-B：改用專用 16:9 橫向資產，CSS 以 cover 鋪滿場景寬。
+     直立原圖 contain 只會剩中央窄條；場景節點仍不疊文字、emoji 或對話框。 */
   const scene = element("section", `p3e-scene p3e-scene-${view.phase}`);
   scene.setAttribute("aria-label", `${view.currentYear} 年的生活場景`);
-  const sceneCopy = element("div", "p3e-scene-copy");
-  sceneCopy.append(
-    element("span", undefined, `${view.identity.regionCode} · ${stage.label}`),
-    element("strong", undefined, `${view.age} 歲的你`)
-  );
-  const character = element("div", "p3e-character-stage");
-  character.dataset["ageStage"] = stage.label;
-  character.setAttribute("aria-label", `${stage.label}人物`);
-  character.append(element("span", undefined, stage.icon));
-  scene.append(sceneCopy, character);
+  scene.dataset["p3eSceneFit"] = "cover";
+  scene.dataset["p3eSceneAsset"] = "life-sim-village-landscape.avif";
 
   const story = element("section", "p3e-story-card");
-  story.append(element("h2", undefined, view.phase === "pending_decision" ? "重要抉擇" : "當年訊息"));
-  const focusSection = renderFocusSection(current);
-  if (focusSection !== null) story.append(focusSection);
-  const last = current.lastOutcome;
-  if (last === null) {
-    story.append(element("p", undefined, `${view.currentYear} 年，你的人生故事正要開始。`));
-  } else if (last.kind === "advance_year") {
-    const eventName = last.selectedEventId === null ? "平凡的一年" : friendlyKey(last.selectedEventId);
-    story.append(element("p", undefined, `${view.currentYear} 年，你 ${view.age} 歲。`));
-    story.append(element("strong", "p3e-event-name", eventName));
-  } else if (last.kind === "choose_decision") {
-    story.append(element("p", undefined, "你已經做出了選擇。"));
-    story.append(element("strong", "p3e-event-name", friendlyChosenOption(last)));
-  } else {
-    const chosen = isP3ELifeFocusId(last.focusId) ? p3eLifeFocusLabel(last.focusId, view.age) : "新的方向";
-    story.append(element("p", undefined, `你把人生重心放在了${chosen}。`));
-    story.append(element("strong", "p3e-event-name", chosen));
-  }
+  story.append(element("h2", undefined, view.phase === "pending_decision" ? "重要抉擇" : "人生紀錄"));
 
+  // 重要決定卡／重新開始永遠排在最前面，玩家不必往下捲就能立即點選。
   if (view.phase === "pending_decision" && view.pendingDecision !== null) {
     story.append(renderPending(view.pendingDecision));
   }
 
+  const last = current.lastOutcome;
   if (view.phase === "death") {
     const death = element("div", "p3e-death");
     death.append(element("h3", undefined, "這段人生走到了終點"));
@@ -1613,6 +1930,12 @@ function renderLife(view: P3EPlaySession["view"], current: P3EPlaySession): HTML
     death.append(again);
     story.append(death);
   }
+
+  const focusSection = renderFocusSection(current);
+  if (focusSection !== null) story.append(focusSection);
+
+  // 人生紀錄放在決定卡之後，卡內捲動；頁面本身永遠不因紀錄變長而捲動。
+  story.append(renderLifeLog(current));
 
   const statDock = element("section", "p3e-stat-dock");
   statDock.setAttribute("aria-label", "人物狀態");

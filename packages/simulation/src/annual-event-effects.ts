@@ -4,6 +4,8 @@ import {
   type P3BEventRecord,
   type P3BSelectionState,
   type P3CYearEventOutcome,
+  applyP3EMoneyModifierDeltaForAge,
+  normalizeP3EAssetsForAge,
   type P3EAssets,
   type P3EErrorCode,
   type P3EEventOccurrence,
@@ -387,7 +389,7 @@ export function resolveP3EAnnualEventEffects(input: unknown): P3EAnnualEventEffe
       selection,
       selectedEventId: null,
       stats: copyStats(roll.statsAfter),
-      assets: copyAssets(roll.assetsAfter),
+      assets: copyAssets(normalizeP3EAssetsForAge(roll.ageAfter, roll.assetsAfter)),
       flags: Object.freeze([...state.flags]),
       occurrences: freezeOccurrences(occurrences),
       informational: false,
@@ -407,6 +409,9 @@ export function resolveP3EAnnualEventEffects(input: unknown): P3EAnnualEventEffe
     flags: [...state.flags]
   };
   const application = applyP3EEventEffectsAndOutcome(effectState, event.effects);
+  // GPT-0032-A：持續性收入／支出效果寫成明確 modifier 旗標（不靠下一輪猜測）。
+  // GPT-0033-A：0–15 歲的 money effects 不寫個人 modifier（否則會在 16 歲後漏出）。
+  const flagsAfter = applyP3EMoneyModifierDeltaForAge(roll.ageAfter, application.flags, application.outcome.moneyDelta);
   const openedDecision = resolveP3EPendingDecision(event, application, selection.selectionHash);
 
   // 6. occurrences
@@ -418,8 +423,9 @@ export function resolveP3EAnnualEventEffects(input: unknown): P3EAnnualEventEffe
     selection,
     selectedEventId: event.eventId,
     stats: copyStats(application.stats),
-    assets: copyAssets(application.assets),
-    flags: Object.freeze([...application.flags]),
+    // GPT-0032-A：0–15 歲的個人財務在這裡就歸零（涵蓋所有未來的 money effects）。
+    assets: copyAssets(normalizeP3EAssetsForAge(roll.ageAfter, application.assets)),
+    flags: Object.freeze([...flagsAfter]),
     occurrences: freezeOccurrences(occurrences),
     informational: application.informational,
     openedDecision,

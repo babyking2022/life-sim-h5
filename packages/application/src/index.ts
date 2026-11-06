@@ -150,6 +150,7 @@ export * from "./event-life";
 export * from "./event-ledger";
 export * from "./p3e-game";
 export * from "./p3e-session";
+export * from "./p3e-life-log";
 export * from "./p3e-life-focus";
 export * from "./p3e-birth-preview";
 export * from "./p3e-browser-bootstrap";

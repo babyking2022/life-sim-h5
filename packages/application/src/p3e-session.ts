@@ -11,6 +11,12 @@ import {
   type P3ELedgerHistory
 } from "@life-sim/simulation";
 import { createP3EGame, runP3EGameCommand } from "./p3e-game";
+import {
+  appendP3ELifeLogEntry,
+  birthLifeLogEntry,
+  buildP3ELifeLog,
+  type P3ELifeLogEntry
+} from "./p3e-life-log";
 
 /**
  * P3-E.1b-2n／2r／2t：Application Play Session ＋ ViewModel ＋ Raw Session Persistence
@@ -77,6 +83,13 @@ export interface P3EPlaySessionView {
   readonly controls: P3EPlaySessionControls;
   readonly pendingDecision: P3EAdvanceYearOutcome["pendingDecision"];
   readonly lastOutcome: P3ECommandOutcome | null;
+  /**
+   * 可累積的人生紀錄（GPT-0031-A；最新在最前面、最多 256 筆）。
+   *
+   * 只放可由 UI 翻譯的公開 ID（eventId／decisionId／optionId／focusId／causeId），
+   * 不含任何繁中文字串；存檔復原後由 ledger／commands 決定性重建。
+   */
+  readonly lifeLog: readonly P3ELifeLogEntry[];
 }
 
 /** 不可變的遊戲 session。 */
@@ -194,7 +207,11 @@ function controlsFor(phase: P3ELifeState["phase"]): P3EPlaySessionControls {
 }
 
 /** 建立 view：只讀 State 與 lastOutcome，不查 pack、不重跑任何模擬。 */
-function buildView(state: P3ELifeState, lastOutcome: P3ECommandOutcome | null): P3EPlaySessionView {
+function buildView(
+  state: P3ELifeState,
+  lastOutcome: P3ECommandOutcome | null,
+  lifeLog: readonly P3ELifeLogEntry[]
+): P3EPlaySessionView {
   const pendingDecision =
     state.phase === "pending_decision" && lastOutcome !== null && lastOutcome.kind === "advance_year"
       ? lastOutcome.pendingDecision
@@ -208,7 +225,8 @@ function buildView(state: P3ELifeState, lastOutcome: P3ECommandOutcome | null): 
     assets: copyAssets(state.assets),
     controls: controlsFor(state.phase),
     pendingDecision,
-    lastOutcome
+    lastOutcome,
+    lifeLog
   });
 }
 
@@ -262,13 +280,14 @@ function readExactObject(
 function sealSession(
   state: P3ELifeState,
   ledgerHistory: P3ELedgerHistory,
-  lastOutcome: P3ECommandOutcome | null
+  lastOutcome: P3ECommandOutcome | null,
+  lifeLog: readonly P3ELifeLogEntry[]
 ): P3EPlaySession {
   return deepFreeze({
     state,
     ledgerHistory,
     lastOutcome,
-    view: buildView(state, lastOutcome)
+    view: buildView(state, lastOutcome, lifeLog)
   });
 }
 
@@ -294,7 +313,9 @@ export function createP3EPlaySession(input: unknown): P3EPlaySession {
     deathPack: raw.deathPack
   };
   const state = createP3EGame(genesis);
-  const session = sealSession(state, createP3ELedgerHistory(state), null);
+  const session = sealSession(state, createP3ELedgerHistory(state), null, [
+    birthLifeLogEntry(state.identity.birthYear)
+  ]);
   GENESIS_BY_SESSION.set(session, genesis);
   return session;
 }
@@ -332,7 +353,15 @@ export function runP3EPlaySessionCommand(input: unknown): P3EPlaySessionCommandR
     yearRecord: result.yearRecord
   });
 
-  const next = sealSession(result.state, ledgerHistory, result.outcome);
+  // GPT-0031-A：只有成功的命令才會留下紀錄；年份／年齡取自這一年的 Year Record。
+  const lifeLog = appendP3ELifeLogEntry(
+    current.view.lifeLog,
+    result.yearRecord.year,
+    result.yearRecord.age,
+    result.outcome
+  );
+
+  const next = sealSession(result.state, ledgerHistory, result.outcome, lifeLog);
   GENESIS_BY_SESSION.set(next, genesis);
 
   return deepFreeze({
@@ -413,7 +442,15 @@ export function restoreP3EPlaySessionPayload(input: unknown): P3EPlaySession {
   });
   if (canonical !== raw.payload) throw new P3EError("E_P3E_ARGUMENT", PATH_CLAIM);
 
-  const session = sealSession(replayed.state, replayed.history, replayed.lastOutcome);
+  // GPT-0031-A：`lifeLog` 由重執行的權威 outcome 逐筆重建（與即時遊玩逐位元相同）。
+  const sources = replayed.history.records.map((pair, index) => ({
+    year: pair.yearRecord.year,
+    age: pair.yearRecord.age,
+    outcome: replayed.outcomes[index] as P3ECommandOutcome
+  }));
+  const lifeLog = buildP3ELifeLog(replayed.state.identity.birthYear, sources);
+
+  const session = sealSession(replayed.state, replayed.history, replayed.lastOutcome, lifeLog);
   GENESIS_BY_SESSION.set(session, genesis);
   return session;
 }

@@ -8,12 +8,12 @@
     "totalDecisionOptions": 172
   },
   "totals": {
-    "commands": 11529,
-    "decisions": 4094,
-    "years": 7435,
+    "commands": 11490,
+    "decisions": 4080,
+    "years": 7410,
     "yearsPerDecision": 1.816,
-    "averageDecisionsPerLife": 40.94,
-    "averageDeathAge": 74.35
+    "averageDecisionsPerLife": 40.8,
+    "averageDeathAge": 74.1
   },
   "coverage": {
     "decisionEventsSeen": 56,
@@ -104,15 +104,15 @@
   "stageDecisions": {
     "perStageTotals": {
       "childhood": 515,
-      "adolescence": 265,
-      "adulthood": 2728,
-      "later_life": 586
+      "adolescence": 269,
+      "adulthood": 2720,
+      "later_life": 576
     },
     "averagePerLife": {
       "childhood": 5.15,
-      "adolescence": 2.65,
-      "adulthood": 27.28,
-      "later_life": 5.86
+      "adolescence": 2.69,
+      "adulthood": 27.2,
+      "later_life": 5.76
     },
     "decisionEventsPerStage": {
       "childhood": 16,
@@ -125,27 +125,27 @@
     "yearsBetweenDecisions": [
       {
         "years": 1,
-        "count": 2179
+        "count": 2166
       },
       {
         "years": 2,
-        "count": 1174
+        "count": 1166
       },
       {
         "years": 3,
-        "count": 403
+        "count": 415
       },
       {
         "years": 4,
-        "count": 147
+        "count": 153
       },
       {
         "years": 5,
-        "count": 60
+        "count": 51
       },
       {
         "years": 6,
-        "count": 19
+        "count": 17
       },
       {
         "years": 7,
@@ -285,21 +285,21 @@
     },
     {
       "seed": "p3b-choice-003",
-      "commands": 135,
-      "decisions": 46,
-      "deathAge": 89,
+      "commands": 111,
+      "decisions": 39,
+      "deathAge": 72,
       "stageDecisions": {
         "childhood": 4,
         "adolescence": 1,
         "adulthood": 29,
-        "later_life": 12
+        "later_life": 5
       },
       "decisionsSeen": [
         "ev.child.kindergarten",
         "ev.child.family-move",
         "ev.child.chores",
         "ev.child.pocket-money",
-        "ev.teen.talent",
+        "ev.teen.study-plan",
         "ev.adult.after-school",
         "ev.adult.move-city",
         "ev.adult.first-job",
@@ -333,14 +333,7 @@
         "ev.senior.medical",
         "ev.senior.grandchildren",
         "ev.senior.legacy",
-        "ev.senior.retirement",
-        "ev.senior.medical",
-        "ev.senior.housing",
-        "ev.senior.social",
-        "ev.senior.daily-health",
-        "ev.senior.social",
-        "ev.senior.housing",
-        "ev.senior.medical"
+        "ev.senior.retirement"
       ]
     },
     {
