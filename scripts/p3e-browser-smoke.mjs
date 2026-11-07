@@ -78,7 +78,14 @@ const BOOT_BUDGET_GZIP = 512 * 1024;
  * 流程都必須明確用 `?seed=GOLDEN_SEED` 開頁，不再依賴「乾淨啟動固定 seed」。
  */
 const GOLDEN_SEED = "p3e-166-playable-runtime-v4";
-const GOLDEN_QUERY = `?seed=${encodeURIComponent(GOLDEN_SEED)}`;
+/**
+ * GPT-0036-B：官方 106 命令 golden 必須逐位元重播，不能被 UI 新加的
+ * 「首次必選重心」插入指令。這個參數只對自動化瀏覽器
+ * （navigator.webdriver === true）生效，真人玩家無法用網址關掉必選暫停；
+ * 另有一個完全不帶此參數的專章驗證 D 的強制暫停。
+ */
+const REPLAY_QUERY = "p3eReplay=official-golden";
+const GOLDEN_QUERY = `?seed=${encodeURIComponent(GOLDEN_SEED)}&${REPLAY_QUERY}`;
 
 const results = [];
 const layoutReport = [];
@@ -228,17 +235,34 @@ async function commandCount(page) {
 }
 
 /**
- * GPT-0029-B：滿 7 歲會自動出現一次人生重心選擇卡。官方 golden 路徑刻意
- * 不設定重心，按「先不改」收起即可；這是純 UI 呈現狀態，不產生 command，
- * 不影響 golden state hash、command head 與命令數，也不會讓前景卡擋住
- * 「下一步」或決策選項。
+ * GPT-0036-B：官方 golden 重播頁不會出現必選卡；非重播頁（例如真隨機
+ * rebirth 情境）則必須先選一個有效重心才能繼續。這裡只在「必選」時
+ * 真正送出 SET_LIFE_FOCUS，重播頁完全是 no-op，不影響 golden。
  */
-async function dismissFocusPickerIfOpen(page) {
-  const dismiss = page.locator(
-    '.p3e-focus[data-p3e-focus-expanded="true"] .p3e-focus-dismiss'
+async function resolveFocusGateIfRequired(page) {
+  const required = await page.evaluate(
+    () => document.querySelector("[data-p3e-live]")?.getAttribute("data-p3e-focus-required")
   );
-  if ((await dismiss.count()) === 0) return;
-  await dismiss.first().click({ timeout: 3000 }).catch(() => {});
+  if (required !== "true") {
+    const dismiss = page.locator(
+      '.p3e-focus[data-p3e-focus-expanded="true"] .p3e-focus-dismiss'
+    );
+    if ((await dismiss.count()) > 0) await dismiss.first().click({ timeout: 3000 }).catch(() => {});
+    return;
+  }
+  await page
+    .locator('.p3e-focus[data-p3e-focus-required="true"] [data-action="set-focus"][data-focus-id="study"]')
+    .first()
+    .click({ timeout: 5000 });
+  await page.waitForFunction(
+    () => document.querySelector("[data-p3e-live]")?.getAttribute("data-p3e-focus-required") === "false",
+    undefined,
+    { timeout: 20000 }
+  );
+}
+
+async function dismissFocusPickerIfOpen(page) {
+  await resolveFocusGateIfRequired(page);
 }
 
 async function clickAndWait(page, selector) {
@@ -854,6 +878,8 @@ async function main() {
   // GPT-0025-D：收集官方固定 seed 路徑上每一個決策的事件標題／問題／選項文字。
   // 只讀 DOM，不下命令，所以 78 命令 golden 完全不受影響。
   const copySamples = [];
+  // GPT-0036-B C：沿著官方 golden 路徑收集具名伴侶與「關係建立當年」訊息。
+  const partnerSamples = [];
   const copyReport = { decisions: 0, texts: 0, exactHits: [], newExactHits: [] };
   const collectCopySample = async (target) => {
     const sample = await target.evaluate(() => {
@@ -913,6 +939,20 @@ async function main() {
   while ((await phaseOf(page)) !== "death" && guard < 400) {
     const phase = await phaseOf(page);
     if (phase === "pending_decision") await collectCopySample(page);
+    partnerSamples.push(
+      await page.evaluate(() => {
+        const line = document.querySelector(".p3e-partner-line");
+        return {
+          name: line?.getAttribute("data-p3e-partner-name") ?? null,
+          display: line?.querySelector(".p3e-partner-name")?.textContent ?? null,
+          label: line?.querySelector(".p3e-partner-label")?.textContent ?? null,
+          fullNameTitle: line?.querySelector(".p3e-partner-name")?.getAttribute("title") ?? null,
+          relationTexts: [
+            ...document.querySelectorAll('[data-p3e-life-log-partner="true"] .p3e-life-log-text')
+          ].map((node) => node.textContent ?? "")
+        };
+      })
+    );
     const selector = phase === "pending_decision" ? '[data-action="choose"]' : '[data-action="advance"]';
     await clickAndWait(page, selector);
     guard += 1;
@@ -964,6 +1004,49 @@ async function main() {
   check("run_to_death_with_51_commands", finalCount === EXPECTED_COMMANDS, `commands=${finalCount}`);
   check("final_state_hash", finalStateHash === EXPECTED_STATE_HASH, finalStateHash ?? "null");
   check("final_command_head", finalHead === EXPECTED_COMMAND_HEAD, finalHead ?? "null");
+
+  /* ---------------------------------------------------------------- */
+  /* 6a. GPT-0036-B C：具名伴侶（正式 view.partner projection）          */
+  /* ---------------------------------------------------------------- */
+  const namedPartner = partnerSamples.find((sample) => sample.name !== null) ?? null;
+  const allPartnerNames = [
+    ...new Set(partnerSamples.map((sample) => sample.name).filter((name) => name !== null))
+  ];
+  check(
+    "partner_named_identity_from_projection",
+    namedPartner !== null &&
+      typeof namedPartner.name === "string" &&
+      namedPartner.name.length > 0 &&
+      namedPartner.label === "伴侶：" &&
+      namedPartner.display !== null &&
+      /[\u3400-\u9fffA-Za-z]/.test(namedPartner.name) &&
+      !INTERNAL_KEY_PATTERN.test(namedPartner.name) &&
+      allPartnerNames.length === 1,
+    `names=${JSON.stringify(allPartnerNames)} label=${namedPartner?.label} display=${namedPartner?.display}`
+  );
+  check(
+    "partner_full_name_kept_in_title_and_aria",
+    namedPartner !== null &&
+      namedPartner.fullNameTitle === namedPartner.name &&
+      (namedPartner.display === namedPartner.name || namedPartner.display?.endsWith("…") === true),
+    `title=${namedPartner?.fullNameTitle} display=${namedPartner?.display}`
+  );
+  const relationTexts = partnerSamples.flatMap((sample) => sample.relationTexts);
+  check(
+    "relationship_year_message_includes_partner_name",
+    namedPartner !== null &&
+      relationTexts.length >= 1 &&
+      relationTexts.some((text) => text.includes(namedPartner.name)),
+    `texts=${JSON.stringify(relationTexts.slice(0, 3))}`
+  );
+  const finalPartnerName = await page.evaluate(
+    () => document.querySelector(".p3e-partner-line")?.getAttribute("data-p3e-partner-name") ?? null
+  );
+  check(
+    "partner_name_survives_to_death_without_fake_names",
+    finalPartnerName !== null && finalPartnerName === namedPartner?.name,
+    `final=${finalPartnerName} sampled=${namedPartner?.name}`
+  );
 
   /* ---------------------------------------------------------------- */
   /* 6b. GPT-0025-D：新決策文案全部自然繁中、無 internal key             */
@@ -1226,7 +1309,8 @@ async function main() {
    * 明確傳別的字串 → 用該 seed；傳 `null` → 完全不帶 query（驗證真隨機首次開頁）。
    */
   async function openScenario(scenarioPage, seed = GOLDEN_SEED) {
-    const query = seed === null ? "" : `?seed=${encodeURIComponent(seed)}`;
+    const query =
+      seed === null ? "" : `?seed=${encodeURIComponent(seed)}&${REPLAY_QUERY}`;
     await scenarioPage.goto(`${baseUrl}/${query}`, { waitUntil: "domcontentloaded" });
     await scenarioPage.waitForSelector("[data-p3e-live='true']", { timeout: 30000 });
     await ensurePlayable(scenarioPage);
@@ -2272,7 +2356,14 @@ async function main() {
         removedChrome: document.querySelectorAll(
           ".p3e-tools, .p3e-tab, .p3e-tabs, .p3e-game-title"
         ).length,
-        gearGlyph: (header.textContent ?? "").includes("⚙"),
+        // GPT-0036-B A：齒輪只允許以「設定與存檔」標題文字出現在面板裡，
+        // 不能再是任何獨立按鈕／summary 的圖示。
+        gearGlyph: [...header.querySelectorAll("button, summary, [role='button']")].some(
+          (node) =>
+            (node.textContent ?? "").includes("⚙") ||
+            (node.getAttribute("aria-label") ?? "").includes("齒輪")
+        ),
+        settingsTitle: header.querySelector(".p3e-menu-title")?.textContent ?? null,
         menuPersistence: header.querySelector(".p3e-hud-menu-panel .p3e-persistence") !== null,
         menuExport: header.querySelector('.p3e-hud-menu-panel [data-action="export"]') !== null,
         menuImport: header.querySelector('.p3e-hud-menu-panel input[data-role="import-input"]') !== null,
@@ -2290,13 +2381,14 @@ async function main() {
         hud.soundRect !== null && hud.menuRect !== null &&
         hud.soundRect.left >= hud.incomeRight - 2 &&
         hud.menuRect.left >= hud.soundRect.left + hud.soundRect.w - 2 &&
-        hud.removedChrome === 0 && !hud.gearGlyph,
-      `soundLeft=${hud?.soundRect?.left} incomeRight=${hud?.incomeRight} menuLeft=${hud?.menuRect?.left} removed=${hud?.removedChrome}`
+        hud.removedChrome === 0 && !hud.gearGlyph && hud.settingsTitle === "⚙ 設定與存檔",
+      `soundLeft=${hud?.soundRect?.left} incomeRight=${hud?.incomeRight} menuLeft=${hud?.menuRect?.left} removed=${hud?.removedChrome} title=${hud?.settingsTitle}`
     );
     verify(
       "gear_button_and_bottom_tabs_removed_from_dom",
-      hud !== null && hud.removedChrome === 0 && !hud.gearGlyph,
-      `removed=${hud?.removedChrome} gearGlyph=${hud?.gearGlyph}`
+      hud !== null && hud.removedChrome === 0 && !hud.gearGlyph &&
+        hud.settingsTitle === "⚙ 設定與存檔",
+      `removed=${hud?.removedChrome} gearGlyph=${hud?.gearGlyph} title=${hud?.settingsTitle}`
     );
     verify(
       "hamburger_keeps_save_diagnostic_recovery",
@@ -2569,6 +2661,1115 @@ async function main() {
       `beforeReload=${offAgain.stored} stored=${finalPref.stored} enabled=${finalPref.enabled} requested=${finalPref.requested}`
     );
     await scenarioContext.close();
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* 15. GPT-0036-B：設定面板／比較 strip／具名伴侶／重心必選暫停       */
+  /* ---------------------------------------------------------------- */
+  const qaQuery = `?seed=${encodeURIComponent(GOLDEN_SEED)}`; // 刻意不帶 REPLAY_QUERY
+  const readGate = (target) =>
+    target.evaluate(() => {
+      const live = document.querySelector("[data-p3e-live]");
+      const rect = (selector) => {
+        const node = document.querySelector(selector);
+        if (node === null) return null;
+        const box = node.getBoundingClientRect();
+        return { w: Math.round(box.width), h: Math.round(box.height) };
+      };
+      return {
+        phase: live?.getAttribute("data-p3e-phase") ?? null,
+        age: Number(live?.getAttribute("data-p3e-life-focus-age") ?? "-1"),
+        commands: Number(live?.getAttribute("data-p3e-command-count") ?? "-1"),
+        required: live?.getAttribute("data-p3e-focus-required") ?? null,
+        held: live?.getAttribute("data-p3e-clock-held") ?? null,
+        reason: live?.getAttribute("data-p3e-clock-hold-reason") ?? null,
+        running: live?.getAttribute("data-p3e-clock-running") ?? null,
+        speed: live?.getAttribute("data-p3e-clock-speed") ?? null,
+        replay: live?.getAttribute("data-p3e-official-replay") ?? null,
+        soundBox: rect(".p3e-hud-sound"),
+        menuBox: rect(".p3e-hud-menu > summary"),
+        gears: document.querySelectorAll(".p3e-tools").length,
+        gearGlyphs: [...document.querySelectorAll(".p3e-hud button, .p3e-hud summary")].filter(
+          (node) => (node.textContent ?? "").includes("⚙")
+        ).length,
+        rightControls: document.querySelectorAll(".p3e-hud > button, .p3e-hud > details").length,
+        menuLabel: document.querySelector(".p3e-hud-menu > summary")?.getAttribute("aria-label") ?? null
+      };
+    });
+
+  async function driveUntil(target, predicate, maxSteps = 40, afterStep = undefined) {
+    let count = 0;
+    while (!(await predicate()) && count < maxSteps) {
+      const phase = await phaseOf(target);
+      const selector = phase === "pending_decision"
+        ? '[data-action="choose"]'
+        : '[data-action="advance"]';
+      const before = await commandCount(target);
+      await target.locator(selector).first().click({ timeout: 10000 });
+      await target.waitForFunction(
+        (prev) => {
+          const node = document.querySelector("[data-p3e-live]");
+          return (
+            Number(node?.getAttribute("data-p3e-command-count") ?? "0") > prev ||
+            node?.getAttribute("data-p3e-phase") === "death"
+          );
+        },
+        before,
+        { timeout: 20000 }
+      );
+      if (afterStep !== undefined) await afterStep();
+      count += 1;
+    }
+    return count;
+  }
+
+  // ---- A + 兒童 B + D：完全正常的公開測試網址（沒有重播參數） ----------
+  {
+    const qaContext = await browser.newContext({
+      viewport: { width: 390, height: 844 },
+      deviceScaleFactor: 1,
+      isMobile: true,
+      hasTouch: true
+    });
+    const qaPage = await qaContext.newPage();
+    const qaErrors = [];
+    qaPage.on("pageerror", (error) => qaErrors.push(String(error)));
+    await qaPage.goto(`${baseUrl}/${qaQuery}`, { waitUntil: "domcontentloaded" });
+    await qaPage.waitForSelector("[data-p3e-live='true']", { timeout: 30000 });
+    await qaPage.locator('[data-action="start-life"]').click();
+
+    const initial = await readGate(qaPage);
+    check(
+      "settings_menu_no_standalone_gear",
+      initial.gears === 0 && initial.gearGlyphs === 0 && initial.rightControls === 2 &&
+        initial.menuLabel === "開啟設定與存檔選單" &&
+        initial.soundBox?.w >= 44 && initial.soundBox?.h >= 44 &&
+        initial.menuBox?.w >= 44 && initial.menuBox?.h >= 44,
+      `gears=${initial.gears} glyphs=${initial.gearGlyphs} right=${initial.rightControls} ` +
+        `label=${initial.menuLabel} sound=${JSON.stringify(initial.soundBox)} menu=${JSON.stringify(initial.menuBox)}`
+    );
+
+    // 鍵盤開合漢堡
+    await qaPage.locator("details.p3e-hud-menu > summary").focus();
+    await qaPage.keyboard.press("Enter");
+    await qaPage.waitForTimeout(80);
+    const menuOpen = await qaPage.locator("details.p3e-hud-menu").evaluate((node) => node.open);
+    const menuPanel = await qaPage.evaluate(() => ({
+      title: document.querySelector(".p3e-menu-title")?.textContent ?? null,
+      aria: document.querySelector(".p3e-hud-menu-panel")?.getAttribute("aria-label") ?? null,
+      text: document.querySelector(".p3e-hud-menu-panel")?.textContent ?? ""
+    }));
+    check(
+      "settings_menu_title_and_original_gear_features",
+      menuOpen === true &&
+        menuPanel.title === "⚙ 設定與存檔" &&
+        menuPanel.aria === "設定與存檔" &&
+        ["匯出存檔", "匯入存檔", "自動存檔", "seed=", "stateHash="].every((part) =>
+          menuPanel.text.includes(part)
+        ),
+      `open=${menuOpen} title=${menuPanel.title} aria=${menuPanel.aria} parts=${menuPanel.text.slice(0, 90)}`
+    );
+    await qaPage.keyboard.press("Enter");
+    await qaPage.waitForTimeout(80);
+    const menuClosed = await qaPage.locator("details.p3e-hud-menu").evaluate((node) => node.open);
+    check("settings_menu_keyboard_toggle", menuOpen === true && menuClosed === false, `open=${menuOpen} closed=${menuClosed}`);
+
+    // 兒童：比較 strip 兩行、自然文案、沒有 0 百分位、HUD 仍是 —
+    const childCompare = await qaPage.evaluate(() => ({
+      rows: document.querySelectorAll(".p3e-compare-row").length,
+      texts: [...document.querySelectorAll(".p3e-compare-text")].map((node) => node.textContent ?? ""),
+      source: document.querySelector(".p3e-compare-strip")?.getAttribute("data-p3e-compare-source") ?? null,
+      estimate: document.querySelector(".p3e-compare-estimate")?.textContent ?? null,
+      note: document.querySelector(".p3e-compare-strip")?.getAttribute("data-p3e-estimate-note") ?? null,
+      minor: document.querySelectorAll('[data-p3e-minor-finance="true"]').length,
+      partnerLines: document.querySelectorAll(".p3e-partner-line").length
+    }));
+    check(
+      "compare_strip_two_compact_rows_with_estimate_note",
+      childCompare.rows === 2 &&
+        childCompare.texts.every((text) => text.includes("未成年")) &&
+        childCompare.texts.every((text) => !/%|0%/.test(text)) &&
+        childCompare.estimate === "估算" &&
+        (childCompare.note ?? "").includes("估算") &&
+        childCompare.minor === 2 &&
+        childCompare.partnerLines === 0,
+      `rows=${childCompare.rows} texts=${JSON.stringify(childCompare.texts)} source=${childCompare.source} minor=${childCompare.minor} partner=${childCompare.partnerLines}`
+    );
+
+    // 先設 16×，讓「跨越多個 interval」能在 ~1.4s 內被驗證。
+    await qaPage.locator('[data-speed="16"]').click();
+    await qaPage.waitForTimeout(60);
+    await driveUntil(qaPage, async () => (await readGate(qaPage)).required === "true", 30);
+    const locked = await readGate(qaPage);
+    const lockedDom = await qaPage.evaluate(() => {
+      const q = (selector) => document.querySelector(selector);
+      return {
+        expanded: q(".p3e-focus")?.getAttribute("data-p3e-focus-expanded") ?? null,
+        required: q(".p3e-focus")?.getAttribute("data-p3e-focus-required") ?? null,
+        dismiss: document.querySelectorAll(".p3e-focus-dismiss").length,
+        options: document.querySelectorAll(".p3e-focus-option").length,
+        pendingCards: document.querySelectorAll(".p3e-pending").length,
+        advanceDisabled: q('[data-action="advance"]')?.disabled ?? null,
+        timeDisabled: q('[data-action="toggle-time"]')?.disabled ?? null,
+        speedDisabled: q('[data-speed="4"]')?.disabled ?? null,
+        jumpDisabled: q('[data-action="jump-decision"]')?.disabled ?? null,
+        // GPT-0037-B P2：必選 dialog 的讀屏語意與 autofocus。
+        dialogRole: q('.p3e-focus-panel[data-p3e-focus-dialog="required"]')?.getAttribute("role") ?? null,
+        dialogModal: q('.p3e-focus-panel[data-p3e-focus-dialog="required"]')?.getAttribute("aria-modal") ?? null,
+        dialogTitle: q("#p3e-focus-required-title")?.textContent ?? null,
+        dialogDesc: q("#p3e-focus-required-desc")?.textContent ?? null,
+        dialogLabelledBy: q('.p3e-focus-panel[data-p3e-focus-dialog="required"]')?.getAttribute("aria-labelledby") ?? null,
+        dialogDescribedBy: q('.p3e-focus-panel[data-p3e-focus-dialog="required"]')?.getAttribute("aria-describedby") ?? null,
+        activeAction: document.activeElement?.getAttribute("data-action") ?? null,
+        activeFocusId: document.activeElement?.getAttribute("data-focus-id") ?? null,
+        activeIsBody: document.activeElement === document.body
+      };
+    });
+    check(
+      "focus_required_gate_pauses_clock_and_disables_controls",
+      locked.replay === "false" && locked.age >= 7 &&
+        locked.required === "true" && locked.held === "true" &&
+        locked.reason === "life-focus-required" && locked.running === "false" &&
+        locked.speed === "16" && locked.phase === "life" &&
+        lockedDom.expanded === "true" && lockedDom.required === "true" &&
+        lockedDom.dismiss === 0 && lockedDom.options === 5 &&
+        lockedDom.pendingCards === 0 &&
+        lockedDom.advanceDisabled === true && lockedDom.timeDisabled === true &&
+        lockedDom.speedDisabled === true && lockedDom.jumpDisabled === true,
+      `age=${locked.age} held=${locked.held} running=${locked.running} speed=${locked.speed} dom=${JSON.stringify(lockedDom)}`
+    );
+    check(
+      "focus_required_dialog_semantics_and_autofocus",
+      lockedDom.dialogRole === "dialog" && lockedDom.dialogModal === "true" &&
+        lockedDom.dialogLabelledBy === "p3e-focus-required-title" &&
+        lockedDom.dialogDescribedBy === "p3e-focus-required-desc" &&
+        (lockedDom.dialogTitle ?? "").includes("人生重心") &&
+        (lockedDom.dialogDesc ?? "").includes("暫停") &&
+        lockedDom.activeAction === "set-focus" && lockedDom.activeFocusId !== null &&
+        !lockedDom.activeIsBody,
+      `role=${lockedDom.dialogRole} modal=${lockedDom.dialogModal} title="${lockedDom.dialogTitle}" ` +
+        `active=${lockedDom.activeAction}/${lockedDom.activeFocusId} body=${lockedDom.activeIsBody}`
+    );
+    const dialogViolations = await axeAudit(qaPage);
+    const dialogSerious = dialogViolations.filter(
+      (violation) => violation.impact === "critical" || violation.impact === "serious"
+    );
+    check(
+      "focus_required_dialog_axe_critical_serious_0",
+      dialogSerious.length === 0,
+      JSON.stringify(dialogSerious)
+    );
+
+    // GPT-0038-B：aria-modal 的背景必須真的 inert，dialog 本身保持可操作。
+    const inertBefore = await qaPage.evaluate(() => {
+      const q = (s) => document.querySelector(s);
+      const dialog = q('.p3e-focus-panel[data-p3e-focus-dialog="required"]');
+      const covered = (s) => {
+        const node = q(s);
+        return node === null ? null : node.closest("[inert]") !== null;
+      };
+      return {
+        inertCount: document.querySelectorAll("[inert]").length,
+        dialogInert: dialog?.closest("[inert]") !== null,
+        dialogParentInert: dialog?.parentElement?.closest("[inert]") !== null,
+        activeInside: dialog !== null && dialog.contains(document.activeElement),
+        background: {
+          sound: covered(".p3e-hud-sound"),
+          menu: covered(".p3e-hud-menu > summary"),
+          estimate: covered('[data-action="toggle-estimate-note"]'),
+          advance: covered('[data-action="advance"]'),
+          toggleTime: covered('[data-action="toggle-time"]'),
+          jump: covered('[data-action="jump-decision"]'),
+          speed: covered('[data-speed="16"]'),
+          status: covered("#p3e-status")
+        }
+      };
+    });
+    check(
+      "focus_required_background_is_inert",
+      inertBefore.inertCount > 0 && inertBefore.dialogInert === false &&
+        inertBefore.dialogParentInert === false && inertBefore.activeInside === true &&
+        Object.values(inertBefore.background).every((value) => value === true),
+      JSON.stringify(inertBefore)
+    );
+
+    // 鍵盤連按 Tab／Shift+Tab：焦點永遠留在 dialog 的重心選項，不掉進背景。
+    const tabTrail = [];
+    for (let step = 0; step < 12; step += 1) {
+      await qaPage.keyboard.press(step % 4 === 3 ? "Shift+Tab" : "Tab");
+      tabTrail.push(
+        await qaPage.evaluate(() => {
+          const dialog = document.querySelector(
+            '.p3e-focus-panel[data-p3e-focus-dialog="required"]'
+          );
+          const active = document.activeElement;
+          return {
+            inside: dialog !== null && dialog.contains(active),
+            action: active?.getAttribute?.("data-action") ?? null,
+            tag: active?.tagName ?? null,
+            inert: active?.closest?.("[inert]") !== null
+          };
+        })
+      );
+    }
+    check(
+      "focus_required_tab_never_reaches_background_controls",
+      tabTrail.length === 12 &&
+        tabTrail.every(
+          (step) =>
+            step.inside === true && step.inert === false &&
+            step.tag === "BUTTON" && step.action === "set-focus"
+        ),
+      JSON.stringify(tabTrail)
+    );
+
+    // 背景 inert 擋下真實滑鼠；另外用程式派送 click 直接打既有 command 硬閘門，
+    // 再等 3 個以上 16× interval，指令數與年齡都不能變。
+    await qaPage.evaluate(() => {
+      for (const selector of [
+        '[data-action="advance"]',
+        '[data-action="jump-decision"]',
+        '[data-speed="16"]',
+        '[data-action="toggle-time"]'
+      ]) {
+        document.querySelector(selector)?.dispatchEvent(
+          new MouseEvent("click", { bubbles: true, cancelable: true })
+        );
+      }
+    });
+    await qaPage.waitForTimeout(1400);
+    const afterWait = await readGate(qaPage);
+    check(
+      "focus_required_blocks_advance_and_multiple_intervals",
+      afterWait.commands === locked.commands && afterWait.age === locked.age &&
+        afterWait.required === "true" && afterWait.held === "true",
+      `before=${locked.commands}/${locked.age} after=${afterWait.commands}/${afterWait.age} held=${afterWait.held}`
+    );
+
+    // 選有效重心後：原本正在播放 → 回到同一速度 16×。
+    await qaPage
+      .locator('.p3e-focus[data-p3e-focus-required="true"] [data-action="set-focus"][data-focus-id="study"]')
+      .first()
+      .click();
+    await qaPage.evaluate(() => { window.__qaReleaseFocus = null; });
+    await qaPage.waitForFunction(
+      () => {
+        const live = document.querySelector("[data-p3e-live]");
+        if (live?.getAttribute("data-p3e-focus-required") !== "false") return false;
+        window.__qaReleaseFocus = {
+          action: document.activeElement?.getAttribute("data-action") ?? null,
+          isBody: document.activeElement === document.body,
+          tag: document.activeElement?.tagName ?? null,
+          // GPT-0038-B：選定後 inert 必須移除，背景控制恢復可操作。
+          inertCount: document.querySelectorAll("[inert]").length,
+          activeInert: document.activeElement?.closest?.("[inert]") !== null
+        };
+        return true;
+      },
+      undefined,
+      { timeout: 20000, polling: "raf" }
+    );
+    const released = await readGate(qaPage);
+    check(
+      "focus_chosen_restores_original_playback_speed",
+      released.commands === locked.commands + 1 &&
+        released.required === "false" && released.held === "false" &&
+        released.running === "true" && released.speed === "16",
+      `commands=${locked.commands}->${released.commands} running=${released.running} speed=${released.speed}`
+    );
+    // GPT-0037-B P2：dialog 關閉後焦點回到合理的遊戲控制，不掉回 body。
+    const restoredFocus = await qaPage.evaluate(() => window.__qaReleaseFocus);
+    check(
+      "focus_required_dialog_returns_focus_to_game_control",
+      restoredFocus.action === "advance" && !restoredFocus.isBody && restoredFocus.tag === "BUTTON",
+      `action=${restoredFocus.action} tag=${restoredFocus.tag} body=${restoredFocus.isBody}`
+    );
+    check(
+      "focus_required_inert_removed_after_choice",
+      restoredFocus.inertCount === 0 && restoredFocus.activeInert === false,
+      `inert=${restoredFocus.inertCount} activeInert=${restoredFocus.activeInert}`
+    );
+
+    // 三尺寸：比較 strip 不造成水平捲動，頁面仍單畫面。
+    for (const viewport of [
+      { width: 360, height: 800 },
+      { width: 390, height: 844 },
+      { width: 430, height: 932 }
+    ]) {
+      await qaPage.setViewportSize(viewport);
+      const overflow = await horizontalOverflow(qaPage);
+      const strip = await qaPage.evaluate(() => {
+        const node = document.querySelector(".p3e-compare-strip");
+        const box = node?.getBoundingClientRect();
+        return {
+          rows: document.querySelectorAll(".p3e-compare-row").length,
+          width: box === undefined ? 0 : Math.round(box.width),
+          inside: box === undefined ? false : box.left >= 0 && box.right <= window.innerWidth + 1
+        };
+      });
+      check(
+        `compare_strip_no_horizontal_overflow_${viewport.width}x${viewport.height}`,
+        overflow === 0 && strip.rows === 2 && strip.inside,
+        `overflow=${overflow} rows=${strip.rows} width=${strip.width} inside=${strip.inside}`
+      );
+      // GPT-0037-B P2：「估算」至少 44x44，展開說明後也不能讓整頁下滑。
+      const target = await qaPage.evaluate(() => {
+        const button = document.querySelector('[data-action="toggle-estimate-note"]');
+        const r = button?.getBoundingClientRect();
+        return {
+          w: r?.width ?? 0,
+          h: r?.height ?? 0,
+          inside: r === undefined ? false : r.left >= -1 && r.right <= window.innerWidth + 1
+        };
+      });
+      check(
+        `estimate_touch_target_44px_${viewport.width}x${viewport.height}`,
+        target.w >= 43.5 && target.h >= 43.5 && target.inside,
+        `w=${target.w} h=${target.h} inside=${target.inside}`
+      );
+      await qaPage.locator('[data-action="toggle-estimate-note"]').click();
+      const expanded = await qaPage.evaluate(() => {
+        const doc = document.scrollingElement ?? document.documentElement;
+        window.scrollTo(0, 99999);
+        const scrolled = window.scrollY;
+        window.scrollTo(0, 0);
+        return {
+          docY: doc.scrollHeight - doc.clientHeight,
+          docX: doc.scrollWidth - doc.clientWidth,
+          scrolled,
+          expanded: document
+            .querySelector('[data-action="toggle-estimate-note"]')
+            ?.getAttribute("aria-expanded") ?? null,
+          noteVisible: document.querySelector(".p3e-compare-note")?.hidden === false
+        };
+      });
+      check(
+        `estimate_note_expanded_no_page_scroll_${viewport.width}x${viewport.height}`,
+        expanded.expanded === "true" && expanded.noteVisible &&
+          expanded.docY <= 1 && expanded.docX <= 1 && expanded.scrolled === 0,
+        `docY=${expanded.docY} docX=${expanded.docX} scrolled=${expanded.scrolled} visible=${expanded.noteVisible}`
+      );
+      await qaPage.locator('[data-action="toggle-estimate-note"]').click();
+    }
+    check("focus_gate_no_page_errors", qaErrors.length === 0, `errors=${JSON.stringify(qaErrors)}`);
+    await qaContext.close();
+  }
+
+  // ---- D：原本手動暫停 → 選完不自動播放；reload 仍鎖住 ----------------
+  {
+    const pauseContext = await browser.newContext({
+      viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true
+    });
+    const pausePage = await pauseContext.newPage();
+    await pausePage.goto(`${baseUrl}/${qaQuery}`, { waitUntil: "domcontentloaded" });
+    await pausePage.waitForSelector("[data-p3e-live='true']", { timeout: 30000 });
+    await pausePage.locator('[data-action="start-life"]').click();
+    await pausePage.locator('[data-action="toggle-time"]').click(); // 手動暫停
+    // 既有「解決 decision 後 resume」會把 clock 打開，這裡每一步後補回手動暫停，
+    // 才能真的驗證「觸發前本來就是手動暫停」的情境。
+    const keepManuallyPaused = async () => {
+      const running = await pausePage
+        .locator("[data-p3e-live]")
+        .getAttribute("data-p3e-clock-running")
+        .catch(() => "false");
+      if (running === "true") {
+        await pausePage.locator('[data-action="toggle-time"]').click({ timeout: 5000 }).catch(() => {});
+      }
+    };
+    await driveUntil(
+      pausePage,
+      async () => (await readGate(pausePage)).required === "true",
+      30,
+      keepManuallyPaused
+    );
+    const held = await readGate(pausePage);
+    // reload 後仍鎖住，且不能偷跑一年
+    await pausePage.reload({ waitUntil: "domcontentloaded" });
+    await pausePage.waitForSelector("[data-p3e-live='true']", { timeout: 30000 });
+    await pausePage.waitForTimeout(400);
+    const reloaded = await readGate(pausePage);
+    const reloadAdvanceDisabled = await pausePage
+      .locator('[data-action="advance"]')
+      .evaluate((node) => node.disabled)
+      .catch(() => null);
+    check(
+      "focus_required_reload_stays_locked_without_sneaking_a_year",
+      held.required === "true" && reloaded.required === "true" &&
+        reloaded.held === "true" && reloaded.running === "false" &&
+        reloaded.commands === held.commands && reloaded.age === held.age &&
+        reloadAdvanceDisabled === true,
+      `before=${held.commands}/${held.age} after=${reloaded.commands}/${reloaded.age} held=${reloaded.held} advanceDisabled=${reloadAdvanceDisabled}`
+    );
+    await pausePage
+      .locator('.p3e-focus[data-p3e-focus-required="true"] [data-action="set-focus"][data-focus-id="health"]')
+      .first()
+      .click();
+    await pausePage.waitForFunction(
+      () => document.querySelector("[data-p3e-live]")?.getAttribute("data-p3e-focus-required") === "false",
+      undefined,
+      { timeout: 20000 }
+    );
+    const afterChoice = await readGate(pausePage);
+    check(
+      "focus_chosen_keeps_manual_pause",
+      afterChoice.required === "false" && afterChoice.held === "false" &&
+        afterChoice.running === "false" && afterChoice.commands === reloaded.commands + 1,
+      `running=${afterChoice.running} held=${afterChoice.held} commands=${reloaded.commands}->${afterChoice.commands}`
+    );
+    await pauseContext.close();
+  }
+
+  // ---- B 成年 + C reload：重播模式只為了快速走到有 projection 的年齡 ----
+  {
+    const adultContext = await browser.newContext({
+      viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true
+    });
+    const adultPage = await adultContext.newPage();
+    await adultPage.goto(`${baseUrl}/${GOLDEN_QUERY}`, { waitUntil: "domcontentloaded" });
+    await adultPage.waitForSelector("[data-p3e-live='true']", { timeout: 30000 });
+    await adultPage.locator('[data-action="start-life"]').click();
+    await driveUntil(
+      adultPage,
+      async () =>
+        (await adultPage.locator('.p3e-compare-strip[data-p3e-compare-source="projection"]').count()) > 0,
+      110
+    );
+    const adultCompare = await adultPage.evaluate(() => ({
+      age: Number(document.querySelector("[data-p3e-live]")?.getAttribute("data-p3e-life-focus-age") ?? "-1"),
+      source: document.querySelector(".p3e-compare-strip")?.getAttribute("data-p3e-compare-source") ?? null,
+      basis: document.querySelector(".p3e-compare-strip")?.getAttribute("data-p3e-compare-basis-year") ?? null,
+      texts: [...document.querySelectorAll(".p3e-compare-text")].map((node) => node.textContent ?? ""),
+      hud: [...document.querySelectorAll(".p3e-hud-item strong")].map((node) => node.textContent ?? ""),
+      note: document.querySelector(".p3e-compare-strip")?.getAttribute("data-p3e-estimate-note") ?? null
+    }));
+    check(
+      "adult_compare_uses_view_percentile_projection",
+      adultCompare.age >= 18 && adultCompare.source === "projection" &&
+        adultCompare.texts.length === 2 &&
+        adultCompare.texts.every((text) => /高於中國 \d+%｜高於全球 \d+%/.test(text)) &&
+        adultCompare.basis === "2021" && (adultCompare.note ?? "").includes("估算") &&
+        adultCompare.hud[2] !== "—" && adultCompare.hud[3] !== "—",
+      `age=${adultCompare.age} source=${adultCompare.source} basis=${adultCompare.basis} texts=${JSON.stringify(adultCompare.texts)} hud=${JSON.stringify(adultCompare.hud)}`
+    );
+    // 「估算」可展開且說明不会露出 internal key
+    await adultPage.locator('[data-action="toggle-estimate-note"]').click();
+    const noteState = await adultPage.evaluate(() => ({
+      expanded: document.querySelector(".p3e-compare-estimate")?.getAttribute("aria-expanded") ?? null,
+      visible: document.querySelector(".p3e-compare-note")?.hidden === false,
+      text: document.querySelector(".p3e-compare-note")?.textContent ?? ""
+    }));
+    check(
+      "estimate_note_is_expandable_and_plain_language",
+      noteState.expanded === "true" && noteState.visible &&
+        noteState.text.includes("估算") && !INTERNAL_KEY_PATTERN.test(noteState.text),
+      `expanded=${noteState.expanded} visible=${noteState.visible} text=${noteState.text.slice(0, 60)}`
+    );
+
+    // C：具名伴侶在 reload／讀檔後姓名不變
+    await driveUntil(
+      adultPage,
+      async () => (await adultPage.locator(".p3e-partner-line").count()) > 0,
+      80
+    );
+    const beforeReload = await adultPage.evaluate(
+      () => document.querySelector(".p3e-partner-line")?.getAttribute("data-p3e-partner-name") ?? null
+    );
+    // 等 idle autosave flush 完成，reload 才能由 command log 重建同一個伴侶姓名。
+    await adultPage.waitForTimeout(700);
+    await adultPage.reload({ waitUntil: "domcontentloaded" });
+    await adultPage.waitForSelector("[data-p3e-live='true']", { timeout: 30000 });
+    const afterReload = await adultPage.evaluate(
+      () => document.querySelector(".p3e-partner-line")?.getAttribute("data-p3e-partner-name") ?? null
+    );
+    check(
+      "partner_name_persists_after_reload",
+      beforeReload !== null && beforeReload === afterReload &&
+        !INTERNAL_KEY_PATTERN.test(beforeReload),
+      `before=${beforeReload} after=${afterReload}`
+    );
+    await adultContext.close();
+  }
+
+  // ---- D6：decision modal 優先於必選重心，不得同時兩張前景卡 ----------
+  {
+    const seedContext = await browser.newContext({
+      viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true
+    });
+    const seedPage = await seedContext.newPage();
+    await seedPage.goto(`${baseUrl}/${GOLDEN_QUERY}`, { waitUntil: "domcontentloaded" });
+    await seedPage.waitForSelector("[data-p3e-live='true']", { timeout: 30000 });
+    await seedPage.locator('[data-action="start-life"]').click();
+    await driveUntil(
+      seedPage,
+      async () => {
+        const state = await readGate(seedPage);
+        return state.phase === "pending_decision" && state.age >= 7;
+      },
+      70
+    );
+    await seedPage.waitForFunction(
+      () => document.querySelector("[data-p3e-live]")?.getAttribute("data-p3e-persistence-status") === "saved",
+      undefined,
+      { timeout: 20000 }
+    );
+    const pendingRaw = await seedPage.evaluate(() => {
+      try { return window.localStorage.getItem("life-sim:p3e:v6:autosave"); }
+      catch { return null; }
+    });
+    await seedContext.close();
+
+    const priorityContext = await browser.newContext({
+      viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true
+    });
+    if (pendingRaw !== null) {
+      await priorityContext.addInitScript((raw) => {
+        try { window.localStorage.setItem("life-sim:p3e:v6:autosave", raw); } catch { /* noop */ }
+      }, pendingRaw);
+    }
+    const priorityPage = await priorityContext.newPage();
+    await priorityPage.goto(`${baseUrl}/${qaQuery}`, { waitUntil: "domcontentloaded" });
+    await priorityPage.waitForSelector("[data-p3e-live='true']", { timeout: 30000 });
+    const beforeDecision = await priorityPage.evaluate(() => {
+      const live = document.querySelector("[data-p3e-live]");
+      const focus = document.querySelector(".p3e-focus");
+      return {
+        phase: live?.getAttribute("data-p3e-phase") ?? null,
+        age: Number(live?.getAttribute("data-p3e-life-focus-age") ?? "-1"),
+        required: live?.getAttribute("data-p3e-focus-required") ?? null,
+        held: live?.getAttribute("data-p3e-clock-held") ?? null,
+        focusExpanded: focus?.getAttribute("data-p3e-focus-expanded") ?? null,
+        pendingCards: document.querySelectorAll(".p3e-pending").length,
+        choiceButtons: document.querySelectorAll('[data-action="choose"]').length,
+        foregroundCards: document.querySelectorAll(".p3e-focus-panel, .p3e-pending").length
+      };
+    });
+    check(
+      "decision_takes_priority_over_focus_required_gate",
+      pendingRaw !== null && beforeDecision.phase === "pending_decision" &&
+        beforeDecision.age >= 7 && beforeDecision.required === "false" &&
+        beforeDecision.held === "false" && beforeDecision.pendingCards === 1 &&
+        beforeDecision.choiceButtons >= 2 && beforeDecision.focusExpanded !== "true" &&
+        beforeDecision.foregroundCards === 1,
+      `phase=${beforeDecision.phase} age=${beforeDecision.age} required=${beforeDecision.required} pending=${beforeDecision.pendingCards} focus=${beforeDecision.focusExpanded} cards=${beforeDecision.foregroundCards}`
+    );
+    await priorityPage.locator('[data-action="choose"]').first().click();
+    await priorityPage.waitForFunction(
+      () => document.querySelector("[data-p3e-live]")?.getAttribute("data-p3e-focus-required") === "true",
+      undefined,
+      { timeout: 20000 }
+    );
+    const afterDecision = await priorityPage.evaluate(() => {
+      const live = document.querySelector("[data-p3e-live]");
+      return {
+        required: live?.getAttribute("data-p3e-focus-required") ?? null,
+        held: live?.getAttribute("data-p3e-clock-held") ?? null,
+        running: live?.getAttribute("data-p3e-clock-running") ?? null,
+        focusExpanded: document.querySelector(".p3e-focus")?.getAttribute("data-p3e-focus-expanded") ?? null,
+        pendingCards: document.querySelectorAll(".p3e-pending").length,
+        foregroundCards: document.querySelectorAll(".p3e-focus-panel, .p3e-pending").length,
+        advanceDisabled: document.querySelector('[data-action="advance"]')?.disabled ?? null
+      };
+    });
+    check(
+      "focus_gate_applies_after_decision_resolved_without_double_overlay",
+      afterDecision.required === "true" && afterDecision.held === "true" &&
+        afterDecision.running === "false" && afterDecision.focusExpanded === "true" &&
+        afterDecision.pendingCards === 0 && afterDecision.foregroundCards === 1 &&
+        afterDecision.advanceDisabled === true,
+      `required=${afterDecision.required} held=${afterDecision.held} cards=${afterDecision.foregroundCards} advanceDisabled=${afterDecision.advanceDisabled}`
+    );
+    await priorityContext.close();
+  }
+
+  // ---- GPT-0037-B P1：decision → 首次重心完整播放 intent ----------------
+  // 這個 seed 在 7 歲同年先出現 pending decision（dec.child.family-move），
+  // 正是驗收單描述的重現路徑；公開網址（沒有 p3eReplay）必選閘門完整生效。
+  {
+    const FLOW_SEED = "probe-seed-36";
+    const flowQuery = `?seed=${encodeURIComponent(FLOW_SEED)}`;
+    for (const variant of [
+      { name: "playing_16x", playing: true, expectedRunning: "true" },
+      { name: "manual_paused", playing: false, expectedRunning: "false" }
+    ]) {
+      const flowContext = await browser.newContext({
+        viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true
+      });
+      const flowPage = await flowContext.newPage();
+      const flowErrors = [];
+      flowPage.on("pageerror", (error) => flowErrors.push(String(error)));
+      await flowPage.goto(`${baseUrl}/${flowQuery}`, { waitUntil: "domcontentloaded" });
+      await flowPage.waitForSelector("[data-p3e-live='true']", { timeout: 30000 });
+      await flowPage.locator('[data-action="start-life"]').click();
+      if (!variant.playing) await flowPage.locator('[data-action="toggle-time"]').click();
+      await flowPage.locator('[data-speed="16"]').click();
+      const keepPaused = async () => {
+        const running = await flowPage
+          .locator("[data-p3e-live]")
+          .getAttribute("data-p3e-clock-running")
+          .catch(() => "false");
+        if (running === "true") {
+          await flowPage.locator('[data-action="toggle-time"]').click({ timeout: 5000 }).catch(() => {});
+        }
+      };
+      await driveUntil(
+        flowPage,
+        async () => {
+          const gate = await readGate(flowPage);
+          return gate.phase === "pending_decision" && gate.age >= 7;
+        },
+        40,
+        variant.playing ? undefined : keepPaused
+      );
+      const atDecision = await readGate(flowPage);
+      check(
+        `p1_${variant.name}_age7_decision_pauses_clock_at_16x`,
+        atDecision.phase === "pending_decision" && atDecision.age >= 7 &&
+          atDecision.required === "false" && atDecision.held === "false" &&
+          atDecision.running === "false" && atDecision.speed === "16" &&
+          (await flowPage.locator('[data-action="choose"]').count()) >= 2,
+        `phase=${atDecision.phase} age=${atDecision.age} required=${atDecision.required} ` +
+          `running=${atDecision.running} speed=${atDecision.speed}`
+      );
+
+      await flowPage.locator('[data-action="choose"]').first().click();
+      await flowPage.waitForFunction(
+        () => document.querySelector("[data-p3e-live]")?.getAttribute("data-p3e-focus-required") === "true",
+        undefined,
+        { timeout: 20000 }
+      );
+      const afterChoose = await readGate(flowPage);
+      const gateDialog = await flowPage.evaluate(() => {
+        const q = (s) => document.querySelector(s);
+        return {
+          role: q('.p3e-focus-panel[data-p3e-focus-dialog="required"]')?.getAttribute("role") ?? null,
+          modal: q('.p3e-focus-panel[data-p3e-focus-dialog="required"]')?.getAttribute("aria-modal") ?? null,
+          activeAction: document.activeElement?.getAttribute("data-action") ?? null,
+          advanceDisabled: q('[data-action="advance"]')?.disabled ?? null,
+          jumpDisabled: q('[data-action="jump-decision"]')?.disabled ?? null,
+          speedDisabled: q('[data-speed="4"]')?.disabled ?? null,
+          timeDisabled: q('[data-action="toggle-time"]')?.disabled ?? null
+        };
+      });
+      check(
+        `p1_${variant.name}_focus_required_hard_gate_after_decision`,
+        afterChoose.required === "true" && afterChoose.held === "true" &&
+          afterChoose.running === "false" && afterChoose.speed === "16" &&
+          afterChoose.commands === atDecision.commands + 1 &&
+          gateDialog.advanceDisabled === true && gateDialog.jumpDisabled === true &&
+          gateDialog.speedDisabled === true && gateDialog.timeDisabled === true,
+        `required=${afterChoose.required} held=${afterChoose.held} running=${afterChoose.running} ` +
+          `commands=${atDecision.commands}->${afterChoose.commands} dom=${JSON.stringify(gateDialog)}`
+      );
+      check(
+        `p1_${variant.name}_focus_dialog_autofocus_first_option`,
+        gateDialog.role === "dialog" && gateDialog.modal === "true" &&
+          gateDialog.activeAction === "set-focus",
+        `role=${gateDialog.role} modal=${gateDialog.modal} active=${gateDialog.activeAction}`
+      );
+
+      // 鍵盤、強制點擊、程式派送 click、多個 16x interval 都不能偷跑一年。
+      // 注意：dialog 內第一個重心有 autofocus，直接按 Enter 會合法選定重心，
+      // 所以這裡改派送 synthetic click 到全部被停用的推進／速度控制，
+      // 驗證 `runCommand` 的硬閘門而不是只靠 DOM disabled 屬性。
+      await flowPage.evaluate(() => {
+        for (const selector of [
+          '[data-action="advance"]',
+          '[data-action="jump-decision"]',
+          '[data-speed="16"]',
+          '[data-action="toggle-time"]'
+        ]) {
+          document.querySelector(selector)?.dispatchEvent(
+            new MouseEvent("click", { bubbles: true, cancelable: true })
+          );
+        }
+      });
+      await flowPage.keyboard.press("Tab").catch(() => {});
+      await flowPage.keyboard.press("Tab").catch(() => {});
+      await flowPage.locator('[data-action="advance"]').click({ force: true }).catch(() => {});
+      await flowPage.waitForTimeout(1400);
+      const afterWait = await readGate(flowPage);
+      check(
+        `p1_${variant.name}_no_sneak_while_decision_or_focus_unresolved`,
+        afterWait.commands === afterChoose.commands && afterWait.age === afterChoose.age &&
+          afterWait.required === "true" && afterWait.held === "true",
+        `before=${afterChoose.commands}/${afterChoose.age} after=${afterWait.commands}/${afterWait.age} held=${afterWait.held}`
+      );
+
+      // 16× 恢復播放後下一個 interval 只有 375ms；用 raf polling 在
+      // 「release 的第一個 render」當下就快照，避免被之後的自動推進干擾。
+      await flowPage.evaluate(() => { window.__p1Release = null; });
+      await flowPage
+        .locator('.p3e-focus[data-p3e-focus-required="true"] [data-action="set-focus"][data-focus-id="study"]')
+        .first()
+        .click();
+      await flowPage.waitForFunction(
+        () => {
+          const live = document.querySelector("[data-p3e-live]");
+          if (live?.getAttribute("data-p3e-focus-required") !== "false") return false;
+          if (live?.getAttribute("data-p3e-clock-held") !== "false") return false;
+          window.__p1Release = {
+            required: live?.getAttribute("data-p3e-focus-required") ?? null,
+            held: live?.getAttribute("data-p3e-clock-held") ?? null,
+            running: live?.getAttribute("data-p3e-clock-running") ?? null,
+            speed: live?.getAttribute("data-p3e-clock-speed") ?? null,
+            commands: Number(live?.getAttribute("data-p3e-command-count") ?? "-1"),
+            action: document.activeElement?.getAttribute("data-action") ?? null,
+            isBody: document.activeElement === document.body
+          };
+          return true;
+        },
+        undefined,
+        { timeout: 20000, polling: "raf" }
+      );
+      const afterFocus = await flowPage.evaluate(() => window.__p1Release);
+      check(
+        `p1_${variant.name}_focus_chosen_restores_pre_decision_play_intent`,
+        afterFocus.required === "false" && afterFocus.held === "false" &&
+          afterFocus.running === variant.expectedRunning && afterFocus.speed === "16" &&
+          afterFocus.commands === afterWait.commands + 1,
+        `running=${afterFocus.running} speed=${afterFocus.speed} held=${afterFocus.held} ` +
+          `commands=${afterWait.commands}->${afterFocus.commands}`
+      );
+      check(
+        `p1_${variant.name}_focus_returns_to_expected_control`,
+        !afterFocus.isBody &&
+          afterFocus.action === (variant.playing ? "advance" : "toggle-time"),
+        `action=${afterFocus.action} body=${afterFocus.isBody}`
+      );
+      check(`p1_${variant.name}_no_page_errors`, flowErrors.length === 0, `errors=${JSON.stringify(flowErrors)}`);
+      await flowContext.close();
+    }
+  }
+
+  /* ---------------------------------------------------------------- */
+  /* 16. GPT-0038-B：「下一個決定」播放意圖（真正點擊 jump 按鈕）        */
+  /* ---------------------------------------------------------------- */
+  const jumpQuery = `?seed=${encodeURIComponent(GOLDEN_SEED)}&${REPLAY_QUERY}`;
+  const readJumpState = (target) =>
+    target.evaluate(() => {
+      const live = document.querySelector("[data-p3e-live]");
+      return {
+        phase: live?.getAttribute("data-p3e-phase") ?? null,
+        age: Number(live?.getAttribute("data-p3e-life-focus-age") ?? "-1"),
+        commands: Number(live?.getAttribute("data-p3e-command-count") ?? "-1"),
+        running: live?.getAttribute("data-p3e-clock-running") ?? null,
+        speed: live?.getAttribute("data-p3e-clock-speed") ?? null,
+        required: live?.getAttribute("data-p3e-focus-required") ?? null,
+        held: live?.getAttribute("data-p3e-clock-held") ?? null,
+        decisionIntent: live?.getAttribute("data-p3e-decision-intent") ?? null,
+        jumpIntent: live?.getAttribute("data-p3e-jump-intent") ?? null,
+        fastForwarding: live?.getAttribute("data-p3e-fast-forwarding") ?? null,
+        inertCount: document.querySelectorAll("[inert]").length,
+        choices: document.querySelectorAll('[data-action="choose"]').length
+      };
+    });
+
+  /** 真正點擊 [data-action="jump-decision"]，並等快轉整個結束（finally render）。 */
+  async function clickJumpAndWait(target) {
+    const before = await commandCount(target);
+    await target.locator('[data-action="jump-decision"]').click();
+    await target.waitForFunction(
+      (prev) => {
+        const live = document.querySelector("[data-p3e-live]");
+        const commands = Number(live?.getAttribute("data-p3e-command-count") ?? "0");
+        return (
+          commands > prev &&
+          live?.getAttribute("data-p3e-fast-forwarding") === "false" &&
+          live?.getAttribute("data-p3e-jump-intent") === "none"
+        );
+      },
+      before,
+      { timeout: 30000 }
+    );
+  }
+
+  function newJumpContext() {
+    return browser.newContext({
+      viewport: { width: 390, height: 844 },
+      deviceScaleFactor: 1,
+      isMobile: true,
+      hasTouch: true
+    });
+  }
+
+  async function openJumpPage(query) {
+    const context = await newJumpContext();
+    const page = await context.newPage();
+    const errors = [];
+    page.on("pageerror", (error) => errors.push(String(error)));
+    await page.goto(`${baseUrl}/${query}`, { waitUntil: "domcontentloaded" });
+    await page.waitForSelector("[data-p3e-live='true']", { timeout: 30000 });
+    await page.locator('[data-action="start-life"]').click();
+    await page.waitForFunction(
+      () => document.querySelector("[data-p3e-live]")?.getAttribute("data-p3e-phase") === "life",
+      undefined,
+      { timeout: 20000 }
+    );
+    return { context, page, errors };
+  }
+
+  // ---- A：playing 4×／16× 與手動暫停三種狀態 → 普通 decision ----------
+  for (const variant of [
+    { name: "playing_4x", playing: true, speed: "4", expectedRunning: "true" },
+    { name: "playing_16x", playing: true, speed: "16", expectedRunning: "true" },
+    { name: "manual_paused_4x", playing: false, speed: "4", expectedRunning: "false" }
+  ]) {
+    const { context, page, errors } = await openJumpPage(jumpQuery);
+    if (!variant.playing) await page.locator('[data-action="toggle-time"]').click();
+    await page.locator(`[data-speed="${variant.speed}"]`).click();
+    const beforeJump = await readJumpState(page);
+    check(
+      `jump_${variant.name}_starts_from_expected_clock_state`,
+      beforeJump.running === String(variant.playing) && beforeJump.speed === variant.speed &&
+        beforeJump.decisionIntent === "none" && beforeJump.jumpIntent === "none" &&
+        beforeJump.phase === "life" && beforeJump.fastForwarding === "false",
+      `running=${beforeJump.running} speed=${beforeJump.speed} intent=${beforeJump.decisionIntent}/${beforeJump.jumpIntent}`
+    );
+
+    await clickJumpAndWait(page);
+    const reached = await readJumpState(page);
+    check(
+      `jump_${variant.name}_reaches_pending_decision_with_pre_jump_intent`,
+      reached.phase === "pending_decision" && reached.choices >= 2 &&
+        reached.running === "false" && reached.speed === variant.speed &&
+        reached.decisionIntent === `${variant.playing ? "playing" : "paused"}:${variant.speed}` &&
+        reached.jumpIntent === "none" && reached.fastForwarding === "false",
+      `phase=${reached.phase} running=${reached.running} speed=${reached.speed} ` +
+        `intent=${reached.decisionIntent}/${reached.jumpIntent} choices=${reached.choices}`
+    );
+
+    // 恢復播放後 16× interval 只有 375ms，用 raf 在第一個 render 當下快照。
+    await page.evaluate(() => { window.__jumpRelease = null; });
+    await page.locator('[data-action="choose"]').first().click();
+    await page.waitForFunction(
+      () => {
+        const live = document.querySelector("[data-p3e-live]");
+        if (live?.getAttribute("data-p3e-phase") !== "life") return false;
+        window.__jumpRelease = {
+          running: live?.getAttribute("data-p3e-clock-running") ?? null,
+          speed: live?.getAttribute("data-p3e-clock-speed") ?? null,
+          commands: Number(live?.getAttribute("data-p3e-command-count") ?? "-1"),
+          decisionIntent: live?.getAttribute("data-p3e-decision-intent") ?? null,
+          jumpIntent: live?.getAttribute("data-p3e-jump-intent") ?? null
+        };
+        return true;
+      },
+      undefined,
+      { timeout: 20000, polling: "raf" }
+    );
+    const after = await page.evaluate(() => window.__jumpRelease);
+    check(
+      `jump_${variant.name}_choose_restores_pre_jump_playback`,
+      after.running === variant.expectedRunning && after.speed === variant.speed &&
+        after.commands === reached.commands + 1 &&
+        after.decisionIntent === "none" && after.jumpIntent === "none",
+      `running=${after.running} speed=${after.speed} commands=${reached.commands}->${after.commands} ` +
+        `intent=${after.decisionIntent}/${after.jumpIntent}`
+    );
+    check(`jump_${variant.name}_no_page_errors`, errors.length === 0, `errors=${JSON.stringify(errors)}`);
+    await context.close();
+  }
+
+  // ---- B：jump → decision → 首次必選重心 → 沿用同一 intent -----------
+  // probe-seed-36 在 7 歲同年有 pending decision；先手動暫停穩定走到 6 歲。
+  for (const variant of [
+    { name: "playing_4x", playing: true, speed: "4", expectedRunning: "true" },
+    { name: "manual_paused_4x", playing: false, speed: "4", expectedRunning: "false" }
+  ]) {
+    const { context, page, errors } = await openJumpPage(
+      `?seed=${encodeURIComponent("probe-seed-36")}`
+    );
+    await page.locator('[data-action="toggle-time"]').click(); // 先手動暫停，避免自動推進干擾
+    let guard = 0;
+    while (guard < 40) {
+      const state = await readJumpState(page);
+      if (state.age >= 6 && state.phase === "life") break;
+      const selector = state.phase === "pending_decision"
+        ? '[data-action="choose"]'
+        : '[data-action="advance"]';
+      const before = await commandCount(page);
+      await page.locator(selector).first().click();
+      await page.waitForFunction(
+        (prev) =>
+          Number(
+            document.querySelector("[data-p3e-live]")?.getAttribute("data-p3e-command-count") ?? "0"
+          ) > prev,
+        before,
+        { timeout: 20000 }
+      );
+      guard += 1;
+    }
+    const atSix = await readJumpState(page);
+    check(
+      `jump_focus_${variant.name}_reaches_age6_manually_paused`,
+      atSix.age === 6 && atSix.phase === "life" && atSix.running === "false" &&
+        atSix.required === "false" && atSix.decisionIntent === "none",
+      `age=${atSix.age} phase=${atSix.phase} running=${atSix.running} intent=${atSix.decisionIntent}`
+    );
+
+    await page.locator(`[data-speed="${variant.speed}"]`).click();
+    if (variant.playing) await page.locator('[data-action="toggle-time"]').click();
+    const beforeJump = await readJumpState(page);
+    check(
+      `jump_focus_${variant.name}_pre_jump_clock_state`,
+      beforeJump.running === String(variant.playing) && beforeJump.speed === variant.speed,
+      `running=${beforeJump.running} speed=${beforeJump.speed}`
+    );
+    await clickJumpAndWait(page);
+    const reached = await readJumpState(page);
+    check(
+      `jump_focus_${variant.name}_age7_decision_inherits_pre_jump_intent`,
+      reached.phase === "pending_decision" && reached.age === 7 &&
+        reached.running === "false" && reached.speed === variant.speed &&
+        reached.choices >= 2 &&
+        reached.decisionIntent === `${variant.playing ? "playing" : "paused"}:${variant.speed}` &&
+        reached.jumpIntent === "none",
+      `phase=${reached.phase} age=${reached.age} intent=${reached.decisionIntent}/${reached.jumpIntent} ` +
+        `speed=${reached.speed} running=${reached.running}`
+    );
+
+    await page.locator('[data-action="choose"]').first().click();
+    await page.waitForFunction(
+      () =>
+        document.querySelector("[data-p3e-live]")?.getAttribute("data-p3e-focus-required") === "true",
+      undefined,
+      { timeout: 20000 }
+    );
+    const gate = await readJumpState(page);
+    check(
+      `jump_focus_${variant.name}_focus_gate_after_choose`,
+      gate.required === "true" && gate.held === "true" && gate.running === "false" &&
+        gate.commands === reached.commands + 1 &&
+        gate.decisionIntent === "none" && gate.jumpIntent === "none" &&
+        gate.inertCount > 0,
+      `required=${gate.required} held=${gate.held} commands=${reached.commands}->${gate.commands} ` +
+        `intent=${gate.decisionIntent}/${gate.jumpIntent} inert=${gate.inertCount}`
+    );
+
+    await page.evaluate(() => { window.__jumpFocusRelease = null; });
+    await page
+      .locator('.p3e-focus[data-p3e-focus-required="true"] [data-action="set-focus"][data-focus-id="study"]')
+      .first()
+      .click();
+    await page.waitForFunction(
+      () => {
+        const live = document.querySelector("[data-p3e-live]");
+        if (live?.getAttribute("data-p3e-focus-required") !== "false") return false;
+        window.__jumpFocusRelease = {
+          required: live?.getAttribute("data-p3e-focus-required") ?? null,
+          held: live?.getAttribute("data-p3e-clock-held") ?? null,
+          running: live?.getAttribute("data-p3e-clock-running") ?? null,
+          speed: live?.getAttribute("data-p3e-clock-speed") ?? null,
+          commands: Number(live?.getAttribute("data-p3e-command-count") ?? "-1"),
+          decisionIntent: live?.getAttribute("data-p3e-decision-intent") ?? null,
+          jumpIntent: live?.getAttribute("data-p3e-jump-intent") ?? null,
+          inertCount: document.querySelectorAll("[inert]").length
+        };
+        return true;
+      },
+      undefined,
+      { timeout: 20000, polling: "raf" }
+    );
+    const released = await page.evaluate(() => window.__jumpFocusRelease);
+    check(
+      `jump_focus_${variant.name}_focus_restores_pre_jump_intent`,
+      released.required === "false" && released.held === "false" &&
+        released.running === variant.expectedRunning && released.speed === variant.speed &&
+        released.commands === gate.commands + 1 &&
+        released.decisionIntent === "none" && released.jumpIntent === "none" &&
+        released.inertCount === 0,
+      `running=${released.running} speed=${released.speed} held=${released.held} ` +
+        `commands=${gate.commands}->${released.commands} inert=${released.inertCount}`
+    );
+    check(`jump_focus_${variant.name}_no_page_errors`, errors.length === 0, `errors=${JSON.stringify(errors)}`);
+    await context.close();
+  }
+
+  // ---- C：jump 中死亡 → 重生，intent 不得污染下一條命 ------------------
+  {
+    const { context, page, errors } = await openJumpPage(jumpQuery);
+    await page.locator('[data-action="toggle-time"]').click(); // 全程手動暫停，狀態可預測
+    // golden 有 106 個命令，jump 每遇到 decision 就停下，一輪約推進一年；
+    // 上限放寬到 240 次迭代才足以一路走到死亡。
+    let guard = 0;
+    while (guard < 240) {
+      const state = await readJumpState(page);
+      if (state.phase === "death") break;
+      if (state.phase === "pending_decision") {
+        const before = await commandCount(page);
+        await page.locator('[data-action="choose"]').first().click();
+        await page.waitForFunction(
+          (prev) =>
+            Number(
+              document.querySelector("[data-p3e-live]")?.getAttribute("data-p3e-command-count") ?? "0"
+            ) > prev,
+          before,
+          { timeout: 20000 }
+        );
+      } else if (state.phase === "life") {
+        await clickJumpAndWait(page);
+      } else break;
+      guard += 1;
+    }
+    const atDeath = await readJumpState(page);
+    check(
+      "jump_death_clears_armed_and_decision_intent",
+      atDeath.phase === "death" && atDeath.running === "false" &&
+        atDeath.jumpIntent === "none" && atDeath.decisionIntent === "none" &&
+        atDeath.fastForwarding === "false",
+      `phase=${atDeath.phase} running=${atDeath.running} guard=${guard} ` +
+        `intent=${atDeath.decisionIntent}/${atDeath.jumpIntent}`
+    );
+
+    if (atDeath.phase !== "death") {
+      const reason = `death not reached after ${guard} iterations`;
+      check("jump_rebirth_no_stale_intent", false, reason);
+      check("jump_rebirth_new_life_captures_its_own_paused_intent", false, reason);
+      check("jump_rebirth_new_life_manual_pause_not_resumed", false, reason);
+    } else {
+      await page.locator('[data-action="rebirth"]').click();
+      await page.waitForSelector(".p3e-birth-card", { timeout: 20000 });
+      await page.locator('[data-action="start-life"]').click();
+      await page.waitForFunction(
+        () => document.querySelector("[data-p3e-live]")?.getAttribute("data-p3e-phase") === "life",
+        undefined,
+        { timeout: 20000 }
+      );
+      const reborn = await readJumpState(page);
+      check(
+        "jump_rebirth_no_stale_intent",
+        reborn.age === 0 && reborn.phase === "life" &&
+          reborn.jumpIntent === "none" && reborn.decisionIntent === "none",
+        `age=${reborn.age} intent=${reborn.decisionIntent}/${reborn.jumpIntent}`
+      );
+
+      // 新的一命手動暫停 → jump → choose，必須保持暫停（若有 playing intent 殘留會 resume）。
+      await page.locator('[data-action="toggle-time"]').click();
+      await clickJumpAndWait(page);
+      const newReached = await readJumpState(page);
+      check(
+        "jump_rebirth_new_life_captures_its_own_paused_intent",
+        newReached.phase === "pending_decision" &&
+          newReached.decisionIntent === `paused:${newReached.speed}` &&
+          newReached.jumpIntent === "none" && newReached.running === "false",
+        `phase=${newReached.phase} intent=${newReached.decisionIntent} speed=${newReached.speed}`
+      );
+      await page.locator('[data-action="choose"]').first().click();
+      await page.waitForFunction(
+        () => document.querySelector("[data-p3e-live]")?.getAttribute("data-p3e-phase") === "life",
+        undefined,
+        { timeout: 20000 }
+      );
+      const afterNewChoose = await readJumpState(page);
+      check(
+        "jump_rebirth_new_life_manual_pause_not_resumed",
+        afterNewChoose.running === "false" &&
+          afterNewChoose.decisionIntent === "none" && afterNewChoose.jumpIntent === "none",
+        `running=${afterNewChoose.running} intent=${afterNewChoose.decisionIntent}/${afterNewChoose.jumpIntent}`
+      );
+    }
+    check("jump_rebirth_no_page_errors", errors.length === 0, `errors=${JSON.stringify(errors)}`);
+    await context.close();
   }
 
   const allChecks = [...results, ...scenarioResults];

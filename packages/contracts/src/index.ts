@@ -10,5 +10,6 @@ export * from "./p3c";
 export * from "./p3d";
 export * from "./p3e";
 export * from "./p3e-economy";
+export * from "./p3e-percentile";
 export * from "./p3e-life-focus";
 export * from "./versions";

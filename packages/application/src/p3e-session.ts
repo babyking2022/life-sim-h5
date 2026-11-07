@@ -1,5 +1,13 @@
 import type { P3ELifeState } from "@life-sim/contracts";
 import {
+  deriveP3EEmploymentStatus,
+  estimateIncomePercentileMicroUsd,
+  estimateWealthPercentileMicroUsd,
+  formatPercentileSummary,
+  type P3EPercentileMeta,
+  type P3EPercentileResult
+} from "@life-sim/contracts";
+import {
   P3EError,
   appendP3ELedgerHistory,
   createP3ELedgerHistory,
@@ -17,6 +25,12 @@ import {
   buildP3ELifeLog,
   type P3ELifeLogEntry
 } from "./p3e-life-log";
+import {
+  advanceP3ELifePartner,
+  resolveP3ELifePartner,
+  type P3ELifePartner,
+  type P3EPartnerChoice
+} from "./p3e-partner";
 
 /**
  * P3-E.1b-2n／2r／2t：Application Play Session ＋ ViewModel ＋ Raw Session Persistence
@@ -72,6 +86,27 @@ export interface P3EPlaySessionControls {
   readonly isDead: boolean;
 }
 
+/** 收入／資產百分位（GPT-DEEPSEEK-0036-A；「高於中國 X%｜高於全球 Y%」）。 */
+export interface P3EPlaySessionPercentileField {
+  readonly available: boolean;
+  /** 高於中國多少比例的人（0–99.9；不可用時為 null）。 */
+  readonly chinaPercent: number | null;
+  /** 高於全球多少比例的人（0–99.9；不可用時為 null）。 */
+  readonly globalPercent: number | null;
+  /** UI 可直接顯示的字串（含「估算」語意；不可用時是「估算不可用」）。 */
+  readonly summary: string;
+  /** 不可用原因。 */
+  readonly reason: "age_below_minimum" | "no_income" | "not_employed" | null;
+  /** 資料口徑（基準年／單位／方法／版本）；不可用時為 null。 */
+  readonly meta: P3EPercentileMeta | null;
+}
+
+/** 收入與資產的百分位投影。 */
+export interface P3EPlaySessionPercentiles {
+  readonly income: P3EPlaySessionPercentileField;
+  readonly wealth: P3EPlaySessionPercentileField;
+}
+
 /** 呈現用 ViewModel。 */
 export interface P3EPlaySessionView {
   readonly phase: P3ELifeState["phase"];
@@ -90,6 +125,16 @@ export interface P3EPlaySessionView {
    * 不含任何繁中文字串；存檔復原後由 ledger／commands 決定性重建。
    */
   readonly lifeLog: readonly P3ELifeLogEntry[];
+  /**
+   * 收入／資產百分位（GPT-DEEPSEEK-0036-A）：語意是「高於多少比例的人」，
+   * 全部標示估算，並附基準年／單位／來源／方法。
+   */
+  readonly percentiles: P3EPlaySessionPercentiles;
+  /**
+   * 具名伴侶（GPT-DEEPSEEK-0036-A）：沒有關係事件時是 null；
+   * 由 masterSeed ＋ command log 決定性重建（不消耗年度 RNG）。
+   */
+  readonly partner: P3ELifePartner | null;
 }
 
 /** 不可變的遊戲 session。 */
@@ -206,11 +251,122 @@ function controlsFor(phase: P3ELifeState["phase"]): P3EPlaySessionControls {
   return { canAdvanceYear: false, canChooseDecision: false, isDead: true };
 }
 
+/** 百分位欄位：把契約層結果轉成 UI 直接可用的形狀（不含 bigint）。 */
+function percentileField(result: P3EPercentileResult): P3EPlaySessionPercentileField {
+  if (!result.available) {
+    return Object.freeze({
+      available: false,
+      chinaPercent: null,
+      globalPercent: null,
+      summary: formatPercentileSummary(result),
+      reason: result.reason,
+      meta: null
+    });
+  }
+  return Object.freeze({
+    available: true,
+    chinaPercent: result.chinaPercent,
+    globalPercent: result.globalPercent,
+    summary: formatPercentileSummary(result),
+    reason: null,
+    meta: Object.freeze({ ...result.meta })
+  });
+}
+
+/** 由 State 算百分位（純呈現；不消耗 RNG、不查 pack、不寫任何狀態）。 */
+function buildPercentiles(state: P3ELifeState): P3EPlaySessionPercentiles {
+  const employmentStatus = deriveP3EEmploymentStatus(state.age, state.flags);
+  return Object.freeze({
+    income: percentileField(
+      estimateIncomePercentileMicroUsd({
+        age: state.age,
+        annualIncomeMicroUsd: state.assets.annualIncomeMicroUsd,
+        employmentStatus
+      })
+    ),
+    wealth: percentileField(
+      estimateWealthPercentileMicroUsd({ age: state.age, balanceMicroUsd: state.assets.balanceMicroUsd })
+    )
+  });
+}
+
+/* ------------------------------------------------------------------ */
+/* GPT-DEEPSEEK-0036-A：伴侶投影 helper                                  */
+/* ------------------------------------------------------------------ */
+
+interface PartnerIdentityPackView {
+  readonly vitalsByEntity: Record<string, { readonly cultureId: string }>;
+}
+
+/** 由 state.identity.entityId 找出玩家出生文化（給姓名語料用）。 */
+function cultureIdOf(identityPack: PartnerIdentityPackView, state: P3ELifeState): string {
+  const vital = identityPack.vitalsByEntity[state.identity.entityId];
+  return vital === undefined ? "han" : vital.cultureId;
+}
+
+/**
+ * 從「逐命令結果」抽出所有 choose_decision（伴侶轉移表自己會依 eventId 過濾）。
+ *
+ * 這裡刻意不做任何關係判斷：是否建立／升級／清除伴侶完全由
+ * `P3E_PARTNER_TRANSITIONS`（eventId ＋ decisionId ＋ optionId）決定，
+ * 因此即時路徑與 replay 路徑用的是同一份規則。
+ */
+function partnerChoicesOf(
+  sources: readonly { readonly year: number; readonly outcome: P3ECommandOutcome }[]
+): readonly P3EPartnerChoice[] {
+  const result: P3EPartnerChoice[] = [];
+  for (const source of sources) {
+    const outcome = source.outcome;
+    if (outcome.kind !== "choose_decision") continue;
+    result.push({
+      eventId: outcome.eventId,
+      decisionId: outcome.decisionId,
+      optionId: outcome.selectedOptionId,
+      year: source.year
+    });
+  }
+  return result;
+}
+
+/** 這次 outcome 是否是一次選擇（只有選擇才可能建立／升級／清除伴侶）。 */
+function partnerChoiceOf(outcome: P3ECommandOutcome, year: number): P3EPartnerChoice | null {
+  if (outcome.kind !== "choose_decision") return null;
+  return { eventId: outcome.eventId, decisionId: outcome.decisionId, optionId: outcome.selectedOptionId, year };
+}
+
+/**
+ * 即時路徑：用「上一個 view 的伴侶」＋「本次 outcome」更新。
+ *
+ * 關係轉移（含 `single` 清除）完全由 `advanceP3ELifePartner` 決定；
+ * 姓名永遠由**第一段關係**推導，之後只升級 status。
+ */
+function advancePartner(input: {
+  readonly masterSeed: string;
+  readonly identityPack: unknown;
+  readonly cultureId: string;
+  readonly playerSex: string;
+  readonly previous: P3ELifePartner | null;
+  readonly outcome: P3ECommandOutcome;
+  readonly year: number;
+}): P3ELifePartner | null {
+  const choice = partnerChoiceOf(input.outcome, input.year);
+  if (choice === null) return input.previous;
+  return advanceP3ELifePartner({
+    masterSeed: input.masterSeed,
+    identityPack: input.identityPack as never,
+    cultureId: input.cultureId,
+    playerSex: input.playerSex,
+    previous: input.previous,
+    choice
+  });
+}
+
 /** 建立 view：只讀 State 與 lastOutcome，不查 pack、不重跑任何模擬。 */
 function buildView(
   state: P3ELifeState,
   lastOutcome: P3ECommandOutcome | null,
-  lifeLog: readonly P3ELifeLogEntry[]
+  lifeLog: readonly P3ELifeLogEntry[],
+  partner: P3ELifePartner | null
 ): P3EPlaySessionView {
   const pendingDecision =
     state.phase === "pending_decision" && lastOutcome !== null && lastOutcome.kind === "advance_year"
@@ -226,7 +382,9 @@ function buildView(
     controls: controlsFor(state.phase),
     pendingDecision,
     lastOutcome,
-    lifeLog
+    lifeLog,
+    percentiles: buildPercentiles(state),
+    partner
   });
 }
 
@@ -281,13 +439,14 @@ function sealSession(
   state: P3ELifeState,
   ledgerHistory: P3ELedgerHistory,
   lastOutcome: P3ECommandOutcome | null,
-  lifeLog: readonly P3ELifeLogEntry[]
+  lifeLog: readonly P3ELifeLogEntry[],
+  partner: P3ELifePartner | null
 ): P3EPlaySession {
   return deepFreeze({
     state,
     ledgerHistory,
     lastOutcome,
-    view: buildView(state, lastOutcome, lifeLog)
+    view: buildView(state, lastOutcome, lifeLog, partner)
   });
 }
 
@@ -315,7 +474,7 @@ export function createP3EPlaySession(input: unknown): P3EPlaySession {
   const state = createP3EGame(genesis);
   const session = sealSession(state, createP3ELedgerHistory(state), null, [
     birthLifeLogEntry(state.identity.birthYear)
-  ]);
+  ], null);
   GENESIS_BY_SESSION.set(session, genesis);
   return session;
 }
@@ -361,7 +520,17 @@ export function runP3EPlaySessionCommand(input: unknown): P3EPlaySessionCommandR
     result.outcome
   );
 
-  const next = sealSession(result.state, ledgerHistory, result.outcome, lifeLog);
+  const partner = advancePartner({
+    masterSeed: genesis.masterSeed as string,
+    identityPack: genesis.identityPack,
+    cultureId: cultureIdOf(genesis.identityPack as never, result.state),
+    playerSex: result.state.identity.sex,
+    previous: current.view.partner,
+    outcome: result.outcome,
+    year: result.yearRecord.year
+  });
+
+  const next = sealSession(result.state, ledgerHistory, result.outcome, lifeLog, partner);
   GENESIS_BY_SESSION.set(next, genesis);
 
   return deepFreeze({
@@ -448,9 +617,18 @@ export function restoreP3EPlaySessionPayload(input: unknown): P3EPlaySession {
     age: pair.yearRecord.age,
     outcome: replayed.outcomes[index] as P3ECommandOutcome
   }));
+  const partnerChoices = partnerChoicesOf(sources);
   const lifeLog = buildP3ELifeLog(replayed.state.identity.birthYear, sources);
 
-  const session = sealSession(replayed.state, replayed.history, replayed.lastOutcome, lifeLog);
+  const partner = resolveP3ELifePartner({
+    masterSeed: raw.masterSeed as string,
+    identityPack: raw.identityPack as never,
+    cultureId: cultureIdOf(raw.identityPack as never, replayed.state),
+    playerSex: replayed.state.identity.sex,
+    choices: partnerChoices
+  });
+
+  const session = sealSession(replayed.state, replayed.history, replayed.lastOutcome, lifeLog, partner);
   GENESIS_BY_SESSION.set(session, genesis);
   return session;
 }

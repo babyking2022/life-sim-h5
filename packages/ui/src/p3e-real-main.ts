@@ -19,6 +19,18 @@ import {
   type P3EPlaySession
 } from "@life-sim/application";
 import { createLifeClock, type Speed } from "./p3e-time-controller.js";
+import {
+  createDecisionPlayIntentTracker,
+  isEnteringDecision,
+  type DecisionPlayIntent
+} from "./p3e-play-intent.js";
+import {
+  ellipsizeName,
+  readComparisonView,
+  readPartnerIdentity,
+  type ComparisonView,
+  type PartnerIdentity
+} from "./p3e-view-readers.js";
 
 /**
  * H5-CTO-176-A／H5-CTO-188-A／GPT-0017-D：真實 P3-E runtime 的瀏覽器垂直切片。
@@ -118,6 +130,29 @@ const NATURE_SOUND_VOLUME = 0.15;
  * 執行期路徑永遠是本站，不會向 GitHub／Freesound 發請求。
  */
 const NATURE_SOUND_URL = new URL("../../../assets/audio/birds.mp3", import.meta.url).href;
+
+/**
+ * GPT-0036-B：官方 106 命令 golden 的「重播驗證模式」。
+ *
+ * 只給 browser smoke／mobile layout 的自動化重播使用：一般瀏覽器
+ * `navigator.webdriver` 是 false，真人玩家無法用網址關掉必選暫停。
+ * 這個模式純粹讓既有 official golden 逐位元驗證不被 UI 插入的
+ * `SET_LIFE_FOCUS` 指令破壞；公開測試網址完全沒有這個參數，D 的
+ * 強制暫停一律完整生效。
+ */
+const OFFICIAL_REPLAY =
+  typeof navigator !== "undefined" &&
+  navigator.webdriver === true &&
+  new URLSearchParams(window.location.search).get("p3eReplay") === "official-golden";
+
+/** focus gate 讀取「首次必選」狀態的共用判斷（decision 優先、死亡不鎖）。 */
+function isFocusRequired(current: P3EPlaySession | null): boolean {
+  if (current === null || OFFICIAL_REPLAY) return false;
+  const state = current.state;
+  if (state.phase === "pending_decision" || state.phase === "death") return false;
+  if (state.age < P3E_LIFE_FOCUS_FIRST_AGE) return false;
+  return readP3ELifeFocus(state.flags) === null;
+}
 
 /* ------------------------------------------------------------------ */
 /* 顯示層繁中對照（只影響畫面；不改資料包、不改 fixtures）                 */
@@ -457,6 +492,8 @@ let focusPickerOpen: boolean | null = null;
 let busy = false;
 let focusAdvanceAfterRender = false;
 let fastForwarding = false;
+/** GPT-0037-B P2：必選 dialog 是否正在顯示，用來在關閉時把焦點送回遊戲控制。 */
+let focusDialogWasOpen = false;
 
 /** 這條命的 seed（`?seed=` > active seed > DEFAULT_SEED）。出生卡階段就已確定。 */
 let activeSeed: string | null = null;
@@ -505,6 +542,29 @@ const app: HTMLDivElement = (() => {
   return found;
 })();
 
+/** clock 狀態通知若發生在 render 內（gate 自己觸發），不要再巢狀 render 一次。 */
+let suppressClockRender = false;
+
+/**
+ * GPT-0037-B P1／GPT-0038-B：進入 pending decision「之前」的播放意圖。
+ *
+ * decision 會為了等待玩家選擇而 `pause()`，若之後同年還要首次必選重心，
+ * hold 不能再讀取這個被動暫停後的 `running=false`。這份意圖由
+ * `runCommand` 在進入 decision 前擷取，並在 decision 解決後交給
+ * `hold()`（或普通 decision 的續播）使用；一經取用即清空。
+ *
+ * 0038-B：「下一個決定」快轉過程也必須 `pause()`，所以 jump 會先用
+ * `arm()` 把跳轉前的 `{ running, speed }` 預置進 tracker，進入 decision
+ * 時由 `capture()` 優先繼承，而不是把快轉中的 paused 狀態誤記成手動暫停。
+ * 純邏輯放在 `p3e-play-intent.ts`，可在 Node 單測裡跑完整路徑。
+ */
+const decisionPlayIntent = createDecisionPlayIntentTracker();
+
+/** 只作診斷用的 dataset 字串（`none`／`playing:16`／`paused:4`）。 */
+function describeIntent(intent: DecisionPlayIntent | null): string {
+  return intent === null ? "none" : `${intent.resume ? "playing" : "paused"}:${intent.speed}`;
+}
+
 const lifeClock = createLifeClock({
   baseIntervalMs: 6000,
   initialSpeed: 1,
@@ -513,11 +573,71 @@ const lifeClock = createLifeClock({
     else lifeClock.pause();
   },
   onStateChange: () => {
-    if (session !== null && !busy) render();
+    if (session !== null && !busy && !suppressClockRender) render();
   }
 });
 // 世界資料載入前先停住；boot 完成後才開始推進正式 session。
 lifeClock.pause();
+
+/** 換命／讀檔／重載時重設意圖；讀進來就是待決策時沿用「自動續播」既有行為。 */
+function resetDecisionPlayIntent(current: P3EPlaySession | null): void {
+  decisionPlayIntent.reset(current, lifeClock.getState().speed);
+}
+
+/** 普通 decision 解決後：只回到 decision 前的播放狀態與速度。 */
+function applyDecisionPlayIntent(intent: DecisionPlayIntent): void {
+  const clock = lifeClock.getState();
+  if (clock.held || clock.disposed) return;
+  if (clock.speed !== intent.speed) lifeClock.setSpeed(intent.speed);
+  if (intent.resume) {
+    if (!clock.running) lifeClock.resume();
+  } else if (clock.running) {
+    lifeClock.pause();
+  }
+}
+
+/**
+ * GPT-0036-B D：唯一的「必選重心」閘門。每次 session／phase 改變後都要同步：
+ * 需要選 → 立刻 hold（clock 會記住原本播放狀態並清除計時器）；
+ * 已選定或改成 pending decision → release（只回到觸發前的播放狀態）。
+ *
+ * GPT-0037-B P1：`holdIntent` 只由「剛解決 decision」的路徑傳入，讓 hold
+ * 繼承 decision 前的播放意圖，而不是 decision 被動暫停後的 running=false。
+ * GPT-0038-B：jump 直接撞上必選重心（沒有先遇到 decision）時，改繼承
+ * 尚未被 capture 消費的 jump 前意圖；這份 armed 會在 jump 結束時清除。
+ */
+function syncFocusGate(holdIntent?: DecisionPlayIntent | null): void {
+  const required = isFocusRequired(session);
+  const clock = lifeClock.getState();
+  if (required === (clock.held && clock.holdReason === "life-focus-required")) return;
+  suppressClockRender = true;
+  try {
+    if (required) {
+      lifeClock.hold(
+        "life-focus-required",
+        holdIntent ?? decisionPlayIntent.peekArmed() ?? undefined
+      );
+    } else if (clock.held && clock.holdReason === "life-focus-required") lifeClock.release();
+  } finally {
+    suppressClockRender = false;
+  }
+}
+
+/** boot／開始人生／讀檔後統一決定 clock，避免「偷跑一年」或無條件 resume。 */
+function syncClockAfterSession(): void {
+  resetDecisionPlayIntent(session);
+  syncFocusGate();
+  if (!lifeClock.getState().held && session !== null && session.view.controls.canAdvanceYear) {
+    lifeClock.resume();
+  } else {
+    lifeClock.pause();
+  }
+}
+
+/** held 時只允許設定重心；其他指令一律不進 engine（包含鍵盤、計時器、快轉）。 */
+function isSetLifeFocusCommand(command: unknown): boolean {
+  return isPlainRecord(command) && command["type"] === "SET_LIFE_FOCUS";
+}
 
 /* ------------------------------------------------------------------ */
 /* 小工具                                                              */
@@ -1041,10 +1161,11 @@ function lifeLogText(entry: LifeLogEntryLike): string {
   return firstFriendlyLabel(eventIds.length > 0 ? eventIds : entry.ids) ?? "平凡的一年";
 }
 
-function renderLifeLog(current: P3EPlaySession): HTMLElement {
+function renderLifeLog(current: P3EPlaySession, partner: PartnerIdentity | null): HTMLElement {
   const projection = readLifeLog(current.view);
   const entries = projection ?? fallbackLifeLog(current);
   const section = element("section", "p3e-life-log");
+  const birthYear = current.view.currentYear - current.view.age;
   section.setAttribute("aria-label", "人生紀錄");
   section.dataset["p3eLifeLogSource"] = projection === null ? "fallback" : "projection";
   section.dataset["p3eLifeLogCount"] = String(entries.length);
@@ -1053,18 +1174,44 @@ function renderLifeLog(current: P3EPlaySession): HTMLElement {
     return section;
   }
   const list = element("ol", "p3e-life-log-list");
+  let partnerNamed = false;
   for (const entry of entries) {
-    const text = lifeLogText(entry);
+    let text = lifeLogText(entry);
+    // GPT-0036-B C：關係建立當年的訊息必須帶入具名伴侶；全部走 textContent。
+    if (
+      partner !== null && !partnerNamed &&
+      partner.sinceYear === entry.year &&
+      !text.includes(partner.displayName)
+    ) {
+      text = `${text} · 與${partner.displayName}開始交往`;
+      partnerNamed = true;
+    }
     const item = element("li", "p3e-life-log-entry");
     item.dataset["p3eLifeLogYear"] = String(entry.year);
     item.dataset["p3eLifeLogAge"] = String(entry.age);
     item.dataset["p3eLifeLogText"] = text;
+    if (text.includes(partner?.displayName ?? "\u0000")) item.dataset["p3eLifeLogPartner"] = "true";
     item.append(
       element("span", "p3e-life-log-when", `${entry.year} 年 · ${entry.age} 歲`),
       element("span", "p3e-life-log-sep", "｜"),
       element("span", "p3e-life-log-text", text)
     );
     list.append(item);
+  }
+  if (partner !== null && !partnerNamed && partner.sinceYear !== null) {
+    // projection 節錄後沒有留下當年紀錄時，仍補一筆具名關係訊息。
+    const item = element("li", "p3e-life-log-entry");
+    const text = `與${partner.displayName}開始交往`;
+    item.dataset["p3eLifeLogYear"] = String(partner.sinceYear);
+    item.dataset["p3eLifeLogAge"] = String(partner.sinceYear - birthYear);
+    item.dataset["p3eLifeLogText"] = text;
+    item.dataset["p3eLifeLogPartner"] = "true";
+    item.append(
+      element("span", "p3e-life-log-when", `${partner.sinceYear} 年`),
+      element("span", "p3e-life-log-sep", "｜"),
+      element("span", "p3e-life-log-text", text)
+    );
+    list.prepend(item);
   }
   section.append(list);
   return section;
@@ -1194,6 +1341,7 @@ function importPortableSaveFile(file: File): void {
         });
         cancelScheduledSave();
         session = restored;
+        resetDecisionPlayIntent(session);
         persistenceGeneration += 1;
         alertText = null;
         persistenceError = null;
@@ -1233,6 +1381,7 @@ function recoverAutosave(): void {
     recoveryNeeded = false;
     persistenceError = null;
     session = startLife(readSeed());
+    resetDecisionPlayIntent(session);
     persistenceGeneration += 1;
     persistenceStatus = "cleared";
     persistCurrentSession();
@@ -1340,6 +1489,10 @@ function showBirth(seed: string): void {
   writeActiveSeed(seed);
   birthPreview = previewP3EBrowserBirth({ world: currentWorld, masterSeed: seed });
   session = null;
+  // 回到出生卡時解除上一條命可能還在的必選暫停，clock 仍保持暫停。
+  resetDecisionPlayIntent(null);
+  focusDialogWasOpen = false;
+  syncFocusGate();
   lifeClock.pause();
   renderBirth();
 }
@@ -1384,8 +1537,7 @@ function startLifeFromCard(): void {
     focusAdvanceAfterRender = true;
     // 明確的使用者手勢：現在才允許建立 Audio 並請求本機音檔。
     armNatureSound();
-    if (session.view.controls.canAdvanceYear) lifeClock.resume();
-    else lifeClock.pause();
+    syncClockAfterSession();
   } catch (error) {
     showAlert(describeError(error));
   } finally {
@@ -1484,13 +1636,25 @@ function renderBirth(): void {
 /* 命令                                                                */
 /* ------------------------------------------------------------------ */
 
-function runCommand(command: unknown): void {
+function runCommand(command: unknown, focusHoldIntent?: DecisionPlayIntent | null): void {
   if (session === null || busy) return;
+  // GPT-0036-B D：這是真正的硬閘門，不是視覺遮罩。即使有人直接呼叫
+  // advanceYear()、用鍵盤觸發按鈕或讓 clock tick，指令也進不了 engine。
+  if (lifeClock.getState().held && !isSetLifeFocusCommand(command)) return;
+  // GPT-0037-B P1：在 decision 造成的 pause() 之前擷取「是否播放」與速度。
+  const phaseBefore = session.view.phase;
+  const clockBefore = lifeClock.getState();
   busy = true;
   setControlsDisabled(true);
   try {
     const result = runP3EPlaySessionCommand({ session, command });
     session = result.session;
+    if (isEnteringDecision(phaseBefore, session.view.phase)) {
+      decisionPlayIntent.capture(clockBefore);
+    }
+    // 每次命令後重新判断必選閘門：SET_LIFE_FOCUS 會 release，
+    // 第一次推進到 7 歲則會 hold（並記住原本播放狀態）。
+    syncFocusGate(focusHoldIntent);
     // 從舊存檔直接進遊戲時，第一個成功命令也算「第一次有效操作」。
     armNatureSound();
     if (!session.view.controls.canAdvanceYear) lifeClock.pause();
@@ -1511,27 +1675,72 @@ function advanceYear(): void {
   runCommand({ type: "ADVANCE_YEAR", contentMode: "standard" });
 }
 
+/**
+ * GPT-0038-B：「下一個決定」是使用者指定的主要玩法。
+ *
+ * 快轉本身必須暫停逐年推進（不讓計時器並行偷跑），但這會讓 `runCommand`
+ * 在進入 pending decision 時看到 `running=false`。因此先在 `pause()` 之前
+ * 擷取跳轉前的 `{ running, speed }` 並 `arm()` 到 decision intent tracker；
+ * `capture()` 會優先繼承這份意圖。沒有找到 decision（死亡／錯誤／換命／
+ * 讀檔／匯入／復原）時一律 `disarm()`，不污染下一條命。
+ * 既有 command／hold 硬閘門完全保留。
+ */
 async function jumpToNextDecision(): Promise<void> {
   if (session === null || busy || fastForwarding || !session.view.controls.canAdvanceYear) return;
-  lifeClock.pause();
+  const clockBefore = lifeClock.getState();
+  if (clockBefore.held || clockBefore.disposed) return;
+  decisionPlayIntent.arm({
+    resume: clockBefore.running && !clockBefore.held,
+    speed: clockBefore.speed
+  });
+  lifeClock.pause(); // 快轉期間不排程任何 tick
   fastForwarding = true;
+  let foundDecision = false;
+  let failed = false;
   try {
     for (let index = 0; index < 120; index += 1) {
       if (session === null || !session.view.controls.canAdvanceYear || session.view.phase === "death") break;
       advanceYear();
+      if (session !== null && session.view.phase === "pending_decision") {
+        foundDecision = true;
+        break;
+      }
       if ((index + 1) % 8 === 0) {
         await new Promise<void>((resolve) => window.setTimeout(resolve, 0));
       }
     }
+  } catch (error) {
+    failed = true;
+    showAlert(describeError(error));
   } finally {
+    if (
+      failed ||
+      !foundDecision ||
+      session === null ||
+      session.view.phase !== "pending_decision"
+    ) {
+      decisionPlayIntent.disarm();
+    }
     fastForwarding = false;
     render();
   }
 }
 
 function chooseOption(optionId: string): void {
-  runCommand({ type: "CHOOSE_DECISION", optionId });
-  if (session?.view.controls.canAdvanceYear === true) lifeClock.resume();
+  // GPT-0037-B P1：先取出「進入 decision 前」的播放意圖再解決 decision。
+  // 若同年立刻進 focus-required hold，這個意圖會由 hold 繼承；
+  // 若是普通 decision，則由這裡回到原本的播放狀態與速度。
+  const captured = decisionPlayIntent.take();
+  // 防呆：萬一沒有可繼承的意圖（例如外部替換 session），沿用既有「自動續播」，
+  // 也避免 hold 誤讀 decision 被動暫停後的 running=false。
+  const intent: DecisionPlayIntent = captured ?? {
+    resume: true,
+    speed: lifeClock.getState().speed
+  };
+  runCommand({ type: "CHOOSE_DECISION", optionId }, intent);
+  if (session?.view.controls.canAdvanceYear === true && !lifeClock.getState().held) {
+    applyDecisionPlayIntent(intent);
+  }
 }
 
 /** 設定／更改人生重心：走正式 command，狀態進 state flags、存檔、replay 與 state hash。 */
@@ -1569,19 +1778,32 @@ function renderFocusSection(current: P3EPlaySession): HTMLElement | null {
   const label = snapshot === null ? null : p3eLifeFocusLabel(snapshot.focusId, state.age);
   const changedThisYear = snapshot !== null && snapshot.changedYear === state.currentYear;
   const canChange = state.phase === "life" && !changedThisYear;
-  const firstTime = snapshot === null && state.age === P3E_LIFE_FOCUS_FIRST_AGE;
+  // GPT-0036-B D：只要滿 7 歲且還沒設定，不論何時讀檔／reload 都是必選。
+  // OFFICIAL_REPLAY 只保留給自動化重播官方 golden 指令序列。
+  const required = isFocusRequired(current);
+  const firstTime = snapshot === null && state.age >= P3E_LIFE_FOCUS_FIRST_AGE && !OFFICIAL_REPLAY;
   const expanded =
-    state.phase === "life" && (focusPickerOpen === true || (focusPickerOpen === null && firstTime));
+    state.phase === "life" &&
+    (required || focusPickerOpen === true || (focusPickerOpen === null && firstTime));
 
   const box = element("section", "p3e-focus");
   box.setAttribute("aria-label", "人生重心");
   box.dataset["p3eFocus"] = snapshot?.focusId ?? "none";
   box.dataset["p3eFocusChangedYear"] = snapshot === null ? "" : String(snapshot.changedYear);
   box.dataset["p3eFocusExpanded"] = expanded ? "true" : "false";
+  box.dataset["p3eFocusRequired"] = String(required);
+  box.dataset["p3eFocusGate"] = required ? "required" : "optional";
+  if (required) box.classList.add("p3e-focus-required");
 
   const line = element("p", "p3e-focus-current");
   if (label === null) {
-    line.append(element("span", undefined, "上學了，還沒有設定人生重心。"));
+    line.append(
+      element(
+        "span",
+        undefined,
+        required ? "還沒有設定人生重心，請先選擇。" : "上學了，還沒有設定人生重心。"
+      )
+    );
   } else {
     line.append(element("span", undefined, "目前重心："), element("strong", undefined, label));
   }
@@ -1601,10 +1823,33 @@ function renderFocusSection(current: P3EPlaySession): HTMLElement | null {
   }
 
   const panel = element("div", "p3e-focus-panel");
-  panel.append(element("h3", undefined, label === null ? "上學了，想先把心力放在哪裡？" : "想把心力改放在哪裡？"));
-  panel.append(
-    element("p", "p3e-focus-note", "每年至多調整一次；不同重心會慢慢改變狀態，也會讓相關事件更容易遇到。")
+  panel.setAttribute("aria-label", required ? "必選人生重心" : "調整人生重心");
+  // GPT-0037-B P2：首次必選是真正的 modal dialog，讀屏要能唸出標題與說明，
+  // 且開啟後鍵盤焦點必須落在可選重心而不是掉回 body。
+  if (required) {
+    panel.setAttribute("role", "dialog");
+    panel.setAttribute("aria-modal", "true");
+    panel.setAttribute("aria-labelledby", "p3e-focus-required-title");
+    panel.setAttribute("aria-describedby", "p3e-focus-required-desc");
+    panel.dataset["p3eFocusDialog"] = "required";
+    panel.tabIndex = -1;
+  }
+  const panelTitle = element(
+    "h3",
+    undefined,
+    required ? "先選一個人生重心，時間才會繼續" : label === null ? "上學了，想先把心力放在哪裡？" : "想把心力改放在哪裡？"
   );
+  if (required) panelTitle.id = "p3e-focus-required-title";
+  panel.append(panelTitle);
+  const panelNote = element(
+    "p",
+    "p3e-focus-note",
+    required
+      ? "這是上學後一定要做的選擇；選好之前時間會暫停，選完就會照原本速度繼續。"
+      : "每年至多調整一次；不同重心會慢慢改變狀態，也會讓相關事件更容易遇到。"
+  );
+  if (required) panelNote.id = "p3e-focus-required-desc";
+  panel.append(panelNote);
   const options = element("div", "p3e-focus-options");
   const icons: Readonly<Record<P3ELifeFocusId, string>> = {
     study: "📚",
@@ -1629,11 +1874,15 @@ function renderFocusSection(current: P3EPlaySession): HTMLElement | null {
     options.append(button);
   }
   panel.append(options);
-  const dismiss = element("button", "p3e-focus-dismiss", "先不改");
-  dismiss.type = "button";
-  dismiss.dataset["action"] = "toggle-focus";
-  dismiss.addEventListener("click", dismissFocusPicker);
-  panel.append(dismiss);
+  // GPT-0036-B D：還沒設定重心時完全移除「先不改」；只有玩家主動更改
+  // 已設定的重心（不必強制暫停）才有返回的次要按鈕。
+  if (!required && snapshot !== null) {
+    const dismiss = element("button", "p3e-focus-dismiss", "返回");
+    dismiss.type = "button";
+    dismiss.dataset["action"] = "toggle-focus";
+    dismiss.addEventListener("click", dismissFocusPicker);
+    panel.append(dismiss);
+  }
   box.append(panel);
   return box;
 }
@@ -1678,6 +1927,72 @@ function rebirth(): void {
 /* 渲染                                                                */
 /* ------------------------------------------------------------------ */
 
+/* ------------------------------------------------------------------ */
+/* GPT-0036-B B/C：收入資產比較 strip 與具名伴侶（純顯示層）              */
+/* ------------------------------------------------------------------ */
+
+/**
+ * HUD 主列下方的兩行 compact strip。數值完全來自 application projection，
+ * UI 不重算百分位；unavailable 顯示自然中文，兒童絕不顯示 0 百分位。
+ * 「估算」是可點的簡短說明，不寫成精確即時排行。
+ */
+function renderComparisonStrip(comparison: ComparisonView): HTMLElement {
+  const strip = element("section", "p3e-compare-strip");
+  strip.setAttribute("aria-label", "收入與資產比較估算");
+  strip.dataset["p3eCompareSource"] = comparison.source;
+  strip.dataset["p3eCompareBasisYear"] =
+    comparison.basisYear === null ? "" : String(comparison.basisYear);
+  strip.dataset["p3eEstimateNote"] = comparison.note;
+
+  const row = (label: string, block: ComparisonView["income"], kind: string): HTMLElement => {
+    const line = element("div", `p3e-compare-row p3e-compare-${kind}`);
+    line.dataset["p3eCompareAvailable"] = String(block.available);
+    line.append(
+      element("span", "p3e-compare-label", label),
+      element("span", "p3e-compare-text", block.text)
+    );
+    if (!block.available) line.classList.add("p3e-compare-unavailable");
+    line.title = `${label}：${block.text}`;
+    return line;
+  };
+  strip.append(row("收入", comparison.income, "income"), row("資產", comparison.wealth, "wealth"));
+
+  const estimate = element("button", "p3e-compare-estimate", "估算");
+  estimate.type = "button";
+  estimate.dataset["action"] = "toggle-estimate-note";
+  estimate.setAttribute("aria-expanded", "false");
+  estimate.setAttribute("aria-label", `估算說明：${comparison.note}`);
+  const note = element("p", "p3e-compare-note", comparison.note);
+  note.hidden = true;
+  estimate.addEventListener("click", () => {
+    const expanded = estimate.getAttribute("aria-expanded") === "true";
+    estimate.setAttribute("aria-expanded", String(!expanded));
+    note.hidden = expanded;
+  });
+  strip.append(estimate, note);
+  return strip;
+}
+
+/** 沒有伴侶時完全不產生節點；姓名過長只做視覺省略，完整值留在 title/aria-label。 */
+function renderPartnerLine(view: unknown): HTMLElement | null {
+  const partner: PartnerIdentity | null = readPartnerIdentity(view);
+  if (partner === null) return null;
+  const line = element("p", "p3e-partner-line");
+  line.dataset["p3ePartnerName"] = partner.displayName;
+  line.dataset["p3ePartnerStatus"] = partner.status ?? "";
+  line.dataset["p3ePartnerSinceYear"] =
+    partner.sinceYear === null ? "" : String(partner.sinceYear);
+  const name = element("strong", "p3e-partner-name", ellipsizeName(partner.displayName, 12));
+  name.title = partner.displayName;
+  name.setAttribute("aria-label", `伴侶姓名：${partner.displayName}`);
+  line.append(element("span", "p3e-partner-label", "伴侶："), name);
+  if (partner.sinceYear !== null) {
+    line.append(element("span", "p3e-partner-since", ` · ${partner.sinceYear} 年開始`));
+  }
+  line.title = `伴侶：${partner.displayName}`;
+  return line;
+}
+
 let alertText: string | null = null;
 
 function showAlert(message: string): void {
@@ -1690,8 +2005,44 @@ function setControlsDisabled(disabled: boolean): void {
   });
 }
 
+/**
+ * GPT-0038-B：`aria-modal="true"` 必須真的讓背景不可操作。
+ *
+ * 只對「不在 dialog 祖先鏈上、也不是 dialog 子樹」的分支設 `inert`；
+ * dialog 本身與其祖先（`.p3e-focus` → content → shell）仍需保持可操作，
+ * 所以沿著祖先鏈往下遞迴、旁支才標記。整棵 DOM 每次 render 都重建，
+ * 新 shell 沒有舊標記；開頭的清除只是防禦性收尾。
+ */
+function setBackgroundInert(shell: HTMLElement, dialog: HTMLElement | null): void {
+  shell.querySelectorAll<HTMLElement>("[inert]").forEach((node) => node.removeAttribute("inert"));
+  if (dialog === null || !shell.contains(dialog)) return;
+  const ancestors = new Set<Element>();
+  for (let node: Element | null = dialog; node !== null && node !== shell; node = node.parentElement) {
+    ancestors.add(node);
+  }
+  const mark = (node: Element, insideDialog: boolean): void => {
+    if (insideDialog || node === dialog) {
+      for (const child of Array.from(node.children)) mark(child, true);
+      return;
+    }
+    if (ancestors.has(node)) {
+      for (const child of Array.from(node.children)) mark(child, false);
+      return;
+    }
+    // inert 會套用整棵子樹：HUD 音效／漢堡、比較 strip 的估算、時間控制
+    // 都不再接受 Tab 或滑鼠操作。命令硬閘門仍由 runCommand 獨立把守。
+    node.setAttribute("inert", "");
+  };
+  for (const child of Array.from(shell.children)) mark(child, false);
+}
+
 function render(): void {
   if (session === null) return;
+  // 任何 render（命令、讀檔、reload、clock 通知）都重新同步必選閘門，
+  // 這是唯一入口，避免各路徑漏掉而讓 clock 偷跑一年。
+  syncFocusGate();
+  const clockState = lifeClock.getState();
+  const focusRequired = isFocusRequired(session);
   const view = session.view;
   // 直接讀取舊 DOM 的開合狀態，避免 `toggle` 事件尚未派送時重建把選單關掉。
   const existingMenu = app.querySelector<HTMLDetailsElement>("details.p3e-hud-menu");
@@ -1707,6 +2058,18 @@ function render(): void {
   shell.dataset["p3eCopySchema"] = COPY_SCHEMA_VERSION;
   shell.dataset["p3eLifeFocus"] = readP3ELifeFocus(session.state.flags)?.focusId ?? "none";
   shell.dataset["p3eLifeFocusAge"] = String(session.state.age);
+  // GPT-0036-B D：讓 browser 驗收能直接觀察「必選暫停」與 clock 狀態。
+  shell.dataset["p3eFocusRequired"] = String(focusRequired);
+  shell.dataset["p3eClockHeld"] = String(clockState.held);
+  shell.dataset["p3eClockHoldReason"] = clockState.holdReason ?? "";
+  shell.dataset["p3eClockRunning"] = String(clockState.running);
+  shell.dataset["p3eClockSpeed"] = String(clockState.speed);
+  // GPT-0038-B：播放意圖診斷快照（純 UI，不進 session／存檔／replay），
+  // 讓 browser 驗收能直接看到「跳轉前」與「快轉過程」不是同一份 intent。
+  shell.dataset["p3eDecisionIntent"] = describeIntent(decisionPlayIntent.peek());
+  shell.dataset["p3eJumpIntent"] = describeIntent(decisionPlayIntent.peekArmed());
+  shell.dataset["p3eFastForwarding"] = String(fastForwarding);
+  shell.dataset["p3eOfficialReplay"] = String(OFFICIAL_REPLAY);
   shell.dataset["p3eStateHash"] = session.state.stateHash;
   shell.dataset["p3eCommandCount"] = String(session.state.commandLog.count);
   shell.dataset["p3eCommandHead"] = session.state.commandLog.headHash;
@@ -1759,7 +2122,9 @@ function render(): void {
     hudMenuOpen = menu.open;
   });
   const menuSummary = element("summary", undefined, "☰");
-  menuSummary.setAttribute("aria-label", "開啟存檔與診斷選單");
+  // GPT-0036-B A：齒輪完全收進漢堡，面板本身就是「設定與存檔」。
+  menuSummary.setAttribute("aria-label", "開啟設定與存檔選單");
+  menuSummary.dataset["action"] = "toggle-settings-menu";
   const notice = element(
     "p",
     "p3e-mvp-notice",
@@ -1771,8 +2136,12 @@ function render(): void {
     `seed=${readSeed()} · commands=${session.state.commandLog.count} · stateHash=${session.state.stateHash}`
   );
   const menuPanel = element("div", "p3e-hud-menu-panel");
-  menuPanel.setAttribute("aria-label", "存檔、診斷與復原");
+  menuPanel.setAttribute("aria-label", "設定與存檔");
+  menuPanel.dataset["p3eSettingsTitle"] = "⚙ 設定與存檔";
+  const menuTitle = element("h2", "p3e-menu-title", "⚙ 設定與存檔");
+  menuTitle.dataset["p3eMenuTitle"] = "設定與存檔";
   menuPanel.append(
+    menuTitle,
     element("p", "p3e-menu-note", "公開測試版 · 進度自動儲存在本機"),
     renderPersistence(),
     notice,
@@ -1800,11 +2169,62 @@ function render(): void {
   content.setAttribute("aria-label", "人生主畫面");
   content.append(renderLife(view, session));
 
+  // GPT-0036-B B：比較資訊在 HUD 主列下方自成兩行 compact strip，
+  // 不擠進年份／年齡／資產／年收入四個欄位，也不增加整頁下滑。
+  const comparisonStrip = renderComparisonStrip(readComparisonView(view as unknown, view.age));
+
   // 底部四個 tabs 與獨立齒輪（.p3e-tools）已完全移除；存檔／診斷／復原
   // 全部收進上面的漢堡選單，保留壞存檔的明確復原能力。
-  shell.append(header, alert, content);
+  shell.append(header, comparisonStrip, alert, content);
+  // GPT-0037-B P2：整棵 DOM 每次 render 都重建，先記住 dialog 裡原本聚焦的
+  // 重心 id，重建後才能把焦點放回同一個選項，不掉回 body。
+  const dialogBefore = app.querySelector<HTMLElement>(
+    '.p3e-focus-panel[data-p3e-focus-dialog="required"]'
+  );
+  const activeBefore = document.activeElement;
+  const activeFocusId =
+    dialogBefore !== null && activeBefore instanceof HTMLElement && dialogBefore.contains(activeBefore)
+      ? activeBefore.dataset["focusId"] ?? null
+      : null;
   app.replaceChildren(shell);
   syncNatureSoundDom();
+
+  /* GPT-0037-B P2：必選 dialog 的 autofocus 與關閉後的焦點回歸。 */
+  const requiredDialog = shell.querySelector<HTMLElement>(
+    '.p3e-focus-panel[data-p3e-focus-dialog="required"]'
+  );
+  // GPT-0038-B：先讓背景 inert，再把焦點放進 dialog；關閉時整棵 DOM 重建，
+  // 新 shell 沒有 inert，既有 focus return 自然恢復背景可操作。
+  setBackgroundInert(shell, requiredDialog);
+  if (requiredDialog !== null) {
+    const sameOption = activeFocusId === null
+      ? null
+      : requiredDialog.querySelector<HTMLButtonElement>(
+        `[data-action="set-focus"][data-focus-id="${activeFocusId}"]:not([disabled])`
+      );
+    const firstOption = requiredDialog.querySelector<HTMLButtonElement>(
+      '[data-action="set-focus"]:not([disabled])'
+    );
+    (sameOption ?? firstOption ?? requiredDialog).focus({ preventScroll: true });
+    focusDialogWasOpen = true;
+    focusAdvanceAfterRender = false; // dialog 開啟期間由 dialog 擁有鍵盤焦點
+  } else if (focusDialogWasOpen) {
+    focusDialogWasOpen = false;
+    // 仍暫停 → 暫停／繼續鍵；恢復播放 → 主要控制（下一步）。
+    // 必須分兩次 querySelector：逗號選擇器會回傳 DOM 順序最前面的
+    // toggle-time，而不是播放中該優先的「下一步」。
+    const preferred = clockState.running
+      ? '[data-action="advance"]:not([disabled])'
+      : '[data-action="toggle-time"]:not([disabled])';
+    const fallback = clockState.running
+      ? '[data-action="toggle-time"]:not([disabled])'
+      : '[data-action="advance"]:not([disabled])';
+    const target =
+      shell.querySelector<HTMLButtonElement>(preferred) ??
+      shell.querySelector<HTMLButtonElement>(fallback);
+    target?.focus({ preventScroll: true });
+    focusAdvanceAfterRender = false;
+  }
 
   const advance = shell.querySelector<HTMLButtonElement>('[data-action="advance"]');
   if (focusAdvanceAfterRender && advance !== null) {
@@ -1907,6 +2327,10 @@ function renderLife(view: P3EPlaySession["view"], current: P3EPlaySession): HTML
 
   const story = element("section", "p3e-story-card");
   story.append(element("h2", undefined, view.phase === "pending_decision" ? "重要抉擇" : "人生紀錄"));
+  // GPT-0036-B C：伴侶姓名放在當年訊息上方；沒有伴侶時完全不佔版面。
+  const partner = readPartnerIdentity(view as unknown);
+  const partnerLine = renderPartnerLine(view as unknown);
+  if (partnerLine !== null) story.append(partnerLine);
 
   // 重要決定卡／重新開始永遠排在最前面，玩家不必往下捲就能立即點選。
   if (view.phase === "pending_decision" && view.pendingDecision !== null) {
@@ -1935,7 +2359,7 @@ function renderLife(view: P3EPlaySession["view"], current: P3EPlaySession): HTML
   if (focusSection !== null) story.append(focusSection);
 
   // 人生紀錄放在決定卡之後，卡內捲動；頁面本身永遠不因紀錄變長而捲動。
-  story.append(renderLifeLog(current));
+  story.append(renderLifeLog(current, partner));
 
   const statDock = element("section", "p3e-stat-dock");
   statDock.setAttribute("aria-label", "人物狀態");
@@ -1964,10 +2388,14 @@ function renderLife(view: P3EPlaySession["view"], current: P3EPlaySession): HTML
   const timeControls = renderTimeControls(view);
   const controls = element("section", "p3e-controls");
   controls.setAttribute("aria-label", "操作");
+  const held = lifeClock.getState().held;
   if (view.controls.canAdvanceYear) {
     const advance = element("button", "p3e-primary p3e-next-button", "下一步");
     advance.type = "button";
     advance.dataset["action"] = "advance";
+    // GPT-0036-B D：未選重心前，連按鈕本身都是 disabled（不是只有遮罩）。
+    advance.disabled = held;
+    advance.dataset["p3eAdvanceLocked"] = String(held);
     advance.addEventListener("click", advanceYear);
     controls.append(advance);
   } else if (view.phase === "pending_decision") {
@@ -1987,7 +2415,7 @@ function renderTimeControls(view: P3EPlaySession["view"]): HTMLElement {
   const pause = element("button", "p3e-time-toggle", state.running ? "❚❚ 暫停" : "▶ 繼續");
   pause.type = "button";
   pause.dataset["action"] = "toggle-time";
-  pause.disabled = view.phase === "death";
+  pause.disabled = view.phase === "death" || state.held;
   pause.addEventListener("click", () => lifeClock.togglePause());
   section.append(pause);
   const speeds: readonly Speed[] = [1, 2, 4, 8, 16];
@@ -1996,14 +2424,14 @@ function renderTimeControls(view: P3EPlaySession["view"]): HTMLElement {
     button.type = "button";
     button.dataset["speed"] = String(speed);
     button.setAttribute("aria-pressed", String(state.speed === speed));
-    button.disabled = view.phase === "death";
+    button.disabled = view.phase === "death" || state.held;
     button.addEventListener("click", () => lifeClock.setSpeed(speed));
     section.append(button);
   }
   const jump = element("button", "p3e-jump-button", "下一個決定 »");
   jump.type = "button";
   jump.dataset["action"] = "jump-decision";
-  jump.disabled = !view.controls.canAdvanceYear || fastForwarding;
+  jump.disabled = !view.controls.canAdvanceYear || fastForwarding || state.held;
   jump.addEventListener("click", () => void jumpToNextDecision());
   section.append(jump);
   return section;
@@ -2105,8 +2533,7 @@ async function boot(): Promise<void> {
         activeSeed = DEFAULT_SEED;
         session = startLife(DEFAULT_SEED);
         persistenceGeneration += 1;
-        if (session.view.controls.canAdvanceYear) lifeClock.resume();
-        else lifeClock.pause();
+        syncClockAfterSession();
         render();
         return;
       }
@@ -2123,8 +2550,7 @@ async function boot(): Promise<void> {
       persistenceGeneration += 1;
       savedGeneration = persistenceGeneration;
       persistenceStatus = "restored";
-      if (session.view.controls.canAdvanceYear) lifeClock.resume();
-      else lifeClock.pause();
+      syncClockAfterSession();
       render();
       return;
     }
@@ -2156,13 +2582,53 @@ async function boot(): Promise<void> {
       session = startLife(knownSeed);
       persistenceGeneration += 1;
     }
-    if (session.view.controls.canAdvanceYear) lifeClock.resume();
-    else lifeClock.pause();
+    syncClockAfterSession();
     render();
   } catch (error) {
     renderBootError(describeError(error));
   }
 }
+
+/**
+ * GPT-0038-B：Tab 的最小 focus containment（背景 inert 之外的第二道保險）。
+ * 必選 dialog 開啟時，Tab／Shift+Tab 只在 dialog 的可聚焦元素間循環，
+ * 絕不落到 HUD 音效、漢堡、估算或時間控制；關閉後不攔截任何按鍵。
+ */
+document.addEventListener(
+  "keydown",
+  (event) => {
+    if (event.key !== "Tab") return;
+    const dialog = app.querySelector<HTMLElement>(
+      '.p3e-focus-panel[data-p3e-focus-dialog="required"]'
+    );
+    if (dialog === null) return;
+    const focusable = Array.from(
+      dialog.querySelectorAll<HTMLElement>(
+        'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), ' +
+          'textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )
+    );
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (first === undefined || last === undefined) {
+      event.preventDefault();
+      dialog.focus({ preventScroll: true });
+      return;
+    }
+    const active = document.activeElement;
+    if (!dialog.contains(active)) {
+      event.preventDefault();
+      (event.shiftKey ? last : first).focus({ preventScroll: true });
+    } else if (event.shiftKey && active === first) {
+      event.preventDefault();
+      last.focus({ preventScroll: true });
+    } else if (!event.shiftKey && active === last) {
+      event.preventDefault();
+      first.focus({ preventScroll: true });
+    }
+  },
+  true
+);
 
 // 離開頁面／切到背景時盡力同步 flush 最新 session（不阻塞正常路徑）。
 window.addEventListener("pagehide", () => flushAutosaveNow());

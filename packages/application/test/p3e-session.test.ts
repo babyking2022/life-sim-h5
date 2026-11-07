@@ -438,7 +438,9 @@ describe("H5-CTO-174-A Play Session：不可變性與錯誤", () => {
       "identity",
       "lastOutcome",
       "lifeLog",
+      "partner",
       "pendingDecision",
+      "percentiles",
       "phase",
       "stats"
     ]);
@@ -681,7 +683,9 @@ describe("H5-CTO-181-A Session Ledger History", () => {
       "identity",
       "lastOutcome",
       "lifeLog",
+      "partner",
       "pendingDecision",
+      "percentiles",
       "phase",
       "stats"
     ]);

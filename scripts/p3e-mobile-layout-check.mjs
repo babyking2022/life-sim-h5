@@ -42,6 +42,8 @@ const LONGEST_COPY = {
 const viewports = [
   { width: 320, height: 568 },
   { width: 360, height: 640 },
+  // GPT-0036-B：任務指定 360x800 也要單畫面無水平捲動。
+  { width: 360, height: 800 },
   { width: 390, height: 844 },
   { width: 430, height: 932 },
   { width: 537, height: 976 },
@@ -246,7 +248,9 @@ async function pageSnapshot() {
     '[data-action="rebirth"]',
     ".p3e-time-controls button",
     '[data-action="toggle-nature-sound"]',
-    ".p3e-hud-menu > summary"
+    ".p3e-hud-menu > summary",
+    // GPT-0037-B P2：「估算」也是觸控目標，必須跟著通過 44x44 檢查。
+    '[data-action="toggle-estimate-note"]'
   ].join(", ");
   const visibleTargets = [...document.querySelectorAll(touchSelector)]
     .filter(shown)
@@ -409,8 +413,56 @@ function focusSnapshot() {
   const allButtons = [...(focusBox?.querySelectorAll("button") ?? [])].filter(shown);
   const fontOf = (node) => (node === null ? null : parseFloat(getComputedStyle(node).fontSize));
   const text = (focusBox?.textContent ?? "").replace(/\s+/g, " ").trim();
+  const dialog = q('.p3e-focus-panel[data-p3e-focus-dialog="required"]');
+  const estimate = q('[data-action="toggle-estimate-note"]');
+  const estimateBox = box(estimate);
+  const active = document.activeElement;
+  const labelledBy = dialog?.getAttribute("aria-labelledby") ?? null;
+  const describedBy = dialog?.getAttribute("aria-describedby") ?? null;
+  const dialogInfo = {
+    present: shown(dialog),
+    role: dialog?.getAttribute("role") ?? null,
+    modal: dialog?.getAttribute("aria-modal") ?? null,
+    labelledBy,
+    labelText: labelledBy === null ? null : q(`#${labelledBy}`)?.textContent ?? null,
+    describedBy,
+    descText: describedBy === null ? null : q(`#${describedBy}`)?.textContent ?? null,
+    firstOptionFocused:
+      dialog !== null && active instanceof HTMLElement &&
+      active === dialog.querySelector('.p3e-focus-option:not([disabled])'),
+    focusInsideDialog: dialog !== null && active instanceof HTMLElement && dialog.contains(active),
+    activeTag: active?.tagName ?? null,
+    optionCount: document.querySelectorAll(".p3e-focus-option").length
+  };
+  const estimateInfo = {
+    present: shown(estimate),
+    width: estimateBox?.width ?? 0,
+    height: estimateBox?.height ?? 0,
+    inside: estimateBox === null
+      ? false
+      : estimateBox.left >= -1 && estimateBox.right <= window.innerWidth + 1
+  };
+  // GPT-0038-B：必選 dialog 期間背景不可操作，dialog 本身仍可操作。
+  const inertInfo = {
+    count: document.querySelectorAll("[inert]").length,
+    dialogCovered: dialog?.closest("[inert]") !== null,
+    backgroundCovered: [
+      ".p3e-hud-sound",
+      ".p3e-hud-menu > summary",
+      '[data-action="toggle-estimate-note"]',
+      '[data-action="advance"]',
+      '[data-action="toggle-time"]',
+      '[data-action="jump-decision"]'
+    ].every((selector) => {
+      const node = q(selector);
+      return node !== null && node.closest("[inert]") !== null;
+    })
+  };
 
   return {
+    dialog: dialogInfo,
+    inert: inertInfo,
+    estimate: estimateInfo,
     phase: live?.getAttribute("data-p3e-phase") ?? "unknown",
     age: Number(live?.getAttribute("data-p3e-life-focus-age") ?? "-1"),
     shellFocus: live?.getAttribute("data-p3e-life-focus") ?? "none",
@@ -452,13 +504,14 @@ function focusSnapshot() {
   };
 }
 
-/** 把前景選擇卡捲到底，確認第五個選項與「先不改」都能局部捲到。 */
+/** 把前景選擇卡捲到底，確認第五個選項可局部捲到；必選時不應有「先不改」。 */
 function focusBottomProbe() {
   const box = document.querySelector('.p3e-focus[data-p3e-focus-expanded="true"]');
   if (box !== null) box.scrollTop = box.scrollHeight;
   const options = [...document.querySelectorAll(".p3e-focus-option")];
   const last = options[options.length - 1] ?? null;
   const dismiss = document.querySelector(".p3e-focus-dismiss");
+  const dismissCount = document.querySelectorAll(".p3e-focus-dismiss").length;
   const visible = (node) => {
     if (node === null) return false;
     const r = node.getBoundingClientRect();
@@ -474,6 +527,7 @@ function focusBottomProbe() {
     scrollable: box === null ? false : box.scrollHeight > box.clientHeight + 1,
     lastOptionVisible: visible(last),
     dismissVisible: visible(dismiss),
+    dismissCount,
     docY: doc.scrollHeight - doc.clientHeight,
     bodyY: body.scrollHeight - body.clientHeight,
     scrolled
@@ -587,6 +641,33 @@ function evaluateFocusPicker(label, s) {
       s.optionLabels.some((t) => t.includes("興趣")) &&
       s.optionLabels.some((t) => t.includes("健康")),
     JSON.stringify(s.optionLabels)
+  );
+  // GPT-0037-B P2：必選面板是真正的 dialog，且開啟後焦點在第一個可選重心。
+  const d = s.dialog;
+  check(
+    `${prefix}_required_dialog_semantics_and_autofocus`,
+    d.present && d.role === "dialog" && d.modal === "true" &&
+      typeof d.labelledBy === "string" && d.labelledBy.length > 0 &&
+      typeof d.labelText === "string" && d.labelText.includes("人生重心") &&
+      typeof d.describedBy === "string" && d.describedBy.length > 0 &&
+      typeof d.descText === "string" && d.descText.includes("暫停") &&
+      d.firstOptionFocused && d.focusInsideDialog && d.activeTag !== "BODY",
+    `role=${d.role} modal=${d.modal} label="${d.labelText}" desc="${d.descText?.slice(0, 24)}" ` +
+      `firstFocused=${d.firstOptionFocused} inside=${d.focusInsideDialog} active=${d.activeTag}`
+  );
+  // GPT-0038-B：aria-modal 期間背景分支 inert，dialog 本身不受影響。
+  check(
+    `${prefix}_required_dialog_background_inert`,
+    s.inert.count > 0 && s.inert.dialogCovered === false &&
+      s.inert.backgroundCovered === true,
+    `inert=${s.inert.count} dialog=${s.inert.dialogCovered} background=${s.inert.backgroundCovered}`
+  );
+  // GPT-0037-B P2：「估算」觸控區至少 44x44，且不造成水平 overflow。
+  const e = s.estimate;
+  check(
+    `${prefix}_estimate_touch_target_44px`,
+    e.present && e.width >= 43.5 && e.height >= 43.5 && e.inside,
+    `w=${e.width} h=${e.height} inside=${e.inside}`
   );
 }
 
@@ -853,7 +934,12 @@ async function main() {
       hasTouch: true
     });
     const page = await context.newPage();
-    await page.goto(`${baseUrl}/?seed=${encodeURIComponent(GOLDEN_SEED)}`, { waitUntil: "domcontentloaded" });
+    // GPT-0036-B：官方 golden 量測流程用重播模式，不被必選重心插入指令；
+    // 下方專屬 focus probe 刻意不帶此參數，直接量測「必選暫停」的真實畫面。
+    await page.goto(
+      `${baseUrl}/?seed=${encodeURIComponent(GOLDEN_SEED)}&p3eReplay=official-golden`,
+      { waitUntil: "domcontentloaded" }
+    );
     await page.waitForSelector("[data-p3e-live='true']", { timeout: 30000 });
 
     // GPT-0029-B：先量測出生卡（birth phase）再開始人生。
@@ -944,13 +1030,55 @@ async function main() {
     const age7 = await runToAge(focusPage, 7);
     const picker = await focusPage.evaluate(focusSnapshot);
     evaluateFocusPicker(label, picker);
+    // GPT-0038-B：七個尺寸都實測 Tab 不會離開必選 dialog。
+    await focusPage.keyboard.press("Tab");
+    const tabState = await focusPage.evaluate(() => {
+      const dialog = document.querySelector(
+        '.p3e-focus-panel[data-p3e-focus-dialog="required"]'
+      );
+      const active = document.activeElement;
+      return {
+        inside: dialog !== null && dialog.contains(active),
+        action: active?.getAttribute?.("data-action") ?? null,
+        inert: active?.closest?.("[inert]") !== null
+      };
+    });
+    check(
+      `${label}_focus_picker_tab_stays_inside_dialog`,
+      tabState.inside === true && tabState.inert === false && tabState.action === "set-focus",
+      `inside=${tabState.inside} action=${tabState.action} inert=${tabState.inert}`
+    );
     await focusPage.screenshot({ path: join(outDir, `${label}-focus-picker.png`) });
     const bottom = await focusPage.evaluate(focusBottomProbe);
     check(
       `${label}_focus_picker_local_scroll_reaches_last_option`,
-      bottom.lastOptionVisible && bottom.dismissVisible &&
+      bottom.lastOptionVisible && bottom.dismissCount === 0 &&
         bottom.docY <= 1 && bottom.bodyY <= 1 && bottom.scrolled === 0,
-      `last=${bottom.lastOptionVisible} dismiss=${bottom.dismissVisible} scrollTop=${bottom.scrollTop} scrollable=${bottom.scrollable} docY=${bottom.docY}`
+      `last=${bottom.lastOptionVisible} dismissCount=${bottom.dismissCount} scrollTop=${bottom.scrollTop} scrollable=${bottom.scrollable} docY=${bottom.docY}`
+    );
+    // GPT-0036-B D：必選畫面必須真的把 clock 與所有推進控制鎖住。
+    const gate = await focusPage.evaluate(() => {
+      const live = document.querySelector("[data-p3e-live]");
+      const q = (selector) => document.querySelector(selector);
+      return {
+        required: live?.getAttribute("data-p3e-focus-required") ?? null,
+        held: live?.getAttribute("data-p3e-clock-held") ?? null,
+        running: live?.getAttribute("data-p3e-clock-running") ?? null,
+        advanceDisabled: q('[data-action="advance"]')?.disabled ?? null,
+        timeDisabled: q('[data-action="toggle-time"]')?.disabled ?? null,
+        speedDisabled: q('[data-speed="4"]')?.disabled ?? null,
+        compareRows: document.querySelectorAll(".p3e-compare-row").length,
+        settingsTitle: q(".p3e-menu-title")?.textContent ?? null,
+        standaloneGears: document.querySelectorAll(".p3e-tools").length
+      };
+    });
+    check(
+      `${label}_focus_required_gate_and_new_chrome`,
+      gate.required === "true" && gate.held === "true" && gate.running === "false" &&
+        gate.advanceDisabled === true && gate.timeDisabled === true && gate.speedDisabled === true &&
+        gate.compareRows === 2 && gate.settingsTitle === "⚙ 設定與存檔" &&
+        gate.standaloneGears === 0,
+      `required=${gate.required} held=${gate.held} advance=${gate.advanceDisabled} rows=${gate.compareRows} title=${gate.settingsTitle}`
     );
     await focusPage.evaluate(() => {
       const box = document.querySelector('.p3e-focus[data-p3e-focus-expanded="true"]');
