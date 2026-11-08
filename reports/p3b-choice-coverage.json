@@ -8,12 +8,12 @@
     "totalDecisionOptions": 176
   },
   "totals": {
-    "commands": 11301,
-    "decisions": 4076,
-    "years": 7225,
-    "yearsPerDecision": 1.773,
-    "averageDecisionsPerLife": 40.76,
-    "averageDeathAge": 72.25
+    "commands": 11381,
+    "decisions": 4088,
+    "years": 7293,
+    "yearsPerDecision": 1.784,
+    "averageDecisionsPerLife": 40.88,
+    "averageDeathAge": 72.93
   },
   "coverage": {
     "decisionEventsSeen": 57,
@@ -107,15 +107,15 @@
   "stageDecisions": {
     "perStageTotals": {
       "childhood": 515,
-      "adolescence": 269,
-      "adulthood": 2706,
-      "later_life": 586
+      "adolescence": 265,
+      "adulthood": 2705,
+      "later_life": 603
     },
     "averagePerLife": {
       "childhood": 5.15,
-      "adolescence": 2.69,
-      "adulthood": 27.06,
-      "later_life": 5.86
+      "adolescence": 2.65,
+      "adulthood": 27.05,
+      "later_life": 6.03
     },
     "decisionEventsPerStage": {
       "childhood": 16,
@@ -128,31 +128,31 @@
     "yearsBetweenDecisions": [
       {
         "years": 1,
-        "count": 2219
+        "count": 2216
       },
       {
         "years": 2,
-        "count": 1137
+        "count": 1141
       },
       {
         "years": 3,
-        "count": 404
+        "count": 406
       },
       {
         "years": 4,
-        "count": 144
+        "count": 147
       },
       {
         "years": 5,
-        "count": 51
+        "count": 54
       },
       {
         "years": 6,
-        "count": 15
+        "count": 17
       },
       {
         "years": 7,
-        "count": 6
+        "count": 7
       },
       {
         "years": 8,
@@ -172,14 +172,14 @@
   "samples": [
     {
       "seed": "p3b-choice-000",
-      "commands": 35,
-      "decisions": 12,
-      "deathAge": 23,
+      "commands": 132,
+      "decisions": 48,
+      "deathAge": 84,
       "stageDecisions": {
         "childhood": 5,
         "adolescence": 4,
-        "adulthood": 3,
-        "later_life": 0
+        "adulthood": 28,
+        "later_life": 11
       },
       "decisionsSeen": [
         "ev.child.picky-eating",
@@ -193,7 +193,43 @@
         "ev.teen.talent",
         "ev.adult.after-school",
         "ev.adult.first-job",
-        "ev.adult.relationship"
+        "ev.adult.relationship",
+        "ev.adult.finance-start",
+        "ev.adult.further-study",
+        "ev.adult.friend-circle",
+        "ev.adult.side-project",
+        "ev.adult.relationship",
+        "ev.adult.career-pivot",
+        "ev.adult.children",
+        "ev.adult.marital-breakup",
+        "ev.adult.health-checkup",
+        "ev.adult.housing-buy",
+        "ev.adult.health-checkup",
+        "ev.adult.kids-school",
+        "ev.adult.network",
+        "ev.adult.elder-care",
+        "ev.adult.kids-school",
+        "ev.adult.network",
+        "ev.late.elder-care",
+        "ev.adult.marital-breakup",
+        "ev.late.pension",
+        "ev.late.career-change",
+        "ev.late.elder-care",
+        "ev.late.family-time",
+        "ev.late.new-hobby",
+        "ev.late.family-time",
+        "ev.late.elder-care",
+        "ev.senior.retirement",
+        "ev.senior.social",
+        "ev.senior.housing",
+        "ev.senior.medical",
+        "ev.senior.daily-health",
+        "ev.senior.grandchildren",
+        "ev.senior.legacy",
+        "ev.senior.housing",
+        "ev.senior.daily-health",
+        "ev.senior.medical",
+        "ev.senior.daily-health"
       ]
     },
     {
@@ -252,14 +288,14 @@
     },
     {
       "seed": "p3b-choice-002",
-      "commands": 98,
-      "decisions": 39,
-      "deathAge": 59,
+      "commands": 143,
+      "decisions": 54,
+      "deathAge": 89,
       "stageDecisions": {
         "childhood": 5,
         "adolescence": 5,
-        "adulthood": 29,
-        "later_life": 0
+        "adulthood": 33,
+        "later_life": 11
       },
       "decisionsSeen": [
         "ev.child.interest-seed",
@@ -300,7 +336,22 @@
         "ev.late.elder-care",
         "ev.late.new-hobby",
         "ev.late.family-time",
-        "ev.late.chronic-care"
+        "ev.late.chronic-care",
+        "ev.late.career-change",
+        "ev.late.elder-care",
+        "ev.adult.relationship",
+        "ev.adult.marital-breakup",
+        "ev.senior.medical",
+        "ev.senior.social",
+        "ev.senior.retirement",
+        "ev.senior.legacy",
+        "ev.senior.medical",
+        "ev.senior.daily-health",
+        "ev.senior.housing",
+        "ev.senior.daily-health",
+        "ev.senior.legacy",
+        "ev.senior.medical",
+        "ev.senior.social"
       ]
     },
     {

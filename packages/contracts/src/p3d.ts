@@ -41,13 +41,13 @@ export const P3D_MAX_HAZARD_PPM = 1_000_000;
 export type P3DSex = "female" | "male";
 export const P3D_SEXES: readonly P3DSex[] = ["female", "male"];
 
-/** P2-A 的 region class（死因權重用這一層，避免 172×2×bands 的資料量）。 */
+/** P2-A 的 region class（死因權重用這一層，避免 169×2×bands 的資料量）。 */
 export type P3DRegionClass = "asia" | "europe" | "africa" | "americas" | "oceania" | "other";
 export const P3D_REGION_CLASSES: readonly P3DRegionClass[] = ["asia", "europe", "africa", "americas", "oceania", "other"];
 
-/** 死亡率表必須剛好覆蓋 P2-A 的 172 個 entity × 2 sex × 121 age。 */
-export const P3D_BASE_ENTITY_COUNT = 172;
-export const P3D_REQUIRED_MORTALITY_RECORDS = P3D_BASE_ENTITY_COUNT * P3D_SEXES.length * P3D_AGE_COUNT; // 41,624
+/** 死亡率表必須剛好覆蓋 P2-A 的 169 個 entity × 2 sex × 121 age。 */
+export const P3D_BASE_ENTITY_COUNT = 169;
+export const P3D_REQUIRED_MORTALITY_RECORDS = P3D_BASE_ENTITY_COUNT * P3D_SEXES.length * P3D_AGE_COUNT; // 40,898
 
 /* ------------------------------------------------------------------ */
 /* 上限（全部固定拒絕，不做靜默截斷）                                   */

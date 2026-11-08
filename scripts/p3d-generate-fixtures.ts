@@ -29,7 +29,7 @@ import { computeDeathDatasetChecksum, computeDeathPackChecksum } from "../packag
  * 產生 `fixtures/p3d/`：
  * - `cause-registry.v1.json`（8 個中性 synthetic 死因，逐欄等於契約 registry）
  * - `cause-weights.v1.json`（6 regionClass × 2 sex × 9 age bands，完整鋪滿 0..120）
- * - `mortality.v1.json`（172 entity × 2 sex × 121 age = 41,624 筆，每筆恰好一次）
+ * - `mortality.v1.json`（169 entity × 2 sex × 121 age = 40,898 筆，每筆恰好一次）
  * - `licenses.v1.json`（每個內容資料集恰好一筆 synthetic 授權）
  * - `lineage.v1.json`（每個內容資料集恰好一筆 lineage，outputChecksum 綁 dataset checksum）
  * - `manifest.v1.json`（綁 P2-A base pack，含 packChecksum）
@@ -326,7 +326,7 @@ function buildLineage(datasetChecksums: Readonly<Record<string, string>>) {
       generatedAt: CREATED_AT,
       inputChecksums: [],
       outputChecksum: datasetChecksums.mortality as string,
-      notes: "covers all 172 base-pack entities; game-tuned, not a life table, no external mortality source"
+      notes: "covers all 169 base-pack entities; game-tuned, not a life table, no external mortality source"
     }
   ];
 }

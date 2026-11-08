@@ -642,21 +642,21 @@ describe("H5-CTO-180-A Ledger Replay V1：正向", () => {
     expect(built.finalState.age).toBe(67);
     expect(built.finalState.currentYear).toBe(2091);
     expect(built.finalState.stateHash).toBe(
-      "d323c0e1a88301ef04576b4d2cf0579779c67b289e30d386f1b51d868134eb1f"
+      "c9d58970a061880c7fc681e59682b4d2b7882f0d9c05c0d68150d985fef1d31c"
     );
     expect(built.finalState.commandLog.headHash).toBe(
-      "9ba816000c247982a2d4b8bfd064bbf2351e17770613af36f2a6fd7f2600077c"
+      "5117aed149a2cfc0c7e7b5147a5e19a63b7c3137d69c53e2c9d93275491a5979"
     );
     expect(built.finalState.heads.hashChain).toBe(
-      "3e065ffde46cbbec6cd7d3bc91a8fe3c48b7b8e2e4b37a2e386d57de0e97020c"
+      "a248f7e714b6887eb1f604cb320f5ed31667170fcb579784c6b7f3e5c1fb2750"
     );
     const records = result.history.records as unknown as readonly Dict[];
     const lastPair = records[records.length - 1] as Dict;
     expect((lastPair.commandRecord as P3ECommandRecord).entryHash).toBe(
-      "2adfd899dc139d0fb6905b7a5c167aba5844e4baf0e36e225c624922c9560136"
+      "2ea5b7e47bbcc964f69b413e4b261c7893e03e3a6a09e7f002e0c00cb6e03b91"
     );
     expect((lastPair.yearRecord as Dict).entryHash).toBe(
-      "2adfd899dc139d0fb6905b7a5c167aba5844e4baf0e36e225c624922c9560136"
+      "2ea5b7e47bbcc964f69b413e4b261c7893e03e3a6a09e7f002e0c00cb6e03b91"
     );
 
     // replay bit-exact：最終 State、全部 78 對 Record 都與 live 完全一致。

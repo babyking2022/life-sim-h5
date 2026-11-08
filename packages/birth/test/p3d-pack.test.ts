@@ -78,7 +78,7 @@ describe("P3-D 死亡資料包：基本形狀與完整性", () => {
     }
   });
 
-  it("172 entity × 2 sex × 121 age 完整覆蓋，且每個 entity×sex×age 恰好一筆", () => {
+  it("169 entity × 2 sex × 121 age 完整覆蓋，且每個 entity×sex×age 恰好一筆", () => {
     const actualKeys = new Set<string>();
     for (const record of pack.mortality) actualKeys.add(`${record.entityId}|${record.sex}|${record.age}`);
     const expectedKeys = new Set<string>();
@@ -93,7 +93,7 @@ describe("P3-D 死亡資料包：基本形狀與完整性", () => {
     for (const key of expectedKeys) if (!actualKeys.has(key)) missing += 1;
     expect(missing).toBe(0);
     const entities = new Set(pack.mortality.map((record) => record.entityId));
-    expect(entities.size).toBe(172);
+    expect(entities.size).toBe(169);
     let rangeViolations = 0;
     for (const key of expectedKeys) {
       const hazard = pack.hazardIndex[key];

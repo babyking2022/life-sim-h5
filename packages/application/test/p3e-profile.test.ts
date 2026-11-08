@@ -55,7 +55,7 @@ function stateStub(age: number, options: { flags?: readonly string[]; knowledge?
     currentYear: options.year ?? 2024 + age,
     flags: options.flags ?? [],
     stats: { health: 60, happiness: 55, knowledge: options.knowledge ?? 50, relationships: 40 },
-    identity: { entityId: "cr:TWN", regionCode: "TWN", sex: "female" }
+    identity: { entityId: "cr:JPN", regionCode: "JPN", sex: "female" }
   } as never;
 }
 
@@ -342,7 +342,7 @@ describe("GPT-0040-A profile：整合與 residence", () => {
       cultureId: "han",
       playerSex: "female"
     });
-    expect(profile.residence).toEqual({ entityId: "cr:TWN", regionCode: "TWN" });
+    expect(profile.residence).toEqual({ entityId: "cr:JPN", regionCode: "JPN" });
     expect(Object.isFrozen(profile.residence)).toBe(true);
     expect(Object.isFrozen(profile)).toBe(true);
     expect(() => JSON.parse(JSON.stringify(profile))).not.toThrow();

@@ -16,7 +16,7 @@ import type {
   NameRecord,
   StoryTemplateRecord
 } from "@life-sim/contracts";
-import { P2B_ALL_DATASET_IDS, P2B_SCHEMA_VERSION, P2B_WEIGHT_PPM_TOTAL } from "@life-sim/contracts";
+import { P2A_ENTITY_COUNT, P2B_ALL_DATASET_IDS, P2B_SCHEMA_VERSION, P2B_WEIGHT_PPM_TOTAL } from "@life-sim/contracts";
 import {
   computeIdentityDatasetChecksum,
   computeIdentityPackChecksum,
@@ -61,7 +61,7 @@ const CULTURES: readonly CultureRow[] = [
     id: "han",
     script: "han",
     order: "family_first",
-    entities: ["CHN", "HKG", "MAC", "TWN"],
+    entities: ["CHN"], // GPT-DEEPSEEK-0046-A：HKG／MAC／TWN 已從資料中刪除
     urban: 620000,
     life: 780,
     u5: 60,
@@ -383,7 +383,7 @@ function main(): void {
       entityToCulture.set(code, culture.id);
     }
   }
-  if (entityToCulture.size !== 172) throw new Error(`expected 172 culture assignments, got ${entityToCulture.size}`);
+  if (entityToCulture.size !== P2A_ENTITY_COUNT) throw new Error(`expected ${P2A_ENTITY_COUNT} culture assignments, got ${entityToCulture.size}`);
   for (const entityId of base.entityIds) {
     const code = entityId.slice(3);
     if (!entityToCulture.has(code)) throw new Error(`entity without culture: ${code}`);

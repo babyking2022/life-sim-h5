@@ -188,8 +188,8 @@ const MAX_TEXT_LENGTH = 256;
 const MIN_OCCURRENCE_COUNT = 1;
 const MAX_OCCURRENCE_COUNT = P3E_MAX_AGE;
 const MAX_EVENT_COUNT = 4096;
-/** H5-CTO-065-A：死亡包的 entityCount 固定值（P3-D synthetic pack 的 172 個 entity）。 */
-const REQUIRED_DEATH_ENTITY_COUNT = 172;
+/** H5-CTO-065-A：死亡包的 entityCount 固定值（P3-D synthetic pack 的 169 個 entity）。 */
+const REQUIRED_DEATH_ENTITY_COUNT = 169;
 const U32_MAX = 0xffffffff;
 
 /* ------------------------------------------------------------------ */

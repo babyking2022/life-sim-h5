@@ -21,7 +21,7 @@ const code = (pack: MutableIdentityPack) => codeOfIdentity(() => validate(pack))
 describe("P2-B identity pack validation", () => {
   it("accepts the synthetic identity pack and binds it to the P2-A base pack", () => {
     const pack = validate(loadIdentityPack());
-    expect(pack.vitals).toHaveLength(172);
+    expect(pack.vitals).toHaveLength(169);
     expect(pack.profiles).toHaveLength(13);
     expect(pack.names).toHaveLength(234);
     expect(pack.stories).toHaveLength(26);

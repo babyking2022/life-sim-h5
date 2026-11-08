@@ -5,13 +5,13 @@ import { asRaw, codeOf, dataset, descriptor, loadPack, recordAt, repair, repairC
 describe("P2-A pack validation", () => {
   it("accepts the synthetic fixture pack", () => {
     const pack = validateDataPack(asRaw(loadPack()));
-    expect(pack.registry).toHaveLength(172);
-    expect(pack.indicators).toHaveLength(344);
-    expect(pack.birthWeights).toHaveLength(344);
+    expect(pack.registry).toHaveLength(169);
+    expect(pack.indicators).toHaveLength(338);
+    expect(pack.birthWeights).toHaveLength(338);
     expect(pack.licenses).toHaveLength(4);
     expect(pack.lineage).toHaveLength(4);
-    expect(pack.enabledEntityIds).toHaveLength(172);
-    expect(pack.entityIds).toHaveLength(172);
+    expect(pack.enabledEntityIds).toHaveLength(169);
+    expect(pack.entityIds).toHaveLength(169);
     expect(pack.packChecksum).toMatch(/^[0-9a-f]{64}$/);
   });
 
@@ -72,21 +72,21 @@ describe("P2-A pack validation", () => {
 
   it("rejects a registry entry that has both a name and a sensitive ref", () => {
     const pack = loadPack();
-    const hkg = recordAt(pack, "country-registry", 0);
-    hkg.displayNameZhHans = "X";
-    hkg.sensitiveNameRef = "sn:HKG";
+    const record = recordAt(pack, "country-registry", 0);
+    record.displayNameZhHans = "X";
+    record.sensitiveNameRef = "sn:JPN";
     repair(pack);
     expect(codeOf(() => validateDataPack(asRaw(pack)))).toBe("E_P2A_REGISTRY_CODE");
   });
 
-  it("rejects a registry that is not exactly 172 entities", () => {
+  it("rejects a registry that is not exactly 169 entities", () => {
     const pack = loadPack();
     dataset(pack, "country-registry").records.pop();
     repair(pack);
     expect(codeOf(() => validateDataPack(asRaw(pack)))).toBe("E_P2A_ENTITY_COUNT");
 
     const manifestCount = loadPack();
-    manifestCount.manifest.entityCount = 171;
+    manifestCount.manifest.entityCount = 168;
     expect(codeOf(() => validateDataPack(asRaw(manifestCount)))).toBe("E_P2A_ENTITY_COUNT");
   });
 

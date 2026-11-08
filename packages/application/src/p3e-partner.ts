@@ -35,7 +35,19 @@ import type { ValidatedIdentityPack } from "@life-sim/birth";
  */
 
 /** 伴侶姓名推導用的獨立 RNG 版本。 */
-export const P3E_PARTNER_SPEC_VERSION = "p3e-partner-1.1.0";
+export const P3E_PARTNER_SPEC_VERSION = "p3e-partner-1.2.0";
+
+/**
+ * 同名避免的最大嘗試次數（GPT-0046-B）。
+ *
+ * 姓名語料每個文化只有 6 姓氏 × 6 異性 given（36 種組合）。當一位玩家經歷多次關係，
+ * 新伴侶可能抽到與先前伴侶相同的名字。為避免「不同關係同名」，我們在**獨立 domain**
+ * 的 KDF 輸入後附加 `attempt` 序數，依序嘗試其他姓名（不消耗、也不改變正式年度 RNG）。
+ *
+ * 上限取 64，遠大於任何單一文化的組合數；正常情況下遠早於上限就會找到不重複的名字。
+ * 若語料真的耗盡（極端多段關係），回退到 `attempt=0` 的姓名（穩定、確定性、不洩漏 internal key）。
+ */
+export const P3E_PARTNER_NAME_MAX_ATTEMPTS = 64;
 
 /** 伴侶姓名推導的 engine domain（與 `life`／`events`／`p3e/death` 分離）。 */
 export const P3E_PARTNER_DOMAIN = "partner";
@@ -143,15 +155,16 @@ function oppositeSex(playerSex: string): PartnerSex {
  * 由 seed ＋ 第一段關係推導「獨立」RNG 游標：
  *
  * ```text
- * seedText = `${masterSeed}|partner|${eventId}|${decisionId}|${optionId}|${sinceYear}`
+ * seedText = `${masterSeed}|partner|${eventId}|${decisionId}|${optionId}|${sinceYear}|${attempt}`
  * state    = deriveDomainState(seedText, "partner", "1.0.0")
  * ```
  *
  * 只用第一段關係當種子，因此「交往 → 同居 → 結婚」的姓名不會改變，只有 `status` 升級；
  * 清除後再建立的新關係會用新的 seedText，因此會是不同的人。
+ * `attempt` 用於 GPT-0046-B 的同名避免：依序嘗試不同的獨立 domain 輸入，直到抽到不重複的名字。
  */
-function partnerRng(masterSeed: string, eventId: string, decisionId: string, optionId: string, sinceYear: number): Xoshiro128StarStar {
-  const seedText = `${masterSeed}|partner|${eventId}|${decisionId}|${optionId}|${sinceYear}`;
+function partnerRng(masterSeed: string, eventId: string, decisionId: string, optionId: string, sinceYear: number, attempt: number): Xoshiro128StarStar {
+  const seedText = `${masterSeed}|partner|${eventId}|${decisionId}|${optionId}|${sinceYear}|${attempt}`;
   const state = deriveDomainState(seedText, P3E_PARTNER_DOMAIN, PARTNER_SPEC);
   // 與年度 RNG 同一個演算法（Xoshiro128**），但游標完全獨立、不影響正式 RNG 序列。
   return new Xoshiro128StarStar([state[0], state[1], state[2], state[3]]);
@@ -196,7 +209,7 @@ function resolveCulture(pack: ValidatedIdentityPack, cultureId: string): { cultu
   return { cultureId: FALLBACK_CULTURE_ID, pools: fallbackPools, profile: fallbackProfile };
 }
 
-/** 由獨立 RNG 抽姓氏與名字（兩次 draw，與出生姓名同一套語料）。 */
+/** 由獨立 RNG 抽姓氏與名字（兩次 draw，與出生姓名同一套語料）。`attempt` 用於同名避免。 */
 function drawName(
   pack: ValidatedIdentityPack,
   playerCultureId: string,
@@ -205,10 +218,11 @@ function drawName(
   eventId: string,
   decisionId: string,
   optionId: string,
-  sinceYear: number
+  sinceYear: number,
+  attempt: number
 ): { displayName: string; givenName: string; surname: string; cultureId: string } {
   const culture = resolveCulture(pack, playerCultureId);
-  const rng = partnerRng(masterSeed, eventId, decisionId, optionId, sinceYear);
+  const rng = partnerRng(masterSeed, eventId, decisionId, optionId, sinceYear, attempt);
   const givenPool = oppositeSex(playerSex) === "female" ? culture.pools.female : culture.pools.male;
   const surname = culture.pools.surname[Number(rng.uniformBigInt(BigInt(culture.pools.surname.length)))] as string;
   const givenName = givenPool[Number(rng.uniformBigInt(BigInt(givenPool.length)))] as string;
@@ -218,10 +232,45 @@ function drawName(
 }
 
 /**
+ * GPT-0046-B：依序嘗試，直到抽到一個不在 `forbiddenNames` 的姓名。
+ *
+ * - 每次 `attempt` 改變 KDF 輸入（`seedText` 尾端的 `attempt` 序數），因此每個 attempt 都是
+ *   **獨立 deterministic domain** 的另一次抽樣；不消耗、也不改變正式年度 RNG
+ *   （`life`／`events`／`p3e/death` 完全不動）。
+ * - 同一組輸入（masterSeed＋第一段關係座標＋forbiddenNames）永遠得到同一個姓名，
+ *   因此 save／load／replay 後逐位元一致。
+ * - `forbiddenNames` = 這位玩家「歷史上所有伴侶」的顯示名（含已結束的），新伴侶不得與之重複。
+ * - 語料耗盡（`attempt` 用盡仍未找到不重複的名字）時，回退到 `attempt=0` 的姓名：
+ *   穩定、確定性、不洩漏任何 internal key（例如不會顯示 `伴侶2`）。
+ */
+function derivePartnerName(
+  pack: ValidatedIdentityPack,
+  playerCultureId: string,
+  playerSex: string,
+  masterSeed: string,
+  eventId: string,
+  decisionId: string,
+  optionId: string,
+  sinceYear: number,
+  forbiddenNames: readonly string[]
+): { displayName: string; givenName: string; surname: string; cultureId: string } {
+  const chosen = drawName(pack, playerCultureId, playerSex, masterSeed, eventId, decisionId, optionId, sinceYear, 0);
+  if (!forbiddenNames.includes(chosen.displayName)) return chosen;
+  for (let attempt = 1; attempt < P3E_PARTNER_NAME_MAX_ATTEMPTS; attempt += 1) {
+    const candidate = drawName(pack, playerCultureId, playerSex, masterSeed, eventId, decisionId, optionId, sinceYear, attempt);
+    if (!forbiddenNames.includes(candidate.displayName)) return candidate;
+  }
+  // 穩定 fallback：極端情況下語料耗盡，回傳 attempt=0 的姓名（與任何輸入確定性對應）。
+  return chosen;
+}
+
+/**
  * 建立伴侶身分（純函式、深層凍結）。
  *
  * @param input.first 第一段關係（決定姓名與 `sinceYear`）
  * @param input.latestStatus 最新狀態（同居／結婚會升級）
+ * @param input.forbiddenNames 這位玩家歷史上所有伴侶的顯示名（含已結束），新伴侶不得與之重複
+ *   （GPT-0046-B 同名避免）。省略時視為空集合（即第一段關係不受限）。
  */
 export function buildP3ELifePartner(input: {
   readonly masterSeed: string;
@@ -230,8 +279,9 @@ export function buildP3ELifePartner(input: {
   readonly playerSex: string;
   readonly first: P3EPartnerChoice;
   readonly latestStatus: P3ELifePartnerStatus;
+  readonly forbiddenNames?: readonly string[];
 }): P3ELifePartner {
-  const name = drawName(
+  const name = derivePartnerName(
     input.identityPack,
     input.cultureId,
     input.playerSex,
@@ -239,7 +289,8 @@ export function buildP3ELifePartner(input: {
     input.first.eventId,
     input.first.decisionId,
     input.first.optionId,
-    input.first.year
+    input.first.year,
+    input.forbiddenNames ?? []
   );
   return Object.freeze({
     displayName: name.displayName,
@@ -263,49 +314,45 @@ interface PartnerResolveContext {
 }
 
 /**
- * 依時間順序套用所有選擇，回傳「第一段關係 ＋ 最新狀態」。
+ * 由「逐命令選擇」重建伴侶（restore 路徑；也適用於任何持有完整 command log 的地方）。
  *
- * - `create`：目前沒有伴侶 → 記下第一段；已有伴侶 → 只升級狀態（姓名不變）；
- * - `clear`：伴侶與第一段一起清掉（之後再建立就是新的對象、新的姓名）；
- * - 其他選擇不影響。
+ * 依序套用 `P3E_PARTNER_TRANSITIONS`：
+ * - `create` 且目前無伴侶 → 建立新對象，並把其姓名加入 `usedNames`，後續關係不得重複；
+ * - `create` 且已有伴侶 → 只升級狀態（姓名不變，絕不重抽）；
+ * - `clear`（`single`）→ 伴侶清成 `null`，但 `usedNames` 保留其姓名（新關係不得與之同名）。
+ *
+ * 因為 `buildP3ELifePartner` 是同 seed＋command log 的純函式，且 `usedNames` 完全由
+ * 選擇序列決定，故存檔／重播後逐位元一致（GPT-0046-B：不同關係姓名必須不同）。
  */
-function applyChoices(context: PartnerResolveContext, choices: readonly P3EPartnerChoice[]): {
-  first: P3EPartnerChoice;
-  status: P3ELifePartnerStatus;
-} | null {
-  let first: P3EPartnerChoice | null = null;
-  let status: P3ELifePartnerStatus | null = null;
-  for (const choice of choices) {
+export function resolveP3ELifePartner(input: PartnerResolveContext & { readonly choices: readonly P3EPartnerChoice[] }): P3ELifePartner | null {
+  const usedNames: string[] = [];
+  let current: P3ELifePartner | null = null;
+  for (const choice of input.choices) {
     const transition = partnerTransitionFromChoice(choice.eventId, choice.decisionId, choice.optionId);
     if (transition === null) continue;
     if (transition.kind === "clear") {
-      first = null;
-      status = null;
+      current = null;
       continue;
     }
-    if (first === null || status === null) {
-      first = choice;
-      status = transition.status;
+    if (current === null) {
+      current = buildP3ELifePartner({
+        masterSeed: input.masterSeed,
+        identityPack: input.identityPack,
+        cultureId: input.cultureId,
+        playerSex: input.playerSex,
+        first: choice,
+        latestStatus: transition.status,
+        forbiddenNames: usedNames
+      });
+      usedNames.push(current.displayName);
       continue;
     }
-    if (P3E_LIFE_PARTNER_STATUSES.indexOf(transition.status) > P3E_LIFE_PARTNER_STATUSES.indexOf(status)) {
-      status = transition.status;
+    // 已有伴侶：只升級狀態，姓名保持不變（絕不重抽、絕不改寫前任姓名）。
+    if (P3E_LIFE_PARTNER_STATUSES.indexOf(transition.status) > P3E_LIFE_PARTNER_STATUSES.indexOf(current.status)) {
+      current = Object.freeze({ ...current, status: transition.status });
     }
   }
-  if (first === null || status === null) return null;
-  return { first, status };
-}
-
-/**
- * 由「逐命令選擇」重建伴侶（restore 路徑；也適用於任何持有完整 command log 的地方）。
- *
- * 依序套用 `P3E_PARTNER_TRANSITIONS`；`single`（或未來任何 clear 轉移）會把伴侶清成
- * `null`，因此存檔／重播後仍然沒有伴侶。
- */
-export function resolveP3ELifePartner(input: PartnerResolveContext & { readonly choices: readonly P3EPartnerChoice[] }): P3ELifePartner | null {
-  const resolved = applyChoices(input, input.choices);
-  if (resolved === null) return null;
-  return buildP3ELifePartner({ ...input, first: resolved.first, latestStatus: resolved.status });
+  return current;
 }
 
 /**
@@ -313,34 +360,38 @@ export function resolveP3ELifePartner(input: PartnerResolveContext & { readonly 
  *
  * - 無關選擇 → 原樣回傳 `previous`（不清除、不改名）；
  * - `single` → `null`（立即清除，不保留舊伴侶）；
- * - `create` → 沒有伴侶時建立；已有伴侶時升級同一人的 status（姓名不變）。
+ * - `create` → 沒有伴侶時建立（依 `forbiddenNames` 避免與歷史伴侶同名）；
+ *   已有伴侶時只升級同一人的 status（姓名不變，絕不重抽、絕不改寫前任姓名）。
+ *
+ * @param input.forbiddenNames 這位玩家歷史上所有伴侶的顯示名（含已結束），新伴侶不得與之重複。
  */
 export function advanceP3ELifePartner(
   input: PartnerResolveContext & {
     readonly previous: P3ELifePartner | null;
     readonly choice: P3EPartnerChoice;
+    readonly forbiddenNames?: readonly string[];
   }
 ): P3ELifePartner | null {
   const transition = partnerTransitionFromChoice(input.choice.eventId, input.choice.decisionId, input.choice.optionId);
   if (transition === null) return input.previous;
   if (transition.kind === "clear") return null;
   if (input.previous === null) {
-    return buildP3ELifePartner({ ...input, first: input.choice, latestStatus: transition.status });
+    return buildP3ELifePartner({
+      masterSeed: input.masterSeed,
+      identityPack: input.identityPack,
+      cultureId: input.cultureId,
+      playerSex: input.playerSex,
+      first: input.choice,
+      latestStatus: transition.status,
+      forbiddenNames: input.forbiddenNames ?? []
+    });
   }
   const upgraded =
     P3E_LIFE_PARTNER_STATUSES.indexOf(transition.status) > P3E_LIFE_PARTNER_STATUSES.indexOf(input.previous.status)
       ? transition.status
       : input.previous.status;
-  return buildP3ELifePartner({
-    ...input,
-    first: {
-      eventId: input.previous.eventId,
-      decisionId: input.previous.decisionId,
-      optionId: input.previous.optionId,
-      year: input.previous.sinceYear
-    },
-    latestStatus: upgraded
-  });
+  // 升級只改 status，姓名保持不變（不重抽、不改寫前任姓名）。
+  return Object.freeze({ ...input.previous, status: upgraded });
 }
 
 /** 兼容型 type guard（UI 可漸進採用）。 */

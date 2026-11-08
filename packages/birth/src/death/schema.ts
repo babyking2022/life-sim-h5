@@ -28,7 +28,7 @@ export function readObject(value: unknown, path: string): JsonObject {
  * 嚴格物件：先擋 prototype 危險鍵，再檢查缺少的 key（依宣告順序），最後檢查多出的 key。
  * 因此同一份資料的錯誤碼與路徑是穩定的。
  *
- * `keySet` 可預先計算（熱路徑：mortality 有 41,624 筆，每次重建 Set 會多出四萬次配置）。
+ * `keySet` 可預先計算（熱路徑：mortality 有 40,898 筆，每次重建 Set 會多出四萬次配置）。
  */
 export function readExactObject(
   value: unknown,

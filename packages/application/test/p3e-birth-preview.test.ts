@@ -436,9 +436,10 @@ describe("GPT-DEEPSEEK-0017 previewP3EBrowserBirth：型別與欄位", () => {
       expect(simplifiedOnly.test(name), `${code}:${name}`).toBe(false);
     }
     // 敏感地區一律沿用資料包審核過的正式名稱（逐字轉繁）。
-    expect(P3E_ZH_HANT_COUNTRY_NAMES["HKG"]).toBe("中國香港特別行政區");
-    expect(P3E_ZH_HANT_COUNTRY_NAMES["MAC"]).toBe("中國澳門特別行政區");
-    expect(P3E_ZH_HANT_COUNTRY_NAMES["TWN"]).toBe("中國台灣地區");
+    // GPT-0046-A：這三個地區已從資料中刪除，名稱表也不再保留。
+    expect(P3E_ZH_HANT_COUNTRY_NAMES["HKG"]).toBeUndefined();
+    expect(P3E_ZH_HANT_COUNTRY_NAMES["MAC"]).toBeUndefined();
+    expect(P3E_ZH_HANT_COUNTRY_NAMES["TWN"]).toBeUndefined();
   });
 });
 

@@ -116,12 +116,12 @@ export function repairDeath(
   return pack;
 }
 
-/** 驗證 P2-A base pack（172 entities）；只做一次。 */
+/** 驗證 P2-A base pack（169 entities）；只做一次。 */
 function buildBase() {
   return validateDataPack(asRaw(loadPack()));
 }
 
-/** 只驗證一次的 base pack（P2-A 172 entities）。 */
+/** 只驗證一次的 base pack（P2-A 169 entities）。 */
 export const BASE = buildBase();
 
 /** 每次都是全新的 validated death pack（避免測試之間互相影響）。 */

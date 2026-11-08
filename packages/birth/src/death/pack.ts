@@ -72,7 +72,7 @@ import {
  * 4. 授權門檻（只允許 synthetic）
  * 5. lineage 圖（未知 parent／重複 parent／環／input checksum／output checksum）
  * 6. dataset checksum 與 recordCount
- * 7. 覆蓋率（mortality 剛好 172×2×121；cause age bands 完整鋪滿 0..120）
+ * 7. 覆蓋率（mortality 剛好 169×2×121；cause age bands 完整鋪滿 0..120）
  * 8. 權重（正整數、單筆上限、總和上限）
  * 9. packChecksum
  * 10. deep-freeze → brand
@@ -161,7 +161,7 @@ function sortKeyOf(datasetId: P3DDatasetId, record: unknown): string {
  *
  * 排序鍵只用已驗證的 ASCII 欄位（entityId／sex／age／regionClass／causeId／
  * sourceId／lineageId，全部符合 `ID_PATTERN` 或固定 enum），因此 JS 字串比較
- * 與 UTF-8 byte 比較的次序相同。**排序鍵只算一次**：41,624 筆的 mortality
+ * 與 UTF-8 byte 比較的次序相同。**排序鍵只算一次**：40,898 筆的 mortality
  * 若在每次比較都做 `utf8Encode`，光是排序就會吃掉數百毫秒。
  */
 function canonicalRecords(datasetId: P3DDatasetId, records: readonly unknown[]): readonly unknown[] {
@@ -171,7 +171,7 @@ function canonicalRecords(datasetId: P3DDatasetId, records: readonly unknown[]):
 }
 
 export function computeDeathDatasetChecksum(manifest: P3DDeathPackManifest, datasetId: P3DDatasetId, records: readonly unknown[]): string {
-  // mortality 有 41,624 筆：用專用的列投影（純 ASCII、前綴長度、單一 join），
+  // mortality 有 40,898 筆：用專用的列投影（純 ASCII、前綴長度、單一 join），
   // 避免通用遞迴投影在每筆紀錄上做 key 排序與多次字串配置。
   if (datasetId === "mortality") {
     const rows = (records as readonly P3DMortalityRecord[]).map(
@@ -609,7 +609,7 @@ export function validateDeathPack(raw: unknown, basePack: unknown): ValidatedDea
   /* 3a) 死因 registry 必須與契約的固定 registry 完全相同。 */
   assertCauseRegistry(causeRegistry);
 
-  /* 7a) mortality 覆蓋率：剛好 172×2×121、每個 entity×sex×age 恰好一筆。 */
+  /* 7a) mortality 覆蓋率：剛好 169×2×121、每個 entity×sex×age 恰好一筆。 */
   const hazardIndex = buildHazardIndex(mortality, base);
 
   /* 7b) cause age bands：每個 regionClass×sex 都必須完整鋪滿 0..120。 */

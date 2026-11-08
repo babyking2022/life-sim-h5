@@ -111,9 +111,9 @@ export interface P3EBrowserBirthPreview {
  *
  * - 這是一張**呈現層**對照表：不是資料包、不影響抽選、權重、hash 或任何規則；
  * - 以參考專案 `born-somewhere` 的繁中譯名為基準，逐一對齊本專案 P2-A registry
- *   的 172 個 regionCode；
- * - 三個敏感地區（HKG／MAC／TWN）**一律沿用資料包審核過的正式名稱**逐字轉繁，
- *   不採用其他來源的稱呼；
+ *   的 169 個 regionCode；
+ * - GPT-DEEPSEEK-0046-A：HKG／MAC／TWN 已依使用者要求從資料來源刪除，
+ *   對照表也不再保留這三個代碼；
  * - 對照表未收錄的代碼（例如未來新增實體）回退為資料包原文，永不拋錯。
  */
 export const P3E_ZH_HANT_COUNTRY_NAMES: Readonly<Record<string, string>> = Object.freeze({
@@ -179,7 +179,6 @@ export const P3E_ZH_HANT_COUNTRY_NAMES: Readonly<Record<string, string>> = Objec
   GRC: "希臘",
   GTM: "瓜地馬拉",
   GUY: "蓋亞那",
-  HKG: "中國香港特別行政區",
   HND: "宏都拉斯",
   HRV: "克羅埃西亞",
   HTI: "海地",
@@ -210,7 +209,6 @@ export const P3E_ZH_HANT_COUNTRY_NAMES: Readonly<Record<string, string>> = Objec
   LTU: "立陶宛",
   LUX: "盧森堡",
   LVA: "拉脫維亞",
-  MAC: "中國澳門特別行政區",
   MAR: "摩洛哥",
   MDA: "摩爾多瓦",
   MDG: "馬達加斯加",
@@ -274,7 +272,6 @@ export const P3E_ZH_HANT_COUNTRY_NAMES: Readonly<Record<string, string>> = Objec
   TON: "東加",
   TUN: "突尼西亞",
   TUR: "土耳其",
-  TWN: "中國台灣地區",
   TZA: "坦尚尼亞",
   UGA: "烏干達",
   UKR: "烏克蘭",

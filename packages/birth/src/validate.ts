@@ -416,7 +416,7 @@ export function validateDataPack(raw: RawDataPack): ValidatedDataPack {
   for (const entityId of enabledEntityIds) {
     birthShare[entityId] = assertRecordWeight(shareById.get(entityId)?.value, `pack.datasets.indicators.birth_share_weight.${entityId}`);
   }
-  /* 172 筆權重的總和一定要用 BigInt 檢查一次，避免之後抽樣才爆。 */
+  /* 169 筆權重的總和一定要用 BigInt 檢查一次，避免之後抽樣才爆。 */
   sumWeights(enabledEntityIds.map((entityId) => birthShare[entityId] as number));
 
   const pack: ValidatedDataPack = {

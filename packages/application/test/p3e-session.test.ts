@@ -479,16 +479,16 @@ describe("H5-CTO-174-A Play Session：完整生命週期與效能", () => {
     expect(played.finalSession.state.age).toBe(67);
     expect(played.finalSession.state.phase).toBe("death");
     expect(played.finalSession.state.stateHash).toBe(
-      "d323c0e1a88301ef04576b4d2cf0579779c67b289e30d386f1b51d868134eb1f"
+      "c9d58970a061880c7fc681e59682b4d2b7882f0d9c05c0d68150d985fef1d31c"
     );
     expect(played.finalSession.state.commandLog.headHash).toBe(
-      "9ba816000c247982a2d4b8bfd064bbf2351e17770613af36f2a6fd7f2600077c"
+      "5117aed149a2cfc0c7e7b5147a5e19a63b7c3137d69c53e2c9d93275491a5979"
     );
     expect(played.finalSession.state.heads.hashChain).toBe(
-      "3e065ffde46cbbec6cd7d3bc91a8fe3c48b7b8e2e4b37a2e386d57de0e97020c"
+      "a248f7e714b6887eb1f604cb320f5ed31667170fcb579784c6b7f3e5c1fb2750"
     );
     expect(played.finalSession.state.heads.lastEntryHash).toBe(
-      "2adfd899dc139d0fb6905b7a5c167aba5844e4baf0e36e225c624922c9560136"
+      "2ea5b7e47bbcc964f69b413e4b261c7893e03e3a6a09e7f002e0c00cb6e03b91"
     );
   });
 
@@ -640,16 +640,16 @@ describe("H5-CTO-181-A Session Ledger History", () => {
     expect(played.commands).toBe(107);
     expect(played.finalSession.ledgerHistory.records.length).toBe(107);
     expect(played.finalSession.state.stateHash).toBe(
-      "d323c0e1a88301ef04576b4d2cf0579779c67b289e30d386f1b51d868134eb1f"
+      "c9d58970a061880c7fc681e59682b4d2b7882f0d9c05c0d68150d985fef1d31c"
     );
     expect(played.finalSession.state.commandLog.headHash).toBe(
-      "9ba816000c247982a2d4b8bfd064bbf2351e17770613af36f2a6fd7f2600077c"
+      "5117aed149a2cfc0c7e7b5147a5e19a63b7c3137d69c53e2c9d93275491a5979"
     );
     expect(played.finalSession.state.heads.hashChain).toBe(
-      "3e065ffde46cbbec6cd7d3bc91a8fe3c48b7b8e2e4b37a2e386d57de0e97020c"
+      "a248f7e714b6887eb1f604cb320f5ed31667170fcb579784c6b7f3e5c1fb2750"
     );
     expect(played.finalSession.state.heads.lastEntryHash).toBe(
-      "2adfd899dc139d0fb6905b7a5c167aba5844e4baf0e36e225c624922c9560136"
+      "2ea5b7e47bbcc964f69b413e4b261c7893e03e3a6a09e7f002e0c00cb6e03b91"
     );
   });
 
@@ -764,8 +764,8 @@ describe("H5-CTO-181-A Session Ledger History", () => {
     expect(callSites).toBeGreaterThanOrEqual(17);
     expect(viewports).toBeGreaterThanOrEqual(3);
     expect(callSites - 1 + viewports).toBeGreaterThanOrEqual(19);
-    expect(smoke).toContain("d323c0e1a88301ef04576b4d2cf0579779c67b289e30d386f1b51d868134eb1f");
-    expect(smoke).toContain("9ba816000c247982a2d4b8bfd064bbf2351e17770613af36f2a6fd7f2600077c");
+    expect(smoke).toContain("c9d58970a061880c7fc681e59682b4d2b7882f0d9c05c0d68150d985fef1d31c");
+    expect(smoke).toContain("5117aed149a2cfc0c7e7b5147a5e19a63b7c3137d69c53e2c9d93275491a5979");
     expect(smoke).toContain("run_to_death_with_51_commands");
   });
 
@@ -884,16 +884,16 @@ describe("H5-CTO-183-A Raw Session Persistence", () => {
     const restored = restoreP3EPlaySessionPayload(restoreInput(payload));
     expect(restored.ledgerHistory.records.length).toBe(107);
     expect(restored.state.stateHash).toBe(
-      "d323c0e1a88301ef04576b4d2cf0579779c67b289e30d386f1b51d868134eb1f"
+      "c9d58970a061880c7fc681e59682b4d2b7882f0d9c05c0d68150d985fef1d31c"
     );
     expect(restored.state.commandLog.headHash).toBe(
-      "9ba816000c247982a2d4b8bfd064bbf2351e17770613af36f2a6fd7f2600077c"
+      "5117aed149a2cfc0c7e7b5147a5e19a63b7c3137d69c53e2c9d93275491a5979"
     );
     expect(restored.state.heads.hashChain).toBe(
-      "3e065ffde46cbbec6cd7d3bc91a8fe3c48b7b8e2e4b37a2e386d57de0e97020c"
+      "a248f7e714b6887eb1f604cb320f5ed31667170fcb579784c6b7f3e5c1fb2750"
     );
     expect(restored.state.heads.lastEntryHash).toBe(
-      "2adfd899dc139d0fb6905b7a5c167aba5844e4baf0e36e225c624922c9560136"
+      "2ea5b7e47bbcc964f69b413e4b261c7893e03e3a6a09e7f002e0c00cb6e03b91"
     );
   });
 
@@ -953,7 +953,7 @@ describe("H5-CTO-183-A Raw Session Persistence", () => {
     expect(isP3EError(packError)).toBe(true);
 
     // 4. 篡改 payload：codec 綁定失敗。
-    const tampered = payload.replace("d323c0e1", "d323c0e2");
+    const tampered = payload.replace("c9d58970", "c9d58971");
     expect(tampered).not.toBe(payload);
     let tamperedError: unknown;
     try {
@@ -1085,7 +1085,7 @@ describe("H5-CTO-183-A Raw Session Persistence", () => {
     expect(callSites).toBeGreaterThanOrEqual(17);
     expect(viewports).toBeGreaterThanOrEqual(3);
     expect(callSites - 1 + viewports).toBeGreaterThanOrEqual(19);
-    expect(smoke).toContain("d323c0e1a88301ef04576b4d2cf0579779c67b289e30d386f1b51d868134eb1f");
-    expect(smoke).toContain("9ba816000c247982a2d4b8bfd064bbf2351e17770613af36f2a6fd7f2600077c");
+    expect(smoke).toContain("c9d58970a061880c7fc681e59682b4d2b7882f0d9c05c0d68150d985fef1d31c");
+    expect(smoke).toContain("5117aed149a2cfc0c7e7b5147a5e19a63b7c3137d69c53e2c9d93275491a5979");
   });
 });

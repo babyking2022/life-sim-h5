@@ -38,7 +38,7 @@ const RNG_SPEC_VERSION = "1.0.0";
 
 type Row = readonly [code: string, name: string | null, region: RegionClass];
 
-/* 198 個國家與地區的授權來源表；DROP 之後剛好 172。 */
+/* 198 個國家與地區的授權來源表；DROP 之後剛好 169（0046-A 再刪 HKG／MAC／TWN）。 */
 const ROWS: readonly Row[] = [
   /* africa */
   ["DZA", "阿尔及利亚", "africa"],
@@ -107,7 +107,6 @@ const ROWS: readonly Row[] = [
   ["CHN", "中国", "asia"],
   ["CYP", "塞浦路斯", "asia"],
   ["GEO", "格鲁吉亚", "asia"],
-  ["HKG", null, "asia"],
   ["IND", "印度", "asia"],
   ["IDN", "印度尼西亚", "asia"],
   ["IRN", "伊朗", "asia"],
@@ -120,7 +119,6 @@ const ROWS: readonly Row[] = [
   ["KGZ", "吉尔吉斯斯坦", "asia"],
   ["LAO", "老挝", "asia"],
   ["LBN", "黎巴嫩", "asia"],
-  ["MAC", null, "asia"],
   ["MYS", "马来西亚", "asia"],
   ["MDV", "马尔代夫", "asia"],
   ["MNG", "蒙古", "asia"],
@@ -137,7 +135,6 @@ const ROWS: readonly Row[] = [
   ["KOR", "韩国", "asia"],
   ["LKA", "斯里兰卡", "asia"],
   ["SYR", "叙利亚", "asia"],
-  ["TWN", null, "asia"],
   ["TJK", "塔吉克斯坦", "asia"],
   ["THA", "泰国", "asia"],
   ["TLS", "东帝汶", "asia"],
@@ -246,8 +243,9 @@ const ROWS: readonly Row[] = [
 ];
 
 /**
- * 172 = 169 個主權／觀察員 + 3 個敏感地區（HKG、MAC、TWN）。
- * 這 26 個小型國家與地區先不進 P2-A 合成包；正式 172 名單待產品確認。
+ * 169 = 主權／觀察員清單（GPT-DEEPSEEK-0046-A：原本的 3 個敏感地區
+ * HKG／MAC／TWN 已依使用者要求從權威來源刪除，不再產生任何資料列）。
+ * 這 26 個小型國家與地區先不進 P2-A 合成包；正式 169 名單待產品確認。
  */
 const DROPPED = new Set([
   "VAT",
@@ -278,7 +276,13 @@ const DROPPED = new Set([
   "BTN"
 ]);
 
-const SENSITIVE = new Set(["HKG", "MAC", "TWN"]);
+/**
+ * GPT-DEEPSEEK-0046-A：敏感地區清單刻意保持**空的**。
+ * 這三個地區（HKG／MAC／TWN）已從權威來源移除，因此不會產生 registry／
+ * indicators／birth-weights／sensitive-names 的任何記錄；保留這個集合是為了
+ * 讓「敏感名稱」機制仍然存在（未來若產品要求其他地區時可再使用）。
+ */
+const SENSITIVE = new Set<string>();
 
 function digest(text: string): Buffer {
   return createHash("sha256").update(text, "utf8").digest();
@@ -401,9 +405,21 @@ function main(): void {
   writeDataset("country-registry.v1.json", "country-registry", registry);
   writeDataset("indicators.v1.json", "indicators", indicators);
   writeDataset("birth-weights.v1.json", "birth-weights", birthWeights);
-  /* sensitive-names.v1.json 由人工維護（可審核映射表），產生器不改寫。 */
-  const sensitive = JSON.parse(readFileSync(join(OUT, "sensitive-names.v1.json"), "utf8")) as DatasetEnvelope<SensitiveNameRecord>;
-  if (sensitive.records.length !== SENSITIVE.size) throw new Error("sensitive-names.v1.json must have exactly 3 records");
+  /*
+   * GPT-DEEPSEEK-0046-A：敏感名稱映射表仍由產生器寫出，但目前**必須是 0 筆**。
+   * 這三個地區已從權威來源刪除；若 SENSITIVE 又加入任何代碼，這裡會直接失敗，
+   * 避免有人只把地區加進集合卻忘了同步資料集。
+   */
+  const sensitiveRecords: SensitiveNameRecord[] = [...SENSITIVE].map((code) => ({
+    entityId: `cr:${code}`,
+    displayNameZhHans: "",
+    reviewStatus: "pending" as const,
+    reviewedBy: "p2a-generate-fixtures",
+    reviewedAt: CREATED_AT,
+    note: "敏感名稱映射由產生器維護；目前清單為空。"
+  }));
+  writeDataset("sensitive-names.v1.json", "sensitive-names", sensitiveRecords);
+  if (sensitiveRecords.length !== 0) throw new Error("sensitive-names.v1.json must be empty after 0046-A");
 
   const checksums = {
     "country-registry": checksumOf("country-registry.v1.json"),
@@ -446,7 +462,7 @@ function main(): void {
     datasetId,
     parentLineageIds: [],
     transform,
-    generatedBy: datasetId === "sensitive-names" ? "docs/p2a/country-registry.md (manual mapping)" : "scripts/p2a-generate-fixtures.ts",
+    generatedBy: "scripts/p2a-generate-fixtures.ts",
     generatedAt: CREATED_AT,
     inputChecksums: [],
     outputChecksum: checksums[datasetId],
@@ -465,7 +481,7 @@ function main(): void {
     { datasetId: "country-registry", fileName: "country-registry.v1.json", records: registry },
     { datasetId: "indicators", fileName: "indicators.v1.json", records: indicators },
     { datasetId: "birth-weights", fileName: "birth-weights.v1.json", records: birthWeights },
-    { datasetId: "sensitive-names", fileName: "sensitive-names.v1.json", records: sensitive.records },
+    { datasetId: "sensitive-names", fileName: "sensitive-names.v1.json", records: sensitiveRecords },
     { datasetId: "licenses", fileName: "licenses.v1.json", records: licenses },
     { datasetId: "lineage", fileName: "lineage.v1.json", records: lineage }
   ];

@@ -118,7 +118,7 @@ function buildState(age: number, options: Options = {}): contracts.P3ELifeState 
         deathPackChecksum: HEX("8"),
         basePackId: BASE_PACK_ID,
         basePackChecksum: BASE_PACK_CHECKSUM,
-        entityCount: 172
+        entityCount: 169
       }
     },
     currentYear: BIRTH_YEAR + age,

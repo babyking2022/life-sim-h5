@@ -385,6 +385,12 @@ export function resolveP3ERelationship(input: {
   let sinceYear: number | null = null;
   /** 這「一段」關係是否已婚（不是一生是否曾結婚）。 */
   let currentMarried = false;
+  /**
+   * GPT-0046-B：這位玩家「歷史上所有伴侶」的顯示名（含已結束的）。
+   * 每次建立新伴侶時傳入 `buildP3ELifePartner` 當 forbiddenNames，確保新姓名不與任何
+   * 先前伴侶重複；清除關係時保留在集合中（新關係仍須避開前任姓名）。
+   */
+  const usedNames: string[] = [];
 
   const startPartner = (
     eventId: string,
@@ -392,33 +398,27 @@ export function resolveP3ERelationship(input: {
     optionId: string,
     year: number,
     partnerStatus: "dating" | "partner" | "spouse"
-  ): P3ELifePartner =>
-    buildP3ELifePartner({
+  ): P3ELifePartner => {
+    const created = buildP3ELifePartner({
       masterSeed: input.masterSeed,
       identityPack: input.identityPack,
       cultureId: input.cultureId,
       playerSex: input.playerSex,
       first: { eventId, decisionId, optionId, year },
-      latestStatus: partnerStatus
+      latestStatus: partnerStatus,
+      forbiddenNames: usedNames
     });
+    usedNames.push(created.displayName);
+    return created;
+  };
 
   const upgradePartner = (year: number, partnerStatus: "partner" | "spouse"): P3ELifePartner => {
     if (partner === null) {
+      // 沒有既有伴侶卻出現 cohabit／marry：視為新關係的建立（仍避開歷史姓名）。
       return startPartner("ev.adult.relationship", "dec.adult.relationship", partnerStatus === "spouse" ? "marry" : "cohabit", year, partnerStatus);
     }
-    return buildP3ELifePartner({
-      masterSeed: input.masterSeed,
-      identityPack: input.identityPack,
-      cultureId: input.cultureId,
-      playerSex: input.playerSex,
-      first: {
-        eventId: partner.eventId,
-        decisionId: partner.decisionId,
-        optionId: partner.optionId,
-        year: partner.sinceYear
-      },
-      latestStatus: partnerStatus
-    });
+    // 已有伴侶：只升級狀態，姓名保持不變（絕不重抽、絕不改寫前任姓名）。
+    return Object.freeze({ ...partner, status: partnerStatus });
   };
 
   const endRelationship = (year: number, nextStatus: "single" | "divorced" | "widowed"): void => {

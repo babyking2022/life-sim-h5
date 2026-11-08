@@ -22,7 +22,7 @@ const TOTAL_COUNT = PLAYER_COUNT * (1 + PEER_COUNT_PER_PLAYER);
  * 預先註冊的容差（執行前固定）：
  * - sigma = 4：以二項分布的 4 個標準差為上限。
  * - metricFloor = 0.004：性別／體重帶／城鄉／收入／住宅／宗教／區域等彙總指標的絕對誤差下限。
- * - countryFloor = 0.0015：172 個國家與地區逐項檢查的絕對誤差下限（小樣本）。
+ * - countryFloor = 0.0015：169 個國家與地區逐項檢查的絕對誤差下限（小樣本）。
  * - minExpectedCountForCountry = 5：期望次數 < 5 的國家只記錄、不做比例判定（避免不適用的卡方結論）。
  */
 const TOLERANCE = {
@@ -340,7 +340,7 @@ function main(): void {
     "|---|---|---|",
     `| sigma | ${TOLERANCE.sigma} | 二項分布標準差的倍數 |`,
     `| metricFloor | ${TOLERANCE.metricFloor} | 性別／體重帶／城鄉／收入／住宅／宗教／區域的絕對誤差下限 |`,
-    `| countryFloor | ${TOLERANCE.countryFloor} | 172 國逐項檢查的絕對誤差下限 |`,
+    `| countryFloor | ${TOLERANCE.countryFloor} | 169 國逐項檢查的絕對誤差下限 |`,
     `| regionFloor | ${TOLERANCE.regionFloor} | 區域彙總的絕對誤差下限 |`,
     `| minExpectedCountForCountry | ${TOLERANCE.minExpectedCountForCountry} | 期望次數低於此值的國家不做比例判定（避免不適用的卡方結論） |`,
     "",
@@ -368,9 +368,9 @@ function main(): void {
     metricTable("housing", "住宅"),
     metricTable("religion", "宗教"),
     "",
-    "## 國家與地區（172 項）",
+    "## 國家與地區（169 項）",
     "",
-    `172 個分類多數期望次數很小，因此**不使用卡方結論**；逐項以「期望次數 ≥ ${TOLERANCE.minExpectedCountForCountry}」與預先註冊的絕對誤差下限檢查。完整 172 項在 \`reports/p2c-distribution-report.json\`。`,
+    `169 個分類多數期望次數很小，因此**不使用卡方結論**；逐項以「期望次數 ≥ ${TOLERANCE.minExpectedCountForCountry}」與預先註冊的絕對誤差下限檢查。完整 169 項在 \`reports/p2c-distribution-report.json\`。`,
     "",
     "前 10 名（合計）：",
     "",

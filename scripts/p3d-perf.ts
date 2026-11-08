@@ -11,7 +11,7 @@ import { utf8Encode } from "../packages/engine/src/bytes";
  * P3-D 效能證據。
  *
  * 三條路徑分開量：
- * 1. pack 驗證成本（含 41,624 筆 mortality 的 canonical 排序與 checksum）；
+ * 1. pack 驗證成本（含 40,898 筆 mortality 的 canonical 排序與 checksum）；
  * 2. 未死亡路徑（一次 u64 → 2 個 u32 draws）；
  * 3. 死亡＋死因抽選路徑（兩次 u64 → 4 個 u32 draws）。
  *
@@ -19,7 +19,7 @@ import { utf8Encode } from "../packages/engine/src/bytes";
  * - 每呼叫的 `drawsUsed` 固定為 2 或 4，代表 RNG 工作量與資料表大小無關；
  * - 每批 10,000 次的 per-op 時間必須平坦（第一批與最後一批差異在門檻內），
  *   代表沒有隨呼叫次數累積的狀態；
- * - 量一次「明確掃過 41,624 筆 mortality」的成本，與 per-op 成本相比，
+ * - 量一次「明確掃過 40,898 筆 mortality」的成本，與 per-op 成本相比，
  *   證明 `evaluateAnnualDeath` 不可能在掃表（差三個數量級）。
  */
 
@@ -168,7 +168,7 @@ function main(): void {
   const validationMedian = sortedValidation[1] as number;
   const mortalityBytes = statSync(join(ROOT, "fixtures/p3d/mortality.v1.json")).size;
 
-  /* 2) 明確掃過 41,624 筆 mortality 的成本（結構性對照）。 */
+  /* 2) 明確掃過 40,898 筆 mortality 的成本（結構性對照）。 */
   const mortalityRecords = deathRaw().datasets.mortality.records;
   const scanStarted = performance.now();
   let hazardSum = 0;
@@ -192,7 +192,7 @@ function main(): void {
    * 結構性判定的三條：
    * 1. 每呼叫的 drawsUsed 固定（2＝未死亡、4＝死亡）→ RNG 工作量與資料表大小無關；
    * 2. 每批 10,000 次的 per-op 時間平坦（10 批的首尾比 < 1.5）→ 沒有累積狀態；
-   * 3. per-op 遠小於「掃過全部 41,624 筆 mortality」的成本（> 5×）→ 不可能在掃表。
+   * 3. per-op 遠小於「掃過全部 40,898 筆 mortality」的成本（> 5×）→ 不可能在掃表。
    */
   const drawsOk = alivePath.drawsUsedSeen.join(",") === "2" && deathPath.drawsUsedSeen.join(",") === "4";
   const flatOk = flatnessLike < 1.5;

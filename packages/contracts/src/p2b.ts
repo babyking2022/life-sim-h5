@@ -13,7 +13,8 @@
 export const P2B_SCHEMA_VERSION = "p2b-1" as const;
 export type P2BSchemaVersion = typeof P2B_SCHEMA_VERSION;
 
-export const P2B_ENTITY_COUNT = 172;
+/** GPT-DEEPSEEK-0046-A：169（HKG／MAC／TWN 已從權威來源刪除，原 172 = 169 + 3）。 */
+export const P2B_ENTITY_COUNT = 169;
 
 export const P2B_DATASET_IDS = ["country-vitals", "household-profiles", "name-corpus", "story-templates"] as const;
 export type P2BDatasetId = (typeof P2B_DATASET_IDS)[number];
@@ -21,7 +22,7 @@ export type P2BDatasetId = (typeof P2B_DATASET_IDS)[number];
 export const P2B_ALL_DATASET_IDS = [...P2B_DATASET_IDS, "licenses", "lineage"] as const;
 export type P2BAllDatasetId = (typeof P2B_ALL_DATASET_IDS)[number];
 
-export const P2B_MAX_VITAL_RECORDS = 172;
+export const P2B_MAX_VITAL_RECORDS = 169;
 export const P2B_MAX_HOUSEHOLD_RECORDS = 64;
 export const P2B_MAX_NAME_RECORDS = 4096;
 export const P2B_MAX_STORY_RECORDS = 512;

@@ -1,9 +1,9 @@
 // 由 .artifacts/gen-country-hant.mjs 產生。
 // GPT-0043-B：真正 zh-Hant 國名來源＝ Intl.DisplayNames(["zh-Hant"], { type: "region" }).of(ISO2)。
 // 靜態表 ZH_HANT_BY_ISO3 即由上述權威 API 產生（非簡→繁逐字替換），作為瀏覽器不支援時的 fallback。
-// 敏感地區 HKG/MAC/TWN 保留應用審核過的精簡繁中名（見 gen-country-hant.mjs 的 SENSITIVE_OVERRIDE）。
+// GPT-0046-B：已移除 TWN／HKG／MAC 三個正式國名映射（registry 僅剩 169 筆）。
 
-/** ISO3 region code → ISO2（TWN 無 ISO2，不列入）。供運行時優先嘗試 Intl.DisplayNames 使用。 */
+/** ISO3 region code → ISO2。供運行時優先嘗試 Intl.DisplayNames 使用。 */
 export const ISO2_BY_ISO3: Readonly<Record<string, string>> = Object.freeze({
   "AFG": "AF",
   "AGO": "AO",
@@ -67,7 +67,6 @@ export const ISO2_BY_ISO3: Readonly<Record<string, string>> = Object.freeze({
   "GRC": "GR",
   "GTM": "GT",
   "GUY": "GY",
-  "HKG": "HK",
   "HND": "HN",
   "HRV": "HR",
   "HTI": "HT",
@@ -98,7 +97,6 @@ export const ISO2_BY_ISO3: Readonly<Record<string, string>> = Object.freeze({
   "LTU": "LT",
   "LUX": "LU",
   "LVA": "LV",
-  "MAC": "MO",
   "MAR": "MA",
   "MDA": "MD",
   "MDG": "MG",
@@ -180,7 +178,7 @@ export const ISO2_BY_ISO3: Readonly<Record<string, string>> = Object.freeze({
 
 /**
  * 靜態繁中對照表（ISO3 → 真正 zh-Hant 國名）。
- * 由 Intl.DisplayNames(["zh-Hant"], { type: "region" }).of(ISO2) 產生；HKG/MAC/TWN 為應用審核的精簡名。
+ * 由 Intl.DisplayNames(["zh-Hant"], { type: "region" }).of(ISO2) 產生。
  * 作為瀏覽器 Intl 不可用／回空時的 fallback。
  */
 export const ZH_HANT_BY_ISO3: Readonly<Record<string, string>> = Object.freeze({
@@ -246,7 +244,6 @@ export const ZH_HANT_BY_ISO3: Readonly<Record<string, string>> = Object.freeze({
   "GRC": "希臘",
   "GTM": "瓜地馬拉",
   "GUY": "蓋亞那",
-  "HKG": "香港",
   "HND": "宏都拉斯",
   "HRV": "克羅埃西亞",
   "HTI": "海地",
@@ -277,7 +274,6 @@ export const ZH_HANT_BY_ISO3: Readonly<Record<string, string>> = Object.freeze({
   "LTU": "立陶宛",
   "LUX": "盧森堡",
   "LVA": "拉脫維亞",
-  "MAC": "澳門",
   "MAR": "摩洛哥",
   "MDA": "摩爾多瓦",
   "MDG": "馬達加斯加",
@@ -341,7 +337,6 @@ export const ZH_HANT_BY_ISO3: Readonly<Record<string, string>> = Object.freeze({
   "TON": "東加",
   "TUN": "突尼西亞",
   "TUR": "土耳其",
-  "TWN": "臺灣",
   "TZA": "坦尚尼亞",
   "UGA": "烏干達",
   "UKR": "烏克蘭",
@@ -357,8 +352,6 @@ export const ZH_HANT_BY_ISO3: Readonly<Record<string, string>> = Object.freeze({
   "ZMB": "尚比亞",
   "ZWE": "辛巴威"
 });
-
-const SENSITIVE_ISO3 = new Set(["HKG", "MAC", "TWN"]);
 
 type DisplayNamesCtor = new (
   locales: string | string[],
@@ -377,7 +370,6 @@ const nameCache = new Map<string, string>();
 function runtimeZhHant(regionCode: string): string | null {
   try {
     if (cachedDnUnavailable) return null;
-    if (SENSITIVE_ISO3.has(regionCode)) return null;
     const iso2 = ISO2_BY_ISO3[regionCode];
     if (iso2 === undefined) return null;
     if (cachedDn === null) {

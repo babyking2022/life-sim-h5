@@ -78,10 +78,13 @@ describe("P2-A.1 edge cases", () => {
   });
 
   it("rejects a sensitive ref that points at the wrong mapping", () => {
+    // GPT-0046-A：正式資料已沒有敏感地區，這裡刻意把 JPN 標成敏感且把 ref 指到別的代碼，
+    // 驗證「ref 必須等於 sn:<regionCode>」這條規則仍然有效。
     const pack = loadPack();
-    const record = dataset(pack, "country-registry").records.find((item) => item.entityId === "cr:HKG");
-    if (!record) throw new Error("missing HKG");
-    record.sensitiveNameRef = "sn:MAC";
+    const record = dataset(pack, "country-registry").records.find((item) => item.entityId === "cr:JPN");
+    if (!record) throw new Error("missing JPN");
+    record.displayNameZhHans = null;
+    record.sensitiveNameRef = "sn:KOR";
     repair(pack);
     expect(codeOf(() => validateDataPack(asRaw(pack)))).toBe("E_P2A_SENSITIVE_NAME_MISSING");
   });

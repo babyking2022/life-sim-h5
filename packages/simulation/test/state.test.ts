@@ -60,7 +60,7 @@ function sampleState(): contracts.P3ELifeState {
         deathPackChecksum: HEX("8"),
         basePackId: "p2a-synthetic-20261027",
         basePackChecksum: HEX("4"),
-        entityCount: 172
+        entityCount: 169
       }
     },
     currentYear: 2030,
@@ -225,7 +225,7 @@ describe("P3-E.1a-2c-2a 合法 state", () => {
     (boundary.commandLog as Dict).count = 0;
     expect(() => readP3EStateShape(boundary)).not.toThrow();
     // death.entityCount 仍是固定值
-    expect(death.entityCount).toBe(172);
+    expect(death.entityCount).toBe(169);
 
     const upper = mutable();
     nodeAt(upper, ["identity"]).birthYear = 2200;

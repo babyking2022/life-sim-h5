@@ -537,7 +537,7 @@ describe("H5-CTO-184-A Save Envelope V6：正向", () => {
     expect(official.finalState.age).toBe(67);
     expect(official.finalState.currentYear).toBe(2091);
     expect(official.finalState.stateHash).toBe(
-      "d323c0e1a88301ef04576b4d2cf0579779c67b289e30d386f1b51d868134eb1f"
+      "c9d58970a061880c7fc681e59682b4d2b7882f0d9c05c0d68150d985fef1d31c"
     );
     expect(((official.ledger as { records: unknown[] }).records).length).toBe(107);
 

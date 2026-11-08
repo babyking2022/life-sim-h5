@@ -3,14 +3,14 @@
   "deathSpecVersion": "1.0.0",
   "healthRuleVersion": "p3d-health-1.0.0",
   "deathPackId": "p3d-synthetic-mortality-v1",
-  "deathPackChecksum": "7ae8539c3d950f9feb6236aeba6f62097f36b064115f83aa9140308f42bb74b5",
+  "deathPackChecksum": "e9df7de24474f836ae9513c8dcdd7b7736541bd0ed0ae9d56f55cafff0b95789",
   "basePackId": "p2a-synthetic-20261027",
-  "basePackChecksum": "c6d7e9261060e5ecacb1de2c7823d39dec12d6b4142512a6d3c1f10529f54c7b",
+  "basePackChecksum": "d849b5d440fd29f3ba9f8850823bc8b063eb80d9594975be8332f64de52656f2",
   "digestDomain": "LIFE1/P3D/DEATH/v1",
   "caseCount": 108,
   "diedCount": 15,
   "distinctCauses": [
-    "cause.neutral.circulatory",
+    "cause.neutral.digestive",
     "cause.neutral.infection",
     "cause.neutral.neoplasm",
     "cause.neutral.neurological",
@@ -19,10 +19,10 @@
   "cases": [
     {
       "id": "p3d-001",
-      "entityId": "cr:TUR",
-      "regionCode": "TUR",
+      "entityId": "cr:SLB",
+      "regionCode": "SLB",
       "entityStatus": "enabled",
-      "region": "asia",
+      "region": "oceania",
       "sex": "female",
       "age": 15,
       "calendarYear": 2015,
@@ -33,9 +33,9 @@
         4368510,
         971566646
       ],
-      "digest": "ad1acab9e34e8c7be0a93a5fba5b97dfb4458319b950a1061f273c8a5cc13cca",
-      "baseHazardPpm": 875,
-      "adjustedHazardPpm": 875,
+      "digest": "c54003d271a3f5cde558ab751a496f3df3277aeaee247b26eed82cb75fb20d5c",
+      "baseHazardPpm": 869,
+      "adjustedHazardPpm": 869,
       "healthFactorPpm": 1000000,
       "died": false,
       "causeId": null,
@@ -53,14 +53,14 @@
         2019526093,
         1760229453
       ],
-      "regionClass": "asia"
+      "regionClass": "oceania"
     },
     {
       "id": "p3d-002",
-      "entityId": "cr:COG",
-      "regionCode": "COG",
+      "entityId": "cr:THA",
+      "regionCode": "THA",
       "entityStatus": "enabled",
-      "region": "africa",
+      "region": "asia",
       "sex": "male",
       "age": 5,
       "calendarYear": 2012,
@@ -71,9 +71,9 @@
         3398884041,
         1176330456
       ],
-      "digest": "525f8fac819bb874f40a285e3625614d7b701136787879b23ef7b16414e515d5",
-      "baseHazardPpm": 2504,
-      "adjustedHazardPpm": 5008,
+      "digest": "35869c41b8851f65a32c74743cbcfb814b70c6decb3472a877ea32750f62e1d0",
+      "baseHazardPpm": 1184,
+      "adjustedHazardPpm": 2368,
       "healthFactorPpm": 2000000,
       "died": false,
       "causeId": null,
@@ -91,12 +91,12 @@
         2172243837,
         2388358454
       ],
-      "regionClass": "africa"
+      "regionClass": "asia"
     },
     {
       "id": "p3d-003",
-      "entityId": "cr:ARE",
-      "regionCode": "ARE",
+      "entityId": "cr:OMN",
+      "regionCode": "OMN",
       "entityStatus": "enabled",
       "region": "asia",
       "sex": "female",
@@ -109,9 +109,9 @@
         1371569945,
         4118151374
       ],
-      "digest": "2dd10dbf185dcfac0a8ecfa0131feaa869d9121d893be8c408054820b464aef6",
-      "baseHazardPpm": 951,
-      "adjustedHazardPpm": 1427,
+      "digest": "accb299f98e57f06880df3c1322fee0e75145462641997204112d98b7c89e771",
+      "baseHazardPpm": 939,
+      "adjustedHazardPpm": 1409,
       "healthFactorPpm": 1500000,
       "died": false,
       "causeId": null,
@@ -133,10 +133,10 @@
     },
     {
       "id": "p3d-004",
-      "entityId": "cr:SWZ",
-      "regionCode": "SWZ",
+      "entityId": "cr:AUS",
+      "regionCode": "AUS",
       "entityStatus": "enabled",
-      "region": "africa",
+      "region": "oceania",
       "sex": "female",
       "age": 120,
       "calendarYear": 2037,
@@ -147,12 +147,12 @@
         481392462,
         4115228190
       ],
-      "digest": "e248ebf3c89702a33e5c7efa90cc885f0b073b280fb6f9f64a3d3fb7b9b218f6",
-      "baseHazardPpm": 988000,
+      "digest": "71d3bb4e6a3c3335085cdc84907a13f0e3eeb4e6e5fcb2f2b0e004dda1a9deab",
+      "baseHazardPpm": 1000000,
       "adjustedHazardPpm": 1000000,
       "healthFactorPpm": 1500000,
       "died": true,
-      "causeId": "cause.neutral.circulatory",
+      "causeId": "cause.neutral.respiratory",
       "mortalityDraw": "812601",
       "drawsUsed": 4,
       "rngStateBefore": [
@@ -167,14 +167,14 @@
         250903969,
         1674594503
       ],
-      "regionClass": "africa"
+      "regionClass": "oceania"
     },
     {
       "id": "p3d-005",
-      "entityId": "cr:BHR",
-      "regionCode": "BHR",
+      "entityId": "cr:GTM",
+      "regionCode": "GTM",
       "entityStatus": "enabled",
-      "region": "asia",
+      "region": "americas",
       "sex": "male",
       "age": 30,
       "calendarYear": 2047,
@@ -185,9 +185,9 @@
         1546167824,
         3158375866
       ],
-      "digest": "78d124151e15590722fc078129345a3f0164303998b21e837ebffae0d942740a",
-      "baseHazardPpm": 1264,
-      "adjustedHazardPpm": 632,
+      "digest": "52de6c6df8a15b1cb6e00812da03190142306da4fbbe9957606a9adae3d6f336",
+      "baseHazardPpm": 1360,
+      "adjustedHazardPpm": 680,
       "healthFactorPpm": 500000,
       "died": false,
       "causeId": null,
@@ -205,14 +205,14 @@
         3897507918,
         1083192189
       ],
-      "regionClass": "asia"
+      "regionClass": "americas"
     },
     {
       "id": "p3d-006",
-      "entityId": "cr:BIH",
-      "regionCode": "BIH",
+      "entityId": "cr:CAN",
+      "regionCode": "CAN",
       "entityStatus": "enabled",
-      "region": "europe",
+      "region": "americas",
       "sex": "female",
       "age": 90,
       "calendarYear": 2001,
@@ -223,9 +223,9 @@
         2763492831,
         3588124018
       ],
-      "digest": "21159486855cbcbca2a76c81b46748ca023a91fe6517232c55c1e0f1e1810ae6",
-      "baseHazardPpm": 209829,
-      "adjustedHazardPpm": 419658,
+      "digest": "0c04a267adc77ef6bc30b95d71713e1d2da29abb5e39249f5e9df3d643796e87",
+      "baseHazardPpm": 314970,
+      "adjustedHazardPpm": 629940,
       "healthFactorPpm": 2000000,
       "died": false,
       "causeId": null,
@@ -243,14 +243,14 @@
         3101553014,
         706682202
       ],
-      "regionClass": "europe"
+      "regionClass": "americas"
     },
     {
       "id": "p3d-007",
-      "entityId": "cr:SUR",
-      "regionCode": "SUR",
+      "entityId": "cr:IRN",
+      "regionCode": "IRN",
       "entityStatus": "enabled",
-      "region": "americas",
+      "region": "asia",
       "sex": "female",
       "age": 0,
       "calendarYear": 2049,
@@ -261,9 +261,9 @@
         558098494,
         258258839
       ],
-      "digest": "558eb4f4716492d2d6b8e45f530f6e3dc4bf861e6cd1480ad528733c2c070dba",
-      "baseHazardPpm": 4721,
-      "adjustedHazardPpm": 2361,
+      "digest": "f23bc0cc0c0681d236d67302b099cc4540dfc1b520c05b2bd3524b3811957ba9",
+      "baseHazardPpm": 4391,
+      "adjustedHazardPpm": 2196,
       "healthFactorPpm": 500000,
       "died": false,
       "causeId": null,
@@ -281,14 +281,14 @@
         3345725455,
         516209214
       ],
-      "regionClass": "americas"
+      "regionClass": "asia"
     },
     {
       "id": "p3d-008",
-      "entityId": "cr:CAF",
-      "regionCode": "CAF",
+      "entityId": "cr:JAM",
+      "regionCode": "JAM",
       "entityStatus": "enabled",
-      "region": "africa",
+      "region": "americas",
       "sex": "female",
       "age": 14,
       "calendarYear": 2010,
@@ -299,9 +299,9 @@
         484986066,
         3319744898
       ],
-      "digest": "7740922cf1fb843ab53db40cc46eb735583c7da50b47850d2a82b45a4381a965",
-      "baseHazardPpm": 1663,
-      "adjustedHazardPpm": 832,
+      "digest": "a008dad91f559e6d05ee338a625a1c0293c2ddff3743d273282f151fa8337928",
+      "baseHazardPpm": 1157,
+      "adjustedHazardPpm": 579,
       "healthFactorPpm": 500000,
       "died": false,
       "causeId": null,
@@ -319,14 +319,14 @@
         318345509,
         3675275475
       ],
-      "regionClass": "africa"
+      "regionClass": "americas"
     },
     {
       "id": "p3d-009",
-      "entityId": "cr:VNM",
-      "regionCode": "VNM",
+      "entityId": "cr:SDN",
+      "regionCode": "SDN",
       "entityStatus": "enabled",
-      "region": "asia",
+      "region": "africa",
       "sex": "female",
       "age": 0,
       "calendarYear": 2017,
@@ -337,9 +337,9 @@
         1171139056,
         2990946836
       ],
-      "digest": "f328c2d3e0e781fb60d2bece1a2603c51f3ed5df4d537ea33e4a346b03911405",
-      "baseHazardPpm": 4381,
-      "adjustedHazardPpm": 2191,
+      "digest": "c015e401d2b9cb65c72209648100b5fbeeb32eb07e885379ad465dd60cf8ecf3",
+      "baseHazardPpm": 7139,
+      "adjustedHazardPpm": 3570,
       "healthFactorPpm": 500000,
       "died": false,
       "causeId": null,
@@ -357,14 +357,14 @@
         1266337506,
         3793832806
       ],
-      "regionClass": "asia"
+      "regionClass": "africa"
     },
     {
       "id": "p3d-010",
-      "entityId": "cr:SYR",
-      "regionCode": "SYR",
+      "entityId": "cr:CPV",
+      "regionCode": "CPV",
       "entityStatus": "enabled",
-      "region": "asia",
+      "region": "africa",
       "sex": "female",
       "age": 15,
       "calendarYear": 2000,
@@ -375,9 +375,9 @@
         2695823541,
         4234583252
       ],
-      "digest": "6d77b47410d5368b4cd5007481dbaa61b879c84a1b7697935ee223213fec36c3",
-      "baseHazardPpm": 831,
-      "adjustedHazardPpm": 831,
+      "digest": "576ad96049a8981173cf8110c97c01e305ad93c7b57b811beab4add30e1e7132",
+      "baseHazardPpm": 1479,
+      "adjustedHazardPpm": 1479,
       "healthFactorPpm": 1000000,
       "died": false,
       "causeId": null,
@@ -395,14 +395,14 @@
         2894932935,
         457319036
       ],
-      "regionClass": "asia"
+      "regionClass": "africa"
     },
     {
       "id": "p3d-011",
-      "entityId": "cr:PSE",
-      "regionCode": "PSE",
+      "entityId": "cr:MEX",
+      "regionCode": "MEX",
       "entityStatus": "enabled",
-      "region": "asia",
+      "region": "americas",
       "sex": "female",
       "age": 1,
       "calendarYear": 2012,
@@ -413,9 +413,9 @@
         2566364973,
         2381059502
       ],
-      "digest": "c2761305e050fa3d0ae79b3ba31f16ab49fc3fbf3c370c19040a2011d9ab38f8",
-      "baseHazardPpm": 1980,
-      "adjustedHazardPpm": 1980,
+      "digest": "82052e6186378779a21a9f4098d39b5e985ab1c689effaf0bea01283fc692ded",
+      "baseHazardPpm": 1978,
+      "adjustedHazardPpm": 1978,
       "healthFactorPpm": 1000000,
       "died": false,
       "causeId": null,
@@ -433,14 +433,14 @@
         475501580,
         3813341157
       ],
-      "regionClass": "asia"
+      "regionClass": "americas"
     },
     {
       "id": "p3d-012",
-      "entityId": "cr:JPN",
-      "regionCode": "JPN",
+      "entityId": "cr:LTU",
+      "regionCode": "LTU",
       "entityStatus": "enabled",
-      "region": "asia",
+      "region": "europe",
       "sex": "male",
       "age": 60,
       "calendarYear": 2017,
@@ -451,9 +451,9 @@
         1417114275,
         1850067665
       ],
-      "digest": "fc60d6c1797d3c93bc27d1f111c09cad5f38588ace65a9ee55b9affe0aa0e698",
-      "baseHazardPpm": 10068,
-      "adjustedHazardPpm": 10068,
+      "digest": "bc3242b0e9125d3656a9826f9013aab53701278fec47b3b94d87aa647a4e60dd",
+      "baseHazardPpm": 8290,
+      "adjustedHazardPpm": 8290,
       "healthFactorPpm": 1000000,
       "died": false,
       "causeId": null,
@@ -471,14 +471,14 @@
         1278480304,
         1974352259
       ],
-      "regionClass": "asia"
+      "regionClass": "europe"
     },
     {
       "id": "p3d-013",
-      "entityId": "cr:AUS",
-      "regionCode": "AUS",
+      "entityId": "cr:AUT",
+      "regionCode": "AUT",
       "entityStatus": "enabled",
-      "region": "oceania",
+      "region": "europe",
       "sex": "male",
       "age": 1,
       "calendarYear": 2031,
@@ -489,9 +489,9 @@
         2024970730,
         1871120613
       ],
-      "digest": "92b5a6ad78a97c1e8a8e041cfa4620b691936a82671ea55aadc25debba952037",
-      "baseHazardPpm": 1841,
-      "adjustedHazardPpm": 3682,
+      "digest": "95d7d9e61b79926f6dbe29b142f55cfb0cd8414f63fa83843ac3af0cf8fe83bd",
+      "baseHazardPpm": 1440,
+      "adjustedHazardPpm": 2880,
       "healthFactorPpm": 2000000,
       "died": false,
       "causeId": null,
@@ -509,14 +509,14 @@
         1844759729,
         652305207
       ],
-      "regionClass": "oceania"
+      "regionClass": "europe"
     },
     {
       "id": "p3d-014",
-      "entityId": "cr:VUT",
-      "regionCode": "VUT",
+      "entityId": "cr:PAN",
+      "regionCode": "PAN",
       "entityStatus": "enabled",
-      "region": "oceania",
+      "region": "americas",
       "sex": "female",
       "age": 90,
       "calendarYear": 2036,
@@ -527,9 +527,9 @@
         2245207935,
         740949818
       ],
-      "digest": "5e1e6232f69c72881973e692389ba9d98efcbe97b0bfa33f5add6b9ef9bf0c88",
-      "baseHazardPpm": 253811,
-      "adjustedHazardPpm": 25381,
+      "digest": "dd758f5d67cfdde2855539f30d4281e45208585216741ead7ed2821764e1d803",
+      "baseHazardPpm": 333546,
+      "adjustedHazardPpm": 33355,
       "healthFactorPpm": 100000,
       "died": false,
       "causeId": null,
@@ -547,12 +547,12 @@
         4157301279,
         1861344854
       ],
-      "regionClass": "oceania"
+      "regionClass": "americas"
     },
     {
       "id": "p3d-015",
-      "entityId": "cr:TKM",
-      "regionCode": "TKM",
+      "entityId": "cr:GEO",
+      "regionCode": "GEO",
       "entityStatus": "enabled",
       "region": "asia",
       "sex": "male",
@@ -565,9 +565,9 @@
         1260284981,
         4092958310
       ],
-      "digest": "0056f919bfcc8fc8748c9ad4ced336644a2e36e40d6289fd1377ff07cee15b32",
-      "baseHazardPpm": 361677,
-      "adjustedHazardPpm": 542516,
+      "digest": "cae401c0d5a70b2b0d7473200d22901c6ef60ca4d5e8a34db5935db45d86f8f9",
+      "baseHazardPpm": 335819,
+      "adjustedHazardPpm": 503729,
       "healthFactorPpm": 1500000,
       "died": true,
       "causeId": "cause.neutral.neurological",
@@ -589,10 +589,10 @@
     },
     {
       "id": "p3d-016",
-      "entityId": "cr:MLI",
-      "regionCode": "MLI",
+      "entityId": "cr:BIH",
+      "regionCode": "BIH",
       "entityStatus": "enabled",
-      "region": "africa",
+      "region": "europe",
       "sex": "male",
       "age": 45,
       "calendarYear": 2022,
@@ -603,9 +603,9 @@
         19325548,
         1461950274
       ],
-      "digest": "b219e96bb884b592067833d42666285ec66b58a4391a13320bffacff61e4de5c",
-      "baseHazardPpm": 3783,
-      "adjustedHazardPpm": 378,
+      "digest": "5e9d35ceb29c0eb395106a3674df78d42b698187e832662e2b7495064378b868",
+      "baseHazardPpm": 1478,
+      "adjustedHazardPpm": 148,
       "healthFactorPpm": 100000,
       "died": false,
       "causeId": null,
@@ -623,14 +623,14 @@
         4293782146,
         1744965064
       ],
-      "regionClass": "africa"
+      "regionClass": "europe"
     },
     {
       "id": "p3d-017",
-      "entityId": "cr:AGO",
-      "regionCode": "AGO",
+      "entityId": "cr:PSE",
+      "regionCode": "PSE",
       "entityStatus": "enabled",
-      "region": "africa",
+      "region": "asia",
       "sex": "male",
       "age": 14,
       "calendarYear": 2029,
@@ -641,9 +641,9 @@
         1639405093,
         424707699
       ],
-      "digest": "a96958f7ef5e7eee26f64c55d7b7b03b1cda0c3b26b0d8b454c2b5442414384e",
-      "baseHazardPpm": 1932,
-      "adjustedHazardPpm": 193,
+      "digest": "fef09c67b11df91b0ad19ea01396cbf6879e038ddbbfe7840e8fd38b2dd50cde",
+      "baseHazardPpm": 957,
+      "adjustedHazardPpm": 96,
       "healthFactorPpm": 100000,
       "died": false,
       "causeId": null,
@@ -661,12 +661,12 @@
         3246892340,
         1933103416
       ],
-      "regionClass": "africa"
+      "regionClass": "asia"
     },
     {
       "id": "p3d-018",
-      "entityId": "cr:PAN",
-      "regionCode": "PAN",
+      "entityId": "cr:CHL",
+      "regionCode": "CHL",
       "entityStatus": "enabled",
       "region": "americas",
       "sex": "female",
@@ -679,9 +679,9 @@
         3037052344,
         2959067543
       ],
-      "digest": "3708eb872eb7a1dd8ada9a8edcfd684a8ab450a8c430ad2dc657f04eec03ed5c",
-      "baseHazardPpm": 1859,
-      "adjustedHazardPpm": 3718,
+      "digest": "c36883093bebce0e816edfe04e06a29570414e311c1445a0bc69d868d2c5492c",
+      "baseHazardPpm": 2112,
+      "adjustedHazardPpm": 4224,
       "healthFactorPpm": 2000000,
       "died": false,
       "causeId": null,
@@ -703,8 +703,8 @@
     },
     {
       "id": "p3d-019",
-      "entityId": "cr:MYS",
-      "regionCode": "MYS",
+      "entityId": "cr:CHN",
+      "regionCode": "CHN",
       "entityStatus": "enabled",
       "region": "asia",
       "sex": "female",
@@ -717,9 +717,9 @@
         1822849220,
         3367874147
       ],
-      "digest": "a09de333af3960192c9d07b2a42c465a268b8acea080aaeab6263c2bcd330f67",
-      "baseHazardPpm": 1118,
-      "adjustedHazardPpm": 1677,
+      "digest": "009e20882693b8aacc690ea0c88a84920fef55d4ea747b878f474efdc1496acc",
+      "baseHazardPpm": 957,
+      "adjustedHazardPpm": 1436,
       "healthFactorPpm": 1500000,
       "died": false,
       "causeId": null,
@@ -741,10 +741,10 @@
     },
     {
       "id": "p3d-020",
-      "entityId": "cr:NGA",
-      "regionCode": "NGA",
+      "entityId": "cr:SLV",
+      "regionCode": "SLV",
       "entityStatus": "enabled",
-      "region": "africa",
+      "region": "americas",
       "sex": "female",
       "age": 30,
       "calendarYear": 2015,
@@ -755,9 +755,9 @@
         1947627178,
         2454264690
       ],
-      "digest": "782d82511235d2b4559fd9cde1ffb9a27c2e5ac74fe5876bfe06417c19cafa19",
-      "baseHazardPpm": 2019,
-      "adjustedHazardPpm": 2019,
+      "digest": "25725239027cc5fb9a500324d68245cc7c567c10b31dc469a12a147d24240456",
+      "baseHazardPpm": 1074,
+      "adjustedHazardPpm": 1074,
       "healthFactorPpm": 1000000,
       "died": false,
       "causeId": null,
@@ -775,12 +775,12 @@
         1425523162,
         2500876681
       ],
-      "regionClass": "africa"
+      "regionClass": "americas"
     },
     {
       "id": "p3d-021",
-      "entityId": "cr:LKA",
-      "regionCode": "LKA",
+      "entityId": "cr:PHL",
+      "regionCode": "PHL",
       "entityStatus": "enabled",
       "region": "asia",
       "sex": "male",
@@ -793,9 +793,9 @@
         2296119453,
         1036406151
       ],
-      "digest": "38e3e76968975cff48e16cdb7889cfef981f7dc07954ceb603c941415d1d96d0",
-      "baseHazardPpm": 1170,
-      "adjustedHazardPpm": 585,
+      "digest": "3e2fd21f9db3cb9a549d9b02abe042825cad492452f80cacd6df446f698b72c8",
+      "baseHazardPpm": 985,
+      "adjustedHazardPpm": 493,
       "healthFactorPpm": 500000,
       "died": false,
       "causeId": null,
@@ -817,10 +817,10 @@
     },
     {
       "id": "p3d-022",
-      "entityId": "cr:ARG",
-      "regionCode": "ARG",
+      "entityId": "cr:MKD",
+      "regionCode": "MKD",
       "entityStatus": "enabled",
-      "region": "americas",
+      "region": "europe",
       "sex": "male",
       "age": 14,
       "calendarYear": 2020,
@@ -831,9 +831,9 @@
         3938046324,
         2363760008
       ],
-      "digest": "78d22c4936000125eac64fd4397b4c4f1c3ad26fc567faf4e00b563b8cfeecb4",
-      "baseHazardPpm": 1228,
-      "adjustedHazardPpm": 1228,
+      "digest": "c32c08f475ca0b966d40760f67985fb894f6a0316ce3f1a224fd05a76217ba52",
+      "baseHazardPpm": 800,
+      "adjustedHazardPpm": 800,
       "healthFactorPpm": 1000000,
       "died": false,
       "causeId": null,
@@ -851,14 +851,14 @@
         1321620836,
         4214724750
       ],
-      "regionClass": "americas"
+      "regionClass": "europe"
     },
     {
       "id": "p3d-023",
-      "entityId": "cr:RUS",
-      "regionCode": "RUS",
+      "entityId": "cr:GIN",
+      "regionCode": "GIN",
       "entityStatus": "enabled",
-      "region": "europe",
+      "region": "africa",
       "sex": "female",
       "age": 75,
       "calendarYear": 2037,
@@ -869,9 +869,9 @@
         1970745990,
         3630858324
       ],
-      "digest": "a99d900a59b9a2efbecb5b438e38357388b51ba5aa09c78552170420f2273291",
-      "baseHazardPpm": 43005,
-      "adjustedHazardPpm": 86010,
+      "digest": "bc1adb421524badaa9921cd1d8cdae0f24faa4f70db82a1da67556e97752a734",
+      "baseHazardPpm": 99287,
+      "adjustedHazardPpm": 198574,
       "healthFactorPpm": 2000000,
       "died": false,
       "causeId": null,
@@ -889,14 +889,14 @@
         1156675463,
         151312676
       ],
-      "regionClass": "europe"
+      "regionClass": "africa"
     },
     {
       "id": "p3d-024",
-      "entityId": "cr:SRB",
-      "regionCode": "SRB",
+      "entityId": "cr:AUS",
+      "regionCode": "AUS",
       "entityStatus": "enabled",
-      "region": "europe",
+      "region": "oceania",
       "sex": "female",
       "age": 15,
       "calendarYear": 2046,
@@ -907,9 +907,9 @@
         3039606206,
         702550100
       ],
-      "digest": "73308015202b428ffa3b4baf29082ce29cf3f1680a0ae0ca80dd0b69f3ca89b6",
-      "baseHazardPpm": 632,
-      "adjustedHazardPpm": 1264,
+      "digest": "7e9981429a344b281883515c482d1bea5c147a3bfe4ec00b7189f50e8b661054",
+      "baseHazardPpm": 793,
+      "adjustedHazardPpm": 1586,
       "healthFactorPpm": 2000000,
       "died": false,
       "causeId": null,
@@ -927,14 +927,14 @@
         1856797469,
         2550932377
       ],
-      "regionClass": "europe"
+      "regionClass": "oceania"
     },
     {
       "id": "p3d-025",
-      "entityId": "cr:SRB",
-      "regionCode": "SRB",
+      "entityId": "cr:AZE",
+      "regionCode": "AZE",
       "entityStatus": "enabled",
-      "region": "europe",
+      "region": "asia",
       "sex": "male",
       "age": 45,
       "calendarYear": 2035,
@@ -945,9 +945,9 @@
         2496446186,
         2651171818
       ],
-      "digest": "23a37bf0fb868ec6fbbd0ce2ab6d9cc851cb7fa6ac9a477e55245e216f58dc12",
-      "baseHazardPpm": 1575,
-      "adjustedHazardPpm": 788,
+      "digest": "07f4bcb865ba8a1492ac6262bb573277ca83c6e5a930141628d644ac0a343764",
+      "baseHazardPpm": 1981,
+      "adjustedHazardPpm": 991,
       "healthFactorPpm": 500000,
       "died": false,
       "causeId": null,
@@ -965,14 +965,14 @@
         2993006252,
         2954167003
       ],
-      "regionClass": "europe"
+      "regionClass": "asia"
     },
     {
       "id": "p3d-026",
-      "entityId": "cr:USA",
-      "regionCode": "USA",
+      "entityId": "cr:ZAF",
+      "regionCode": "ZAF",
       "entityStatus": "enabled",
-      "region": "americas",
+      "region": "africa",
       "sex": "female",
       "age": 75,
       "calendarYear": 2003,
@@ -983,9 +983,9 @@
         2825271044,
         411418426
       ],
-      "digest": "ae2a473071a4d050e7d67dc66bd1323971a3aa6490908ea23bf12afcb3e7234d",
-      "baseHazardPpm": 61674,
-      "adjustedHazardPpm": 92511,
+      "digest": "de7c1ed57ea4a681c809691b844f901ce589fe59d10fd96c6149bd892d99a290",
+      "baseHazardPpm": 101104,
+      "adjustedHazardPpm": 151656,
       "healthFactorPpm": 1500000,
       "died": false,
       "causeId": null,
@@ -1003,14 +1003,14 @@
         2918062456,
         2568104178
       ],
-      "regionClass": "americas"
+      "regionClass": "africa"
     },
     {
       "id": "p3d-027",
-      "entityId": "cr:LBY",
-      "regionCode": "LBY",
+      "entityId": "cr:IRQ",
+      "regionCode": "IRQ",
       "entityStatus": "enabled",
-      "region": "africa",
+      "region": "asia",
       "sex": "female",
       "age": 45,
       "calendarYear": 2056,
@@ -1021,9 +1021,9 @@
         58898865,
         1005229742
       ],
-      "digest": "afa565c58651b1316cc18695c0cb836ab70c9d8c5dc5de0de7fbe7833ff68ad0",
-      "baseHazardPpm": 2781,
-      "adjustedHazardPpm": 4172,
+      "digest": "4b4022b83ecec4462897f5a812d386b0eeca8de4ec42ea555c6e9b85e31fea92",
+      "baseHazardPpm": 1713,
+      "adjustedHazardPpm": 2570,
       "healthFactorPpm": 1500000,
       "died": false,
       "causeId": null,
@@ -1041,12 +1041,12 @@
         2705283374,
         1789482501
       ],
-      "regionClass": "africa"
+      "regionClass": "asia"
     },
     {
       "id": "p3d-028",
-      "entityId": "cr:URY",
-      "regionCode": "URY",
+      "entityId": "cr:SLV",
+      "regionCode": "SLV",
       "entityStatus": "enabled",
       "region": "americas",
       "sex": "female",
@@ -1059,9 +1059,9 @@
         3504663493,
         1752597624
       ],
-      "digest": "4354cd5c05e54094831c5cc0af693979606e6921361255d2c8fa0a90c74081b5",
-      "baseHazardPpm": 361980,
-      "adjustedHazardPpm": 361980,
+      "digest": "62a839ddc8dfd4310073534f5cca2984cc57c4ea56994c9ae9726f70274db8f1",
+      "baseHazardPpm": 316151,
+      "adjustedHazardPpm": 316151,
       "healthFactorPpm": 1000000,
       "died": true,
       "causeId": "cause.neutral.neoplasm",
@@ -1083,10 +1083,10 @@
     },
     {
       "id": "p3d-029",
-      "entityId": "cr:HUN",
-      "regionCode": "HUN",
+      "entityId": "cr:NIC",
+      "regionCode": "NIC",
       "entityStatus": "enabled",
-      "region": "europe",
+      "region": "americas",
       "sex": "female",
       "age": 15,
       "calendarYear": 2045,
@@ -1097,9 +1097,9 @@
         3420451758,
         4117885397
       ],
-      "digest": "768bf0859969ddc529681b7b6e93601afab873947d9e6c55c3267f28c7b1082c",
-      "baseHazardPpm": 610,
-      "adjustedHazardPpm": 1220,
+      "digest": "4ca3d68f2e69eae7bd13d81f3447933e4a73af493d47f0ee072410fda4e29911",
+      "baseHazardPpm": 1038,
+      "adjustedHazardPpm": 2076,
       "healthFactorPpm": 2000000,
       "died": false,
       "causeId": null,
@@ -1117,14 +1117,14 @@
         3740872511,
         3682138819
       ],
-      "regionClass": "europe"
+      "regionClass": "americas"
     },
     {
       "id": "p3d-030",
-      "entityId": "cr:BWA",
-      "regionCode": "BWA",
+      "entityId": "cr:ECU",
+      "regionCode": "ECU",
       "entityStatus": "enabled",
-      "region": "africa",
+      "region": "americas",
       "sex": "male",
       "age": 90,
       "calendarYear": 2034,
@@ -1135,9 +1135,9 @@
         2001558484,
         1890210400
       ],
-      "digest": "f81afc40af626adccc176428de76791aef31f8bdfd198787dfba96890323903a",
-      "baseHazardPpm": 582104,
-      "adjustedHazardPpm": 1000000,
+      "digest": "147fd41408d3604d4cc122dd264bd939ae8a9de3f21016d98ee5f511e0de2658",
+      "baseHazardPpm": 411642,
+      "adjustedHazardPpm": 823284,
       "healthFactorPpm": 2000000,
       "died": true,
       "causeId": "cause.neutral.respiratory",
@@ -1155,14 +1155,14 @@
         2372992375,
         3783764632
       ],
-      "regionClass": "africa"
+      "regionClass": "americas"
     },
     {
       "id": "p3d-031",
-      "entityId": "cr:HKG",
-      "regionCode": "HKG",
+      "entityId": "cr:KEN",
+      "regionCode": "KEN",
       "entityStatus": "enabled",
-      "region": "asia",
+      "region": "africa",
       "sex": "male",
       "age": 30,
       "calendarYear": 2013,
@@ -1173,9 +1173,9 @@
         879466982,
         725836557
       ],
-      "digest": "8cc527dd2e05dadd4ada8979c32ac7d2f6587768316255b62bd75c4bd5ee8934",
-      "baseHazardPpm": 1329,
-      "adjustedHazardPpm": 665,
+      "digest": "2346cfa34cbb98fc3d855048903dc84d5f8d9b386b198fd27ee64eb85ddea62d",
+      "baseHazardPpm": 2483,
+      "adjustedHazardPpm": 1242,
       "healthFactorPpm": 500000,
       "died": false,
       "causeId": null,
@@ -1193,14 +1193,14 @@
         3544463774,
         3794859765
       ],
-      "regionClass": "asia"
+      "regionClass": "africa"
     },
     {
       "id": "p3d-032",
-      "entityId": "cr:TKM",
-      "regionCode": "TKM",
+      "entityId": "cr:COG",
+      "regionCode": "COG",
       "entityStatus": "enabled",
-      "region": "asia",
+      "region": "africa",
       "sex": "female",
       "age": 45,
       "calendarYear": 2030,
@@ -1211,9 +1211,9 @@
         3903619537,
         1774258936
       ],
-      "digest": "daf27f7c9fc00b547d22a4ddbdd0a104ce797ebdf9ec3ca2541c0f806980ffb8",
-      "baseHazardPpm": 1472,
-      "adjustedHazardPpm": 736,
+      "digest": "371db7dff1d1fd7db92f4159eca49ba4352dac0c7990dcb9c827e71e5f9396af",
+      "baseHazardPpm": 3051,
+      "adjustedHazardPpm": 1526,
       "healthFactorPpm": 500000,
       "died": false,
       "causeId": null,
@@ -1231,14 +1231,14 @@
         4270176400,
         1866069587
       ],
-      "regionClass": "asia"
+      "regionClass": "africa"
     },
     {
       "id": "p3d-033",
-      "entityId": "cr:DEU",
-      "regionCode": "DEU",
+      "entityId": "cr:ZAF",
+      "regionCode": "ZAF",
       "entityStatus": "enabled",
-      "region": "europe",
+      "region": "africa",
       "sex": "male",
       "age": 60,
       "calendarYear": 2049,
@@ -1249,9 +1249,9 @@
         3332670866,
         2107919096
       ],
-      "digest": "11239ce6c38692860a17b6000484d7506226ec504752e69c6f11e3ecc39bd32d",
-      "baseHazardPpm": 7180,
-      "adjustedHazardPpm": 10770,
+      "digest": "fc7592c2f1765ea79d656d4bc4e6e36bade44c1853e256eefc9307300fd12298",
+      "baseHazardPpm": 20546,
+      "adjustedHazardPpm": 30819,
       "healthFactorPpm": 1500000,
       "died": false,
       "causeId": null,
@@ -1269,14 +1269,14 @@
         2895054100,
         1412904496
       ],
-      "regionClass": "europe"
+      "regionClass": "africa"
     },
     {
       "id": "p3d-034",
-      "entityId": "cr:FJI",
-      "regionCode": "FJI",
+      "entityId": "cr:CMR",
+      "regionCode": "CMR",
       "entityStatus": "enabled",
-      "region": "oceania",
+      "region": "africa",
       "sex": "female",
       "age": 75,
       "calendarYear": 2017,
@@ -1287,9 +1287,9 @@
         1713684928,
         4016715595
       ],
-      "digest": "9b5122b9ff4c88447ede7789e60f889d02f2c6af69eeb9ffce149b8da2ec0c1e",
-      "baseHazardPpm": 46556,
-      "adjustedHazardPpm": 4656,
+      "digest": "53fd5be79a519fa4d92e791037cd76b5736fa2a45a8aa21d86c0059d98297a9d",
+      "baseHazardPpm": 89011,
+      "adjustedHazardPpm": 8901,
       "healthFactorPpm": 100000,
       "died": false,
       "causeId": null,
@@ -1307,14 +1307,14 @@
         796511849,
         2961834102
       ],
-      "regionClass": "oceania"
+      "regionClass": "africa"
     },
     {
       "id": "p3d-035",
-      "entityId": "cr:LAO",
-      "regionCode": "LAO",
+      "entityId": "cr:COL",
+      "regionCode": "COL",
       "entityStatus": "enabled",
-      "region": "asia",
+      "region": "americas",
       "sex": "female",
       "age": 75,
       "calendarYear": 2042,
@@ -1325,9 +1325,9 @@
         3091275305,
         769682190
       ],
-      "digest": "4b05fe1a1bbacf0cb85dcdee27cc40e4791bafd525e4ac05ee6ce228418daaf3",
-      "baseHazardPpm": 56553,
-      "adjustedHazardPpm": 56553,
+      "digest": "6f1babf2c3726c1c5c44f1325c9c28669d4b69492182e7cd97e72ac2531e678c",
+      "baseHazardPpm": 69476,
+      "adjustedHazardPpm": 69476,
       "healthFactorPpm": 1000000,
       "died": false,
       "causeId": null,
@@ -1345,14 +1345,14 @@
         127326324,
         313892681
       ],
-      "regionClass": "asia"
+      "regionClass": "americas"
     },
     {
       "id": "p3d-036",
-      "entityId": "cr:PRT",
-      "regionCode": "PRT",
+      "entityId": "cr:SLV",
+      "regionCode": "SLV",
       "entityStatus": "enabled",
-      "region": "europe",
+      "region": "americas",
       "sex": "female",
       "age": 120,
       "calendarYear": 2035,
@@ -1363,12 +1363,12 @@
         1973142341,
         3955848731
       ],
-      "digest": "2564c04c90805ad735872dbf925b63a1655b4e941d5558d58aa6016d38e7b4d1",
-      "baseHazardPpm": 968000,
+      "digest": "7ea4773918b2b3a61f5f582e2f92f590cc89a404f5c01b927e711cae61f2b5a6",
+      "baseHazardPpm": 1000000,
       "adjustedHazardPpm": 1000000,
       "healthFactorPpm": 2000000,
       "died": true,
-      "causeId": "cause.neutral.circulatory",
+      "causeId": "cause.neutral.respiratory",
       "mortalityDraw": "555353",
       "drawsUsed": 4,
       "rngStateBefore": [
@@ -1383,14 +1383,14 @@
         1988705827,
         294913989
       ],
-      "regionClass": "europe"
+      "regionClass": "americas"
     },
     {
       "id": "p3d-037",
-      "entityId": "cr:KHM",
-      "regionCode": "KHM",
+      "entityId": "cr:SWE",
+      "regionCode": "SWE",
       "entityStatus": "enabled",
-      "region": "asia",
+      "region": "europe",
       "sex": "female",
       "age": 1,
       "calendarYear": 2037,
@@ -1401,9 +1401,9 @@
         3077452841,
         2839391930
       ],
-      "digest": "2913ea3c6dba77edbbedb27d46581c42d3aab3e87d920fcac2a568f14f8a3807",
-      "baseHazardPpm": 1847,
-      "adjustedHazardPpm": 2771,
+      "digest": "d161efac2250d04bb1c8133d8402bb16f4465db534b05c1d1c6e12559d7947a7",
+      "baseHazardPpm": 1398,
+      "adjustedHazardPpm": 2097,
       "healthFactorPpm": 1500000,
       "died": false,
       "causeId": null,
@@ -1421,14 +1421,14 @@
         2441085007,
         1921628761
       ],
-      "regionClass": "asia"
+      "regionClass": "europe"
     },
     {
       "id": "p3d-038",
-      "entityId": "cr:TLS",
-      "regionCode": "TLS",
+      "entityId": "cr:URY",
+      "regionCode": "URY",
       "entityStatus": "enabled",
-      "region": "asia",
+      "region": "americas",
       "sex": "male",
       "age": 120,
       "calendarYear": 2042,
@@ -1439,12 +1439,12 @@
         1378463704,
         1208694777
       ],
-      "digest": "05573e610347345be88bec0a3047943e8d89cc11902b7a4fedbfba27928110e8",
-      "baseHazardPpm": 965000,
+      "digest": "ef515b51f6aafddf2660c4c59cab5ccf8326b906c0085a53acb161993e79b62f",
+      "baseHazardPpm": 1000000,
       "adjustedHazardPpm": 1000000,
       "healthFactorPpm": 1500000,
       "died": true,
-      "causeId": "cause.neutral.neoplasm",
+      "causeId": "cause.neutral.neurological",
       "mortalityDraw": "552816",
       "drawsUsed": 4,
       "rngStateBefore": [
@@ -1459,12 +1459,12 @@
         3032857234,
         3390988062
       ],
-      "regionClass": "asia"
+      "regionClass": "americas"
     },
     {
       "id": "p3d-039",
-      "entityId": "cr:AFG",
-      "regionCode": "AFG",
+      "entityId": "cr:SAU",
+      "regionCode": "SAU",
       "entityStatus": "enabled",
       "region": "asia",
       "sex": "female",
@@ -1477,7 +1477,7 @@
         1821885534,
         919975119
       ],
-      "digest": "31bddc06b6030c7a183983048903c6ea204d5765a21ec76b478245d26cbb6039",
+      "digest": "c8b3786b020603537dcc663fb6d75b034969051852b36baa667851d3d8c5f286",
       "baseHazardPpm": 1000000,
       "adjustedHazardPpm": 500000,
       "healthFactorPpm": 500000,
@@ -1501,8 +1501,8 @@
     },
     {
       "id": "p3d-040",
-      "entityId": "cr:TGO",
-      "regionCode": "TGO",
+      "entityId": "cr:AGO",
+      "regionCode": "AGO",
       "entityStatus": "enabled",
       "region": "africa",
       "sex": "male",
@@ -1515,9 +1515,9 @@
         4241729037,
         2444181321
       ],
-      "digest": "f0e1956c69eda5136b9965e3b689aaa63473e3f346a49dac1218809301257f9f",
-      "baseHazardPpm": 3682,
-      "adjustedHazardPpm": 7364,
+      "digest": "78e0b1791b6e3f8a98883abaa78dd3ae54c0605236dca724c0844cf980e852b0",
+      "baseHazardPpm": 3591,
+      "adjustedHazardPpm": 7182,
       "healthFactorPpm": 2000000,
       "died": false,
       "causeId": null,
@@ -1539,10 +1539,10 @@
     },
     {
       "id": "p3d-041",
-      "entityId": "cr:FIN",
-      "regionCode": "FIN",
+      "entityId": "cr:MDG",
+      "regionCode": "MDG",
       "entityStatus": "enabled",
-      "region": "europe",
+      "region": "africa",
       "sex": "female",
       "age": 5,
       "calendarYear": 2015,
@@ -1553,9 +1553,9 @@
         271490230,
         3156855777
       ],
-      "digest": "d773763f9b88e892dfc486669faddb633005522c795a0ce198277418860f2f54",
-      "baseHazardPpm": 719,
-      "adjustedHazardPpm": 719,
+      "digest": "2c6a74b9beef345a888532a41cc27f7ecede20876d689095cec2c3c592020f93",
+      "baseHazardPpm": 1976,
+      "adjustedHazardPpm": 1976,
       "healthFactorPpm": 1000000,
       "died": false,
       "causeId": null,
@@ -1573,12 +1573,12 @@
         4227381379,
         2038500199
       ],
-      "regionClass": "europe"
+      "regionClass": "africa"
     },
     {
       "id": "p3d-042",
-      "entityId": "cr:UKR",
-      "regionCode": "UKR",
+      "entityId": "cr:PRT",
+      "regionCode": "PRT",
       "entityStatus": "enabled",
       "region": "europe",
       "sex": "male",
@@ -1591,9 +1591,9 @@
         4207749619,
         1338581659
       ],
-      "digest": "28c2a37692b31fb31a188a26d7d0a549b2529641be2a9b1a64879cff77869f2a",
-      "baseHazardPpm": 1337,
-      "adjustedHazardPpm": 669,
+      "digest": "ebe4b128d5f91e51e34057c5040b5627be4a6ea6c3371fca95fbb573d48bf095",
+      "baseHazardPpm": 1339,
+      "adjustedHazardPpm": 670,
       "healthFactorPpm": 500000,
       "died": false,
       "causeId": null,
@@ -1615,8 +1615,8 @@
     },
     {
       "id": "p3d-043",
-      "entityId": "cr:CMR",
-      "regionCode": "CMR",
+      "entityId": "cr:TZA",
+      "regionCode": "TZA",
       "entityStatus": "enabled",
       "region": "africa",
       "sex": "female",
@@ -1629,8 +1629,8 @@
         2864589833,
         257086722
       ],
-      "digest": "ed8d07764d292fddfcc05b93afdf67ff431ad3cb69c3a7eada5564c932cdbbbe",
-      "baseHazardPpm": 961000,
+      "digest": "3b393b468f8cb40933b5600f5462177a59d72cc9b66afdf45d315fedb5a642f3",
+      "baseHazardPpm": 1000000,
       "adjustedHazardPpm": 1000000,
       "healthFactorPpm": 2000000,
       "died": true,
@@ -1653,10 +1653,10 @@
     },
     {
       "id": "p3d-044",
-      "entityId": "cr:SAU",
-      "regionCode": "SAU",
+      "entityId": "cr:PRT",
+      "regionCode": "PRT",
       "entityStatus": "enabled",
-      "region": "asia",
+      "region": "europe",
       "sex": "female",
       "age": 1,
       "calendarYear": 2054,
@@ -1667,9 +1667,9 @@
         3848949704,
         365745996
       ],
-      "digest": "19fbe78e3cb15daf246a13d4c502e17c32484bd543f9f72be083883324069717",
-      "baseHazardPpm": 1783,
-      "adjustedHazardPpm": 2675,
+      "digest": "3213e4b86dcaef9ab667fb234b6bef972ea6e0b677229fc1d86bf5e99b96190e",
+      "baseHazardPpm": 1335,
+      "adjustedHazardPpm": 2003,
       "healthFactorPpm": 1500000,
       "died": false,
       "causeId": null,
@@ -1687,14 +1687,14 @@
         1266886117,
         374550429
       ],
-      "regionClass": "asia"
+      "regionClass": "europe"
     },
     {
       "id": "p3d-045",
-      "entityId": "cr:OMN",
-      "regionCode": "OMN",
+      "entityId": "cr:DZA",
+      "regionCode": "DZA",
       "entityStatus": "enabled",
-      "region": "asia",
+      "region": "africa",
       "sex": "male",
       "age": 30,
       "calendarYear": 2020,
@@ -1705,9 +1705,9 @@
         755621419,
         480219134
       ],
-      "digest": "5c06bc9891fd117e7fb73f21671dfcacfcb4034f44d238c3a0dacfd6fc09ae80",
-      "baseHazardPpm": 1096,
-      "adjustedHazardPpm": 1096,
+      "digest": "b1f947bc2138d156263b11f85e81c735df1f9fcf188b38119b79f1bb0ea51211",
+      "baseHazardPpm": 2296,
+      "adjustedHazardPpm": 2296,
       "healthFactorPpm": 1000000,
       "died": false,
       "causeId": null,
@@ -1725,14 +1725,14 @@
         1475987716,
         1407350779
       ],
-      "regionClass": "asia"
+      "regionClass": "africa"
     },
     {
       "id": "p3d-046",
-      "entityId": "cr:CPV",
-      "regionCode": "CPV",
+      "entityId": "cr:BGD",
+      "regionCode": "BGD",
       "entityStatus": "enabled",
-      "region": "africa",
+      "region": "asia",
       "sex": "female",
       "age": 15,
       "calendarYear": 2009,
@@ -1743,9 +1743,9 @@
         411544538,
         1669776454
       ],
-      "digest": "7a91acc8f15c74c91f945ac26ee087d32d709bb43f39e13d0a5821349fc00c99",
-      "baseHazardPpm": 1479,
-      "adjustedHazardPpm": 740,
+      "digest": "1967a6f7bb3d776f8a4a2ed5d227f1272b92c47198daa20093da044a8b3c60e3",
+      "baseHazardPpm": 948,
+      "adjustedHazardPpm": 474,
       "healthFactorPpm": 500000,
       "died": false,
       "causeId": null,
@@ -1763,14 +1763,14 @@
         3477415852,
         39104672
       ],
-      "regionClass": "africa"
+      "regionClass": "asia"
     },
     {
       "id": "p3d-047",
-      "entityId": "cr:LBN",
-      "regionCode": "LBN",
+      "entityId": "cr:BGR",
+      "regionCode": "BGR",
       "entityStatus": "enabled",
-      "region": "asia",
+      "region": "europe",
       "sex": "female",
       "age": 0,
       "calendarYear": 2010,
@@ -1781,9 +1781,9 @@
         2560041581,
         2301932083
       ],
-      "digest": "27c1167d371d7d94adca84ebc2dd214f48dccd64f0d748e5f66991679438779d",
-      "baseHazardPpm": 4046,
-      "adjustedHazardPpm": 6069,
+      "digest": "82cfeaf2f2a8ccf3b4fc6b609b12e99abd02b9a8ff45c80fddd57cd520af6bb2",
+      "baseHazardPpm": 3364,
+      "adjustedHazardPpm": 5046,
       "healthFactorPpm": 1500000,
       "died": false,
       "causeId": null,
@@ -1801,12 +1801,12 @@
         433216241,
         1874408248
       ],
-      "regionClass": "asia"
+      "regionClass": "europe"
     },
     {
       "id": "p3d-048",
-      "entityId": "cr:ARE",
-      "regionCode": "ARE",
+      "entityId": "cr:GEO",
+      "regionCode": "GEO",
       "entityStatus": "enabled",
       "region": "asia",
       "sex": "male",
@@ -1819,9 +1819,9 @@
         2000597885,
         3774301923
       ],
-      "digest": "9dd963516b0fe2f4dcd30e2ed4a2b0e3273326207846b72043cdaa852cfa384e",
-      "baseHazardPpm": 945,
-      "adjustedHazardPpm": 945,
+      "digest": "890649ea109de246ab08fcafd2194f030a7497d46862cfa8c7853fab5b76af73",
+      "baseHazardPpm": 1035,
+      "adjustedHazardPpm": 1035,
       "healthFactorPpm": 1000000,
       "died": false,
       "causeId": null,
@@ -1843,10 +1843,10 @@
     },
     {
       "id": "p3d-049",
-      "entityId": "cr:GMB",
-      "regionCode": "GMB",
+      "entityId": "cr:GBR",
+      "regionCode": "GBR",
       "entityStatus": "enabled",
-      "region": "africa",
+      "region": "europe",
       "sex": "female",
       "age": 0,
       "calendarYear": 2047,
@@ -1857,9 +1857,9 @@
         1125622097,
         1394472687
       ],
-      "digest": "0f5020b0e7923732b19dd0012654bb488caf89dfb93fd11fdee62c65892f83ac",
-      "baseHazardPpm": 7811,
-      "adjustedHazardPpm": 11717,
+      "digest": "1857acd95088cb137e80fa35dbba7f44fa1a5e8cf06e50defbecd5951afe0d94",
+      "baseHazardPpm": 2821,
+      "adjustedHazardPpm": 4232,
       "healthFactorPpm": 1500000,
       "died": false,
       "causeId": null,
@@ -1877,14 +1877,14 @@
         4133442976,
         4009233821
       ],
-      "regionClass": "africa"
+      "regionClass": "europe"
     },
     {
       "id": "p3d-050",
-      "entityId": "cr:RUS",
-      "regionCode": "RUS",
+      "entityId": "cr:CYP",
+      "regionCode": "CYP",
       "entityStatus": "enabled",
-      "region": "europe",
+      "region": "asia",
       "sex": "female",
       "age": 1,
       "calendarYear": 2005,
@@ -1895,9 +1895,9 @@
         4003464906,
         842631862
       ],
-      "digest": "9761d70b03be4fa8254bb99197f676cf027c45e588e86fe54d598ddc768ed506",
-      "baseHazardPpm": 1489,
-      "adjustedHazardPpm": 149,
+      "digest": "140bfe7e81c08b8176fe59cd179e21ad81b22e163b54ad005ccfc5c1fb05c935",
+      "baseHazardPpm": 1607,
+      "adjustedHazardPpm": 161,
       "healthFactorPpm": 100000,
       "died": false,
       "causeId": null,
@@ -1915,12 +1915,12 @@
         2285469980,
         706722337
       ],
-      "regionClass": "europe"
+      "regionClass": "asia"
     },
     {
       "id": "p3d-051",
-      "entityId": "cr:TGO",
-      "regionCode": "TGO",
+      "entityId": "cr:GAB",
+      "regionCode": "GAB",
       "entityStatus": "enabled",
       "region": "africa",
       "sex": "male",
@@ -1933,9 +1933,9 @@
         4282866855,
         316263788
       ],
-      "digest": "ff579381bd4e5810ba1e0042cb5f12b4bf1d6a31a541d0ca61a5b6d132c751af",
-      "baseHazardPpm": 2037,
-      "adjustedHazardPpm": 3056,
+      "digest": "04d00ee2fb87b7e37778e92ebba60b93796f44bf7f913e49dce75236b058c5db",
+      "baseHazardPpm": 1985,
+      "adjustedHazardPpm": 2978,
       "healthFactorPpm": 1500000,
       "died": false,
       "causeId": null,
@@ -1957,10 +1957,10 @@
     },
     {
       "id": "p3d-052",
-      "entityId": "cr:EGY",
-      "regionCode": "EGY",
+      "entityId": "cr:CAN",
+      "regionCode": "CAN",
       "entityStatus": "enabled",
-      "region": "africa",
+      "region": "americas",
       "sex": "female",
       "age": 14,
       "calendarYear": 2010,
@@ -1971,9 +1971,9 @@
         3585300457,
         3611517853
       ],
-      "digest": "0f627685f7333c18c7ac6efd0f803f732ebd0937d3579b300c00f976d5c01612",
-      "baseHazardPpm": 1455,
-      "adjustedHazardPpm": 146,
+      "digest": "ebe7318398387e1b6a9ab80e53efaa1c499332bb96bea087854708a7124c3371",
+      "baseHazardPpm": 945,
+      "adjustedHazardPpm": 95,
       "healthFactorPpm": 100000,
       "died": false,
       "causeId": null,
@@ -1991,14 +1991,14 @@
         4116502697,
         3892525536
       ],
-      "regionClass": "africa"
+      "regionClass": "americas"
     },
     {
       "id": "p3d-053",
-      "entityId": "cr:EGY",
-      "regionCode": "EGY",
+      "entityId": "cr:TKM",
+      "regionCode": "TKM",
       "entityStatus": "enabled",
-      "region": "africa",
+      "region": "asia",
       "sex": "male",
       "age": 45,
       "calendarYear": 2045,
@@ -2009,9 +2009,9 @@
         2646310779,
         830157439
       ],
-      "digest": "cbb1d08dc3585b58871cd8d4bf8af7dac489c3900e7381836b487106baf952a9",
-      "baseHazardPpm": 3320,
-      "adjustedHazardPpm": 332,
+      "digest": "33516f94c4c12b3a6cd15c220669956705163f308447d53d25ea827d9d1b58a7",
+      "baseHazardPpm": 2222,
+      "adjustedHazardPpm": 222,
       "healthFactorPpm": 100000,
       "died": false,
       "causeId": null,
@@ -2029,14 +2029,14 @@
         2333131640,
         3112823496
       ],
-      "regionClass": "africa"
+      "regionClass": "asia"
     },
     {
       "id": "p3d-054",
-      "entityId": "cr:PRK",
-      "regionCode": "PRK",
+      "entityId": "cr:NER",
+      "regionCode": "NER",
       "entityStatus": "enabled",
-      "region": "asia",
+      "region": "africa",
       "sex": "female",
       "age": 60,
       "calendarYear": 2033,
@@ -2047,9 +2047,9 @@
         3819531577,
         2184779042
       ],
-      "digest": "209aa7166d93136ab175bb0c0feb96a3fe9d59cf76d0cc4e55f161cca84b1aa6",
-      "baseHazardPpm": 8660,
-      "adjustedHazardPpm": 8660,
+      "digest": "c897981e7a63de4b2984388b304ba026c0ce25d81301013dbebb7ab3a478d9ea",
+      "baseHazardPpm": 14297,
+      "adjustedHazardPpm": 14297,
       "healthFactorPpm": 1000000,
       "died": false,
       "causeId": null,
@@ -2067,14 +2067,14 @@
         813093187,
         2438238737
       ],
-      "regionClass": "asia"
+      "regionClass": "africa"
     },
     {
       "id": "p3d-055",
-      "entityId": "cr:SGP",
-      "regionCode": "SGP",
+      "entityId": "cr:SLB",
+      "regionCode": "SLB",
       "entityStatus": "enabled",
-      "region": "asia",
+      "region": "oceania",
       "sex": "female",
       "age": 0,
       "calendarYear": 2036,
@@ -2085,9 +2085,9 @@
         2511616860,
         2172315263
       ],
-      "digest": "6ebeb17e794d230613ffd3df9d699d4b03fbad3cd5dd1ca7707dae9f3fd41892",
-      "baseHazardPpm": 3777,
-      "adjustedHazardPpm": 3777,
+      "digest": "f31f26fe558c146fd4b86ca7a154b1af4a5c0d1bd65af8891f080e48ca54c1c9",
+      "baseHazardPpm": 4045,
+      "adjustedHazardPpm": 4045,
       "healthFactorPpm": 1000000,
       "died": false,
       "causeId": null,
@@ -2105,12 +2105,12 @@
         2606693938,
         2154223761
       ],
-      "regionClass": "asia"
+      "regionClass": "oceania"
     },
     {
       "id": "p3d-056",
-      "entityId": "cr:BDI",
-      "regionCode": "BDI",
+      "entityId": "cr:MRT",
+      "regionCode": "MRT",
       "entityStatus": "enabled",
       "region": "africa",
       "sex": "female",
@@ -2123,9 +2123,9 @@
         254931459,
         2058150953
       ],
-      "digest": "e86fa64f3515d6f8cc3d49c7f378b2b37877c1f25c16ab31d7c9546713e52ec4",
-      "baseHazardPpm": 1576,
-      "adjustedHazardPpm": 1576,
+      "digest": "881eec5a1c201943f0929e3796d8b07564a6ea606f00991f436df5cd356d929d",
+      "baseHazardPpm": 1724,
+      "adjustedHazardPpm": 1724,
       "healthFactorPpm": 1000000,
       "died": false,
       "causeId": null,
@@ -2147,10 +2147,10 @@
     },
     {
       "id": "p3d-057",
-      "entityId": "cr:NZL",
-      "regionCode": "NZL",
+      "entityId": "cr:GAB",
+      "regionCode": "GAB",
       "entityStatus": "enabled",
-      "region": "oceania",
+      "region": "africa",
       "sex": "male",
       "age": 45,
       "calendarYear": 2027,
@@ -2161,9 +2161,9 @@
         20716180,
         948724767
       ],
-      "digest": "9fcb57467efa614318fca52c707839d339c0d09499da9083e0a28bc8492d3569",
-      "baseHazardPpm": 1656,
-      "adjustedHazardPpm": 2484,
+      "digest": "cb5dbe0e2ac9e24b35728a8ea9a82c2bb900f55c67873636c7fdc57285c0f885",
+      "baseHazardPpm": 3823,
+      "adjustedHazardPpm": 5735,
       "healthFactorPpm": 1500000,
       "died": false,
       "causeId": null,
@@ -2181,14 +2181,14 @@
         2144049969,
         2619779973
       ],
-      "regionClass": "oceania"
+      "regionClass": "africa"
     },
     {
       "id": "p3d-058",
-      "entityId": "cr:LBN",
-      "regionCode": "LBN",
+      "entityId": "cr:ZAF",
+      "regionCode": "ZAF",
       "entityStatus": "enabled",
-      "region": "asia",
+      "region": "africa",
       "sex": "female",
       "age": 120,
       "calendarYear": 2012,
@@ -2199,12 +2199,12 @@
         1990575409,
         2536436632
       ],
-      "digest": "6756fc6accb1fbb574331b3d238362da94ee83fd15b4e700429fafd295f5c290",
+      "digest": "cf408851e83997ea3bb6beb775ae14ae5c4ef29bab9b75aab15e526929312c68",
       "baseHazardPpm": 1000000,
       "adjustedHazardPpm": 1000000,
       "healthFactorPpm": 1000000,
       "died": true,
-      "causeId": "cause.neutral.neurological",
+      "causeId": "cause.neutral.neoplasm",
       "mortalityDraw": "466874",
       "drawsUsed": 4,
       "rngStateBefore": [
@@ -2219,14 +2219,14 @@
         2941177133,
         782552979
       ],
-      "regionClass": "asia"
+      "regionClass": "africa"
     },
     {
       "id": "p3d-059",
-      "entityId": "cr:PHL",
-      "regionCode": "PHL",
+      "entityId": "cr:WSM",
+      "regionCode": "WSM",
       "entityStatus": "enabled",
-      "region": "asia",
+      "region": "oceania",
       "sex": "female",
       "age": 75,
       "calendarYear": 2042,
@@ -2237,9 +2237,9 @@
         4102770836,
         1143327615
       ],
-      "digest": "fe6e2aad593594a51323c8457741369941b702a58ddd1675936a09436da64506",
-      "baseHazardPpm": 57241,
-      "adjustedHazardPpm": 28621,
+      "digest": "cd5ad4c6a8c7ff64f662f9471208cae5cabdf9e8ce4468118521af531d9d3695",
+      "baseHazardPpm": 45778,
+      "adjustedHazardPpm": 22889,
       "healthFactorPpm": 500000,
       "died": false,
       "causeId": null,
@@ -2257,14 +2257,14 @@
         2833955802,
         1080133293
       ],
-      "regionClass": "asia"
+      "regionClass": "oceania"
     },
     {
       "id": "p3d-060",
-      "entityId": "cr:GAB",
-      "regionCode": "GAB",
+      "entityId": "cr:GBR",
+      "regionCode": "GBR",
       "entityStatus": "enabled",
-      "region": "africa",
+      "region": "europe",
       "sex": "female",
       "age": 1,
       "calendarYear": 2012,
@@ -2275,9 +2275,9 @@
         3873020022,
         465327739
       ],
-      "digest": "a2b95aeacb58cbab6e4b0b59855bbf8653f093e308917469dbdc9f053cf6caa5",
-      "baseHazardPpm": 3186,
-      "adjustedHazardPpm": 6372,
+      "digest": "1de998804468db1940358ff3aaf3e04fe3ea0420d02aab9337b994f72fed897f",
+      "baseHazardPpm": 1252,
+      "adjustedHazardPpm": 2504,
       "healthFactorPpm": 2000000,
       "died": false,
       "causeId": null,
@@ -2295,14 +2295,14 @@
         4193899808,
         3677927720
       ],
-      "regionClass": "africa"
+      "regionClass": "europe"
     },
     {
       "id": "p3d-061",
-      "entityId": "cr:MUS",
-      "regionCode": "MUS",
+      "entityId": "cr:TON",
+      "regionCode": "TON",
       "entityStatus": "enabled",
-      "region": "africa",
+      "region": "oceania",
       "sex": "female",
       "age": 90,
       "calendarYear": 2044,
@@ -2313,9 +2313,9 @@
         2883732273,
         318233614
       ],
-      "digest": "edac2a355f49de967d08c6eaa1eb058baeac0164cc8ac23f21c7e979e4dae952",
-      "baseHazardPpm": 476111,
-      "adjustedHazardPpm": 238056,
+      "digest": "211dede9ec83fe820a18104472ec5cf220bfc049ca488d8a15cce59641d8ede3",
+      "baseHazardPpm": 276846,
+      "adjustedHazardPpm": 138423,
       "healthFactorPpm": 500000,
       "died": false,
       "causeId": null,
@@ -2333,12 +2333,12 @@
         3317197647,
         4165175248
       ],
-      "regionClass": "africa"
+      "regionClass": "oceania"
     },
     {
       "id": "p3d-062",
-      "entityId": "cr:BOL",
-      "regionCode": "BOL",
+      "entityId": "cr:PRY",
+      "regionCode": "PRY",
       "entityStatus": "enabled",
       "region": "americas",
       "sex": "male",
@@ -2351,9 +2351,9 @@
         815195718,
         702623045
       ],
-      "digest": "661d57f38eb247e616d9210ffc4dc15946c3588e7d843578734ffe381131ce8c",
-      "baseHazardPpm": 2406,
-      "adjustedHazardPpm": 2406,
+      "digest": "9dfb1a5732df7af574b494a46a903dd39e0f75d1040277c48276426f449103d5",
+      "baseHazardPpm": 2223,
+      "adjustedHazardPpm": 2223,
       "healthFactorPpm": 1000000,
       "died": false,
       "causeId": null,
@@ -2375,10 +2375,10 @@
     },
     {
       "id": "p3d-063",
-      "entityId": "cr:NZL",
-      "regionCode": "NZL",
+      "entityId": "cr:SGP",
+      "regionCode": "SGP",
       "entityStatus": "enabled",
-      "region": "oceania",
+      "region": "asia",
       "sex": "female",
       "age": 1,
       "calendarYear": 2031,
@@ -2389,9 +2389,9 @@
         3089301976,
         1446591215
       ],
-      "digest": "4bb7a4503ec2853fceab84b9604bde357e3d1b1df11464e7f5f97490064f6d8a",
-      "baseHazardPpm": 1949,
-      "adjustedHazardPpm": 975,
+      "digest": "eaf95cc2f67c75a3cf9b623640bc4208a02037048d230f8f782c5e9001d329e0",
+      "baseHazardPpm": 1630,
+      "adjustedHazardPpm": 815,
       "healthFactorPpm": 500000,
       "died": false,
       "causeId": null,
@@ -2409,14 +2409,14 @@
         809607163,
         950888725
       ],
-      "regionClass": "oceania"
+      "regionClass": "asia"
     },
     {
       "id": "p3d-064",
-      "entityId": "cr:MKD",
-      "regionCode": "MKD",
+      "entityId": "cr:BRN",
+      "regionCode": "BRN",
       "entityStatus": "enabled",
-      "region": "europe",
+      "region": "asia",
       "sex": "female",
       "age": 0,
       "calendarYear": 2009,
@@ -2427,9 +2427,9 @@
         523768412,
         1889078320
       ],
-      "digest": "d2263ff5c9ca5640c74022db115092e8b5b4bc0b36b573061cefa05c2f2f1b30",
-      "baseHazardPpm": 3363,
-      "adjustedHazardPpm": 5045,
+      "digest": "42990851093f08462c6e4f40e215ad191469a20daefd5e19f2f185a51a4b269b",
+      "baseHazardPpm": 3948,
+      "adjustedHazardPpm": 5922,
       "healthFactorPpm": 1500000,
       "died": false,
       "causeId": null,
@@ -2447,14 +2447,14 @@
         743048464,
         2840188260
       ],
-      "regionClass": "europe"
+      "regionClass": "asia"
     },
     {
       "id": "p3d-065",
-      "entityId": "cr:BWA",
-      "regionCode": "BWA",
+      "entityId": "cr:VNM",
+      "regionCode": "VNM",
       "entityStatus": "enabled",
-      "region": "africa",
+      "region": "asia",
       "sex": "male",
       "age": 14,
       "calendarYear": 2053,
@@ -2465,9 +2465,9 @@
         71487440,
         2403627049
       ],
-      "digest": "113a72c50ba3c63f0487802281e4dd6700f6ab0c039d6fe207dfe92a6a9da8fd",
-      "baseHazardPpm": 1756,
-      "adjustedHazardPpm": 2634,
+      "digest": "3e4ab78887ce0bd3d919733e670f7b867b3618a01d445de89f3d393597a99cae",
+      "baseHazardPpm": 1088,
+      "adjustedHazardPpm": 1632,
       "healthFactorPpm": 1500000,
       "died": false,
       "causeId": null,
@@ -2485,14 +2485,14 @@
         2598527785,
         1096276484
       ],
-      "regionClass": "africa"
+      "regionClass": "asia"
     },
     {
       "id": "p3d-066",
-      "entityId": "cr:TCD",
-      "regionCode": "TCD",
+      "entityId": "cr:URY",
+      "regionCode": "URY",
       "entityStatus": "enabled",
-      "region": "africa",
+      "region": "americas",
       "sex": "male",
       "age": 0,
       "calendarYear": 2019,
@@ -2503,9 +2503,9 @@
         3535802823,
         1141550379
       ],
-      "digest": "6bc71ba90b5a788ca7ed5b6145aab616061463f086708e8d2a394a5e19393571",
-      "baseHazardPpm": 10039,
-      "adjustedHazardPpm": 20078,
+      "digest": "6cfd7477d343c686c93ec449ae9988ee98636a1220883e3eca78dba20ea7a35e",
+      "baseHazardPpm": 5984,
+      "adjustedHazardPpm": 11968,
       "healthFactorPpm": 2000000,
       "died": false,
       "causeId": null,
@@ -2523,14 +2523,14 @@
         2272710545,
         1279080531
       ],
-      "regionClass": "africa"
+      "regionClass": "americas"
     },
     {
       "id": "p3d-067",
-      "entityId": "cr:POL",
-      "regionCode": "POL",
+      "entityId": "cr:MWI",
+      "regionCode": "MWI",
       "entityStatus": "enabled",
-      "region": "europe",
+      "region": "africa",
       "sex": "male",
       "age": 120,
       "calendarYear": 2001,
@@ -2541,12 +2541,12 @@
         2231782688,
         602259035
       ],
-      "digest": "083d7602cab625a6a98b0af850bc19774688c5326b53406d05af218fd36a0a6f",
-      "baseHazardPpm": 1000000,
+      "digest": "7b3f3002d3592cdceb06914c707767e37598c15b6f4f4127735192bf67b9c3fc",
+      "baseHazardPpm": 981000,
       "adjustedHazardPpm": 1000000,
       "healthFactorPpm": 2000000,
       "died": true,
-      "causeId": "cause.neutral.circulatory",
+      "causeId": "cause.neutral.neurological",
       "mortalityDraw": "5454",
       "drawsUsed": 4,
       "rngStateBefore": [
@@ -2561,12 +2561,12 @@
         3691711046,
         3849913253
       ],
-      "regionClass": "europe"
+      "regionClass": "africa"
     },
     {
       "id": "p3d-068",
-      "entityId": "cr:BDI",
-      "regionCode": "BDI",
+      "entityId": "cr:ZMB",
+      "regionCode": "ZMB",
       "entityStatus": "enabled",
       "region": "africa",
       "sex": "female",
@@ -2579,9 +2579,9 @@
         2722736963,
         1194012640
       ],
-      "digest": "df23088ecd4edb68d1ebb5867c44736f7a7aa9d9c8730da56d8e903336fc3b01",
-      "baseHazardPpm": 3096,
-      "adjustedHazardPpm": 310,
+      "digest": "2bc40346bb232a24418954f2270374fcb51de17e1e95fef82f95cc459396312f",
+      "baseHazardPpm": 2727,
+      "adjustedHazardPpm": 273,
       "healthFactorPpm": 100000,
       "died": false,
       "causeId": null,
@@ -2603,10 +2603,10 @@
     },
     {
       "id": "p3d-069",
-      "entityId": "cr:SGP",
-      "regionCode": "SGP",
+      "entityId": "cr:GHA",
+      "regionCode": "GHA",
       "entityStatus": "enabled",
-      "region": "asia",
+      "region": "africa",
       "sex": "female",
       "age": 30,
       "calendarYear": 2004,
@@ -2617,9 +2617,9 @@
         521221206,
         986643269
       ],
-      "digest": "81c935f9f30667fce4c62ef091203766e362541e2ae39d50b87f7f53d6dc73ba",
-      "baseHazardPpm": 886,
-      "adjustedHazardPpm": 1329,
+      "digest": "2533d4958bf981ea63ea273cb21dbd99ab1ad5fc8c0469003a3d0de7728b770f",
+      "baseHazardPpm": 2013,
+      "adjustedHazardPpm": 3020,
       "healthFactorPpm": 1500000,
       "died": false,
       "causeId": null,
@@ -2637,14 +2637,14 @@
         1865317921,
         2285060679
       ],
-      "regionClass": "asia"
+      "regionClass": "africa"
     },
     {
       "id": "p3d-070",
-      "entityId": "cr:TLS",
-      "regionCode": "TLS",
+      "entityId": "cr:MEX",
+      "regionCode": "MEX",
       "entityStatus": "enabled",
-      "region": "asia",
+      "region": "americas",
       "sex": "male",
       "age": 1,
       "calendarYear": 2014,
@@ -2655,9 +2655,9 @@
         3416704218,
         1444935958
       ],
-      "digest": "fb80f0db44563e17da1d318763ea3fe2a8e759dc2894ab71c6e96ce2d7b430f8",
-      "baseHazardPpm": 2144,
-      "adjustedHazardPpm": 2144,
+      "digest": "eabf1a95a12b9e62923fcd8c0ca3ff4811bcc887d8d93db66f4a7e4e11e96448",
+      "baseHazardPpm": 2950,
+      "adjustedHazardPpm": 2950,
       "healthFactorPpm": 1000000,
       "died": false,
       "causeId": null,
@@ -2675,14 +2675,14 @@
         2916419306,
         1163736722
       ],
-      "regionClass": "asia"
+      "regionClass": "americas"
     },
     {
       "id": "p3d-071",
-      "entityId": "cr:MOZ",
-      "regionCode": "MOZ",
+      "entityId": "cr:LUX",
+      "regionCode": "LUX",
       "entityStatus": "enabled",
-      "region": "africa",
+      "region": "europe",
       "sex": "male",
       "age": 15,
       "calendarYear": 2055,
@@ -2693,9 +2693,9 @@
         3759585524,
         1960830773
       ],
-      "digest": "03f08fc14bec61079d38016fd0b581902935531527659d162fce036c8b4a239e",
-      "baseHazardPpm": 1740,
-      "adjustedHazardPpm": 2610,
+      "digest": "ac8a05ad1793e8b7d7627c76a07441cce8ecb2945f88af1518a2399701675f17",
+      "baseHazardPpm": 787,
+      "adjustedHazardPpm": 1181,
       "healthFactorPpm": 1500000,
       "died": false,
       "causeId": null,
@@ -2713,14 +2713,14 @@
         994960370,
         1730263656
       ],
-      "regionClass": "africa"
+      "regionClass": "europe"
     },
     {
       "id": "p3d-072",
-      "entityId": "cr:IRL",
-      "regionCode": "IRL",
+      "entityId": "cr:CIV",
+      "regionCode": "CIV",
       "entityStatus": "enabled",
-      "region": "europe",
+      "region": "africa",
       "sex": "male",
       "age": 120,
       "calendarYear": 2039,
@@ -2731,9 +2731,9 @@
         3508956342,
         294629188
       ],
-      "digest": "ca911614e03b1d5c98518d3a223a021a6c8fac310da0312fc7accf253f1e96ed",
-      "baseHazardPpm": 1000000,
-      "adjustedHazardPpm": 500000,
+      "digest": "141bd51d053896cf8458df8f547c848256db0a3394c92141b36a2e36c424490d",
+      "baseHazardPpm": 983000,
+      "adjustedHazardPpm": 491500,
       "healthFactorPpm": 500000,
       "died": true,
       "causeId": "cause.neutral.neoplasm",
@@ -2751,14 +2751,14 @@
         3385277779,
         3180840652
       ],
-      "regionClass": "europe"
+      "regionClass": "africa"
     },
     {
       "id": "p3d-073",
-      "entityId": "cr:ARE",
-      "regionCode": "ARE",
+      "entityId": "cr:LUX",
+      "regionCode": "LUX",
       "entityStatus": "enabled",
-      "region": "asia",
+      "region": "europe",
       "sex": "female",
       "age": 0,
       "calendarYear": 2020,
@@ -2769,9 +2769,9 @@
         336835126,
         1176487379
       ],
-      "digest": "c5725320ea8003c446135f75e2c9f7cd3421323cc26fe8ab6399dc95c73db946",
-      "baseHazardPpm": 3906,
-      "adjustedHazardPpm": 391,
+      "digest": "0bd2f4a67560a3611503169ff2d49947603479704f9213eef880b731b6d5f4d3",
+      "baseHazardPpm": 2777,
+      "adjustedHazardPpm": 278,
       "healthFactorPpm": 100000,
       "died": false,
       "causeId": null,
@@ -2789,14 +2789,14 @@
         3377554720,
         2864157744
       ],
-      "regionClass": "asia"
+      "regionClass": "europe"
     },
     {
       "id": "p3d-074",
-      "entityId": "cr:URY",
-      "regionCode": "URY",
+      "entityId": "cr:SOM",
+      "regionCode": "SOM",
       "entityStatus": "enabled",
-      "region": "americas",
+      "region": "africa",
       "sex": "male",
       "age": 14,
       "calendarYear": 2053,
@@ -2807,9 +2807,9 @@
         3865946674,
         3695578513
       ],
-      "digest": "01aea3dc28e046d592177844e1764ca74993a6bcff8d23537d464f1dea91b6ea",
-      "baseHazardPpm": 1265,
-      "adjustedHazardPpm": 1265,
+      "digest": "1238a9157ef3797053517895bf8331a8eb040cc420adc3655c7cd8184e686e70",
+      "baseHazardPpm": 1844,
+      "adjustedHazardPpm": 1844,
       "healthFactorPpm": 1000000,
       "died": false,
       "causeId": null,
@@ -2827,14 +2827,14 @@
         223651592,
         170888239
       ],
-      "regionClass": "americas"
+      "regionClass": "africa"
     },
     {
       "id": "p3d-075",
-      "entityId": "cr:TUR",
-      "regionCode": "TUR",
+      "entityId": "cr:DNK",
+      "regionCode": "DNK",
       "entityStatus": "enabled",
-      "region": "asia",
+      "region": "europe",
       "sex": "male",
       "age": 90,
       "calendarYear": 2028,
@@ -2845,9 +2845,9 @@
         2984270605,
         325503408
       ],
-      "digest": "bdb516764f6eb4b3cb072727d3a6a24ef2bd3fe345a89144e9ee4cf49c0ce276",
-      "baseHazardPpm": 326010,
-      "adjustedHazardPpm": 326010,
+      "digest": "877fdc8f6f05fc48e42055c9a93f2a07021243046b9d53571d2b12f35616666b",
+      "baseHazardPpm": 258518,
+      "adjustedHazardPpm": 258518,
       "healthFactorPpm": 1000000,
       "died": false,
       "causeId": null,
@@ -2865,14 +2865,14 @@
         242896808,
         2901700769
       ],
-      "regionClass": "asia"
+      "regionClass": "europe"
     },
     {
       "id": "p3d-076",
-      "entityId": "cr:TKM",
-      "regionCode": "TKM",
+      "entityId": "cr:DNK",
+      "regionCode": "DNK",
       "entityStatus": "enabled",
-      "region": "asia",
+      "region": "europe",
       "sex": "male",
       "age": 5,
       "calendarYear": 2019,
@@ -2883,9 +2883,9 @@
         2734706900,
         4149009300
       ],
-      "digest": "12adcfc9a98861723b4591b28ef96f57a8926b427e5db75d93f08255897a4fe5",
-      "baseHazardPpm": 1392,
-      "adjustedHazardPpm": 1392,
+      "digest": "57c55020b283ed01a8cd25a5b07c841beefb792005774f44dd23e686ebc753eb",
+      "baseHazardPpm": 948,
+      "adjustedHazardPpm": 948,
       "healthFactorPpm": 1000000,
       "died": false,
       "causeId": null,
@@ -2903,14 +2903,14 @@
         2364769069,
         796880914
       ],
-      "regionClass": "asia"
+      "regionClass": "europe"
     },
     {
       "id": "p3d-077",
-      "entityId": "cr:THA",
-      "regionCode": "THA",
+      "entityId": "cr:MNE",
+      "regionCode": "MNE",
       "entityStatus": "enabled",
-      "region": "asia",
+      "region": "europe",
       "sex": "female",
       "age": 14,
       "calendarYear": 2056,
@@ -2921,9 +2921,9 @@
         3072549690,
         791904798
       ],
-      "digest": "f76f07af784d5a4daaf04fa477f3eefaacf6392c262d91454ba9d656d46ab044",
-      "baseHazardPpm": 940,
-      "adjustedHazardPpm": 1880,
+      "digest": "630a80b0c1df71f98014bbdb7b4edaa8e99b689d6ede81855d925115e39aa162",
+      "baseHazardPpm": 598,
+      "adjustedHazardPpm": 1196,
       "healthFactorPpm": 2000000,
       "died": false,
       "causeId": null,
@@ -2941,14 +2941,14 @@
         4158066956,
         1368127144
       ],
-      "regionClass": "asia"
+      "regionClass": "europe"
     },
     {
       "id": "p3d-078",
-      "entityId": "cr:BFA",
-      "regionCode": "BFA",
+      "entityId": "cr:GTM",
+      "regionCode": "GTM",
       "entityStatus": "enabled",
-      "region": "africa",
+      "region": "americas",
       "sex": "male",
       "age": 75,
       "calendarYear": 2048,
@@ -2959,9 +2959,9 @@
         1048862485,
         1899270550
       ],
-      "digest": "a37b02a77b4f58bca4c20c46c686aecf169c5b0e3ead87fe85af8702ec314f1c",
-      "baseHazardPpm": 109542,
-      "adjustedHazardPpm": 109542,
+      "digest": "111af19c7fcb03c4767da9cb48b0923d9eda3ebc715f8cc7c8c218eb3679b638",
+      "baseHazardPpm": 71127,
+      "adjustedHazardPpm": 71127,
       "healthFactorPpm": 1000000,
       "died": false,
       "causeId": null,
@@ -2979,14 +2979,14 @@
         674697829,
         3398169780
       ],
-      "regionClass": "africa"
+      "regionClass": "americas"
     },
     {
       "id": "p3d-079",
-      "entityId": "cr:KHM",
-      "regionCode": "KHM",
+      "entityId": "cr:LBR",
+      "regionCode": "LBR",
       "entityStatus": "enabled",
-      "region": "asia",
+      "region": "africa",
       "sex": "female",
       "age": 30,
       "calendarYear": 2045,
@@ -2997,9 +2997,9 @@
         712089786,
         2745781456
       ],
-      "digest": "01da673c3ce053f9ecb5613195f73b1da26c80d09cbc4a1f4eac41d41c680d08",
-      "baseHazardPpm": 1024,
-      "adjustedHazardPpm": 2048,
+      "digest": "2bb0afae3a1d918dc1de5fc92299f1e6982ae1dc4d7413cd413ae10242c23d1d",
+      "baseHazardPpm": 1925,
+      "adjustedHazardPpm": 3850,
       "healthFactorPpm": 2000000,
       "died": false,
       "causeId": null,
@@ -3017,14 +3017,14 @@
         789156457,
         3301593962
       ],
-      "regionClass": "asia"
+      "regionClass": "africa"
     },
     {
       "id": "p3d-080",
-      "entityId": "cr:PRK",
-      "regionCode": "PRK",
+      "entityId": "cr:SVN",
+      "regionCode": "SVN",
       "entityStatus": "enabled",
-      "region": "asia",
+      "region": "europe",
       "sex": "male",
       "age": 0,
       "calendarYear": 2025,
@@ -3035,9 +3035,9 @@
         575426897,
         543884987
       ],
-      "digest": "6e45abcd3368eba57c94d3a1a4d25b54151fa63b153c3d4948c47e1a2fd62df4",
-      "baseHazardPpm": 5439,
-      "adjustedHazardPpm": 8159,
+      "digest": "aac73c6f327a1ba7f48dbb75872f487308526915973f3de8e1582c36f6e1d1e4",
+      "baseHazardPpm": 3807,
+      "adjustedHazardPpm": 5711,
       "healthFactorPpm": 1500000,
       "died": false,
       "causeId": null,
@@ -3055,14 +3055,14 @@
         3279593832,
         969902149
       ],
-      "regionClass": "asia"
+      "regionClass": "europe"
     },
     {
       "id": "p3d-081",
-      "entityId": "cr:JOR",
-      "regionCode": "JOR",
+      "entityId": "cr:NAM",
+      "regionCode": "NAM",
       "entityStatus": "enabled",
-      "region": "asia",
+      "region": "africa",
       "sex": "male",
       "age": 15,
       "calendarYear": 2001,
@@ -3073,9 +3073,9 @@
         3884582397,
         469722104
       ],
-      "digest": "8d826210685a42dd792d8ba7fee8b7e26afef4f95aec6f3600cc1532e927437f",
-      "baseHazardPpm": 985,
-      "adjustedHazardPpm": 985,
+      "digest": "cebad171614f99d1b45052251e22c960b9ce0b364b2641b020b1685ad312b0c4",
+      "baseHazardPpm": 1794,
+      "adjustedHazardPpm": 1794,
       "healthFactorPpm": 1000000,
       "died": false,
       "causeId": null,
@@ -3093,14 +3093,14 @@
         3648004338,
         4015223754
       ],
-      "regionClass": "asia"
+      "regionClass": "africa"
     },
     {
       "id": "p3d-082",
-      "entityId": "cr:ARE",
-      "regionCode": "ARE",
+      "entityId": "cr:PRY",
+      "regionCode": "PRY",
       "entityStatus": "enabled",
-      "region": "asia",
+      "region": "americas",
       "sex": "male",
       "age": 0,
       "calendarYear": 2047,
@@ -3111,9 +3111,9 @@
         1556126492,
         1694486569
       ],
-      "digest": "599bf332d7e3fca0715a4cd47d04e33f10dc68312273bb6c0ebf9618449a8c41",
-      "baseHazardPpm": 4988,
-      "adjustedHazardPpm": 499,
+      "digest": "636c8cf84c426d82662049655c2d22749493ef6038357be89273e577e110cc70",
+      "baseHazardPpm": 6217,
+      "adjustedHazardPpm": 622,
       "healthFactorPpm": 100000,
       "died": false,
       "causeId": null,
@@ -3131,14 +3131,14 @@
         1740269443,
         2119663374
       ],
-      "regionClass": "asia"
+      "regionClass": "americas"
     },
     {
       "id": "p3d-083",
-      "entityId": "cr:TZA",
-      "regionCode": "TZA",
+      "entityId": "cr:TKM",
+      "regionCode": "TKM",
       "entityStatus": "enabled",
-      "region": "africa",
+      "region": "asia",
       "sex": "male",
       "age": 15,
       "calendarYear": 2031,
@@ -3149,9 +3149,9 @@
         1797712895,
         1552062320
       ],
-      "digest": "694e704686040782c5f3b0bd53ec23892627061e9fd4fe6355b29fd0cfafec8d",
-      "baseHazardPpm": 2045,
-      "adjustedHazardPpm": 4090,
+      "digest": "5b19b01220b157a48952aabce30f798167807c6552b643acdba4fd73cb0dc757",
+      "baseHazardPpm": 1138,
+      "adjustedHazardPpm": 2276,
       "healthFactorPpm": 2000000,
       "died": false,
       "causeId": null,
@@ -3169,14 +3169,14 @@
         2468076538,
         2320763385
       ],
-      "regionClass": "africa"
+      "regionClass": "asia"
     },
     {
       "id": "p3d-084",
-      "entityId": "cr:AGO",
-      "regionCode": "AGO",
+      "entityId": "cr:WSM",
+      "regionCode": "WSM",
       "entityStatus": "enabled",
-      "region": "africa",
+      "region": "oceania",
       "sex": "male",
       "age": 30,
       "calendarYear": 2027,
@@ -3187,9 +3187,9 @@
         2038138536,
         178712054
       ],
-      "digest": "b989af32547e4a119de1e0912fce65a6f18a56fac0407ceed20976f910778fcd",
-      "baseHazardPpm": 2181,
-      "adjustedHazardPpm": 3272,
+      "digest": "c0d87127d497fe9a1df4f6c28c6cab0000781a36041e265a4089add74c254833",
+      "baseHazardPpm": 1256,
+      "adjustedHazardPpm": 1884,
       "healthFactorPpm": 1500000,
       "died": false,
       "causeId": null,
@@ -3207,14 +3207,14 @@
         3504112353,
         349117669
       ],
-      "regionClass": "africa"
+      "regionClass": "oceania"
     },
     {
       "id": "p3d-085",
-      "entityId": "cr:ITA",
-      "regionCode": "ITA",
+      "entityId": "cr:BRN",
+      "regionCode": "BRN",
       "entityStatus": "enabled",
-      "region": "europe",
+      "region": "asia",
       "sex": "female",
       "age": 120,
       "calendarYear": 2049,
@@ -3225,12 +3225,12 @@
         728575815,
         4173692615
       ],
-      "digest": "e09d570b3d75d41463c91b7dba1c9639bfa8cd83a716a3e03766a597f9dd5fa5",
+      "digest": "579f205bfb999b9132afc93ff1e39387944bed9d77a478757289c9b2f5f41ee3",
       "baseHazardPpm": 1000000,
       "adjustedHazardPpm": 1000000,
       "healthFactorPpm": 1500000,
       "died": true,
-      "causeId": "cause.neutral.circulatory",
+      "causeId": "cause.neutral.neurological",
       "mortalityDraw": "236545",
       "drawsUsed": 4,
       "rngStateBefore": [
@@ -3245,12 +3245,12 @@
         1197503990,
         2539613504
       ],
-      "regionClass": "europe"
+      "regionClass": "asia"
     },
     {
       "id": "p3d-086",
-      "entityId": "cr:IDN",
-      "regionCode": "IDN",
+      "entityId": "cr:GEO",
+      "regionCode": "GEO",
       "entityStatus": "enabled",
       "region": "asia",
       "sex": "male",
@@ -3263,9 +3263,9 @@
         2005981663,
         1465857600
       ],
-      "digest": "b50b35b9716d8d1b6732b68233f675966a5e668bee775e94539119413bd90e57",
-      "baseHazardPpm": 1075,
-      "adjustedHazardPpm": 1075,
+      "digest": "8ee6bc0723f531b51ff6c91d9b64a0c84df1e5ffbb03ca4b70166b69e7fae205",
+      "baseHazardPpm": 1169,
+      "adjustedHazardPpm": 1169,
       "healthFactorPpm": 1000000,
       "died": false,
       "causeId": null,
@@ -3287,10 +3287,10 @@
     },
     {
       "id": "p3d-087",
-      "entityId": "cr:GAB",
-      "regionCode": "GAB",
+      "entityId": "cr:PER",
+      "regionCode": "PER",
       "entityStatus": "enabled",
-      "region": "africa",
+      "region": "americas",
       "sex": "male",
       "age": 90,
       "calendarYear": 2017,
@@ -3301,9 +3301,9 @@
         886419697,
         2236630961
       ],
-      "digest": "30897b5fe57b60208d3ef4c3aa81c7cb4d62849b5552909b6ea8369512c3f7f4",
-      "baseHazardPpm": 662320,
-      "adjustedHazardPpm": 66232,
+      "digest": "1f8f2b08e14aa5e1af0677b98d24581cabd59a1b4d2c54dc34e8c254c1f2bbe4",
+      "baseHazardPpm": 409314,
+      "adjustedHazardPpm": 40931,
       "healthFactorPpm": 100000,
       "died": false,
       "causeId": null,
@@ -3321,14 +3321,14 @@
         3861062829,
         2095140089
       ],
-      "regionClass": "africa"
+      "regionClass": "americas"
     },
     {
       "id": "p3d-088",
-      "entityId": "cr:OMN",
-      "regionCode": "OMN",
+      "entityId": "cr:LUX",
+      "regionCode": "LUX",
       "entityStatus": "enabled",
-      "region": "asia",
+      "region": "europe",
       "sex": "male",
       "age": 1,
       "calendarYear": 2031,
@@ -3339,9 +3339,9 @@
         2517302233,
         46727190
       ],
-      "digest": "6ca7e999f42849b71532ed045757994a56137e35a58365e2869375e11572c3ae",
-      "baseHazardPpm": 2118,
-      "adjustedHazardPpm": 2118,
+      "digest": "feb0a27ce52aeefd8d1c720f07ddcb17a9b01041448a2069de03e07b427ddf42",
+      "baseHazardPpm": 1647,
+      "adjustedHazardPpm": 1647,
       "healthFactorPpm": 1000000,
       "died": false,
       "causeId": null,
@@ -3359,14 +3359,14 @@
         2586706648,
         1624532238
       ],
-      "regionClass": "asia"
+      "regionClass": "europe"
     },
     {
       "id": "p3d-089",
-      "entityId": "cr:NAM",
-      "regionCode": "NAM",
+      "entityId": "cr:ITA",
+      "regionCode": "ITA",
       "entityStatus": "enabled",
-      "region": "africa",
+      "region": "europe",
       "sex": "male",
       "age": 45,
       "calendarYear": 2043,
@@ -3377,9 +3377,9 @@
         2702322056,
         4157402256
       ],
-      "digest": "42e7f23df327fa422b0fc3c0995b23668538578741a1c7f7aed4167b9948533e",
-      "baseHazardPpm": 3289,
-      "adjustedHazardPpm": 4934,
+      "digest": "adecc6c212b5d26447e0124b5aaf7827e9f0798e55904ff09c0c33c336456d81",
+      "baseHazardPpm": 1412,
+      "adjustedHazardPpm": 2118,
       "healthFactorPpm": 1500000,
       "died": false,
       "causeId": null,
@@ -3397,14 +3397,14 @@
         635168384,
         1837052488
       ],
-      "regionClass": "africa"
+      "regionClass": "europe"
     },
     {
       "id": "p3d-090",
-      "entityId": "cr:MKD",
-      "regionCode": "MKD",
+      "entityId": "cr:NPL",
+      "regionCode": "NPL",
       "entityStatus": "enabled",
-      "region": "europe",
+      "region": "asia",
       "sex": "male",
       "age": 15,
       "calendarYear": 2048,
@@ -3415,9 +3415,9 @@
         4066194647,
         3485764302
       ],
-      "digest": "eeb20df5621fea50ebc70fa0ad4cd51cf3e8c9fc37fc3743cb2445e3d4f7b48b",
-      "baseHazardPpm": 818,
-      "adjustedHazardPpm": 1636,
+      "digest": "b76516f39ef501f19c7cc6c2fe28b0ebe85177a37fd62a656ac52a202bc11161",
+      "baseHazardPpm": 973,
+      "adjustedHazardPpm": 1946,
       "healthFactorPpm": 2000000,
       "died": false,
       "causeId": null,
@@ -3435,14 +3435,14 @@
         3555099487,
         644064379
       ],
-      "regionClass": "europe"
+      "regionClass": "asia"
     },
     {
       "id": "p3d-091",
-      "entityId": "cr:ZMB",
-      "regionCode": "ZMB",
+      "entityId": "cr:PAN",
+      "regionCode": "PAN",
       "entityStatus": "enabled",
-      "region": "africa",
+      "region": "americas",
       "sex": "female",
       "age": 5,
       "calendarYear": 2010,
@@ -3453,9 +3453,9 @@
         2183848146,
         1677270892
       ],
-      "digest": "f8e41234c26c5393ade5a2e3ec46a8e7d79c8eaed5e5347d90dd1925d2284c77",
-      "baseHazardPpm": 1677,
-      "adjustedHazardPpm": 168,
+      "digest": "eab0315a7467dce1bd9c5868cdf8e399760440a437292c107dbb5760c219fe3a",
+      "baseHazardPpm": 1145,
+      "adjustedHazardPpm": 115,
       "healthFactorPpm": 100000,
       "died": false,
       "causeId": null,
@@ -3473,14 +3473,14 @@
         2148305159,
         2456938548
       ],
-      "regionClass": "africa"
+      "regionClass": "americas"
     },
     {
       "id": "p3d-092",
-      "entityId": "cr:YEM",
-      "regionCode": "YEM",
+      "entityId": "cr:SEN",
+      "regionCode": "SEN",
       "entityStatus": "enabled",
-      "region": "asia",
+      "region": "africa",
       "sex": "female",
       "age": 120,
       "calendarYear": 2002,
@@ -3491,12 +3491,12 @@
         1600795253,
         3109148105
       ],
-      "digest": "c2e6063299550026823e6da663bf0971398fb9f90827e95bbf51035bf8e14453",
-      "baseHazardPpm": 993000,
+      "digest": "99152ca2a17739e9e47b2fd030d0eb0d34e932eed7e9d530d4c6719f96cd0123",
+      "baseHazardPpm": 1000000,
       "adjustedHazardPpm": 1000000,
       "healthFactorPpm": 2000000,
       "died": true,
-      "causeId": "cause.neutral.circulatory",
+      "causeId": "cause.neutral.neurological",
       "mortalityDraw": "138433",
       "drawsUsed": 4,
       "rngStateBefore": [
@@ -3511,14 +3511,14 @@
         3903342612,
         405165009
       ],
-      "regionClass": "asia"
+      "regionClass": "africa"
     },
     {
       "id": "p3d-093",
-      "entityId": "cr:EST",
-      "regionCode": "EST",
+      "entityId": "cr:LBR",
+      "regionCode": "LBR",
       "entityStatus": "enabled",
-      "region": "europe",
+      "region": "africa",
       "sex": "female",
       "age": 75,
       "calendarYear": 2054,
@@ -3529,9 +3529,9 @@
         74203331,
         2197886006
       ],
-      "digest": "bbd39f95c0d382a626f4a857c78c24491291d153b41c8b7b84fe6d2ef9573e6c",
-      "baseHazardPpm": 38358,
-      "adjustedHazardPpm": 57537,
+      "digest": "7e60596a1f8561c18a61604eb939611f53d3ec03f9a9089a5e55bc4654afc562",
+      "baseHazardPpm": 101932,
+      "adjustedHazardPpm": 152898,
       "healthFactorPpm": 1500000,
       "died": false,
       "causeId": null,
@@ -3549,14 +3549,14 @@
         2016109520,
         905095164
       ],
-      "regionClass": "europe"
+      "regionClass": "africa"
     },
     {
       "id": "p3d-094",
-      "entityId": "cr:ISL",
-      "regionCode": "ISL",
+      "entityId": "cr:URY",
+      "regionCode": "URY",
       "entityStatus": "enabled",
-      "region": "europe",
+      "region": "americas",
       "sex": "male",
       "age": 90,
       "calendarYear": 2012,
@@ -3567,12 +3567,12 @@
         1884040426,
         4259632342
       ],
-      "digest": "75d4642dac9d2fcba2a99f529c8631cef19a5af034c8a95ddab777ea2c9bb802",
-      "baseHazardPpm": 262964,
-      "adjustedHazardPpm": 525928,
+      "digest": "ab173159497cb419497bc6044ab6da580df707b5d12be96e58b5926f6bd99c9c",
+      "baseHazardPpm": 402992,
+      "adjustedHazardPpm": 805984,
       "healthFactorPpm": 2000000,
       "died": true,
-      "causeId": "cause.neutral.circulatory",
+      "causeId": "cause.neutral.digestive",
       "mortalityDraw": "457179",
       "drawsUsed": 4,
       "rngStateBefore": [
@@ -3587,14 +3587,14 @@
         4234114448,
         2960085739
       ],
-      "regionClass": "europe"
+      "regionClass": "americas"
     },
     {
       "id": "p3d-095",
-      "entityId": "cr:LVA",
-      "regionCode": "LVA",
+      "entityId": "cr:MNG",
+      "regionCode": "MNG",
       "entityStatus": "enabled",
-      "region": "europe",
+      "region": "asia",
       "sex": "male",
       "age": 120,
       "calendarYear": 2019,
@@ -3605,12 +3605,12 @@
         3031536700,
         637108222
       ],
-      "digest": "2e431b81be6cea2006b9306c94baa96d2c90124a4b3fbdbb332e934c76facc06",
-      "baseHazardPpm": 997000,
+      "digest": "edf522a596c488a04cc5b1399f6c6708ae24183365a0efde7c1935a6701419e7",
+      "baseHazardPpm": 1000000,
       "adjustedHazardPpm": 1000000,
       "healthFactorPpm": 2000000,
       "died": true,
-      "causeId": "cause.neutral.circulatory",
+      "causeId": "cause.neutral.respiratory",
       "mortalityDraw": "78042",
       "drawsUsed": 4,
       "rngStateBefore": [
@@ -3625,14 +3625,14 @@
         4179826070,
         1906642110
       ],
-      "regionClass": "europe"
+      "regionClass": "asia"
     },
     {
       "id": "p3d-096",
-      "entityId": "cr:ZWE",
-      "regionCode": "ZWE",
+      "entityId": "cr:LBN",
+      "regionCode": "LBN",
       "entityStatus": "enabled",
-      "region": "africa",
+      "region": "asia",
       "sex": "male",
       "age": 0,
       "calendarYear": 2016,
@@ -3643,9 +3643,9 @@
         2857122991,
         1420372888
       ],
-      "digest": "b4d4358395f00d2fa955d88376e7aebd0d3de62a36db1594f135a5de25189c6e",
-      "baseHazardPpm": 8826,
-      "adjustedHazardPpm": 883,
+      "digest": "60516b85ec48737c75e42a9b566ea129028b2bf5df5ee8dc4572705f9137e29c",
+      "baseHazardPpm": 5860,
+      "adjustedHazardPpm": 586,
       "healthFactorPpm": 100000,
       "died": false,
       "causeId": null,
@@ -3663,14 +3663,14 @@
         3645267256,
         196942390
       ],
-      "regionClass": "africa"
+      "regionClass": "asia"
     },
     {
       "id": "p3d-097",
-      "entityId": "cr:GBR",
-      "regionCode": "GBR",
+      "entityId": "cr:QAT",
+      "regionCode": "QAT",
       "entityStatus": "enabled",
-      "region": "europe",
+      "region": "asia",
       "sex": "female",
       "age": 75,
       "calendarYear": 2045,
@@ -3681,9 +3681,9 @@
         2931916167,
         1215644602
       ],
-      "digest": "0619ecf9e3db12a9d13e74fea0772b570ee1121887256553b3045469d389d37b",
-      "baseHazardPpm": 35526,
-      "adjustedHazardPpm": 35526,
+      "digest": "764bba1a9682b3f71c7814d2932ec32802e8ef917586674324036321be56a508",
+      "baseHazardPpm": 46665,
+      "adjustedHazardPpm": 46665,
       "healthFactorPpm": 1000000,
       "died": false,
       "causeId": null,
@@ -3701,14 +3701,14 @@
         1876945339,
         641487029
       ],
-      "regionClass": "europe"
+      "regionClass": "asia"
     },
     {
       "id": "p3d-098",
-      "entityId": "cr:QAT",
-      "regionCode": "QAT",
+      "entityId": "cr:SVN",
+      "regionCode": "SVN",
       "entityStatus": "enabled",
-      "region": "asia",
+      "region": "europe",
       "sex": "female",
       "age": 15,
       "calendarYear": 2026,
@@ -3719,9 +3719,9 @@
         4010511225,
         488608568
       ],
-      "digest": "6c669d2505d3376474d2680d207929375515f56afa035cc2b6077e0912b0ea9a",
-      "baseHazardPpm": 787,
-      "adjustedHazardPpm": 1574,
+      "digest": "9c252e7643f9ebb2077e17a33b89523d5ca879ec625a625c9ee8bd02e99de724",
+      "baseHazardPpm": 553,
+      "adjustedHazardPpm": 1106,
       "healthFactorPpm": 2000000,
       "died": false,
       "causeId": null,
@@ -3739,14 +3739,14 @@
         2202702940,
         1752670847
       ],
-      "regionClass": "asia"
+      "regionClass": "europe"
     },
     {
       "id": "p3d-099",
-      "entityId": "cr:SSD",
-      "regionCode": "SSD",
+      "entityId": "cr:AFG",
+      "regionCode": "AFG",
       "entityStatus": "enabled",
-      "region": "africa",
+      "region": "asia",
       "sex": "male",
       "age": 0,
       "calendarYear": 2033,
@@ -3757,9 +3757,9 @@
         4069630818,
         903568095
       ],
-      "digest": "f185e84b00b1e938fa47156250767e9c3af8f5b25ea8cc5411c5fe91eab89da4",
-      "baseHazardPpm": 9845,
-      "adjustedHazardPpm": 14768,
+      "digest": "35ae58bcbf32a10934e5d8649ab90393db351f6cde63e92b09b66825c96a0fc1",
+      "baseHazardPpm": 4797,
+      "adjustedHazardPpm": 7196,
       "healthFactorPpm": 1500000,
       "died": false,
       "causeId": null,
@@ -3777,14 +3777,14 @@
         964141384,
         1841741956
       ],
-      "regionClass": "africa"
+      "regionClass": "asia"
     },
     {
       "id": "p3d-100",
-      "entityId": "cr:CPV",
-      "regionCode": "CPV",
+      "entityId": "cr:DEU",
+      "regionCode": "DEU",
       "entityStatus": "enabled",
-      "region": "africa",
+      "region": "europe",
       "sex": "male",
       "age": 30,
       "calendarYear": 2035,
@@ -3795,9 +3795,9 @@
         2461724943,
         3904150433
       ],
-      "digest": "2e4c4f04d1b89e00558fc484a093207a31dec3c19b1475cbd590516615fa4ee9",
-      "baseHazardPpm": 2334,
-      "adjustedHazardPpm": 4668,
+      "digest": "657c1ee27279bad6fd12013cd6bba3bce0eadc5304306cff144fb257b951cee2",
+      "baseHazardPpm": 842,
+      "adjustedHazardPpm": 1684,
       "healthFactorPpm": 2000000,
       "died": false,
       "causeId": null,
@@ -3815,14 +3815,14 @@
         880727305,
         3061985319
       ],
-      "regionClass": "africa"
+      "regionClass": "europe"
     },
     {
       "id": "p3d-101",
-      "entityId": "cr:IRN",
-      "regionCode": "IRN",
+      "entityId": "cr:VEN",
+      "regionCode": "VEN",
       "entityStatus": "enabled",
-      "region": "asia",
+      "region": "americas",
       "sex": "female",
       "age": 120,
       "calendarYear": 2043,
@@ -3833,7 +3833,7 @@
         3486847393,
         1531955768
       ],
-      "digest": "ad57e3567bce58f63d9508ebb006c6667df543ae444604e7d7a0fe1fbe917201",
+      "digest": "0044b37085e529a2f34181714c998247feeee7ee7aa536a28b9212330f9411b8",
       "baseHazardPpm": 1000000,
       "adjustedHazardPpm": 100000,
       "healthFactorPpm": 100000,
@@ -3853,14 +3853,14 @@
         2807465726,
         2798945089
       ],
-      "regionClass": "asia"
+      "regionClass": "americas"
     },
     {
       "id": "p3d-102",
-      "entityId": "cr:HKG",
-      "regionCode": "HKG",
+      "entityId": "cr:ESP",
+      "regionCode": "ESP",
       "entityStatus": "enabled",
-      "region": "asia",
+      "region": "europe",
       "sex": "female",
       "age": 120,
       "calendarYear": 2054,
@@ -3871,12 +3871,12 @@
         3829672840,
         968243136
       ],
-      "digest": "958fd4bb7803664044cb1c62a0fcbc9adb7bf58217c19d60fdac1aa29ab9d6cd",
-      "baseHazardPpm": 1000000,
+      "digest": "ce1273ad459096650b8147de3539705b207b65c421008b9a48c34f287779c225",
+      "baseHazardPpm": 975000,
       "adjustedHazardPpm": 1000000,
       "healthFactorPpm": 1500000,
       "died": true,
-      "causeId": "cause.neutral.circulatory",
+      "causeId": "cause.neutral.respiratory",
       "mortalityDraw": "390725",
       "drawsUsed": 4,
       "rngStateBefore": [
@@ -3891,14 +3891,14 @@
         2977373008,
         672686826
       ],
-      "regionClass": "asia"
+      "regionClass": "europe"
     },
     {
       "id": "p3d-103",
-      "entityId": "cr:GEO",
-      "regionCode": "GEO",
+      "entityId": "cr:CRI",
+      "regionCode": "CRI",
       "entityStatus": "enabled",
-      "region": "asia",
+      "region": "americas",
       "sex": "male",
       "age": 0,
       "calendarYear": 2053,
@@ -3909,9 +3909,9 @@
         194681488,
         2809209881
       ],
-      "digest": "90f36877483dff641e7819c99de9409e25081bc924e43a281096f041b0a5eeb7",
-      "baseHazardPpm": 5179,
-      "adjustedHazardPpm": 518,
+      "digest": "2f9e8004f6c90c587b338192f4e25eb5db8071a91729599e20531009de1196fc",
+      "baseHazardPpm": 6665,
+      "adjustedHazardPpm": 667,
       "healthFactorPpm": 100000,
       "died": false,
       "causeId": null,
@@ -3929,14 +3929,14 @@
         71454845,
         2541198986
       ],
-      "regionClass": "asia"
+      "regionClass": "americas"
     },
     {
       "id": "p3d-104",
-      "entityId": "cr:RWA",
-      "regionCode": "RWA",
+      "entityId": "cr:VEN",
+      "regionCode": "VEN",
       "entityStatus": "enabled",
-      "region": "africa",
+      "region": "americas",
       "sex": "female",
       "age": 0,
       "calendarYear": 2011,
@@ -3947,9 +3947,9 @@
         1940309935,
         3643746673
       ],
-      "digest": "edf4feefd3be86bd026a75dc88c1871b11cce7d1165231b4594d6ea3cde6b177",
-      "baseHazardPpm": 6774,
-      "adjustedHazardPpm": 677,
+      "digest": "c2181a6405db8477884f6e67cf3612e931eb9c4a76845d7edf5b13003be2ac44",
+      "baseHazardPpm": 5242,
+      "adjustedHazardPpm": 524,
       "healthFactorPpm": 100000,
       "died": false,
       "causeId": null,
@@ -3967,7 +3967,7 @@
         4081407686,
         1633532516
       ],
-      "regionClass": "africa"
+      "regionClass": "americas"
     },
     {
       "id": "p3d-105",
@@ -3985,7 +3985,7 @@
         599294664,
         4144265344
       ],
-      "digest": "230b14291f3bf4000d4fe8e573aa4bdabc822c25cbc91c41949b031dcb1bbabd",
+      "digest": "27704053fe681a131f76c75193909fbdf179861a33823d69a2476314b4978f85",
       "baseHazardPpm": 1596,
       "adjustedHazardPpm": 3192,
       "healthFactorPpm": 2000000,
@@ -4009,10 +4009,10 @@
     },
     {
       "id": "p3d-106",
-      "entityId": "cr:CAN",
-      "regionCode": "CAN",
+      "entityId": "cr:ETH",
+      "regionCode": "ETH",
       "entityStatus": "enabled",
-      "region": "americas",
+      "region": "africa",
       "sex": "female",
       "age": 45,
       "calendarYear": 2027,
@@ -4023,9 +4023,9 @@
         3657142673,
         2113033439
       ],
-      "digest": "5a03b9f7842acfeb17a6c03222dded2054f925454f9dedc942e84bba9c19a04c",
-      "baseHazardPpm": 1776,
-      "adjustedHazardPpm": 178,
+      "digest": "39b6367e7df53d63e65b840d807c11689413fc86a1d16cb4fc7b02ac121182b5",
+      "baseHazardPpm": 2864,
+      "adjustedHazardPpm": 286,
       "healthFactorPpm": 100000,
       "died": false,
       "causeId": null,
@@ -4043,14 +4043,14 @@
         3403717353,
         796320612
       ],
-      "regionClass": "americas"
+      "regionClass": "africa"
     },
     {
       "id": "p3d-107",
-      "entityId": "cr:SLB",
-      "regionCode": "SLB",
+      "entityId": "cr:SVK",
+      "regionCode": "SVK",
       "entityStatus": "enabled",
-      "region": "oceania",
+      "region": "europe",
       "sex": "female",
       "age": 90,
       "calendarYear": 2058,
@@ -4061,9 +4061,9 @@
         210146006,
         1634569345
       ],
-      "digest": "295a814e78c3b6bfe0f8944762feca176926b608c062e53f57469ddc606b3bb1",
-      "baseHazardPpm": 272104,
-      "adjustedHazardPpm": 27210,
+      "digest": "d85e68f0077d4e655bb71f5e074e6e47cdd9cd6abc03f1e02b3cd28d875d899f",
+      "baseHazardPpm": 215163,
+      "adjustedHazardPpm": 21516,
       "healthFactorPpm": 100000,
       "died": false,
       "causeId": null,
@@ -4081,12 +4081,12 @@
         3752213737,
         3207490639
       ],
-      "regionClass": "oceania"
+      "regionClass": "europe"
     },
     {
       "id": "p3d-108",
-      "entityId": "cr:CAF",
-      "regionCode": "CAF",
+      "entityId": "cr:GAB",
+      "regionCode": "GAB",
       "entityStatus": "enabled",
       "region": "africa",
       "sex": "female",
@@ -4099,9 +4099,9 @@
         1461769711,
         2268549697
       ],
-      "digest": "42dcd2c714a97278f8a9c1c612d20358460a1fef277b84d1d78fcc722e7bc079",
-      "baseHazardPpm": 3214,
-      "adjustedHazardPpm": 6428,
+      "digest": "2f61a166063e073bb3c80e0e6a87094267c833d98b1f1fea1795cea7ecf499f9",
+      "baseHazardPpm": 3186,
+      "adjustedHazardPpm": 6372,
       "healthFactorPpm": 2000000,
       "died": false,
       "causeId": null,

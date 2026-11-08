@@ -373,7 +373,6 @@ describe("readProfileRelationship 舊 view.partner 無姓名六態（GPT-0043-B�
 describe("zhHantCountryName（GPT-0043-B 居住國真正 zh-Hant 來源）", () => {
   it("關鍵回歸國家回傳真正 zh-Hant，無簡體", () => {
     expect(zhHantCountryName("CHN")).toBe("中國");
-    expect(zhHantCountryName("TWN")).toBe("臺灣");
     expect(zhHantCountryName("HRV")).toBe("克羅埃西亞");
     expect(zhHantCountryName("USA")).toBe("美國");
     expect(zhHantCountryName("GBR")).toBe("英國");
@@ -392,18 +391,16 @@ describe("zhHantCountryName（GPT-0043-B 居住國真正 zh-Hant 來源）", () 
     expect(zhHantCountryName("BIH")).toBe("波士尼亞與赫塞哥維納");
   });
 
-  it("敏感地區補名：香港／澳門（registry 的 displayNameZhHans 為 null）", () => {
-    expect(zhHantCountryName("HKG")).toBe("香港");
-    expect(zhHantCountryName("MAC")).toBe("澳門");
-  });
-
   it("最長常見國名為完整繁中：波士尼亞與赫塞哥維納", () => {
     expect(zhHantCountryName("BIH")).toBe("波士尼亞與赫塞哥維納");
   });
 
-  it("查無或空 region code 回空字串（由呼叫方回退未知地區）", () => {
+  it("查無或空 region code（含已移除的 TWN／HKG／MAC）回空字串（由呼叫方回退未知地區）", () => {
     expect(zhHantCountryName("")).toBe("");
     expect(zhHantCountryName("XXX")).toBe("");
+    expect(zhHantCountryName("TWN")).toBe("");
+    expect(zhHantCountryName("HKG")).toBe("");
+    expect(zhHantCountryName("MAC")).toBe("");
   });
 
   it("completeness：registry 全部實體皆能取得非空繁中國名（不以簡體特徵 regex 證明全表）", () => {
@@ -418,9 +415,9 @@ describe("zhHantCountryName（GPT-0043-B 居住國真正 zh-Hant 來源）", () 
     expect(missing).toEqual([]);
   });
 
-  it("靜態表 172 條，且無先前漏掉的簡體「别」（針對性回歸守門，非全表證明）", () => {
+  it("靜態表 169 條（GPT-0046-B：已移除 TWN／HKG／MAC），且無先前漏掉的簡體「别」（針對性回歸守門，非全表證明）", () => {
     const entries = Object.entries(ZH_HANT_BY_ISO3 as Record<string, string>);
-    expect(entries.length).toBe(172);
+    expect(entries.length).toBe(169);
     const bad = entries.filter(([, v]) => v.includes("别"));
     expect(bad).toEqual([]);
   });

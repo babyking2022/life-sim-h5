@@ -129,7 +129,7 @@ describe("P2-B birth identity", () => {
     const validated = validateIdentityPack(base, identityRaw(mutable) as never);
     const before = buildBirthIdentity(base, validated, { seed: "p2b-seed-11" });
     (mutable.datasets["name-corpus"]?.records[0] as Record<string, unknown>).value = "被改掉的名字";
-    (mutable.manifest as unknown as { entityCount: number }).entityCount = 172;
+    (mutable.manifest as unknown as { entityCount: number }).entityCount = 169;
     expect(buildBirthIdentity(base, validated, { seed: "p2b-seed-11" })).toEqual(before);
     expect(validated.names[0]).not.toBe(mutable.datasets["name-corpus"]?.records[0]);
   });

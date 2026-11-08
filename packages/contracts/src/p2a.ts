@@ -15,8 +15,11 @@
 export const P2A_SCHEMA_VERSION = "p2a-1" as const;
 export type P2ASchemaVersion = typeof P2A_SCHEMA_VERSION;
 
-/** 172 個國家與地區：這是 G1 之後的產品規格，不是本批的統計值。 */
-export const P2A_ENTITY_COUNT = 172;
+/**
+ * 169 個國家與地區：GPT-DEEPSEEK-0046-A 依使用者要求，從權威來源移除
+ * HKG／MAC／TWN 之後的數量（原 172 = 169 + 3）。
+ */
+export const P2A_ENTITY_COUNT = 169;
 
 export const P2A_DATA_VERSION_PATTERN = /^\d+\.\d+\.\d+$/;
 
@@ -63,7 +66,7 @@ export interface IndicatorDefinition {
 
 /**
  * indicator 的單位、性別與值域在契約層固定；資料層只能照這個表填。
- * `birth_share_weight` 是 172 國／地區的相對出生權重（整數），
+ * `birth_share_weight` 是 169 國／地區的相對出生權重（整數），
  * `underweight_rate_ppm` 是低出生體重率（百萬分率），P2-A 只驗證不使用。
  */
 export const P2A_INDICATOR_DEFINITIONS: Readonly<Record<IndicatorId, IndicatorDefinition>> = {

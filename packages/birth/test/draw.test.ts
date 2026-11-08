@@ -112,6 +112,6 @@ describe("P2-A deterministic birth draw", () => {
     const before = JSON.stringify({ manifest: pack.manifest, registry: pack.registry.length });
     drawBirth(pack, { seed: "p2a-seed-03", settings: SETTINGS });
     expect(JSON.stringify({ manifest: pack.manifest, registry: pack.registry.length })).toBe(before);
-    expect(pack.registry).toHaveLength(172);
+    expect(pack.registry).toHaveLength(169);
   });
 });
