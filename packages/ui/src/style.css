@@ -2930,6 +2930,76 @@ blockquote {
   background: linear-gradient(180deg, transparent, rgba(27, 34, 20, 0.2));
 }
 
+/* GPT-0040-B：場景左側角色即時狀態卡（HUD 風格 overlay，不進 scene 子層） */
+.p3e-scene-wrap {
+  position: relative;
+  width: 100%;
+}
+
+.p3e-profile-card {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 42%;
+  max-width: 43%;
+  padding: 7px 9px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 10px;
+  background: rgba(20, 26, 20, 0.62);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+  color: #fff8de;
+  font-family: inherit;
+  pointer-events: none;
+}
+
+.p3e-profile-row {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  min-width: 0;
+}
+
+.p3e-profile-key {
+  flex: 0 0 auto;
+  font-size: 0.75rem; /* 12px，最小可見字 */
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #ffe9b0;
+  white-space: nowrap;
+}
+
+.p3e-profile-val {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 0.8125rem; /* 13px，確保 320px 寬仍清晰 */
+  font-weight: 800;
+  line-height: 1.25;
+  /* GPT-0041-B：值不可 ellipsis；允許換行，完整國名／姓名直接可見（不藏 title）。 */
+  white-space: normal;
+  overflow: visible;
+  word-break: break-word;
+}
+
+/* GPT-0041-B：最窄 320×568 仍須完整顯示國名，不得省略。
+   縮小字級並略增卡片寬度，讓值有足夠空間；值始終不 ellipsis。 */
+@media (max-width: 360px) {
+  .p3e-profile-card {
+    width: 47%;
+    max-width: 49%;
+    padding: 6px 7px;
+  }
+  .p3e-profile-key {
+    font-size: 0.6875rem; /* 11px */
+  }
+  .p3e-profile-val {
+    font-size: 0.75rem; /* 12px，最小可見字 */
+  }
+}
+
 .p3e-character-stage {
   position: relative;
   z-index: 1;
@@ -4755,40 +4825,6 @@ body:has(:is(.p3e-game-shell, .p3e-birth-screen)) {
   display: none;
 }
 
-/* C：具名伴侶（沒有伴侶時節點根本不存在，不佔任何高度）。 */
-.p3e-game-shell .p3e-partner-line {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 2px;
-  margin: 0 0 5px;
-  padding: 3px 6px;
-  border: 1px solid rgba(200, 120, 140, 0.55);
-  border-radius: 8px;
-  background: rgba(255, 238, 238, 0.86);
-  font-size: 0.78rem;
-  line-height: 1.3;
-}
-
-.p3e-game-shell .p3e-partner-label {
-  color: #7a4356;
-  font-weight: 800;
-}
-
-.p3e-game-shell .p3e-partner-name {
-  min-width: 0;
-  overflow: hidden;
-  color: #5d2739;
-  font-weight: 900;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.p3e-game-shell .p3e-partner-since {
-  color: #7a5a62;
-  font-size: 0.72rem;
-}
-
 /* A：漢堡面板第一眼就是「設定與存檔」。 */
 .p3e-game-shell .p3e-menu-title {
   margin: 0 0 6px;
@@ -4831,11 +4867,5 @@ body:has(:is(.p3e-game-shell, .p3e-birth-screen)) {
     height: 44px;
     min-height: 44px;
     font-size: 0.66rem;
-  }
-
-  .p3e-game-shell .p3e-partner-line {
-    margin-bottom: 3px;
-    padding: 2px 5px;
-    font-size: 0.74rem;
   }
 }

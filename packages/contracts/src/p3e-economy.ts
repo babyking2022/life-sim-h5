@@ -238,6 +238,8 @@ function hasAny(flags: readonly string[], candidates: readonly string[]): boolea
 
 /** 教育等級：碩士以上 → 2、大學 → 1、其他 → 0。 */
 export function readP3EEducationLevel(flags: readonly string[]): P3EEducationLevel {
+  // GPT-DEEPSEEK-0040-A：博士與碩士同級（+$6,000），避免「博士收入必然最高」。
+  if (flags.includes("edu:doctorate")) return 2;
   if (flags.includes("edu:master")) return 2;
   if (flags.includes("edu:university")) return 1;
   return 0;

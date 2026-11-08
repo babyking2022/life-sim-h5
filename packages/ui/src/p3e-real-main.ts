@@ -25,12 +25,15 @@ import {
   type DecisionPlayIntent
 } from "./p3e-play-intent.js";
 import {
-  ellipsizeName,
   readComparisonView,
-  readPartnerIdentity,
+  readProfileRelationship,
+  readProfileResidence,
+  readProfileRole,
   type ComparisonView,
-  type PartnerIdentity
+  type PartnerIdentity,
+  type ProfileResidenceView
 } from "./p3e-view-readers.js";
+import { zhHantCountryName } from "./p3e-country-hant.js";
 
 /**
  * H5-CTO-176-A／H5-CTO-188-A／GPT-0017-D：真實 P3-E runtime 的瀏覽器垂直切片。
@@ -478,6 +481,8 @@ let session: P3EPlaySession | null = null;
  */
 let eventCopy: Readonly<Record<string, string>> | null = null;
 let eventCopyKeys = 0;
+/** GPT-0040-B：國家注册表記錄（loadWorld 成功後才有值），用來查「目前居住」的繁中國名與旗幟。 */
+let countryRegistry: ReadonlyArray<Readonly<Record<string, unknown>>> = [];
 /**
  * GPT-0031-B：漢堡選單開合是純 UI 呈現狀態，跨 render 保留，
  * 讓「匯出／匯入存檔」與壞存檔復原在命令後仍可連續操作。
@@ -1035,7 +1040,19 @@ interface LifeLogEntryLike {
   readonly age: number;
   readonly kind: string;
   readonly ids: readonly string[];
+  /** GPT-0040-B：具體挫折／小確幸變體 ID（p3b.detail.<kind>.<stage>.<1..4>），無則 null。 */
+  readonly detailId: string | null;
 }
+
+/**
+ * GPT-0040-B：detailId 格式守門。DEEPSEEK-0040-A 的 32 條 ID 皆是此形，
+ * 但這裡只用格式守門，不依賴 application 匯出（UI 不重算、不洩漏）。
+ */
+const DETAIL_ID_RE =
+  /^p3b\.detail\.(setback|small-win)\.(childhood|adolescence|adulthood|later_life)\.[1-4]$/;
+
+/** 文案若仍含此類內部鍵模式，視為不安全，退回泛稱。 */
+const COPY_INTERNAL_KEY_PATTERN = /(?:p3[ab]\.|ev\.|focus:|E_[A-Z0-9_]+|SET_LIFE_FOCUS|microUsd)/;
 
 /** projection 可能把公開 ID 放在不同欄位；全部以白名單讀取，絕不列印未知欄位。 */
 const LIFE_LOG_ID_KEYS = [
@@ -1074,7 +1091,21 @@ function readLifeLogEntry(raw: unknown): LifeLogEntryLike | null {
       if (typeof value === "string" && value.length > 0 && !ids.includes(value)) ids.push(value);
     }
   }
-  return { year, age, kind, ids };
+  const detailRaw = raw["detailId"];
+  const detailId = typeof detailRaw === "string" && DETAIL_ID_RE.test(detailRaw) ? detailRaw : null;
+  return { year, age, kind, ids, detailId };
+}
+
+/**
+ * GPT-0040-B：detailId → 顯示層字典的具體文案。
+ * 字典找不到、ID 非法或文案仍含 internal key 時回 null，改走泛稱 fallback，
+ * 絕不直接把 detailId 顯示給玩家。
+ */
+function detailCopyFor(detailId: string): string | null {
+  const copy = eventCopy === null ? undefined : eventCopy[detailId];
+  if (typeof copy !== "string" || copy.trim().length === 0) return null;
+  if (COPY_INTERNAL_KEY_PATTERN.test(copy)) return null;
+  return copy;
 }
 
 /**
@@ -1104,13 +1135,13 @@ function fallbackLifeLog(current: P3EPlaySession): readonly LifeLogEntryLike[] {
   const year = current.view.currentYear;
   const age = current.view.age;
   if (last.kind === "advance_year") {
-    if (last.death !== null) return [{ year, age, kind: "death", ids: [] }];
-    return [{ year, age, kind: "advance_year", ids: last.selectedEventId === null ? [] : [last.selectedEventId] }];
+    if (last.death !== null) return [{ year, age, kind: "death", ids: [], detailId: null }];
+    return [{ year, age, kind: "advance_year", ids: last.selectedEventId === null ? [] : [last.selectedEventId], detailId: null }];
   }
   if (last.kind === "choose_decision") {
-    return [{ year, age, kind: "choose_decision", ids: [friendlyChosenOption(last)] }];
+    return [{ year, age, kind: "choose_decision", ids: [friendlyChosenOption(last)], detailId: null }];
   }
-  return [{ year, age, kind: "set_life_focus", ids: [last.focusId] }];
+  return [{ year, age, kind: "set_life_focus", ids: [last.focusId], detailId: null }];
 }
 
 /** 只接受字典查得到的自然中文；查不到就回 null，絕不外洩 internal key。 */
@@ -1128,6 +1159,12 @@ function firstFriendlyLabel(ids: readonly string[]): string | null {
  * 也相容舊 `advance_year | choose_decision | set_life_focus` 命名。
  */
 function lifeLogText(entry: LifeLogEntryLike): string {
+  // GPT-0040-B：優先顯示具體變體文案（detailId → 字典），不再顯示泛稱。
+  // 缺少 detailId 的舊存檔會自然落到下方泛稱 fallback。
+  if (entry.detailId !== null) {
+    const copy = detailCopyFor(entry.detailId);
+    if (copy !== null) return copy;
+  }
   const kind = entry.kind.toLowerCase();
   // 過渡期回退會直接放入已翻譯好的中文（不是 internal key）。
   const natural = entry.ids.find((id) => /[\u3400-\u9fff]/.test(id));
@@ -1430,6 +1467,16 @@ async function loadWorld(): Promise<P3EBrowserWorld> {
   const validatedCopy = validateEventCopy(data["p3bEventCopy"], packVersion);
   eventCopy = validatedCopy;
   eventCopyKeys = Object.keys(validatedCopy).length;
+
+  // GPT-0040-B：把國家注册表記錄留下來，供「目前居住」查繁中國名與旗幟。
+  const registryRaw = data["p2aCountryRegistry"];
+  const registryRecords =
+    isPlainRecord(registryRaw) && Array.isArray(registryRaw["records"])
+      ? (registryRaw["records"] as unknown[])
+      : [];
+  countryRegistry = registryRecords.filter(
+    (record): record is Record<string, unknown> => isPlainRecord(record)
+  ) as ReadonlyArray<Readonly<Record<string, unknown>>>;
 
   return prepareP3EBrowserWorld({
     base: {
@@ -1973,26 +2020,6 @@ function renderComparisonStrip(comparison: ComparisonView): HTMLElement {
   return strip;
 }
 
-/** 沒有伴侶時完全不產生節點；姓名過長只做視覺省略，完整值留在 title/aria-label。 */
-function renderPartnerLine(view: unknown): HTMLElement | null {
-  const partner: PartnerIdentity | null = readPartnerIdentity(view);
-  if (partner === null) return null;
-  const line = element("p", "p3e-partner-line");
-  line.dataset["p3ePartnerName"] = partner.displayName;
-  line.dataset["p3ePartnerStatus"] = partner.status ?? "";
-  line.dataset["p3ePartnerSinceYear"] =
-    partner.sinceYear === null ? "" : String(partner.sinceYear);
-  const name = element("strong", "p3e-partner-name", ellipsizeName(partner.displayName, 12));
-  name.title = partner.displayName;
-  name.setAttribute("aria-label", `伴侶姓名：${partner.displayName}`);
-  line.append(element("span", "p3e-partner-label", "伴侶："), name);
-  if (partner.sinceYear !== null) {
-    line.append(element("span", "p3e-partner-since", ` · ${partner.sinceYear} 年開始`));
-  }
-  line.title = `伴侶：${partner.displayName}`;
-  return line;
-}
-
 let alertText: string | null = null;
 
 function showAlert(message: string): void {
@@ -2053,6 +2080,9 @@ function render(): void {
   // GPT-0031-B：佔位標題移除後，改用 aria-label 保留可存取名稱。
   shell.setAttribute("aria-label", "人生模擬");
   shell.dataset["p3eLive"] = "true";
+  // GPT-0040-B：直接從 live session 暴露出生國 entity，供 browser 驗收比對「居住國 == 出生國」。
+  shell.dataset["p3eBirthEntity"] = session.state.identity.entityId;
+  shell.dataset["p3eBirthRegion"] = session.state.identity.regionCode;
   shell.dataset["p3ePhase"] = view.phase;
   shell.dataset["p3eCopyKeys"] = String(eventCopyKeys);
   shell.dataset["p3eCopySchema"] = COPY_SCHEMA_VERSION;
@@ -2316,6 +2346,106 @@ function updatePersistenceDom(): void {
   if (old !== null) old.replaceWith(renderPersistence());
 }
 
+/* ------------------------------------------------------------------ */
+/* GPT-0040-B｜場景左側角色即時狀態卡                                    */
+/* ------------------------------------------------------------------ */
+
+interface ResidenceDisplay {
+  readonly name: string;
+  readonly flag: string;
+}
+
+/** 由居住 entityId／regionCode 取真正繁中國名與旗幟；找不到回「未知地區」。 */
+function resolveResidenceDisplay(residence: ProfileResidenceView): ResidenceDisplay {
+  const fallback: ResidenceDisplay = { name: "未知地區", flag: "🌐" };
+  // 把 entityId（cr:XXX）或 regionCode 轉成 ISO3，作為查表 key。
+  const iso3FromEntity = residence.entityId.startsWith("cr:") ? residence.entityId.slice(3) : "";
+  const iso3 = residence.regionCode !== "" ? residence.regionCode : iso3FromEntity;
+  // 1) 優先靜態繁中對照表（含臺灣／香港／澳門等 registry 的 displayNameZhHans 為 null 的敏感地區）。
+  if (iso3 !== "") {
+    const hant = zhHantCountryName(iso3);
+    if (hant !== "") return { name: hant, flag: flagOf(iso3) };
+  }
+  // 2) registry 有紀錄且 displayNameZhHans 存在時，才退回（經 toHantLabel）。
+  if (countryRegistry.length > 0) {
+    const record = countryRegistry.find((r) => {
+      const entityId = typeof r["entityId"] === "string" ? (r["entityId"] as string) : null;
+      const regionCode = typeof r["regionCode"] === "string" ? (r["regionCode"] as string) : null;
+      const rIso3 = typeof r["iso3"] === "string" ? (r["iso3"] as string) : null;
+      if (residence.entityId !== "" && entityId === residence.entityId) return true;
+      if (residence.regionCode !== "" && (regionCode === residence.regionCode || rIso3 === residence.regionCode)) return true;
+      return false;
+    });
+    if (record !== undefined) {
+      const regionCode = typeof record["regionCode"] === "string" ? (record["regionCode"] as string) : iso3;
+      const rawName = typeof record["displayNameZhHans"] === "string" ? (record["displayNameZhHans"] as string) : null;
+      if (rawName !== null && rawName.trim().length > 0) {
+        return { name: toHantLabel(rawName), flag: flagOf(regionCode) };
+      }
+    }
+  }
+  return fallback;
+}
+
+/** 狀態卡單行（鍵＋值），值過長只做視覺省略，完整文字留在 title／aria-label。 */
+function profileRow(key: string, value: string, title: string): HTMLElement {
+  const row = element("div", "p3e-profile-row");
+  const k = element("span", "p3e-profile-key", key);
+  const v = element("span", "p3e-profile-val", value);
+  v.title = title;
+  v.setAttribute("aria-label", title);
+  row.append(k, v);
+  return row;
+}
+
+/**
+ * 場景左上角的緊湊 HUD 狀態卡（三行：身分／居住／情感）。
+ * 讀 `view.profile` 的正式投影，UI 不重算；任何欄位缺失都走安全 placeholder。
+ * 注：GPT-0043-B 已移除舊有的 `window.__p3eProfileOverride` 測試注入入口（不進 production bundle）。
+ *     五態與國名的覆蓋改由 reader/DOM 單元測試與不進 bundle 的測試 fixture 負責。
+ */
+function renderProfileCard(view: unknown): HTMLElement {
+  const card = element("aside", "p3e-profile-card");
+  card.setAttribute("aria-label", "角色即時狀態");
+
+  const effectiveView = view;
+  const role = readProfileRole(effectiveView);
+  const roleKey = role?.rowLabel ?? "目前身分";
+  const roleVal = role?.label ?? "狀態更新中";
+  const roleRow = profileRow(roleKey, roleVal, `${roleKey}：${roleVal}`);
+  // GPT-0040-B：為 browser/mobile 驗收提供決定性屬性，取代已移除的舊伴侶列。
+  if (role !== null && role.id !== "") roleRow.dataset["p3eProfileRoleId"] = role.id;
+  card.append(roleRow);
+
+  const residence = readProfileResidence(effectiveView);
+  let residenceText = "未知地區";
+  let residenceTitle = "未知地區";
+  let residenceEntity = "";
+  let residenceRegion = "";
+  if (residence !== null) {
+    const disp = resolveResidenceDisplay(residence);
+    residenceText = `${disp.flag} ${disp.name}`;
+    residenceTitle = disp.name;
+    residenceEntity = residence.entityId;
+    residenceRegion = residence.regionCode;
+  }
+  const residenceRow = profileRow("目前居住", residenceText, `目前居住：${residenceTitle}`);
+  if (residenceEntity !== "") residenceRow.dataset["p3eProfileResidenceEntity"] = residenceEntity;
+  if (residenceRegion !== "") residenceRow.dataset["p3eProfileResidenceRegion"] = residenceRegion;
+  card.append(residenceRow);
+
+  const relationship = readProfileRelationship(effectiveView);
+  const relLabel = relationship?.label ?? "狀態更新中";
+  const relRow = profileRow("情感狀態", relLabel, `情感狀態：${relLabel}`);
+  if (relationship !== null) {
+    relRow.dataset["p3eRelationshipStatus"] = relationship.status;
+    if (relationship.personName !== null) relRow.dataset["p3ePartnerName"] = relationship.personName;
+  }
+  card.append(relRow);
+
+  return card;
+}
+
 function renderLife(view: P3EPlaySession["view"], current: P3EPlaySession): HTMLElement {
   const root = element("div", "p3e-life");
   /* GPT-0032-B：改用專用 16:9 橫向資產，CSS 以 cover 鋪滿場景寬。
@@ -2325,12 +2455,21 @@ function renderLife(view: P3EPlaySession["view"], current: P3EPlaySession): HTML
   scene.dataset["p3eSceneFit"] = "cover";
   scene.dataset["p3eSceneAsset"] = "life-sim-village-landscape.avif";
 
+  // GPT-0040-B：狀態卡是 scene 的 overlay，但為了不讓 scene 多出子層
+  // （破壞既有「場景只剩一張圖」的視覺與指標），改放在 scene-wrap 裡與 scene 疊合。
+  const sceneWrap = element("div", "p3e-scene-wrap");
+  sceneWrap.append(scene, renderProfileCard(view));
+
+  // GPT-0040-B：情感狀態改由 view.profile.relationship 權威來源；
+  // 關係建立當年的人生紀錄仍帶姓名（由 relationship 的 personName 推導）。
+  const relationship = readProfileRelationship(view);
+  const partner: PartnerIdentity | null =
+    relationship !== null && relationship.personName !== null
+      ? { displayName: relationship.personName, status: relationship.status, sinceYear: relationship.sinceYear }
+      : null;
+
   const story = element("section", "p3e-story-card");
   story.append(element("h2", undefined, view.phase === "pending_decision" ? "重要抉擇" : "人生紀錄"));
-  // GPT-0036-B C：伴侶姓名放在當年訊息上方；沒有伴侶時完全不佔版面。
-  const partner = readPartnerIdentity(view as unknown);
-  const partnerLine = renderPartnerLine(view as unknown);
-  if (partnerLine !== null) story.append(partnerLine);
 
   // 重要決定卡／重新開始永遠排在最前面，玩家不必往下捲就能立即點選。
   if (view.phase === "pending_decision" && view.pendingDecision !== null) {
@@ -2404,7 +2543,7 @@ function renderLife(view: P3EPlaySession["view"], current: P3EPlaySession): HTML
     controls.append(element("p", "p3e-hint", "這條命已結束"));
   }
 
-  root.append(scene, story, statDock, timeControls, controls);
+  root.append(sceneWrap, story, statDock, timeControls, controls);
   return root;
 }
 

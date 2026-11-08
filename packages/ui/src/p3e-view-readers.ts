@@ -292,8 +292,12 @@ const PARTNER_NAME_KEYS = [
 const PARTNER_STATUS_KEYS = ["status", "relationshipStatus"] as const;
 const PARTNER_YEAR_KEYS = ["sinceYear", "startYear", "establishedYear"] as const;
 
-/** 沒有正式 projection 時絕不回傳假名字。 */
-export function readPartnerIdentity(view: unknown): PartnerIdentity | null {
+/**
+ * 從舊 view.partner 讀取伴侶顯示名（不要求狀態）。
+ * 拒絕泛稱／internal key／標記語法；找不到或不是真名回 null。
+ * 姓名與狀態拆開讀取，確保「無姓名時仍能保留狀態」。
+ */
+function readPartnerName(view: unknown): string | null {
   const root: Record<string, unknown> = isPlainRecord(view) ? view : {};
   const record = firstRecord(root, PARTNER_ROOT_KEYS);
   const rawName =
@@ -304,6 +308,15 @@ export function readPartnerIdentity(view: unknown): PartnerIdentity | null {
   // 泛稱不是名字：對方若還沒生成姓名，寧可不顯示。
   if (/^(伴侶|對象|朋友|未知|無|none|null|unknown)$/i.test(displayName)) return null;
   if (!/[\u3400-\u9fffA-Za-z]/.test(displayName)) return null;
+  return displayName;
+}
+
+/** 沒有正式 projection 時絕不回傳假名字。 */
+export function readPartnerIdentity(view: unknown): PartnerIdentity | null {
+  const root: Record<string, unknown> = isPlainRecord(view) ? view : {};
+  const record = firstRecord(root, PARTNER_ROOT_KEYS);
+  const displayName = readPartnerName(view);
+  if (displayName === null) return null;
 
   const rawStatus = record === null ? undefined : firstValue(record, PARTNER_STATUS_KEYS);
   const status = safeText(rawStatus, 32);
@@ -315,4 +328,187 @@ export function readPartnerIdentity(view: unknown): PartnerIdentity | null {
 /** 視覺省略，但完整姓名仍留在 `title`／`aria-label`。 */
 export function ellipsizeName(name: string, maxLength = 12): string {
   return name.length <= maxLength ? name : `${name.slice(0, maxLength - 1)}…`;
+}
+
+/* ------------------------------------------------------------------ */
+/* D：角色即時狀態（GPT-0040-B｜view.profile）                          */
+/* ------------------------------------------------------------------ */
+
+/**
+ * DEEPSEEK-0040-A 把角色即時狀態放在 `view.profile`：
+ *   currentRole / residence / relationship。
+ * 這裡只做安全讀取（type guard + 白名單），UI 永遠不重算狀態、不洩漏 internal key。
+ */
+
+export type ProfileRelationshipStatus =
+  | "single"
+  | "dating"
+  | "married"
+  | "divorced"
+  | "widowed"
+  | "unknown";
+
+export interface ProfileRoleView {
+  /** 已知 role id；未知 ID 為 ""（絕不回傳 internal key）。 */
+  readonly id: string;
+  /** 自然繁體標籤，如「初中生」；未知 ID 為「狀態更新中」。 */
+  readonly label: string;
+  /** 卡片第一欄標籤：身分或職業。 */
+  readonly rowLabel: "目前身分" | "目前職業";
+}
+
+export interface ProfileResidenceView {
+  readonly entityId: string;
+  readonly regionCode: string;
+}
+
+export interface ProfileRelationshipView {
+  /** 五種狀態之一；無效或缺失為 "unknown"。 */
+  readonly status: ProfileRelationshipStatus;
+  /** 現任或前任伴侶姓名（single 時為 null）。 */
+  readonly personName: string | null;
+  readonly sinceYear: number | null;
+  /** 自然繁中整行，如「已婚 · 王小明」、「單身」。 */
+  readonly label: string;
+}
+
+/** role id → 自然繁體標籤與欄位標題（只收錄 DEEPSEEK-0040-A 定義的 24 種）。 */
+const ROLE_LABELS: Readonly<Record<string, { label: string; row: "目前身分" | "目前職業" }>> = Object.freeze({
+  infant: { label: "嬰兒", row: "目前身分" },
+  preschool_child: { label: "幼兒", row: "目前身分" },
+  primary_student: { label: "小學生", row: "目前身分" },
+  junior_high_student: { label: "初中生", row: "目前身分" },
+  senior_high_student: { label: "高中生", row: "目前身分" },
+  university_student: { label: "大學生", row: "目前身分" },
+  master_student: { label: "研究生", row: "目前身分" },
+  doctoral_student: { label: "博士生", row: "目前身分" },
+  general_worker: { label: "一般職員", row: "目前職業" },
+  engineer: { label: "工程師", row: "目前職業" },
+  software_engineer: { label: "軟體工程師", row: "目前職業" },
+  accountant: { label: "會計", row: "目前職業" },
+  office_worker: { label: "行政人員", row: "目前職業" },
+  salesperson: { label: "銷售員", row: "目前職業" },
+  designer: { label: "設計師", row: "目前職業" },
+  marketer: { label: "行銷人員", row: "目前職業" },
+  entrepreneur: { label: "創業者", row: "目前職業" },
+  shopkeeper: { label: "店主", row: "目前職業" },
+  cook: { label: "廚師", row: "目前職業" },
+  farmer: { label: "農民", row: "目前職業" },
+  service_worker: { label: "服務業人員", row: "目前職業" },
+  teacher: { label: "教師", row: "目前職業" },
+  gap_year: { label: "待業", row: "目前身分" },
+  retired: { label: "退休", row: "目前身分" }
+});
+
+const RELATIONSHIP_STATUS_LABELS: Readonly<Record<string, string>> = Object.freeze({
+  single: "單身",
+  dating: "交往中",
+  married: "已婚",
+  divorced: "離異",
+  widowed: "喪偶"
+});
+
+/** 讀 `view.profile.currentRole`，未知 ID 顯示「狀態更新中」，不洩漏 internal key。 */
+export function readProfileRole(view: unknown): ProfileRoleView | null {
+  const root: Record<string, unknown> = isPlainRecord(view) ? view : {};
+  const profile = firstRecord(root, ["profile"]);
+  const role = profile === null ? null : firstRecord(profile, ["currentRole"]);
+  if (role === null) return null;
+  const rawId = role["id"];
+  if (typeof rawId !== "string" || rawId.length === 0) return null;
+  const mapped = ROLE_LABELS[rawId];
+  if (mapped !== undefined) return { id: rawId, label: mapped.label, rowLabel: mapped.row };
+  return { id: "", label: "狀態更新中", rowLabel: "目前身分" };
+}
+
+/** 讀 `view.profile.residence`；國家名與旗幟由 UI 用注册表查。 */
+export function readProfileResidence(view: unknown): ProfileResidenceView | null {
+  const root: Record<string, unknown> = isPlainRecord(view) ? view : {};
+  const profile = firstRecord(root, ["profile"]);
+  const residence = profile === null ? null : firstRecord(profile, ["residence"]);
+  if (residence === null) return null;
+  const entityId = typeof residence["entityId"] === "string" ? (residence["entityId"] as string) : null;
+  const regionCode = typeof residence["regionCode"] === "string" ? (residence["regionCode"] as string) : null;
+  if (entityId === null && regionCode === null) return null;
+  return { entityId: entityId ?? "", regionCode: regionCode ?? "" };
+}
+
+/**
+ * 讀 `view.profile.relationship`（UI 權威情感狀態來源）。
+ * 同時向後相容舊 `view.partner`：只有在 `profile.relationship` 完全缺失時才退回。
+ * 只有 married／dating 才在整行帶姓名；divorced／widowed 只顯示狀態。
+ */
+export function readProfileRelationship(view: unknown): ProfileRelationshipView | null {
+  const root: Record<string, unknown> = isPlainRecord(view) ? view : {};
+  const profile = firstRecord(root, ["profile"]);
+  const rel = profile === null ? null : firstRecord(profile, ["relationship"]);
+  if (rel !== null) {
+    const rawStatus = rel["status"];
+    const status: ProfileRelationshipStatus =
+      typeof rawStatus === "string" && RELATIONSHIP_STATUS_LABELS[rawStatus] !== undefined
+        ? (rawStatus as ProfileRelationshipStatus)
+        : "unknown";
+    const personName = safeText(rel["personName"], 64);
+    const rawYear = rel["sinceYear"];
+    const sinceYear = isFiniteNumber(rawYear) && rawYear >= 0 && rawYear <= 9999 ? Math.round(rawYear) : null;
+    let label: string;
+    if (status === "unknown") {
+      label = "狀態更新中";
+    } else {
+      const base = RELATIONSHIP_STATUS_LABELS[status] as string;
+      label = status === "married" || status === "dating"
+        ? personName === null ? base : `${base} · ${personName}`
+        : base;
+    }
+    return { status, personName, sinceYear, label };
+  }
+  // 向後相容：舊 view.partner（無 view.profile.relationship 時）。
+  // 狀態與姓名拆開讀取：沒有姓名時仍要保留狀態（single/dating/married/divorced/widowed/unknown）；
+  // 只有 married／dating 才在整行帶姓名，絕不假造姓名（GPT-0043-B）。
+  const partnerRecord = firstRecord(
+    isPlainRecord(view) ? (view as Record<string, unknown>) : {},
+    PARTNER_ROOT_KEYS
+  );
+  if (partnerRecord !== null) {
+    const rawStatus = firstValue(partnerRecord, PARTNER_STATUS_KEYS);
+    const name = readPartnerName(view);
+    // 既無狀態也無姓名 → 無可用資訊，回 null（與舊行為一致）；
+    // 只要任一存在，就據狀態映射（無姓名時照樣保留 single/dating/married/divorced/widowed/unknown）。
+    if (rawStatus === undefined && name === null) return null;
+    const status = mapLegacyPartnerStatus(typeof rawStatus === "string" ? rawStatus : null);
+    const base = RELATIONSHIP_STATUS_LABELS[status] ?? "狀態更新中";
+    const showName = (status === "married" || status === "dating") && name !== null && name.length > 0;
+    const label = showName ? `${base} · ${name}` : base;
+    const rawYear = firstValue(partnerRecord, PARTNER_YEAR_KEYS);
+    const sinceYear = isFiniteNumber(rawYear) && rawYear >= 0 && rawYear <= 9999 ? Math.round(rawYear) : null;
+    return { status, personName: showName ? name : null, sinceYear, label };
+  }
+  return null;
+}
+
+/**
+ * 舊 view.partner 的 status 字串 → 五態之一（unknown 兜底）。
+ * married→married；dating/partner/cohabit/cohabiting→dating；
+ * divorced→divorced；widowed→widowed；single→single；其餘→unknown。
+ * 不得在 UI 重新發明關係狀態機，只做既有正式型別的安全映射。
+ */
+function mapLegacyPartnerStatus(raw: string | null): ProfileRelationshipStatus {
+  if (raw === null) return "unknown";
+  switch (raw) {
+    case "married":
+      return "married";
+    case "dating":
+    case "partner":
+    case "cohabit":
+    case "cohabiting":
+      return "dating";
+    case "divorced":
+      return "divorced";
+    case "widowed":
+      return "widowed";
+    case "single":
+      return "single";
+    default:
+      return "unknown";
+  }
 }

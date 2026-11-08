@@ -251,19 +251,24 @@ describe("GPT-0037-A 保持單身必須清除伴侶", () => {
     }
   });
 
-  it("eventId 被改掉的自訂 pack：marry／single 都不會建立或清除伴侶", () => {
+  it("eventId 被改掉的自訂 pack：marry／single 都不會建立、升級或清除伴侶", () => {
     const seed = "gpt-0037-renamed-event";
-    const dating = chooseOption(playUntilDecision(sessionFor(seed, renamedAdultPack), "dec.teen.first-love", "date"), "date");
-    const partnerBefore = JSON.stringify(dating.view.partner);
-    expect(dating.view.partner).not.toBeNull();
 
-    const adult = playUntilDecision(dating, "dec.adult.relationship", "marry");
-    const upgraded = chooseOption(adult, "marry");
-    expect(JSON.stringify(upgraded.view.partner)).toBe(partnerBefore);
+    // A. 改名後的 eventId 不會把 dating 升級成 married。
+    const datingA = chooseOption(playUntilDecision(sessionFor(seed, renamedAdultPack), "dec.teen.first-love", "date"), "date");
+    const partnerBefore = JSON.stringify(datingA.view.partner);
+    expect(datingA.view.partner).not.toBeNull();
+    const married = chooseOption(playUntilDecision(datingA, "dec.adult.relationship", "marry"), "marry");
+    expect(JSON.stringify(married.view.partner)).toBe(partnerBefore);
 
-    const adultSingle = playUntilDecision(upgraded, "dec.adult.relationship", "single");
-    const afterSingle = chooseOption(adultSingle, "single");
-    expect(JSON.stringify(afterSingle.view.partner)).toBe(partnerBefore);
+    // B. 改名後的 eventId 也不會清除伴侶（single 走的是 dec.adult.relationship，
+    //    但 eventId 是 ev.custom.relationship，所以不在轉移表內）。
+    //    注意：GPT-0043-A 之後一般關係事件在已婚時不 eligible，因此這一段在婚前驗證。
+    const datingB = chooseOption(playUntilDecision(sessionFor(seed, renamedAdultPack), "dec.teen.first-love", "date"), "date");
+    const partnerB = JSON.stringify(datingB.view.partner);
+    const afterSingle = chooseOption(playUntilDecision(datingB, "dec.adult.relationship", "single"), "single");
+    expect(JSON.stringify(afterSingle.view.partner)).toBe(partnerB);
+    expect(afterSingle.view.profile.relationship.status).toBe("dating");
   });
 
   it("重建函式：date → cohabit → marry 升級同一人；single 清成 null；清除後再建立是新的人", () => {

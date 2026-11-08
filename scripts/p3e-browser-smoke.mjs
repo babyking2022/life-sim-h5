@@ -62,9 +62,9 @@ const mime = {
   ".woff2": "font/woff2"
 };
 
-const EXPECTED_STATE_HASH = "14d594f9c31ad9b3eb7fee86015aec983511ea3bb93361427f6bb0cadb8531d8";
-const EXPECTED_COMMAND_HEAD = "347184ff2bed0eae76ee4c49a87a01d502fbf4ceb294e30549430bf69a635652";
-const EXPECTED_COMMANDS = 106;
+const EXPECTED_STATE_HASH = "d323c0e1a88301ef04576b4d2cf0579779c67b289e30d386f1b51d868134eb1f";
+const EXPECTED_COMMAND_HEAD = "9ba816000c247982a2d4b8bfd064bbf2351e17770613af36f2a6fd7f2600077c";
+const EXPECTED_COMMANDS = 107;
 /**
  * GPT-0025-D：新增獨立的 307 條繁中字典資產（gzip ≈6.2KB）後，boot 必要資產
  * 從 511169 增加到約 518KB，已超過原本的 500KiB gate。這裡把 gate 調到
@@ -483,7 +483,7 @@ async function main() {
   });
 
   const bootStarted = Date.now();
-  // 主線要跑官方 golden（GPT-0031-A 之後是 106 命令）：明確釘住 seed，不受首次開頁隨機 seed 影響。
+  // 主線要跑官方 golden（GPT-0043-A 之後是 107 命令）：明確釘住 seed，不受首次開頁隨機 seed 影響。
   await page.goto(`${baseUrl}/${GOLDEN_QUERY}`, { waitUntil: "networkidle" });
   await page.waitForSelector("[data-p3e-live='true']", { timeout: 30000 });
   const bootMs = Date.now() - bootStarted;
@@ -941,12 +941,34 @@ async function main() {
     if (phase === "pending_decision") await collectCopySample(page);
     partnerSamples.push(
       await page.evaluate(() => {
-        const line = document.querySelector(".p3e-partner-line");
+        // GPT-0040-B：狀態卡權威呈現身分／居住／情感；舊 .p3e-partner-line 已移除。
+        const live = document.querySelector("[data-p3e-live]");
+        const age = Number(live?.getAttribute("data-p3e-life-focus-age") ?? "-1");
+        const relRow = document.querySelector(".p3e-profile-row[data-p3e-relationship-status]");
+        const status = relRow?.getAttribute("data-p3e-relationship-status") ?? null;
+        const name = relRow?.getAttribute("data-p3e-partner-name") ?? null;
+        const relText = relRow?.querySelector(".p3e-profile-val")?.textContent ?? null;
+        const roleRow = document.querySelector(".p3e-profile-row[data-p3e-profile-role-id]");
+        const roleId = roleRow?.getAttribute("data-p3e-profile-role-id") ?? null;
+        const roleKey = roleRow?.querySelector(".p3e-profile-key")?.textContent ?? null;
+        const roleVal = roleRow?.querySelector(".p3e-profile-val")?.textContent ?? null;
+        const resRow = document.querySelector(".p3e-profile-row[data-p3e-profile-residence-entity]");
+        const resEntity = resRow?.getAttribute("data-p3e-profile-residence-entity") ?? null;
+        const resRegion = resRow?.getAttribute("data-p3e-profile-residence-region") ?? null;
+        const resText = resRow?.querySelector(".p3e-profile-val")?.textContent ?? null;
         return {
-          name: line?.getAttribute("data-p3e-partner-name") ?? null,
-          display: line?.querySelector(".p3e-partner-name")?.textContent ?? null,
-          label: line?.querySelector(".p3e-partner-label")?.textContent ?? null,
-          fullNameTitle: line?.querySelector(".p3e-partner-name")?.getAttribute("title") ?? null,
+          age,
+          status,
+          name,
+          display: relText,
+          label: status,
+          fullNameTitle: name,
+          roleId,
+          roleKey,
+          roleVal,
+          resEntity,
+          resRegion,
+          resText,
           relationTexts: [
             ...document.querySelectorAll('[data-p3e-life-log-partner="true"] .p3e-life-log-text')
           ].map((node) => node.textContent ?? "")
@@ -1012,23 +1034,26 @@ async function main() {
   const allPartnerNames = [
     ...new Set(partnerSamples.map((sample) => sample.name).filter((name) => name !== null))
   ];
+  const namedStatusOk = namedPartner !== null &&
+    (namedPartner.status === "married" || namedPartner.status === "dating");
   check(
     "partner_named_identity_from_projection",
     namedPartner !== null &&
       typeof namedPartner.name === "string" &&
       namedPartner.name.length > 0 &&
-      namedPartner.label === "伴侶：" &&
+      namedStatusOk &&
       namedPartner.display !== null &&
+      namedPartner.display.includes(namedPartner.name) &&
       /[\u3400-\u9fffA-Za-z]/.test(namedPartner.name) &&
       !INTERNAL_KEY_PATTERN.test(namedPartner.name) &&
       allPartnerNames.length === 1,
-    `names=${JSON.stringify(allPartnerNames)} label=${namedPartner?.label} display=${namedPartner?.display}`
+    `names=${JSON.stringify(allPartnerNames)} status=${namedPartner?.status} display=${namedPartner?.display}`
   );
   check(
     "partner_full_name_kept_in_title_and_aria",
     namedPartner !== null &&
       namedPartner.fullNameTitle === namedPartner.name &&
-      (namedPartner.display === namedPartner.name || namedPartner.display?.endsWith("…") === true),
+      namedPartner.display.includes(namedPartner.name),
     `title=${namedPartner?.fullNameTitle} display=${namedPartner?.display}`
   );
   const relationTexts = partnerSamples.flatMap((sample) => sample.relationTexts);
@@ -1039,14 +1064,208 @@ async function main() {
       relationTexts.some((text) => text.includes(namedPartner.name)),
     `texts=${JSON.stringify(relationTexts.slice(0, 3))}`
   );
-  const finalPartnerName = await page.evaluate(
-    () => document.querySelector(".p3e-partner-line")?.getAttribute("data-p3e-partner-name") ?? null
-  );
+  const finalPartnerName = await page.evaluate(() => {
+    const relRow = document.querySelector(".p3e-profile-row[data-p3e-partner-name]");
+    return relRow?.getAttribute("data-p3e-partner-name") ?? null;
+  });
   check(
     "partner_name_survives_to_death_without_fake_names",
     finalPartnerName !== null && finalPartnerName === namedPartner?.name,
     `final=${finalPartnerName} sampled=${namedPartner?.name}`
   );
+
+  /* ---------------------------------------------------------------- */
+  /* 6c. GPT-0040-B：紅框狀態卡／年齡身分路徑／居住／情感／具體挫折成功 */
+  /* ---------------------------------------------------------------- */
+  const profileCard = await page.evaluate(() => {
+    const card = document.querySelector(".p3e-profile-card");
+    if (card === null) return null;
+    const wrap = card.closest(".p3e-scene-wrap");
+    const scene = wrap?.querySelector(".p3e-scene");
+    const cardBox = card.getBoundingClientRect();
+    const sceneBox = scene?.getBoundingClientRect();
+    const rows = [...card.querySelectorAll(".p3e-profile-row")].map((r) => ({
+      key: r.querySelector(".p3e-profile-key")?.textContent ?? "",
+      val: r.querySelector(".p3e-profile-val")?.textContent ?? "",
+      roleId: r.getAttribute("data-p3e-profile-role-id"),
+      resEntity: r.getAttribute("data-p3e-profile-residence-entity"),
+      relStatus: r.getAttribute("data-p3e-relationship-status"),
+      partnerName: r.getAttribute("data-p3e-partner-name")
+    }));
+    // GPT-0041-B：死亡畫面若仍顯示狀態卡，居住國名也必須是完整繁中且未省略。
+    const SIMPLIFIED_TELL =
+      /[国马兰亚罗苏鲜挝东门叶约纳莱刚几内鲁伦买萨腊奥卢时顿爱脱义兹赖茨麦湾维贝宁达冈绍岛韩缅汤乌库图韦叙济]/;
+    const resRow = [...card.querySelectorAll(".p3e-profile-row")].find(
+      (r) => (r.querySelector(".p3e-profile-key")?.textContent ?? "") === "目前居住"
+    );
+    const resValNode = resRow?.querySelector(".p3e-profile-val") ?? null;
+    const resText = resValNode?.textContent ?? "";
+    const country = {
+      text: resText,
+      scrollWidth: resValNode ? resValNode.scrollWidth : 0,
+      clientWidth: resValNode ? resValNode.clientWidth : 0,
+      noOmit: resValNode !== null && resValNode.scrollWidth <= resValNode.clientWidth + 1,
+      hasSimplified: SIMPLIFIED_TELL.test(resText)
+    };
+    return {
+      ariaLabel: card.getAttribute("aria-label"),
+      inSceneWrap: wrap !== null,
+      rows,
+      country,
+      cardLeft: Math.round(cardBox.left),
+      cardRight: Math.round(cardBox.right),
+      cardWidth: Math.round(cardBox.width),
+      sceneLeft: Math.round(sceneBox?.left ?? 0),
+      sceneWidth: Math.round(sceneBox?.width ?? 0),
+      docY: document.documentElement.scrollHeight - document.documentElement.clientHeight,
+      bodyY: document.body.scrollHeight - document.body.clientHeight,
+      legacyPartnerLines: document.querySelectorAll(".p3e-partner-line").length
+    };
+  });
+  check(
+    "profile_card_present_structured_three_rows",
+    profileCard !== null &&
+      profileCard.ariaLabel === "角色即時狀態" &&
+      profileCard.rows.length === 3 &&
+      profileCard.rows.some((r) => r.key === "目前居住") &&
+      profileCard.rows.some((r) => r.key === "情感狀態") &&
+      profileCard.rows.some((r) => r.key === "目前身分" || r.key === "目前職業") &&
+      profileCard.legacyPartnerLines === 0,
+    `aria=${profileCard?.ariaLabel} rows=${profileCard?.rows.length} keys=${JSON.stringify(profileCard?.rows.map((r) => r.key))} legacy=${profileCard?.legacyPartnerLines}`
+  );
+  check(
+    "profile_card_left_side_no_page_overflow",
+    profileCard !== null &&
+      profileCard.inSceneWrap &&
+      profileCard.sceneWidth > 0 &&
+      profileCard.cardLeft >= profileCard.sceneLeft - 1 && profileCard.cardLeft <= profileCard.sceneLeft + 16 &&
+      profileCard.cardRight <= profileCard.sceneLeft + Math.round(profileCard.sceneWidth * 0.5) &&
+      profileCard.cardWidth <= Math.round(profileCard.sceneWidth * 0.46) + 1 &&
+      profileCard.docY <= 1 && profileCard.bodyY <= 1,
+    `card=[${profileCard?.cardLeft},${profileCard?.cardRight}]w${profileCard?.cardWidth} sceneL=${profileCard?.sceneLeft} sceneW=${profileCard?.sceneWidth} docY=${profileCard?.docY} bodyY=${profileCard?.bodyY}`
+  );
+  // GPT-0041-B：死亡畫面若仍顯示狀態卡，居住國名也必須是完整繁中且未省略（不得無條件排除）。
+  check(
+    "profile_card_country_full_hant_no_omit_at_death",
+    profileCard === null ||
+      (profileCard.country.text.length > 0 &&
+        !profileCard.country.hasSimplified &&
+        profileCard.country.noOmit),
+    `text=${JSON.stringify(profileCard?.country.text)} hasSimplified=${profileCard?.country.hasSimplified} scroll=${profileCard?.country.scrollWidth} client=${profileCard?.country.clientWidth} noOmit=${profileCard?.country.noOmit}`
+  );
+
+  // 年齡→身分路徑：6 歲小學生 / 13 歲初中生 / 18 歲依選擇（職業或升學）
+  const childRole = partnerSamples.find((s) => s.age >= 6 && s.age <= 11 && s.roleId === "primary_student") ?? null;
+  const teenRole = partnerSamples.find((s) => s.age >= 12 && s.age <= 14 && s.roleId === "junior_high_student") ?? null;
+  const adultRoles = new Set([
+    "university_student", "gap_year", "master_student", "doctoral_student",
+    "general_worker", "engineer", "software_engineer", "accountant", "office_worker",
+    "salesperson", "designer", "marketer", "entrepreneur", "shopkeeper", "cook",
+    "farmer", "service_worker", "teacher", "retired"
+  ]);
+  const adultRole = partnerSamples.find((s) => s.age >= 18 && s.roleId !== null && adultRoles.has(s.roleId)) ?? null;
+  const reached65 = partnerSamples.some((s) => s.age >= 65);
+  const retiredSample = partnerSamples.find((s) => s.age >= 65 && s.roleId === "retired") ?? null;
+  check(
+    "role_shows_primary_student_at_age6",
+    childRole !== null,
+    `sample=${JSON.stringify(childRole ? { age: childRole.age, role: childRole.roleId } : null)}`
+  );
+  check(
+    "role_shows_junior_high_student_at_age13",
+    teenRole !== null,
+    `sample=${JSON.stringify(teenRole ? { age: teenRole.age, role: teenRole.roleId } : null)}`
+  );
+  check(
+    "role_shows_adult_identity_at_age18",
+    adultRole !== null,
+    `sample=${JSON.stringify(adultRole ? { age: adultRole.age, role: adultRole.roleId } : null)}`
+  );
+  check(
+    "role_shows_retired_at_65plus_when_reached",
+    !reached65 || retiredSample !== null,
+    `reached65=${reached65} retiredAge=${retiredSample?.age ?? null}`
+  );
+
+  // 情感狀態：五態合法；已婚／交往必帶姓名且不洩 internal key
+  const VALID_STATUS = new Set(["single", "dating", "married", "divorced", "widowed", "unknown"]);
+  const allStatusValid = partnerSamples.every((s) => s.status === null || VALID_STATUS.has(s.status));
+  const marriedDating = partnerSamples.filter((s) => s.status === "married" || s.status === "dating");
+  const namedOk = marriedDating.every(
+    (s) => typeof s.name === "string" && s.name.length > 0 && !INTERNAL_KEY_PATTERN.test(s.name)
+  );
+  check(
+    "relationship_status_valid_five_states",
+    allStatusValid,
+    `statuses=${JSON.stringify([...new Set(partnerSamples.map((s) => s.status))])}`
+  );
+  check(
+    "married_or_dating_carries_named_partner",
+    marriedDating.length === 0 || (marriedDating.length > 0 && namedOk),
+    `count=${marriedDating.length} namedOk=${namedOk} sample=${JSON.stringify(marriedDating[0]?.name ?? null)}`
+  );
+
+  // 居住：entityId 格式合法（與出生 entity 相同，由 profile 投影保證）
+  const lastRes = partnerSamples[partnerSamples.length - 1];
+  const resOk = lastRes !== undefined && typeof lastRes.resEntity === "string" && /^cr:[A-Z]{3}$/.test(lastRes.resEntity);
+  check(
+    "residence_entity_valid_format",
+    resOk,
+    `entity=${lastRes?.resEntity} region=${lastRes?.resRegion} text=${lastRes?.resText}`
+  );
+
+  // 具體挫折／成功：人生紀錄不得出現泛稱，也不得洩漏 internal key / detailId
+  const lifeLogDom = await page.evaluate(() =>
+    [...document.querySelectorAll(".p3e-life-log-entry")].map((node) => ({
+      text: node.dataset.p3eLifeLogText ?? (node.textContent ?? "").replace(/\s+/g, " ").trim()
+    }))
+  );
+  const GENERIC_PHRASES = ["遇到了一次挫折", "收穫了一個小小的成功"];
+  const genericHits = lifeLogDom.filter((e) => GENERIC_PHRASES.some((g) => e.text.includes(g)));
+  const leakedHits = lifeLogDom.filter((e) => INTERNAL_KEY_PATTERN.test(e.text));
+  check(
+    "life_log_no_generic_setback_win_phrases",
+    genericHits.length === 0,
+    `generic=${JSON.stringify(genericHits.slice(0, 3).map((e) => e.text))}`
+  );
+  check(
+    "life_log_no_internal_key_or_detail_id",
+    leakedHits.length === 0,
+    `leaked=${JSON.stringify(leakedHits.slice(0, 3).map((e) => e.text))}`
+  );
+
+  // 不同 seed 多樣性：另開一組 seed，人生紀錄挫折／成功文案應與 golden 不同
+  {
+    const altSeed = "p3e-0040-alt-variety-7";
+    const altContext = await browser.newContext({
+      viewport: { width: 390, height: 844 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true
+    });
+    const altPage = await altContext.newPage();
+    await altPage.goto(`${baseUrl}/?seed=${encodeURIComponent(altSeed)}&${REPLAY_QUERY}`, { waitUntil: "domcontentloaded" });
+    await altPage.waitForSelector("[data-p3e-live='true']", { timeout: 30000 });
+    await altPage.locator('[data-action="start-life"]').click().catch(() => {});
+    let altGuard = 0;
+    while ((await phaseOf(altPage)) !== "death" && altGuard < 80) {
+      const ph = await phaseOf(altPage);
+      const sel = ph === "pending_decision" ? '[data-action="choose"]' : '[data-action="advance"]';
+      await clickAndWait(altPage, sel).catch(() => {});
+      altGuard += 1;
+    }
+    const altLog = await altPage.evaluate(() =>
+      [...document.querySelectorAll(".p3e-life-log-entry")].map(
+        (node) => node.dataset.p3eLifeLogText ?? (node.textContent ?? "").replace(/\s+/g, " ").trim()
+      )
+    );
+    const goldenSet = new Set(lifeLogDom.map((e) => e.text));
+    const altSet = new Set(altLog);
+    const difference = [...altSet].filter((t) => !goldenSet.has(t));
+    check(
+      "life_log_different_seed_shows_variety",
+      altLog.length > 0 && difference.length > 0,
+      `golden=${goldenSet.size} alt=${altSet.size} diff=${difference.length}`
+    );
+    await altContext.close();
+  }
 
   /* ---------------------------------------------------------------- */
   /* 6b. GPT-0025-D：新決策文案全部自然繁中、無 internal key             */
@@ -1291,14 +1510,16 @@ async function main() {
     if (!ok) process.exitCode = 1;
   }
 
-  async function newScenarioPage(initScript) {
+  async function newScenarioPage(initScript, initArg) {
     const scenarioContext = await browser.newContext({
       viewport: { width: 390, height: 844 },
       deviceScaleFactor: 1,
       isMobile: true,
       hasTouch: true
     });
-    if (initScript !== undefined) await scenarioContext.addInitScript(initScript);
+    // GPT-0041-B：`addInitScript` 不會擷取 Node 閉包變數，資料必須以引數傳入，
+    // 否則頁面內 `fr.status` 等會 ReferenceError，覆蓋失效。
+    if (initScript !== undefined) await scenarioContext.addInitScript(initScript, initArg);
     const scenarioPage = await scenarioContext.newPage();
     return { scenarioContext, scenarioPage };
   }
@@ -2588,6 +2809,22 @@ async function main() {
         years.every((year, index) => index === 0 || years[index - 1] >= year),
         `years=${JSON.stringify(years.slice(0, 8))}`
       );
+      // GPT-0040-B：居住 entity 與出生 entity 一致，且 reload 不變。
+      const readResidence = () =>
+        scenarioPage.evaluate(() => {
+          const row = document.querySelector(".p3e-profile-row[data-p3e-profile-residence-entity]");
+          return {
+            entity: row?.getAttribute("data-p3e-profile-residence-entity") ?? null,
+            text: row?.querySelector(".p3e-profile-val")?.textContent ?? null
+          };
+        });
+      const readBirthEntity = () =>
+        scenarioPage.evaluate(() => {
+          const shell = document.querySelector("#p3e-main[data-p3e-live='true']");
+          return shell?.getAttribute("data-p3e-birth-entity") ?? null;
+        });
+      const resBefore = await readResidence();
+      const birthEntity = await readBirthEntity();
       await reloadApp(scenarioPage);
       const afterReloadLog = await readLifeLogState();
       verify(
@@ -2596,6 +2833,23 @@ async function main() {
           afterReloadLog.count >= beforeReloadLog.count &&
           afterReloadLog.entries[0]?.inner === beforeReloadLog.entries[0]?.inner,
         `before=${beforeReloadLog.count} after=${afterReloadLog.count} latest="${afterReloadLog.entries[0]?.inner ?? ""}"`
+      );
+      const resAfter = await readResidence();
+      const birthEntityAfter = await readBirthEntity();
+      verify(
+        "profile_residence_persists_after_reload",
+        resBefore.entity !== null && resAfter.entity !== null &&
+          /^cr:[A-Z]{3}$/.test(resAfter.entity) && resBefore.entity === resAfter.entity,
+        `before=${resBefore.entity} after=${resAfter.entity}`
+      );
+      // 居住 entity 必須與出生國 entity 一致（view.profile.residence 由 p3e-profile.ts
+      // 直接投影自 state.identity.entityId，故二者等同；browser 直接從 live shell 讀出生 entity 比對）。
+      verify(
+        "profile_residence_matches_birth_entity",
+        resAfter.entity !== null && birthEntityAfter !== null &&
+          /^cr:[A-Z]{3}$/.test(resAfter.entity) &&
+          resAfter.entity === birthEntityAfter,
+        `residence=${resAfter.entity} birth=${birthEntityAfter}`
       );
     } else {
       // GPT-0031-A 尚未提供 view.lifeLog：任務文件允許安全回退到 lastOutcome。
@@ -3165,21 +3419,21 @@ async function main() {
       `expanded=${noteState.expanded} visible=${noteState.visible} text=${noteState.text.slice(0, 60)}`
     );
 
-    // C：具名伴侶在 reload／讀檔後姓名不變
+    // GPT-0040-B：具名伴侶改由狀態卡情感狀態列呈現；reload／讀檔後姓名不變
     await driveUntil(
       adultPage,
-      async () => (await adultPage.locator(".p3e-partner-line").count()) > 0,
+      async () => (await adultPage.locator(".p3e-profile-row[data-p3e-partner-name]").count()) > 0,
       80
     );
     const beforeReload = await adultPage.evaluate(
-      () => document.querySelector(".p3e-partner-line")?.getAttribute("data-p3e-partner-name") ?? null
+      () => document.querySelector(".p3e-profile-row[data-p3e-partner-name]")?.getAttribute("data-p3e-partner-name") ?? null
     );
     // 等 idle autosave flush 完成，reload 才能由 command log 重建同一個伴侶姓名。
     await adultPage.waitForTimeout(700);
     await adultPage.reload({ waitUntil: "domcontentloaded" });
     await adultPage.waitForSelector("[data-p3e-live='true']", { timeout: 30000 });
     const afterReload = await adultPage.evaluate(
-      () => document.querySelector(".p3e-partner-line")?.getAttribute("data-p3e-partner-name") ?? null
+      () => document.querySelector(".p3e-profile-row[data-p3e-partner-name]")?.getAttribute("data-p3e-partner-name") ?? null
     );
     check(
       "partner_name_persists_after_reload",
@@ -3771,6 +4025,13 @@ async function main() {
     check("jump_rebirth_no_page_errors", errors.length === 0, `errors=${JSON.stringify(errors)}`);
     await context.close();
   }
+
+  /* ---------------------------------------------------------------- */
+  /* 15. 五態與國名的覆蓋已移至 reader/DOM 單元測試（p3e-view-readers   */
+  /*     .test.ts）與不進 production bundle 的測試 fixture；本腳本不再    */
+  /*     依賴 window.__p3eProfileOverride 注入。以下僅保留 golden 資料   */
+  /*     的觀察性驗收（見 6c 與死亡狀態卡檢查）。                       */
+  /* ---------------------------------------------------------------- */
 
   const allChecks = [...results, ...scenarioResults];
 

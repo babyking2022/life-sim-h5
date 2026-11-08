@@ -1,4 +1,5 @@
 import type { P3ECommandOutcome } from "@life-sim/simulation";
+import { detailIdFor } from "./p3e-detail";
 
 /**
  * GPT-0031-A｜可累積的人生紀錄（`lifeLog`）presentation projection。
@@ -57,6 +58,12 @@ export interface P3ELifeLogEntry {
   readonly focusId: string | null;
   readonly causeId: string | null;
   readonly deathReason: "mortality" | "age_ceiling" | null;
+  /**
+   * 泛稱事件（`ev.any.setback`／`ev.any.small-win`）的具體變體 ID
+   * （GPT-DEEPSEEK-0040-A）：`p3b.detail.<kind>.<stage>.<1..4>`；
+   * 其他事件為 `null`。文字只存在顯示層字典，這裡只帶公開 ID。
+   */
+  readonly detailId: string | null;
 }
 
 /** 累積人生紀錄需要的最小權威事實（全部來自一次成功的命令結果）。 */
@@ -72,7 +79,8 @@ const EMPTY_IDS = Object.freeze({
   optionId: null,
   focusId: null,
   causeId: null,
-  deathReason: null
+  deathReason: null,
+  detailId: null
 });
 
 function freezeEntry(entry: P3ELifeLogEntry): P3ELifeLogEntry {
@@ -86,7 +94,8 @@ function freezeEntry(entry: P3ELifeLogEntry): P3ELifeLogEntry {
     optionId: entry.optionId,
     focusId: entry.focusId,
     causeId: entry.causeId,
-    deathReason: entry.deathReason
+    deathReason: entry.deathReason,
+    detailId: entry.detailId
   });
 }
 
@@ -105,7 +114,13 @@ export function birthLifeLogEntry(birthYear: number): P3ELifeLogEntry {
  * - `choose_decision`：`decision`（eventId／decisionId／optionId）；
  * - `set_life_focus`：`focus`（focusId）。
  */
-export function lifeLogEntryFromOutcome(seq: number, year: number, age: number, outcome: P3ECommandOutcome): P3ELifeLogEntry {
+export function lifeLogEntryFromOutcome(
+  seq: number,
+  year: number,
+  age: number,
+  outcome: P3ECommandOutcome,
+  masterSeed = ""
+): P3ELifeLogEntry {
   if (outcome.kind === "choose_decision") {
     return freezeEntry({
       seq,
@@ -130,7 +145,11 @@ export function lifeLogEntryFromOutcome(seq: number, year: number, age: number, 
       ...EMPTY_IDS,
       eventId: outcome.selectedEventId,
       causeId: outcome.death.causeId,
-      deathReason: outcome.death.reason
+      deathReason: outcome.death.reason,
+      detailId:
+        outcome.selectedEventId === null
+          ? null
+          : detailIdFor({ masterSeed, eventId: outcome.selectedEventId, year, age })
     });
   }
   if (outcome.pendingDecision !== null) {
@@ -141,11 +160,20 @@ export function lifeLogEntryFromOutcome(seq: number, year: number, age: number, 
       kind: "event",
       ...EMPTY_IDS,
       eventId: outcome.pendingDecision.eventId,
-      decisionId: outcome.pendingDecision.decisionId
+      decisionId: outcome.pendingDecision.decisionId,
+      detailId: detailIdFor({ masterSeed, eventId: outcome.pendingDecision.eventId, year, age })
     });
   }
   if (outcome.selectedEventId !== null) {
-    return freezeEntry({ seq, year, age, kind: "event", ...EMPTY_IDS, eventId: outcome.selectedEventId });
+    return freezeEntry({
+      seq,
+      year,
+      age,
+      kind: "event",
+      ...EMPTY_IDS,
+      eventId: outcome.selectedEventId,
+      detailId: detailIdFor({ masterSeed, eventId: outcome.selectedEventId, year, age })
+    });
   }
   return freezeEntry({ seq, year, age, kind: "year", ...EMPTY_IDS });
 }
@@ -168,13 +196,14 @@ function finalize(entries: readonly P3ELifeLogEntry[]): readonly P3ELifeLogEntry
  */
 export function buildP3ELifeLog(
   birthYear: number,
-  sources: readonly P3ELifeLogSource[]
+  sources: readonly P3ELifeLogSource[],
+  masterSeed = ""
 ): readonly P3ELifeLogEntry[] {
   const entries: P3ELifeLogEntry[] = [birthLifeLogEntry(birthYear)];
   let seq = 1;
   for (const source of sources) {
     seq += 1;
-    entries.push(lifeLogEntryFromOutcome(seq, source.year, source.age, source.outcome));
+    entries.push(lifeLogEntryFromOutcome(seq, source.year, source.age, source.outcome, masterSeed));
   }
   return finalize(entries);
 }
@@ -184,10 +213,11 @@ export function appendP3ELifeLogEntry(
   entries: readonly P3ELifeLogEntry[],
   year: number,
   age: number,
-  outcome: P3ECommandOutcome
+  outcome: P3ECommandOutcome,
+  masterSeed = ""
 ): readonly P3ELifeLogEntry[] {
   const nextSeq = entries.length === 0 ? 1 : Math.max(...entries.map((entry) => entry.seq)) + 1;
-  return finalize([...entries, lifeLogEntryFromOutcome(nextSeq, year, age, outcome)]);
+  return finalize([...entries, lifeLogEntryFromOutcome(nextSeq, year, age, outcome, masterSeed)]);
 }
 
 /** 兼容型 type guard：UI 可以用它安全地讀 `view.lifeLog`。 */
@@ -198,7 +228,7 @@ export function isP3ELifeLogEntry(value: unknown): value is P3ELifeLogEntry {
   if (typeof record.year !== "number" || !Number.isSafeInteger(record.year)) return false;
   if (typeof record.age !== "number" || !Number.isSafeInteger(record.age) || record.age < 0) return false;
   if (typeof record.kind !== "string" || !(P3E_LIFE_LOG_KINDS as readonly string[]).includes(record.kind)) return false;
-  for (const key of ["eventId", "decisionId", "optionId", "focusId", "causeId", "deathReason"]) {
+  for (const key of ["eventId", "decisionId", "optionId", "focusId", "causeId", "deathReason", "detailId"]) {
     const field = record[key];
     if (field !== null && typeof field !== "string") return false;
   }

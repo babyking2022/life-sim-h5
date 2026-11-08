@@ -347,6 +347,23 @@ function buildMainEvents(): P3BEventRecord[] {
       effects: [stat("happiness", -2), money("balanceMicroUsd", "-400000")]
     }),
     event({
+      eventId: "ev.adult.partner-loss",
+      kind: "ordinary",
+      localizationKey: "p3b.event.adult.partner_loss",
+      ageMin: 30,
+      ageMax: 110,
+      lifeStages: ["adulthood", "later_life"],
+      weight: 8,
+      cooldownYears: 20,
+      conditions: { op: "flag", flag: "partner:married", present: true },
+      effects: [
+        stat("happiness", -6),
+        stat("health", -2),
+        flag("partner:married", "remove"),
+        flag("relationship:widowed", "add")
+      ]
+    }),
+    event({
       eventId: "ev.any.quiet-year",
       kind: "ordinary",
       localizationKey: "p3b.event.any.quiet_year",
@@ -881,18 +898,73 @@ const CHOICE_EVENTS: readonly ChoiceSpec[] = [
   },
   {
     group: "adult",
+    slug: "marital-breakup",
+    title: "婚姻的裂痕",
+    prompt: "兩個人之間出現了不少摩擦，要怎麼走下去？",
+    ageMin: 26,
+    ageMax: 100,
+    stages: ["adulthood", "later_life"],
+    weight: 14,
+    cooldownYears: 10,
+    conditions: { op: "flag", flag: "partner:married", present: true },
+    options: [
+      opt("divorce", "決定離婚", [
+        stat("happiness", -2),
+        money("balanceMicroUsd", "-15000000000"),
+        flag("partner:married", "remove"),
+        flag("partner:cohabit", "remove"),
+        flag("teen:partner", "remove"),
+        flag("relationship:divorced", "add")
+      ]),
+      opt("repair", "一起把事情談開", [stat("relationships", 3), stat("happiness", 2), money("balanceMicroUsd", "-3000000000")]),
+      opt("separate", "先分居一段時間", [stat("happiness", -1), money("balanceMicroUsd", "-6000000000")])
+    ]
+  },
+  {
+    group: "adult",
     slug: "relationship",
     title: "感情的下一步",
-    prompt: "交往一段時間了，接下來呢？",
+    prompt: "你遇到一位合適的人，想怎麼走下去？",
     ageMin: 22,
-    ageMax: 30,
-    stages: ["adulthood"],
+    ageMax: 100,
+    stages: ["adulthood", "later_life"],
     weight: 55,
     cooldownYears: 6,
+    // GPT-DEEPSEEK-0043-A：已婚者只走婚姻事件（marital-breakup）／喪偶事件，
+    // 不得再抽到「感情的下一步」，避免 canonical flags 與 profile 說法不一致。
+    conditions: { op: "not", condition: { op: "flag", flag: "partner:married", present: true } },
     options: [
-      opt("cohabit", "先同居看看", [stat("happiness", 4), stat("relationships", 3), money("annualExpenseMicroUsd", "6000000000"), flag("partner:cohabit", "add")]),
-      opt("marry", "結婚", [stat("relationships", 5), stat("happiness", 4), money("balanceMicroUsd", "-30000000000"), flag("partner:married", "add")]),
-      opt("single", "保持單身", [stat("happiness", 2), money("balanceMicroUsd", "10000000000")])
+      opt("cohabit", "先同居看看", [
+        stat("happiness", 4),
+        stat("relationships", 3),
+        money("annualExpenseMicroUsd", "6000000000"),
+        flag("partner:cohabit", "add"),
+        flag("partner:married", "remove"),
+        flag("teen:partner", "remove"),
+        flag("relationship:divorced", "remove"),
+        flag("relationship:widowed", "remove")
+      ]),
+      opt("marry", "結婚", [
+        stat("relationships", 5),
+        stat("happiness", 4),
+        money("balanceMicroUsd", "-30000000000"),
+        flag("partner:married", "add"),
+        flag("partner:cohabit", "remove"),
+        flag("teen:partner", "remove"),
+        flag("relationship:divorced", "remove"),
+        flag("relationship:widowed", "remove")
+      ]),
+      opt("single", "保持單身", [
+        stat("happiness", 2),
+        money("balanceMicroUsd", "10000000000"),
+        flag("teen:partner", "remove"),
+        flag("partner:cohabit", "remove"),
+        flag("partner:married", "remove"),
+        // GPT-DEEPSEEK-0044-A：divorced／widowed 的玩家回到單身時，
+        // canonical flags 也必須清掉，避免「畫面 single、state 仍 widowed」。
+        flag("relationship:divorced", "remove"),
+        flag("relationship:widowed", "remove")
+      ])
     ]
   },
   {
@@ -937,8 +1009,16 @@ const CHOICE_EVENTS: readonly ChoiceSpec[] = [
     stages: ["adulthood"],
     weight: 45,
     cooldownYears: 8,
+    // GPT-DEEPSEEK-0041-A：碩士／博士都需要先完成大學（模擬層就擋，不靠 UI 隱藏）。
+    conditions: { op: "flag", flag: "edu:university", present: true },
     options: [
       opt("master", "去讀研究所", [stat("knowledge", 7), money("balanceMicroUsd", "-25000000000"), flag("edu:master", "add")]),
+      opt("doctorate", "攻讀博士", [
+        stat("knowledge", 10),
+        stat("happiness", -2),
+        money("balanceMicroUsd", "-40000000000"),
+        flag("edu:doctorate", "add")
+      ]),
       opt("online", "上線上課程", [stat("knowledge", 4), money("balanceMicroUsd", "-3000000000")]),
       opt("none", "先不進修", [stat("happiness", 2), money("balanceMicroUsd", "2000000000")])
     ]
@@ -1357,6 +1437,7 @@ const LEGACY_COPY: Readonly<Record<string, string>> = {
   "ev.adult.promotion": "在工作上獲得晉升",
   "ev.adult.volunteer": "參加了一次志工活動",
   "ev.any.quiet-year": "平靜地度過了一年",
+  "ev.adult.partner-loss": "配偶離世了",
   "ev.any.setback": "遇到了一次挫折",
   "ev.any.small-win": "收穫了一個小小的成功",
   "ev.child.first-word": "說出了人生第一句話",
@@ -1383,6 +1464,73 @@ const LEGACY_COPY: Readonly<Record<string, string>> = {
   "p3b.option.teen.path.study": "繼續升學，累積知識",
   "p3b.option.teen.path.work": "開始工作，累積實務經驗"
 };
+
+/**
+ * GPT-DEEPSEEK-0040-A：泛稱挫折／成功的「具體變體」文案。
+ *
+ * 每筆是 `detailId → 繁中句子`，detailId 格式固定為
+ * `p3b.detail.<setback|small-win>.<lifeStage>.<1..4>`；application 只用 ID，
+ * 這段文字只存在顯示層字典，不進 events checksum、也不進 canonical state。
+ */
+const DETAIL_COPY: Readonly<Record<"setback" | "small-win", Readonly<Record<string, readonly string[]>>>> = {
+  setback: {
+    childhood: [
+      "你花了一整個下午做的紙黏土作品，一個不小心掉在地上摔裂了",
+      "在公園練習騎腳踏車時摔了一跤，膝蓋擦破了一塊皮",
+      "畫到一半的美術作業被水杯打翻，整張紙都糊掉了",
+      "你最喜歡的布偶洗過之後整個變形，只能捨不得地收進櫃子"
+    ],
+    adolescence: [
+      "段考成績比預期低了十幾分，回家路上一直不敢打開成績單",
+      "準備很久的報告上台前，電腦突然更新到一半卡住",
+      "報名校際比賽時填錯組別，最後只拿到參加獎",
+      "和要好的同學為了一件小事冷戰了兩個星期"
+    ],
+    adulthood: [
+      "熬夜準備的資料在簡報前一刻發現版本放錯，只能臨時重講",
+      "出門時公車剛好開走，等下一班讓你遲到了半小時",
+      "排了很久的隊，輪到你的時候名額剛好用完",
+      "連續忙了兩週之後，身體第一次發出明顯的抗議"
+    ],
+    later_life: [
+      "期待很久的聚會因為颱風取消，你只能把準備好的東西收回冰箱",
+      "膝蓋的舊傷在天氣轉涼時隱隱作痛，散步的時間縮短了一半",
+      "原本報名的書法班因為人數不足沒開成",
+      "整理舊照片時發現一疊底片已經發霉，沒辦法再沖洗"
+    ]
+  },
+  "small-win": {
+    childhood: [
+      "你第一次自己把鞋帶綁好，開心地跑去給每個人看",
+      "老師把你畫的圖貼在教室後面，同學都跑過來看",
+      "你終於敢從游泳池的深水區游到對岸",
+      "你學會了用注音拼出自己的名字，還教會了隔壁的同學"
+    ],
+    adolescence: [
+      "成果發表上，你負責的那一段拿到全場最熱烈的掌聲",
+      "你熬夜整理的筆記被同學借去印了一整班",
+      "園遊會時你們攤位的東西不到中午就賣光",
+      "你投的校刊稿子被登出來，還被老師在課堂上唸了一段"
+    ],
+    adulthood: [
+      "你花了幾個月調整的做法終於推行成功，出錯率明顯下降",
+      "第一次自己完成一份完整的規劃書，被對方稱讚做得很仔細",
+      "你把困擾很久的漏水問題自己修好了",
+      "卡了兩個月的問題被你找到原因，終於順利解決"
+    ],
+    later_life: [
+      "你寫的春聯被鄰居要了好幾張，還有人預約明年再寫",
+      "社區的書法班請你去當小老師，第一次上課就來了十幾個人",
+      "你把陽台整理成一個小花園，路過的人都停下來看",
+      "你示範了一次騎腳踏車，旁邊的小朋友看得目不轉睛"
+    ]
+  }
+};
+
+/** detail 文案的顯示層 key（application 端用的是同一個格式）。 */
+function detailCopyId(kind: "setback" | "small-win", stage: string, index: number): string {
+  return `p3b.detail.${kind}.${stage}.${index + 1}`;
+}
 
 /** 事件 id／localizationKey 的固定推導（generator 與內容映射檔共用）。 */
 function choiceIds(spec: ChoiceSpec): {
@@ -1456,6 +1604,15 @@ function buildCopyDocument(): {
       copy[key] = spec.options[index]?.label as string;
       optionCount += 1;
     });
+  }
+  // GPT-DEEPSEEK-0040-A：泛稱挫折／成功的具體變體（32 條，只放顯示層字典）。
+  for (const kind of ["setback", "small-win"] as const) {
+    for (const stage of ["childhood", "adolescence", "adulthood", "later_life"] as const) {
+      const lines = DETAIL_COPY[kind][stage] as readonly string[];
+      lines.forEach((line, index) => {
+        copy[detailCopyId(kind, stage, index)] = line;
+      });
+    }
   }
   const sorted: Record<string, string> = {};
   for (const key of Object.keys(copy).sort()) sorted[key] = copy[key] as string;

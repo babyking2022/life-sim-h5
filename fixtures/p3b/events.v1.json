@@ -826,7 +826,11 @@
     {
       "eventSpecVersion": "1.0.0",
       "contentPackVersion": "1.1.0",
-      "conditions": null,
+      "conditions": {
+        "op": "flag",
+        "flag": "edu:university",
+        "present": true
+      },
       "priority": 0,
       "once": false,
       "cooldownYears": 8,
@@ -859,6 +863,32 @@
               {
                 "type": "flag",
                 "flag": "edu:master",
+                "action": "add"
+              }
+            ]
+          },
+          {
+            "optionId": "doctorate",
+            "labelKey": "p3b.option.adult.further-study.doctorate",
+            "effects": [
+              {
+                "type": "stat",
+                "stat": "knowledge",
+                "delta": 10
+              },
+              {
+                "type": "stat",
+                "stat": "happiness",
+                "delta": -2
+              },
+              {
+                "type": "money",
+                "field": "balanceMicroUsd",
+                "deltaMicroUsd": "-40000000000"
+              },
+              {
+                "type": "flag",
+                "flag": "edu:doctorate",
                 "action": "add"
               }
             ]
@@ -1361,6 +1391,116 @@
     {
       "eventSpecVersion": "1.0.0",
       "contentPackVersion": "1.1.0",
+      "conditions": {
+        "op": "flag",
+        "flag": "partner:married",
+        "present": true
+      },
+      "priority": 0,
+      "once": false,
+      "cooldownYears": 10,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "openDecision",
+          "decisionId": "dec.adult.marital-breakup"
+        }
+      ],
+      "decision": {
+        "decisionId": "dec.adult.marital-breakup",
+        "promptKey": "p3b.decision.adult.marital-breakup",
+        "options": [
+          {
+            "optionId": "divorce",
+            "labelKey": "p3b.option.adult.marital-breakup.divorce",
+            "effects": [
+              {
+                "type": "stat",
+                "stat": "happiness",
+                "delta": -2
+              },
+              {
+                "type": "money",
+                "field": "balanceMicroUsd",
+                "deltaMicroUsd": "-15000000000"
+              },
+              {
+                "type": "flag",
+                "flag": "partner:married",
+                "action": "remove"
+              },
+              {
+                "type": "flag",
+                "flag": "partner:cohabit",
+                "action": "remove"
+              },
+              {
+                "type": "flag",
+                "flag": "teen:partner",
+                "action": "remove"
+              },
+              {
+                "type": "flag",
+                "flag": "relationship:divorced",
+                "action": "add"
+              }
+            ]
+          },
+          {
+            "optionId": "repair",
+            "labelKey": "p3b.option.adult.marital-breakup.repair",
+            "effects": [
+              {
+                "type": "stat",
+                "stat": "relationships",
+                "delta": 3
+              },
+              {
+                "type": "stat",
+                "stat": "happiness",
+                "delta": 2
+              },
+              {
+                "type": "money",
+                "field": "balanceMicroUsd",
+                "deltaMicroUsd": "-3000000000"
+              }
+            ]
+          },
+          {
+            "optionId": "separate",
+            "labelKey": "p3b.option.adult.marital-breakup.separate",
+            "effects": [
+              {
+                "type": "stat",
+                "stat": "happiness",
+                "delta": -1
+              },
+              {
+                "type": "money",
+                "field": "balanceMicroUsd",
+                "deltaMicroUsd": "-6000000000"
+              }
+            ]
+          }
+        ]
+      },
+      "sourceId": "p3b-synthetic-events-v1-source",
+      "eventId": "ev.adult.marital-breakup",
+      "kind": "decision",
+      "localizationKey": "p3b.event.adult.marital_breakup",
+      "ageMin": 26,
+      "ageMax": 100,
+      "lifeStages": [
+        "adulthood",
+        "later_life"
+      ],
+      "weight": 14
+    },
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.1.0",
       "conditions": null,
       "priority": 0,
       "once": false,
@@ -1642,6 +1782,54 @@
       "eventSpecVersion": "1.0.0",
       "contentPackVersion": "1.1.0",
       "conditions": {
+        "op": "flag",
+        "flag": "partner:married",
+        "present": true
+      },
+      "priority": 0,
+      "once": false,
+      "cooldownYears": 20,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "stat",
+          "stat": "happiness",
+          "delta": -6
+        },
+        {
+          "type": "stat",
+          "stat": "health",
+          "delta": -2
+        },
+        {
+          "type": "flag",
+          "flag": "partner:married",
+          "action": "remove"
+        },
+        {
+          "type": "flag",
+          "flag": "relationship:widowed",
+          "action": "add"
+        }
+      ],
+      "decision": null,
+      "sourceId": "p3b-synthetic-events-v1-source",
+      "eventId": "ev.adult.partner-loss",
+      "kind": "ordinary",
+      "localizationKey": "p3b.event.adult.partner_loss",
+      "ageMin": 30,
+      "ageMax": 110,
+      "lifeStages": [
+        "adulthood",
+        "later_life"
+      ],
+      "weight": 8
+    },
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.1.0",
+      "conditions": {
         "op": "all",
         "conditions": [
           {
@@ -1689,7 +1877,14 @@
     {
       "eventSpecVersion": "1.0.0",
       "contentPackVersion": "1.1.0",
-      "conditions": null,
+      "conditions": {
+        "op": "not",
+        "condition": {
+          "op": "flag",
+          "flag": "partner:married",
+          "present": true
+        }
+      },
       "priority": 0,
       "once": false,
       "cooldownYears": 6,
@@ -1728,6 +1923,26 @@
                 "type": "flag",
                 "flag": "partner:cohabit",
                 "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "partner:married",
+                "action": "remove"
+              },
+              {
+                "type": "flag",
+                "flag": "teen:partner",
+                "action": "remove"
+              },
+              {
+                "type": "flag",
+                "flag": "relationship:divorced",
+                "action": "remove"
+              },
+              {
+                "type": "flag",
+                "flag": "relationship:widowed",
+                "action": "remove"
               }
             ]
           },
@@ -1754,6 +1969,26 @@
                 "type": "flag",
                 "flag": "partner:married",
                 "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "partner:cohabit",
+                "action": "remove"
+              },
+              {
+                "type": "flag",
+                "flag": "teen:partner",
+                "action": "remove"
+              },
+              {
+                "type": "flag",
+                "flag": "relationship:divorced",
+                "action": "remove"
+              },
+              {
+                "type": "flag",
+                "flag": "relationship:widowed",
+                "action": "remove"
               }
             ]
           },
@@ -1770,6 +2005,31 @@
                 "type": "money",
                 "field": "balanceMicroUsd",
                 "deltaMicroUsd": "10000000000"
+              },
+              {
+                "type": "flag",
+                "flag": "teen:partner",
+                "action": "remove"
+              },
+              {
+                "type": "flag",
+                "flag": "partner:cohabit",
+                "action": "remove"
+              },
+              {
+                "type": "flag",
+                "flag": "partner:married",
+                "action": "remove"
+              },
+              {
+                "type": "flag",
+                "flag": "relationship:divorced",
+                "action": "remove"
+              },
+              {
+                "type": "flag",
+                "flag": "relationship:widowed",
+                "action": "remove"
               }
             ]
           }
@@ -1780,9 +2040,10 @@
       "kind": "decision",
       "localizationKey": "p3b.event.adult.relationship",
       "ageMin": 22,
-      "ageMax": 30,
+      "ageMax": 100,
       "lifeStages": [
-        "adulthood"
+        "adulthood",
+        "later_life"
       ],
       "weight": 55
     },

@@ -25,12 +25,13 @@ import {
   buildP3ELifeLog,
   type P3ELifeLogEntry
 } from "./p3e-life-log";
+import type { P3ELifePartner } from "./p3e-partner";
 import {
-  advanceP3ELifePartner,
-  resolveP3ELifePartner,
-  type P3ELifePartner,
-  type P3EPartnerChoice
-} from "./p3e-partner";
+  deriveP3EProfile,
+  resolveP3ERelationship,
+  type P3EProfile,
+  type P3EProfileFact
+} from "./p3e-profile";
 
 /**
  * P3-E.1b-2n／2r／2t：Application Play Session ＋ ViewModel ＋ Raw Session Persistence
@@ -130,6 +131,11 @@ export interface P3EPlaySessionView {
    * 全部標示估算，並附基準年／單位／來源／方法。
    */
   readonly percentiles: P3EPlaySessionPercentiles;
+  /**
+   * 角色即時狀態（GPT-DEEPSEEK-0040-A）：目前職業／居住地／感情狀態。
+   * 全部是呈現投影，可由 command log 決定性重建。
+   */
+  readonly profile: P3EProfile;
   /**
    * 具名伴侶（GPT-DEEPSEEK-0036-A）：沒有關係事件時是 null；
    * 由 masterSeed ＋ command log 決定性重建（不消耗年度 RNG）。
@@ -305,60 +311,49 @@ function cultureIdOf(identityPack: PartnerIdentityPackView, state: P3ELifeState)
 }
 
 /**
- * 從「逐命令結果」抽出所有 choose_decision（伴侶轉移表自己會依 eventId 過濾）。
+ * 關係的**唯一真相**（GPT-DEEPSEEK-0041-A）：`view.partner` 與
+ * `view.profile.relationship` 都來自同一次解析，不可能互相矛盾。
  *
- * 這裡刻意不做任何關係判斷：是否建立／升級／清除伴侶完全由
- * `P3E_PARTNER_TRANSITIONS`（eventId ＋ decisionId ＋ optionId）決定，
- * 因此即時路徑與 replay 路徑用的是同一份規則。
+ * facts 來自 `view.lifeLog`（選擇＋事件，oldest → newest），因此即時、存檔、
+ * 重播三條路徑都套用同一組轉移（包含配偶離世 → widowed 時 partner 必須變 null）。
  */
-function partnerChoicesOf(
-  sources: readonly { readonly year: number; readonly outcome: P3ECommandOutcome }[]
-): readonly P3EPartnerChoice[] {
-  const result: P3EPartnerChoice[] = [];
-  for (const source of sources) {
-    const outcome = source.outcome;
-    if (outcome.kind !== "choose_decision") continue;
-    result.push({
-      eventId: outcome.eventId,
-      decisionId: outcome.decisionId,
-      optionId: outcome.selectedOptionId,
-      year: source.year
-    });
-  }
-  return result;
-}
-
-/** 這次 outcome 是否是一次選擇（只有選擇才可能建立／升級／清除伴侶）。 */
-function partnerChoiceOf(outcome: P3ECommandOutcome, year: number): P3EPartnerChoice | null {
-  if (outcome.kind !== "choose_decision") return null;
-  return { eventId: outcome.eventId, decisionId: outcome.decisionId, optionId: outcome.selectedOptionId, year };
-}
-
-/**
- * 即時路徑：用「上一個 view 的伴侶」＋「本次 outcome」更新。
- *
- * 關係轉移（含 `single` 清除）完全由 `advanceP3ELifePartner` 決定；
- * 姓名永遠由**第一段關係**推導，之後只升級 status。
- */
-function advancePartner(input: {
+function resolveSessionRelationship(input: {
   readonly masterSeed: string;
   readonly identityPack: unknown;
-  readonly cultureId: string;
-  readonly playerSex: string;
-  readonly previous: P3ELifePartner | null;
-  readonly outcome: P3ECommandOutcome;
-  readonly year: number;
-}): P3ELifePartner | null {
-  const choice = partnerChoiceOf(input.outcome, input.year);
-  if (choice === null) return input.previous;
-  return advanceP3ELifePartner({
+  readonly state: P3ELifeState;
+  readonly lifeLog: readonly P3ELifeLogEntry[];
+}): { readonly partner: P3ELifePartner | null; readonly profile: P3EProfile } {
+  const profile = deriveP3EProfile({
+    state: input.state,
+    facts: profileFactsFromLifeLog(input.lifeLog),
     masterSeed: input.masterSeed,
     identityPack: input.identityPack as never,
-    cultureId: input.cultureId,
-    playerSex: input.playerSex,
-    previous: input.previous,
-    choice
+    cultureId: cultureIdOf(input.identityPack as never, input.state),
+    playerSex: input.state.identity.sex
   });
+  const relationship = resolveP3ERelationship({
+    masterSeed: input.masterSeed,
+    identityPack: input.identityPack as never,
+    cultureId: cultureIdOf(input.identityPack as never, input.state),
+    playerSex: input.state.identity.sex,
+    facts: profileFactsFromLifeLog(input.lifeLog)
+  });
+  return { partner: relationship.partner, profile };
+}
+
+
+/** 把 lifeLog（最新在前）轉成 profile 需要的 facts（oldest → newest）。 */
+function profileFactsFromLifeLog(lifeLog: readonly P3ELifeLogEntry[]): readonly P3EProfileFact[] {
+  return [...lifeLog]
+    .sort((left, right) => left.seq - right.seq)
+    .map((entry) => ({
+      kind: entry.kind,
+      eventId: entry.eventId,
+      decisionId: entry.decisionId,
+      optionId: entry.optionId,
+      year: entry.year,
+      age: entry.age
+    }));
 }
 
 /** 建立 view：只讀 State 與 lastOutcome，不查 pack、不重跑任何模擬。 */
@@ -366,7 +361,7 @@ function buildView(
   state: P3ELifeState,
   lastOutcome: P3ECommandOutcome | null,
   lifeLog: readonly P3ELifeLogEntry[],
-  partner: P3ELifePartner | null
+  relationship: { readonly partner: P3ELifePartner | null; readonly profile: P3EProfile }
 ): P3EPlaySessionView {
   const pendingDecision =
     state.phase === "pending_decision" && lastOutcome !== null && lastOutcome.kind === "advance_year"
@@ -384,7 +379,8 @@ function buildView(
     lastOutcome,
     lifeLog,
     percentiles: buildPercentiles(state),
-    partner
+    partner: relationship.partner,
+    profile: relationship.profile
   });
 }
 
@@ -440,13 +436,13 @@ function sealSession(
   ledgerHistory: P3ELedgerHistory,
   lastOutcome: P3ECommandOutcome | null,
   lifeLog: readonly P3ELifeLogEntry[],
-  partner: P3ELifePartner | null
+  relationship: { readonly partner: P3ELifePartner | null; readonly profile: P3EProfile }
 ): P3EPlaySession {
   return deepFreeze({
     state,
     ledgerHistory,
     lastOutcome,
-    view: buildView(state, lastOutcome, lifeLog, partner)
+    view: buildView(state, lastOutcome, lifeLog, relationship)
   });
 }
 
@@ -472,9 +468,14 @@ export function createP3EPlaySession(input: unknown): P3EPlaySession {
     deathPack: raw.deathPack
   };
   const state = createP3EGame(genesis);
-  const session = sealSession(state, createP3ELedgerHistory(state), null, [
-    birthLifeLogEntry(state.identity.birthYear)
-  ], null);
+  const lifeLog = [birthLifeLogEntry(state.identity.birthYear)];
+  const relationship = resolveSessionRelationship({
+    masterSeed: genesis.masterSeed as string,
+    identityPack: genesis.identityPack,
+    state,
+    lifeLog
+  });
+  const session = sealSession(state, createP3ELedgerHistory(state), null, lifeLog, relationship);
   GENESIS_BY_SESSION.set(session, genesis);
   return session;
 }
@@ -517,20 +518,18 @@ export function runP3EPlaySessionCommand(input: unknown): P3EPlaySessionCommandR
     current.view.lifeLog,
     result.yearRecord.year,
     result.yearRecord.age,
-    result.outcome
+    result.outcome,
+    genesis.masterSeed as string
   );
 
-  const partner = advancePartner({
+  const relationship = resolveSessionRelationship({
     masterSeed: genesis.masterSeed as string,
     identityPack: genesis.identityPack,
-    cultureId: cultureIdOf(genesis.identityPack as never, result.state),
-    playerSex: result.state.identity.sex,
-    previous: current.view.partner,
-    outcome: result.outcome,
-    year: result.yearRecord.year
+    state: result.state,
+    lifeLog
   });
 
-  const next = sealSession(result.state, ledgerHistory, result.outcome, lifeLog, partner);
+  const next = sealSession(result.state, ledgerHistory, result.outcome, lifeLog, relationship);
   GENESIS_BY_SESSION.set(next, genesis);
 
   return deepFreeze({
@@ -617,18 +616,16 @@ export function restoreP3EPlaySessionPayload(input: unknown): P3EPlaySession {
     age: pair.yearRecord.age,
     outcome: replayed.outcomes[index] as P3ECommandOutcome
   }));
-  const partnerChoices = partnerChoicesOf(sources);
-  const lifeLog = buildP3ELifeLog(replayed.state.identity.birthYear, sources);
+  const lifeLog = buildP3ELifeLog(replayed.state.identity.birthYear, sources, raw.masterSeed as string);
 
-  const partner = resolveP3ELifePartner({
+  const relationship = resolveSessionRelationship({
     masterSeed: raw.masterSeed as string,
-    identityPack: raw.identityPack as never,
-    cultureId: cultureIdOf(raw.identityPack as never, replayed.state),
-    playerSex: replayed.state.identity.sex,
-    choices: partnerChoices
+    identityPack: raw.identityPack,
+    state: replayed.state,
+    lifeLog
   });
 
-  const session = sealSession(replayed.state, replayed.history, replayed.lastOutcome, lifeLog, partner);
+  const session = sealSession(replayed.state, replayed.history, replayed.lastOutcome, lifeLog, relationship);
   GENESIS_BY_SESSION.set(session, genesis);
   return session;
 }

@@ -430,6 +430,7 @@ describe("H5-CTO-174-A Play Session：不可變性與錯誤", () => {
       expect((session as unknown as Dict)[key]).not.toBe(officialEventPack);
       expect((session as unknown as Dict)[key]).not.toBe(deathPack);
     }
+    console.log("VIEWKEYS", JSON.stringify(Object.keys(session.view).sort()));
     expect(Object.keys(session.view).sort()).toEqual([
       "age",
       "assets",
@@ -442,6 +443,7 @@ describe("H5-CTO-174-A Play Session：不可變性與錯誤", () => {
       "pendingDecision",
       "percentiles",
       "phase",
+      "profile",
       "stats"
     ]);
   });
@@ -473,20 +475,20 @@ describe("H5-CTO-174-A Play Session：不可變性與錯誤", () => {
 describe("H5-CTO-174-A Play Session：完整生命週期與效能", () => {
   it("birth_to_death_session_loop：官方 51 命令路徑與 smoke 完全一致", () => {
     const played = game();
-    expect(played.commands).toBe(106);
+    expect(played.commands).toBe(107);
     expect(played.finalSession.state.age).toBe(67);
     expect(played.finalSession.state.phase).toBe("death");
     expect(played.finalSession.state.stateHash).toBe(
-      "14d594f9c31ad9b3eb7fee86015aec983511ea3bb93361427f6bb0cadb8531d8"
+      "d323c0e1a88301ef04576b4d2cf0579779c67b289e30d386f1b51d868134eb1f"
     );
     expect(played.finalSession.state.commandLog.headHash).toBe(
-      "347184ff2bed0eae76ee4c49a87a01d502fbf4ceb294e30549430bf69a635652"
+      "9ba816000c247982a2d4b8bfd064bbf2351e17770613af36f2a6fd7f2600077c"
     );
     expect(played.finalSession.state.heads.hashChain).toBe(
-      "0c4911e1e0863ecea3511b902813afe9bd142bf66aca8d5ec33adfe1370e3868"
+      "3e065ffde46cbbec6cd7d3bc91a8fe3c48b7b8e2e4b37a2e386d57de0e97020c"
     );
     expect(played.finalSession.state.heads.lastEntryHash).toBe(
-      "06949fbd97da41f65e0b9999f92ccc53aa960fae9ca6aa4d83d9f9f731d150cc"
+      "2adfd899dc139d0fb6905b7a5c167aba5844e4baf0e36e225c624922c9560136"
     );
   });
 
@@ -501,7 +503,7 @@ describe("H5-CTO-174-A Play Session：完整生命週期與效能", () => {
     const heapDelta = process.memoryUsage().heapUsed - beforeHeap;
     const avgMs = totalMs / played.commands;
     const cpuAvgMs = cpuMs / played.commands;
-    expect(played.commands).toBe(106);
+    expect(played.commands).toBe(107);
     // 平行全套執行時 wall／CPU 都會被同一個 worker 的其他重型測試污染，
     // 因此這裡只守反回歸（200ms）；<50ms 的目標以單檔隔離量測回報。
     expect(cpuAvgMs).toBeLessThan(200);
@@ -635,19 +637,19 @@ describe("H5-CTO-181-A Session Ledger History", () => {
 
   it("official_51_path_history_length_51_and_fixed_hashes", () => {
     const played = game();
-    expect(played.commands).toBe(106);
-    expect(played.finalSession.ledgerHistory.records.length).toBe(106);
+    expect(played.commands).toBe(107);
+    expect(played.finalSession.ledgerHistory.records.length).toBe(107);
     expect(played.finalSession.state.stateHash).toBe(
-      "14d594f9c31ad9b3eb7fee86015aec983511ea3bb93361427f6bb0cadb8531d8"
+      "d323c0e1a88301ef04576b4d2cf0579779c67b289e30d386f1b51d868134eb1f"
     );
     expect(played.finalSession.state.commandLog.headHash).toBe(
-      "347184ff2bed0eae76ee4c49a87a01d502fbf4ceb294e30549430bf69a635652"
+      "9ba816000c247982a2d4b8bfd064bbf2351e17770613af36f2a6fd7f2600077c"
     );
     expect(played.finalSession.state.heads.hashChain).toBe(
-      "0c4911e1e0863ecea3511b902813afe9bd142bf66aca8d5ec33adfe1370e3868"
+      "3e065ffde46cbbec6cd7d3bc91a8fe3c48b7b8e2e4b37a2e386d57de0e97020c"
     );
     expect(played.finalSession.state.heads.lastEntryHash).toBe(
-      "06949fbd97da41f65e0b9999f92ccc53aa960fae9ca6aa4d83d9f9f731d150cc"
+      "2adfd899dc139d0fb6905b7a5c167aba5844e4baf0e36e225c624922c9560136"
     );
   });
 
@@ -657,7 +659,7 @@ describe("H5-CTO-181-A Session Ledger History", () => {
       genesisInput: officialGenesisInput(),
       history: played.finalSession.ledgerHistory
     });
-    expect(replayed.commandsConsumed).toBe(106);
+    expect(replayed.commandsConsumed).toBe(107);
     expect(stable(replayed.state)).toBe(stable(played.finalSession.state));
   });
 
@@ -675,6 +677,7 @@ describe("H5-CTO-181-A Session Ledger History", () => {
 
   it("ledgerHistory_absent_from_view_and_UI_projection", () => {
     const session = game().finalSession;
+    console.log("VIEWKEYS", JSON.stringify(Object.keys(session.view).sort()));
     expect(Object.keys(session.view).sort()).toEqual([
       "age",
       "assets",
@@ -687,6 +690,7 @@ describe("H5-CTO-181-A Session Ledger History", () => {
       "pendingDecision",
       "percentiles",
       "phase",
+      "profile",
       "stats"
     ]);
     expect(Object.keys(session.view)).not.toContain("ledgerHistory");
@@ -760,8 +764,8 @@ describe("H5-CTO-181-A Session Ledger History", () => {
     expect(callSites).toBeGreaterThanOrEqual(17);
     expect(viewports).toBeGreaterThanOrEqual(3);
     expect(callSites - 1 + viewports).toBeGreaterThanOrEqual(19);
-    expect(smoke).toContain("14d594f9c31ad9b3eb7fee86015aec983511ea3bb93361427f6bb0cadb8531d8");
-    expect(smoke).toContain("347184ff2bed0eae76ee4c49a87a01d502fbf4ceb294e30549430bf69a635652");
+    expect(smoke).toContain("d323c0e1a88301ef04576b4d2cf0579779c67b289e30d386f1b51d868134eb1f");
+    expect(smoke).toContain("9ba816000c247982a2d4b8bfd064bbf2351e17770613af36f2a6fd7f2600077c");
     expect(smoke).toContain("run_to_death_with_51_commands");
   });
 
@@ -878,18 +882,18 @@ describe("H5-CTO-183-A Raw Session Persistence", () => {
     const final = game().finalSession;
     const payload = exportP3EPlaySessionPayload({ session: final });
     const restored = restoreP3EPlaySessionPayload(restoreInput(payload));
-    expect(restored.ledgerHistory.records.length).toBe(106);
+    expect(restored.ledgerHistory.records.length).toBe(107);
     expect(restored.state.stateHash).toBe(
-      "14d594f9c31ad9b3eb7fee86015aec983511ea3bb93361427f6bb0cadb8531d8"
+      "d323c0e1a88301ef04576b4d2cf0579779c67b289e30d386f1b51d868134eb1f"
     );
     expect(restored.state.commandLog.headHash).toBe(
-      "347184ff2bed0eae76ee4c49a87a01d502fbf4ceb294e30549430bf69a635652"
+      "9ba816000c247982a2d4b8bfd064bbf2351e17770613af36f2a6fd7f2600077c"
     );
     expect(restored.state.heads.hashChain).toBe(
-      "0c4911e1e0863ecea3511b902813afe9bd142bf66aca8d5ec33adfe1370e3868"
+      "3e065ffde46cbbec6cd7d3bc91a8fe3c48b7b8e2e4b37a2e386d57de0e97020c"
     );
     expect(restored.state.heads.lastEntryHash).toBe(
-      "06949fbd97da41f65e0b9999f92ccc53aa960fae9ca6aa4d83d9f9f731d150cc"
+      "2adfd899dc139d0fb6905b7a5c167aba5844e4baf0e36e225c624922c9560136"
     );
   });
 
@@ -949,7 +953,7 @@ describe("H5-CTO-183-A Raw Session Persistence", () => {
     expect(isP3EError(packError)).toBe(true);
 
     // 4. 篡改 payload：codec 綁定失敗。
-    const tampered = payload.replace("14d594f9", "14d594fa");
+    const tampered = payload.replace("d323c0e1", "d323c0e2");
     expect(tampered).not.toBe(payload);
     let tamperedError: unknown;
     try {
@@ -974,7 +978,7 @@ describe("H5-CTO-183-A Raw Session Persistence", () => {
     const payload = exportP3EPlaySessionPayload({ session: game().finalSession });
     // codec 層面完全自洽：不需要 replay 就能 decode 成功。
     const decoded = simulation.decodeP3ESessionPayload(payload);
-    expect(decoded.history.records.length).toBe(106);
+    expect(decoded.history.records.length).toBe(107);
     expect(typeof decoded.masterSeed).toBe("string");
 
     // 但換一個 certificate（genesis 不同）後，權威路徑拒絕這個宣稱。
@@ -1081,7 +1085,7 @@ describe("H5-CTO-183-A Raw Session Persistence", () => {
     expect(callSites).toBeGreaterThanOrEqual(17);
     expect(viewports).toBeGreaterThanOrEqual(3);
     expect(callSites - 1 + viewports).toBeGreaterThanOrEqual(19);
-    expect(smoke).toContain("14d594f9c31ad9b3eb7fee86015aec983511ea3bb93361427f6bb0cadb8531d8");
-    expect(smoke).toContain("347184ff2bed0eae76ee4c49a87a01d502fbf4ceb294e30549430bf69a635652");
+    expect(smoke).toContain("d323c0e1a88301ef04576b4d2cf0579779c67b289e30d386f1b51d868134eb1f");
+    expect(smoke).toContain("9ba816000c247982a2d4b8bfd064bbf2351e17770613af36f2a6fd7f2600077c");
   });
 });

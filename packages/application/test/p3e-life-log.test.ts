@@ -160,6 +160,7 @@ describe("GPT-0031-A lifeLog：累積與順序", () => {
         "causeId",
         "deathReason",
         "decisionId",
+        "detailId",
         "eventId",
         "focusId",
         "kind",
@@ -287,7 +288,7 @@ describe("GPT-0031-A lifeLog：復原、決定性與上限", () => {
         outcome: commandResult.session.lastOutcome as never
       });
     }
-    const rebuilt = buildP3ELifeLog(session.state.identity.birthYear, sources as never);
+    const rebuilt = buildP3ELifeLog(session.state.identity.birthYear, sources as never, SEED);
     expect(json(rebuilt)).toBe(json(session.view.lifeLog));
   });
 });

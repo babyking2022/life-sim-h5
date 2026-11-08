@@ -316,6 +316,62 @@ async function pageSnapshot() {
   const inViewport = (b) => b !== null && b.height > 0 && b.top >= -2 && b.bottom <= vh + 2 &&
     b.left >= -2 && b.right <= vw + 2;
 
+  // GPT-0040-B：紅框狀態卡快照（身分／居住／情感三行）。
+  const profileCardNode = q(".p3e-profile-card");
+  const profileWrap = profileCardNode?.closest(".p3e-scene-wrap") ?? null;
+  const profileScene = profileWrap?.querySelector(".p3e-scene") ?? null;
+  const profileRows = profileCardNode === null
+    ? []
+    : [...profileCardNode.querySelectorAll(".p3e-profile-row")].map((r) => ({
+        key: r.querySelector(".p3e-profile-key")?.textContent ?? "",
+        val: r.querySelector(".p3e-profile-val")?.textContent ?? "",
+        roleId: r.getAttribute("data-p3e-profile-role-id"),
+        resEntity: r.getAttribute("data-p3e-profile-residence-entity"),
+        resRegion: r.getAttribute("data-p3e-profile-residence-region"),
+        relStatus: r.getAttribute("data-p3e-relationship-status"),
+        partnerName: r.getAttribute("data-p3e-partner-name")
+      }));
+  const profileCardBox = box(profileCardNode);
+  const profileSceneBox = box(profileScene);
+  // GPT-0041-B：居住國名必須完整繁中且 320px 不可省略（scrollWidth <= clientWidth，不得 ellipsis 隱藏）。
+  const countryRowNode = profileCardNode === null ? null :
+    [...profileCardNode.querySelectorAll(".p3e-profile-row")].find(
+      (r) => (r.querySelector(".p3e-profile-key")?.textContent ?? "").includes("居住")
+    ) ?? null;
+  const countryValNode = countryRowNode?.querySelector(".p3e-profile-val") ?? null;
+  const countryText = countryValNode?.textContent ?? "";
+  const countryScrollWidth = countryValNode ? countryValNode.scrollWidth : 0;
+  const countryClientWidth = countryValNode ? countryValNode.clientWidth : 0;
+  // 簡體中文特徵字，用來偵測「把簡體當繁中」。涵蓋國名可能出現的全部簡體字
+  // （贝宁达冈绍岛韩缅汤乌库图韦叙济 等），避免遺漏。
+  const SIMPLIFIED_TELL = /[国马兰亚罗苏鲜挝东门叶约纳莱刚几内鲁伦买萨腊奥卢时顿爱脱义兹赖茨麦湾维贝宁达冈绍岛韩缅汤乌库图韦叙济]/;
+  const countryHasSimplified = SIMPLIFIED_TELL.test(countryText);
+  const countryNoOmit = countryValNode !== null && countryScrollWidth <= countryClientWidth + 1;
+  const profileCard = {
+    present: profileCardNode !== null,
+    ariaLabel: profileCardNode?.getAttribute("aria-label") ?? null,
+    inSceneWrap: profileWrap !== null,
+    legacyPartnerLine: document.querySelectorAll(".p3e-partner-line").length,
+    rows: profileRows,
+    rowCount: profileRows.length,
+    country: {
+      text: countryText,
+      scrollWidth: countryScrollWidth,
+      clientWidth: countryClientWidth,
+      noOmit: countryNoOmit,
+      hasSimplified: countryHasSimplified
+    },
+    box: profileCardBox,
+    sceneBox: profileSceneBox,
+    leftAligned: profileCardBox !== null && profileSceneBox !== null &&
+      profileCardBox.left >= profileSceneBox.left - 1 && profileCardBox.left <= profileSceneBox.left + 16,
+    withinLeftHalf: profileCardBox !== null && profileSceneBox !== null &&
+      profileCardBox.right <= profileSceneBox.left + profileSceneBox.width * 0.5,
+    widthRatio: profileCardBox !== null && profileSceneBox !== null && profileSceneBox.width > 0
+      ? profileCardBox.width / profileSceneBox.width
+      : null
+  };
+
   return {
     viewport: { w: vw, h: vh },
     phase: q("[data-p3e-live]")?.getAttribute("data-p3e-phase") ?? "unknown",
@@ -375,7 +431,8 @@ async function pageSnapshot() {
       option: optionFont
     },
     touch: { checked: visibleTargets.length, small: smallTargets },
-    chrome
+    chrome,
+    profileCard
   };
 }
 
@@ -764,6 +821,39 @@ function evaluate(label, phase, s) {
     `${prefix}_body_text_readable`,
     (s.fonts.storyP === null || s.fonts.storyP >= 13.9) && (s.fonts.hint === null || s.fonts.hint >= 13.9),
     JSON.stringify(s.fonts)
+  );
+
+  /* GPT-0040-B／0041-B：紅框狀態卡在五尺寸 × 三階段都結構正確、置左、不整頁溢出。
+     death 畫面若仍顯示狀態卡，也必須驗證結構與文字，不得無條件排除。 */
+  const pc = s.profileCard;
+  const pcRequired = phase !== "death";
+  const pcPresentOk = pc.present && pc.ariaLabel === "角色即時狀態" &&
+    pc.rowCount === 3 &&
+    pc.rows.some((r) => r.key === "目前居住") &&
+    pc.rows.some((r) => r.key === "情感狀態") &&
+    pc.rows.some((r) => r.key === "目前身分" || r.key === "目前職業") &&
+    pc.legacyPartnerLine === 0;
+  check(
+    `${prefix}_profile_card_structured`,
+    (!pcRequired || pcPresentOk) && (!pc.present || pcPresentOk),
+    `required=${pcRequired} present=${pc.present} aria=${pc.ariaLabel} rows=${pc.rowCount} keys=${JSON.stringify(pc.rows.map((r) => r.key))} legacy=${pc.legacyPartnerLine}`
+  );
+  // GPT-0041-B：居住國名必須完整繁中，且 320px 不可省略（不得 ellipsis 隱藏到 title）。
+  if (pc.present) {
+    const c = pc.country;
+    check(
+      `${prefix}_profile_card_country_full_hant_no_omit`,
+      c.text.length > 0 && !c.hasSimplified && c.noOmit,
+      `text=${JSON.stringify(c.text)} hasSimplified=${c.hasSimplified} scroll=${c.scrollWidth} client=${c.clientWidth} noOmit=${c.noOmit}`
+    );
+  }
+  const pcPosOk = pc.inSceneWrap && pc.leftAligned && pc.withinLeftHalf &&
+    pc.widthRatio !== null && pc.widthRatio <= 0.47 &&
+    s.overflow.docY <= 1 && s.overflow.bodyY <= 1;
+  check(
+    `${prefix}_profile_card_left_side_no_overflow`,
+    !pcRequired || (pc.present && pcPosOk),
+    `required=${pcRequired} present=${pc.present} wrap=${pc.inSceneWrap} left=${pc.leftAligned} half=${pc.withinLeftHalf} ratio=${pc.widthRatio} docY=${s.overflow.docY} bodyY=${s.overflow.bodyY}`
   );
 
   if (phase === "death") {

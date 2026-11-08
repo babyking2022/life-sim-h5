@@ -463,11 +463,11 @@ describe("P3-E.1b-1a life eligibility", () => {
     );
   });
 
-  it("原始 pack（58 個決策事件，都沒有巢狀）可以通過", () => {
+  it("原始 pack（59 個決策事件，都沒有巢狀）可以通過", () => {
     expect(() => validateP3EAnnualPacks(annualInput())).not.toThrow();
     const withDecision = eventPack.events.filter((event) => event.decision !== null);
-    // GPT-0025-A：主 pack 由 3 個決策事件擴充到 58 個（每個都有 2–5 個選項）。
-    expect(withDecision.length).toBe(58);
+    // GPT-0025-A／GPT-0041-A：主 pack 的決策事件增加到 59 個（每個都有 2–5 個選項）。
+    expect(withDecision.length).toBe(59);
     for (const event of withDecision) {
       for (const option of event.decision?.options ?? []) {
         expect(option.effects.every((effect) => effect.type !== "openDecision")).toBe(true);
