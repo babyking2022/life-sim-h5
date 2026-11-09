@@ -1,4 +1,5 @@
 export * from "./errors";
+export * from "./attest";
 export * from "./schema";
 export * from "./records";
 export * from "./license";

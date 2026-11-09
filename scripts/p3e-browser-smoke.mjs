@@ -5,6 +5,7 @@ import { createRequire } from "node:module";
 import { extname, join, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { gzipSync } from "node:zlib";
+import { display, canonDisplay, canonList } from "./p3e-locale-compat.mjs";
 
 /**
  * H5-CTO-176-A（R1）：真實 P3-E runtime 的瀏覽器 smoke。
@@ -499,7 +500,28 @@ async function main() {
   /* 0a. GPT-0025-D：繁中字典已載入、驗證通過、維持獨立 JSON 資產      */
   /* ---------------------------------------------------------------- */
 
-  const copyAttrs = await page.evaluate(() => {
+  // GPT-0065-A（CTO 授權 MVP）：繁中字典不再在出生卡關鍵路徑下載，
+  // 而是「開始人生」後由完整世界準備階段以正式 validators 驗證。
+  // 用一個獨立的短生命週期頁面真的進遊戲，保留 0025-D 的驗收意圖：
+  // 字典確實被 UI 載入、key 數正確、仍是獨立 JSON 資產。
+  const copyProbeContext = await browser.newContext({
+    viewport: { width: 390, height: 844 },
+    deviceScaleFactor: 1,
+    isMobile: true,
+    hasTouch: true
+  });
+  const copyProbePage = await copyProbeContext.newPage();
+  const copyProbeRequests = new Map();
+  copyProbePage.on("response", (response) => {
+    const url = response.url();
+    if (!url.startsWith(baseUrl) || response.status() >= 400) return;
+    copyProbeRequests.set(new URL(url).pathname, true);
+  });
+  await copyProbePage.goto(`${baseUrl}/${GOLDEN_QUERY}`, { waitUntil: "domcontentloaded" });
+  await copyProbePage.waitForSelector('[data-action="start-life"]', { timeout: 30000 });
+  await copyProbePage.locator('[data-action="start-life"]').click();
+  await copyProbePage.waitForSelector("#p3e-main", { timeout: 30000 });
+  const copyAttrs = await copyProbePage.evaluate(() => {
     const live = document.querySelector("[data-p3e-live]");
     return {
       keys: Number(live?.getAttribute("data-p3e-copy-keys") ?? "0"),
@@ -507,9 +529,10 @@ async function main() {
       phase: live?.getAttribute("data-p3e-phase") ?? null
     };
   });
-  const copyAssetRequests = [...bootRequests.keys()].filter((path) =>
+  const copyAssetRequests = [...copyProbeRequests.keys()].filter((path) =>
     path.includes("event-copy")
   );
+  await copyProbeContext.close();
   const dictionaryKeys = Object.keys(COPY_DOCUMENT.copy ?? {});
   const badCopyEntries = dictionaryKeys.filter(
     (key) =>
@@ -573,6 +596,11 @@ async function main() {
       }
     });
     await failPage.goto(`${baseUrl}/${GOLDEN_QUERY}`, { waitUntil: "domcontentloaded" });
+    // GPT-0065-A（CTO 授權 MVP）：事件文案字典已移到「開始人生」後的完整世界
+    // 準備階段，不再於出生卡關鍵路徑下載。啟動錯誤契約完全保留，只是觸發點
+    // 改成明確的使用者手勢；這裡先等出生卡可操作，再按開始讓字典失敗浮現。
+    await failPage.waitForSelector('[data-action="start-life"]', { timeout: 30000 });
+    await failPage.locator('[data-action="start-life"]').click();
     await failPage.waitForSelector('[data-p3e-phase="error"]', { timeout: 30000 });
     const errorView = await failPage.evaluate(() => ({
       live: document.querySelector("[data-p3e-live]")?.getAttribute("data-p3e-live") ?? null,
@@ -580,11 +608,14 @@ async function main() {
       body: document.body.innerText ?? ""
     }));
     const leaked = INTERNAL_KEY_PATTERN.test(errorView.body);
+    // GPT-0063-B：預設 zh-CN，啟動錯誤的顯示文字可能是簡體或簡繁混合；
+    // 只正規化「顯示文字」，internal-key / live / 錯誤態條件完全不變。
+    const errorMessage = display(errorView.message);
     check(
       failure.name,
       errorView.live === "false" &&
-        errorView.message.includes("啟動失敗") &&
-        errorView.message.includes("重新整理") &&
+        errorMessage.includes("啟動失敗") &&
+        errorMessage.includes("重新整理") &&
         !leaked,
       `mode=${failure.mode} msg=${errorView.message.slice(0, 36)} internalKeyLeaked=${leaked}`
     );
@@ -643,7 +674,10 @@ async function main() {
     "父親",
     "預期壽命"
   ];
-  const missingBirthLabels = requiredBirthLabels.filter((label) => !birthLabels.includes(label));
+  const normalizedBirthLabels = canonList(birthLabels);
+  const missingBirthLabels = requiredBirthLabels.filter(
+    (label) => !normalizedBirthLabels.includes(canonDisplay(label))
+  );
   check(
     "birth_card_shows_all_required_fields",
     bootBirth !== null &&
@@ -854,11 +888,12 @@ async function main() {
   birthReport.started_from_birth = startedFromBirth;
   const phaseAfterStart = await phaseOf(page);
   const bodyText = (await page.locator("body").innerText()) ?? "";
+  const bodyDisplay = display(bodyText);
   check(
     "birth_start_enters_age0",
     (!birthVisible || startedFromBirth) &&
       phaseAfterStart === "life" &&
-      (bodyText.includes("年齡 0") || bodyText.includes("0 歲")),
+      (bodyDisplay.includes("年齡 0") || bodyDisplay.includes("0 歲")),
     `birth_card=${birthVisible} start_clicked=${startedFromBirth} phase=${phaseAfterStart}`
   );
 
@@ -874,7 +909,7 @@ async function main() {
   // 2. age 0 / life
   check(
     "age0_life_initial",
-    (bodyText.includes("年齡 0") || bodyText.includes("0 歲")) && phaseAfterStart === "life"
+    (bodyDisplay.includes("年齡 0") || bodyDisplay.includes("0 歲")) && phaseAfterStart === "life"
   );
 
   // 3. controls 跟 phase
@@ -1090,7 +1125,7 @@ async function main() {
   check(
     "death_shows_real_outcome",
     (deathText.includes("reason") && (deathText.includes("mortality") || deathText.includes("age_ceiling"))) ||
-      (deathText.includes("這段人生走到了終點") && deathText.includes("你活了"))
+      (display(deathText).includes("這段人生走到了終點") && display(deathText).includes("你活了"))
   );
   check("run_to_death_with_51_commands", finalCount === EXPECTED_COMMANDS, `commands=${finalCount}`);
   check("final_state_hash", finalStateHash === EXPECTED_STATE_HASH, finalStateHash ?? "null");
@@ -1194,11 +1229,11 @@ async function main() {
   check(
     "profile_card_present_structured_three_rows",
     profileCard !== null &&
-      profileCard.ariaLabel === "角色即時狀態" &&
+      display(profileCard.ariaLabel).equals("角色即時狀態") &&
       profileCard.rows.length === 3 &&
-      profileCard.rows.some((r) => r.key === "目前居住") &&
-      profileCard.rows.some((r) => r.key === "情感狀態") &&
-      profileCard.rows.some((r) => r.key === "目前身分" || r.key === "目前職業") &&
+      profileCard.rows.some((r) => display(r.key).equals("目前居住")) &&
+      profileCard.rows.some((r) => display(r.key).equals("情感狀態")) &&
+      profileCard.rows.some((r) => display(r.key).equals("目前身分") || display(r.key).equals("目前職業")) &&
       profileCard.legacyPartnerLines === 0,
     `aria=${profileCard?.ariaLabel} rows=${profileCard?.rows.length} keys=${JSON.stringify(profileCard?.rows.map((r) => r.key))} legacy=${profileCard?.legacyPartnerLines}`
   );
@@ -1395,7 +1430,7 @@ async function main() {
     jobSamples.length >= 1 && jobSamples.every((sample) =>
       sample.career.cards.length >= 2 &&
       sample.career.cards.every((card) =>
-        card.name.length > 0 && /^預估年收入 CNY /.test(card.income) && !card.disabled)),
+        card.name.length > 0 && display(card.income).test(/^預估年收入 CNY /) && !card.disabled)),
     `job=${jobSamples.length} sample=${JSON.stringify(jobSamples[0]?.career.cards.slice(0, 2) ?? [])}`
   );
   check(
@@ -1500,7 +1535,7 @@ async function main() {
   const rebirthText = (await page.locator("body").innerText()) ?? "";
   check(
     "rebirth_returns_age0",
-    (rebirthText.includes("年齡 0") || rebirthText.includes("0 歲")) && (await commandCount(page)) === 0
+    (display(rebirthText).includes("年齡 0") || display(rebirthText).includes("0 歲")) && (await commandCount(page)) === 0
   );
 
   // 8. GPT-0031-B：四個手機尺寸（含 360x640）：水平／垂直溢出皆為 0，
@@ -1632,7 +1667,7 @@ async function main() {
       "hud_320x568_font_sizes_and_all_four_items",
       smallHud.labelFont !== null && smallHud.labelFont >= 11 &&
         smallHud.valueFont !== null && smallHud.valueFont >= 13 &&
-        JSON.stringify(smallHud.labels) === JSON.stringify(["年份", "年齡", "資產", "年收入"]) &&
+        JSON.stringify(canonList(smallHud.labels)) === JSON.stringify(canonList(["年份", "年齡", "資產", "年收入"])) &&
         smallHud.values.length === 4 && smallHud.values.every((text) => text.length > 0),
       `label=${smallHud.labelFont}px value=${smallHud.valueFont}px ` +
         `labels=${JSON.stringify(smallHud.labels)} values=${JSON.stringify(smallHud.values)}`
@@ -2792,7 +2827,7 @@ async function main() {
     });
     verify(
       "hud_left_order_year_age_assets_income",
-      hud !== null && JSON.stringify(hud.labels) === JSON.stringify(["年份", "年齡", "資產", "年收入"]),
+      hud !== null && JSON.stringify(canonList(hud.labels)) === JSON.stringify(canonList(["年份", "年齡", "資產", "年收入"])),
       `labels=${JSON.stringify(hud?.labels)}`
     );
     verify(
@@ -2801,13 +2836,13 @@ async function main() {
         hud.soundRect !== null && hud.menuRect !== null &&
         hud.soundRect.left >= hud.incomeRight - 2 &&
         hud.menuRect.left >= hud.soundRect.left + hud.soundRect.w - 2 &&
-        hud.removedChrome === 0 && !hud.gearGlyph && hud.settingsTitle === "⚙ 設定與存檔",
+        hud.removedChrome === 0 && !hud.gearGlyph && display(hud.settingsTitle).equals("⚙ 設定與存檔"),
       `soundLeft=${hud?.soundRect?.left} incomeRight=${hud?.incomeRight} menuLeft=${hud?.menuRect?.left} removed=${hud?.removedChrome} title=${hud?.settingsTitle}`
     );
     verify(
       "gear_button_and_bottom_tabs_removed_from_dom",
       hud !== null && hud.removedChrome === 0 && !hud.gearGlyph &&
-        hud.settingsTitle === "⚙ 設定與存檔",
+        display(hud.settingsTitle).equals("⚙ 設定與存檔"),
       `removed=${hud?.removedChrome} gearGlyph=${hud?.gearGlyph} title=${hud?.settingsTitle}`
     );
     verify(
@@ -2826,7 +2861,7 @@ async function main() {
     verify(
       "minor_finance_shows_dash_with_accessible_note",
       hud !== null && hud.values[2] === "—" && hud.values[3] === "—" &&
-        hud.minorCount === 2 && (hud.note ?? "").includes("尚未擁有個人資產／收入"),
+        hud.minorCount === 2 && display(hud.note ?? "").includes("尚未擁有個人資產／收入"),
       `values=${JSON.stringify(hud?.values)} minor=${hud?.minorCount} note=${hud?.note}`
     );
 
@@ -2952,7 +2987,7 @@ async function main() {
       });
     const beforeReloadLog = await readLifeLogState();
     const logFormatOk = beforeReloadLog.entries.every((entry) =>
-      /^\d{4} 年 · \d+ 歲｜.+$/.test(entry.inner) && entry.text.length > 0
+      display(entry.inner).test(/^\d{4} 年 · \d+ 歲｜.+$/) && entry.text.length > 0
     );
     const logNoInternalKeys = beforeReloadLog.entries.every(
       (entry) => !INTERNAL_KEY_PATTERN.test(entry.text)
@@ -3192,12 +3227,15 @@ async function main() {
     await qaPage.goto(`${baseUrl}/${qaQuery}`, { waitUntil: "domcontentloaded" });
     await qaPage.waitForSelector("[data-p3e-live='true']", { timeout: 30000 });
     await qaPage.locator('[data-action="start-life"]').click();
+    // GPT-0065-A：完整世界在按開始後才準備，進遊戲是非同步的；等 HUD
+    // 真正出現再量測設定選單，而不是在「準備人生…」的出生卡上量。
+    await qaPage.waitForSelector("#p3e-main", { timeout: 30000 });
 
     const initial = await readGate(qaPage);
     check(
       "settings_menu_no_standalone_gear",
       initial.gears === 0 && initial.gearGlyphs === 0 && initial.rightControls === 2 &&
-        initial.menuLabel === "開啟設定與存檔選單" &&
+        display(initial.menuLabel).equals("開啟設定與存檔選單") &&
         initial.soundBox?.w >= 44 && initial.soundBox?.h >= 44 &&
         initial.menuBox?.w >= 44 && initial.menuBox?.h >= 44,
       `gears=${initial.gears} glyphs=${initial.gearGlyphs} right=${initial.rightControls} ` +
@@ -3214,13 +3252,14 @@ async function main() {
       aria: document.querySelector(".p3e-hud-menu-panel")?.getAttribute("aria-label") ?? null,
       text: document.querySelector(".p3e-hud-menu-panel")?.textContent ?? ""
     }));
+    const menuText = display(menuPanel.text);
     check(
       "settings_menu_title_and_original_gear_features",
       menuOpen === true &&
-        menuPanel.title === "⚙ 設定與存檔" &&
-        menuPanel.aria === "設定與存檔" &&
+        display(menuPanel.title).equals("⚙ 設定與存檔") &&
+        display(menuPanel.aria).equals("設定與存檔") &&
         ["匯出存檔", "匯入存檔", "自動存檔", "seed=", "stateHash="].every((part) =>
-          menuPanel.text.includes(part)
+          menuText.includes(part)
         ),
       `open=${menuOpen} title=${menuPanel.title} aria=${menuPanel.aria} parts=${menuPanel.text.slice(0, 90)}`
     );
@@ -3298,8 +3337,8 @@ async function main() {
       lockedDom.dialogRole === "dialog" && lockedDom.dialogModal === "true" &&
         lockedDom.dialogLabelledBy === "p3e-focus-required-title" &&
         lockedDom.dialogDescribedBy === "p3e-focus-required-desc" &&
-        (lockedDom.dialogTitle ?? "").includes("人生重心") &&
-        (lockedDom.dialogDesc ?? "").includes("暫停") &&
+        display(lockedDom.dialogTitle ?? "").includes("人生重心") &&
+        display(lockedDom.dialogDesc ?? "").includes("暫停") &&
         lockedDom.activeAction === "set-focus" && lockedDom.activeFocusId !== null &&
         !lockedDom.activeIsBody,
       `role=${lockedDom.dialogRole} modal=${lockedDom.dialogModal} title="${lockedDom.dialogTitle}" ` +
@@ -3601,8 +3640,8 @@ async function main() {
       "adult_compare_uses_view_percentile_projection",
       adultCompare.age >= 18 && adultCompare.source === "projection" &&
         adultCompare.texts.length === 2 &&
-        adultCompare.texts.every((text) => /高於中國 \d+%｜高於全球 \d+%/.test(text)) &&
-        adultCompare.basis === "2021" && (adultCompare.note ?? "").includes("估算") &&
+        adultCompare.texts.every((text) => display(text).test(/高於中國 \d+%｜高於全球 \d+%/)) &&
+        adultCompare.basis === "2021" && display(adultCompare.note ?? "").includes("估算") &&
         adultCompare.hud[2] !== "—" && adultCompare.hud[3] !== "—",
       `age=${adultCompare.age} source=${adultCompare.source} basis=${adultCompare.basis} texts=${JSON.stringify(adultCompare.texts)} hud=${JSON.stringify(adultCompare.hud)}`
     );

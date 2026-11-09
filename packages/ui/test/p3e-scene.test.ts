@@ -2,6 +2,9 @@ import { describe, expect, it } from "vitest";
 import {
   buildSceneSvg,
   describeSceneLayers,
+  describeSceneParts,
+  ageStageOfAge,
+  lifeStageOfAge,
   DEFAULT_SCENE_VIEW,
   readSceneView,
   sceneSignature,
@@ -18,30 +21,39 @@ import {
   type SceneSex,
   type SceneView
 } from "../src/p3e-scene";
+import { OPEN_PEEPS_BY_SEX } from "../src/p3e-open-peeps";
 
 /**
- * GPT-WORKBUDDY-0054-B｜任務一驗收：分層動態場景。
+ * GPT-WORKBUDDY-0054-B／0063-B｜任務一驗收：分層動態場景。
  *
- * 矩陣：2 性別 × 5 年齡階段 × 2 城鄉 × 有／無伴侶 × dog／cat／none = 120 組。
+ * 矩陣：2 性別 × 6 年齡階段 × 2 城鄉 × 有／無伴侶 × dog／cat／none = 144 組。
  * 全部在純函式上驗證，不需 DOM／jsdom。
  */
 
 const SEXES: readonly SceneSex[] = ["male", "female"];
-const AGE_STAGES: readonly SceneAgeStage[] = ["child", "student", "young", "middle", "senior"];
+const AGE_STAGES: readonly SceneAgeStage[] = ["baby", "child", "student", "young", "middle", "senior"];
+const STAGE_AGE: Readonly<Record<SceneAgeStage, number>> = Object.freeze({
+  baby: 1, child: 4, student: 13, young: 28, middle: 48, senior: 68
+});
 const RESIDENCES: readonly SceneResidenceKind[] = ["urban", "rural"];
 const PETS: readonly ScenePetKind[] = ["none", "dog", "cat"];
 const HAS_PARTNER: readonly boolean[] = [false, true];
 
+/** 一律以精確 age 為準產生一致的 ageStage／lifeStage，模擬正式 view.scene。 */
 function sceneOf(input: Partial<SceneView> = {}): SceneView {
+  const age = input.age ?? STAGE_AGE[input.ageStage ?? "young"];
   return {
     playerSex: "female",
-    ageStage: "young",
     residenceKind: "rural",
     hasPartner: false,
     partnerSex: null,
+    partnerAge: null,
     petKind: "none",
     phase: "alive",
-    ...input
+    ...input,
+    age,
+    ageStage: ageStageOfAge(age),
+    lifeStage: lifeStageOfAge(age)
   };
 }
 
@@ -50,7 +62,7 @@ const EMOJI_RE = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/u;
 const INTERNAL_KEY_RE = /(?:p3[ab]\.|ev\.|dec\.|microUsd|\$[A-Za-z_]|job:|pet:|career:)/;
 
 describe("GPT-0054-B 場景：完整狀態矩陣", () => {
-  it("2 性別 × 5 年齡 × 2 城鄉 × 伴侶有無 × 寵物三態 = 120 組都畫出正確分層", () => {
+  it("2 性別 × 6 年齡 × 2 城鄉 × 伴侶有無 × 寵物三態 = 144 組都畫出正確分層", () => {
     let count = 0;
     for (const playerSex of SEXES) {
       for (const ageStage of AGE_STAGES) {
@@ -83,6 +95,11 @@ describe("GPT-0054-B 場景：完整狀態矩陣", () => {
               expect(layers.find((layer) => layer.layer === "partner")?.visible).toBe(hasPartner);
               expect(layers.find((layer) => layer.layer === "pet")?.visible).toBe(petKind !== "none");
 
+              // 0063-B：頂層 SVG 的精確年齡／生活階段必須與投影一致。
+              expect(svg).toContain(`data-age="${scene.age}"`);
+              expect(svg).toContain(`data-life-stage="${scene.lifeStage}"`);
+              expect(svg).toContain(`data-age-stage="${scene.ageStage}"`);
+
               // 同 seed／同狀態 → 同一張圖（不每次 render 改髮型）。
               expect(buildSceneSvg(scene, "seed-matrix")).toBe(svg);
               expect(sceneSignature(scene, "seed-matrix")).toBe(sceneSignature(scene, "seed-matrix"));
@@ -91,7 +108,7 @@ describe("GPT-0054-B 場景：完整狀態矩陣", () => {
         }
       }
     }
-    expect(count).toBe(120);
+    expect(count).toBe(144);
   });
 
   it("背景層不含任何固定人物／雞，也不含人物用色", () => {
@@ -115,7 +132,7 @@ describe("GPT-0054-B 場景：完整狀態矩陣", () => {
     );
   });
 
-  it("玩家在 5 個年齡階段、2 個性別都有顯著不同外觀（身高／髮型髮色／服裝）", () => {
+  it("玩家在 6 個年齡階段、2 個性別都有顯著不同外觀（身高／髮型髮色／服裝）", () => {
     const variants = new Set<string>();
     for (const playerSex of SEXES) {
       for (const ageStage of AGE_STAGES) {
@@ -127,16 +144,21 @@ describe("GPT-0054-B 場景：完整狀態矩陣", () => {
         expect(svg).toContain(`data-sex="${playerSex}"`);
       }
     }
-    expect(variants.size).toBe(10);
+    expect(variants.size).toBe(12);
     // 老年一定是灰白髮（與其它階段不同）。
     const seniorSvg = buildSceneSvg(sceneOf({ ageStage: "senior" }), "seed-look");
     expect(seniorSvg).toContain("#d9d3c6");
     expect(seniorSvg).toContain("<circle"); // 眼鏡也是向量畫的
-    // 女性長髮、男性短髮形狀不同。
+    // 0062-B：兩個性別使用不同池的完整 Open Peeps 全身資產，且都是本地 SVG。
     const femaleSvg = buildSceneSvg(sceneOf({ playerSex: "female", ageStage: "young" }), "seed-look");
     const maleSvg = buildSceneSvg(sceneOf({ playerSex: "male", ageStage: "young" }), "seed-look");
-    expect(femaleSvg).toContain("/true/true");
-    expect(maleSvg).toContain("/false/false");
+    const femaleAsset = /data-layer="player"[^>]*data-asset="openpeeps\/([^"]+)"/.exec(femaleSvg)?.[1] ?? "";
+    const maleAsset = /data-layer="player"[^>]*data-asset="openpeeps\/([^"]+)"/.exec(maleSvg)?.[1] ?? "";
+    expect((OPEN_PEEPS_BY_SEX.female as readonly string[]).includes(femaleAsset)).toBe(true);
+    expect((OPEN_PEEPS_BY_SEX.male as readonly string[]).includes(maleAsset)).toBe(true);
+    expect(femaleAsset).not.toBe(maleAsset);
+    expect(femaleSvg).toContain("<svg data-part=\"openpeeps/");
+    expect(maleSvg).toContain("<svg data-part=\"openpeeps/");
   });
 
   it("伴侶與寵物不遮住玩家、也不遮左側狀態卡", () => {
@@ -202,7 +224,9 @@ describe("GPT-0054-B 場景：完整狀態矩陣", () => {
     expect(readSceneView({ scene: sceneOf({ ageStage: "senior", petKind: "cat" }) })).toEqual(
       sceneOf({ ageStage: "senior", petKind: "cat" })
     );
-    expect(readSceneView(null).ageStage).toBe("child");
+    expect(readSceneView(null).ageStage).toBe("baby");
+    expect(readSceneView(null).lifeStage).toBe("baby");
+    expect(readSceneView(null).age).toBe(0);
     expect(readSceneView({}).petKind).toBe("none");
     // 即使底層有 pet:dog flag，沒有 scene 投影也不該自己猜。
     expect(readSceneView({ flags: ["pet:dog"], state: { age: 40 } }).petKind).toBe("none");
@@ -210,7 +234,58 @@ describe("GPT-0054-B 場景：完整狀態矩陣", () => {
     expect(readSceneView({ scene: { ageStage: "bogus", playerSex: "x", petKind: "bird" } })).toEqual(
       DEFAULT_SCENE_VIEW
     );
-    expect(DEFAULT_SCENE_VIEW.ageStage).toBe("child");
+    expect(DEFAULT_SCENE_VIEW.ageStage).toBe("baby");
     expect(DEFAULT_SCENE_VIEW.petKind).toBe("none");
+  });
+
+  it("0063-B readSceneView 以精確 age 為準：拒絕 HUD 0 歲但場景塞成人", () => {
+    // 故意給矛盾的 ageStage／lifeStage；formal age 必須勝出。
+    const forged = readSceneView({
+      scene: { ...sceneOf({ age: 0 }), ageStage: "senior", lifeStage: "senior" }
+    });
+    expect(forged.age).toBe(0);
+    expect(forged.ageStage).toBe("baby");
+    expect(forged.lifeStage).toBe("baby");
+    const [baby] = describeSceneParts(forged, "seed-forged");
+    expect(baby!.derived).toBe(true);
+    expect(baby!.body).toContain("onesie");
+    expect(buildSceneSvg(forged, "seed-forged")).not.toContain('data-part="openpeeps/pose/standing/');
+
+    // 逐歲邊界：age → ageStage／lifeStage 與 application 完全一致。
+    for (const [age, ageStage, lifeStage] of [
+      [0, "baby", "baby"], [2, "baby", "baby"],
+      [3, "child", "child"], [5, "child", "child"],
+      [6, "student", "primary"], [11, "student", "primary"],
+      [12, "student", "teen"], [17, "student", "teen"],
+      [18, "student", "university"], [22, "student", "university"],
+      [23, "young", "young"], [39, "young", "young"],
+      [40, "middle", "middle"], [59, "middle", "middle"],
+      [60, "senior", "senior"], [80, "senior", "senior"]
+    ] as const) {
+      expect(ageStageOfAge(age)).toBe(ageStage);
+      expect(lifeStageOfAge(age)).toBe(lifeStage);
+      const view = readSceneView({ scene: { ...sceneOf({ age }), age: age, ageStage: "bogus", lifeStage: "bogus" } });
+      expect(view.ageStage).toBe(ageStage);
+      expect(view.lifeStage).toBe(lifeStage);
+    }
+  });
+
+  it("0063-B 所有年齡的人物都大且清楚，且不遮左側狀態卡", () => {
+    expect(SCENE_SAFE_LEFT_X).toBeGreaterThan(173);
+    for (const age of [0, 3, 6, 13, 18, 25, 45, 65]) {
+      for (const playerSex of SEXES) {
+        const svg = buildSceneSvg(sceneOf({ age, playerSex, hasPartner: true, petKind: "dog" }), "seed-safe");
+        // 玩家／伴侶的 <svg data-part=...> 都必須排在狀態卡右側安全區。
+        const boxes = [...svg.matchAll(/<svg data-part="[^"]+" x="([\d.]+)" y="([\d.]+)" width="([\d.]+)" height="([\d.]+)"/g)];
+        expect(boxes.length).toBeGreaterThanOrEqual(1);
+        for (const box of boxes) {
+          const x = Number(box[1]);
+          const height = Number(box[4]);
+          expect(x).toBeGreaterThan(173);
+          expect(height).toBeGreaterThanOrEqual(100);
+        }
+        expect(svg).toContain(`data-age="${age}"`);
+      }
+    }
   });
 });

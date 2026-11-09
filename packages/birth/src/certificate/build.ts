@@ -7,9 +7,10 @@ import {
 } from "@life-sim/contracts";
 import { ascii, canonicalBytes, concatBytes, sha256Hex } from "@life-sim/engine";
 import { fail } from "../errors";
-import { isValidatedIdentityPack, type ValidatedIdentityPack } from "../identity/validate";
+import { isValidatedDataPack, isValidatedIdentityPack } from "../attest";
+import type { ValidatedIdentityPack } from "../identity/validate";
 import { assertPeerGroupMatches, buildPeerGroup } from "../peer/group";
-import { isValidatedDataPack, type ValidatedDataPack } from "../validate";
+import type { ValidatedDataPack } from "../validate";
 
 const HASH = /^[0-9a-f]{64}$/;
 const CERT_ID = /^cert:[0-9a-f]{24}$/;

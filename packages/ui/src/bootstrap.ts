@@ -1,17 +1,28 @@
-import "./style.css";
-
 /**
- * H5-CTO-176-A：UI 入口分流。
+ * GPT-WORKBUDDY-0065-A｜UI 入口：出生頁 critical path。
  *
- * - 預設（沒有任何 `preview` 參數）→ 載入真實 P3-E runtime（`./p3e-real-main`）；
- * - 只有 `?preview=fixture` → 載入既有的靜態 fixture 預覽（`./main`），
- *   保留原本 P1-C 行為與視覺回歸。
+ * `birth.css` 與 `p3e-birth-main.ts` 是**靜態** import，因此出生卡的
+ * HTML → 單一 entry JS → 單一 birth CSS → 單一 birth bundle JSON
+ * 就是完整的首屏關鍵路徑，沒有第二個 JS／CSS chunk 往返。
  *
- * 兩個模組都用 dynamic import，讓預設路徑**不會**包含 fixture 的程式與文案。
+ * 完整遊戲（`p3e-game-main.ts` + `style.css`）只由 birth entry 在按下
+ * 「開始人生」後動態 import；`?preview=fixture` 的舊 P1-C 靜態預覽保留，
+ * 走另一個動態 chunk，不進出生關鍵路徑。
+ *
+ * GPT-DEEPSEEK-0062-A：在載入任何 UI 之前先套用語系（預設 zh-CN），
+ * 之後所有 render 產生的文字都由 `p3e-locale` 的 MutationObserver 轉成簡體。
  */
+import "./birth.css";
+import { startP3ELocale } from "./p3e-locale.js";
+import { startP3EBirth } from "./p3e-birth-main.js";
+
+const locale = startP3ELocale();
+// 供瀏覽器 smoke 與除錯讀取（不影響任何遊戲狀態）。
+(window as unknown as { __p3eLocale?: string }).__p3eLocale = locale;
+
 const params = new URLSearchParams(window.location.search);
 if (params.get("preview") === "fixture") {
   void import("./main");
 } else {
-  void import("./p3e-real-main");
+  startP3EBirth();
 }

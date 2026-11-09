@@ -3660,14 +3660,64 @@ body:has(:is(.p3e-game-shell, .p3e-birth-screen)) {
   flex: 0 0 auto;
   flex-direction: column;
   justify-content: flex-end;
-  min-height: 104px;
-  padding: 12px 14px;
+  /* GPT-0062-B：上方留白給固定在右上角的語系切換鈕，讓標題列的
+     「↻ 刷新出生」44×44 觸控區不與它重疊。 */
+  min-height: 110px;
+  padding: 40px 14px 10px;
   color: #fff;
   /* GPT-0054-B：與遊戲場景一致，出生卡也不再引用固定人物像素圖。 */
   background:
     linear-gradient(180deg, rgba(18, 72, 108, 0.12), rgba(31, 70, 47, 0.72)),
     linear-gradient(180deg, #f7dca9 0 42%, #aebd78 42% 72%, #c9a978 72%);
   text-shadow: 0 2px 2px rgba(25, 24, 17, 0.75);
+}
+
+/* GPT-0062-B：標題列（左：出生地／國名，右：主要刷新動作）。 */
+.p3e-birth-title-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.p3e-birth-title-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.p3e-birth-refresh {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 2px solid rgba(255, 253, 240, 0.88);
+  border-radius: 999px;
+  color: #fffdf0;
+  background: rgba(31, 70, 47, 0.62);
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+  text-shadow: 0 1px 2px rgba(16, 30, 18, 0.65);
+}
+
+.p3e-birth-refresh:hover:not(:disabled) {
+  background: rgba(31, 70, 47, 0.86);
+}
+
+.p3e-birth-refresh:disabled {
+  opacity: 0.72;
+  cursor: progress;
+}
+
+.p3e-birth-refresh-icon {
+  font-size: 1.05rem;
+  line-height: 1;
 }
 
 .p3e-birth-country {
@@ -3738,7 +3788,8 @@ body:has(:is(.p3e-game-shell, .p3e-birth-screen)) {
 
 .p3e-birth-actions {
   display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.4fr);
+  /* GPT-0062-B：「開始人生」是唯一主要 CTA，底部重新抽取降為次要。 */
+  grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.55fr);
   gap: 7px;
   flex: 0 0 auto;
   padding: 8px 10px 10px;
@@ -3758,9 +3809,14 @@ body:has(:is(.p3e-game-shell, .p3e-birth-screen)) {
   cursor: pointer;
 }
 
+/* GPT-0062-B：弱化底部「重新抽取」，不再是與開始人生同權重的主要按鈕。 */
 .p3e-birth-actions [data-action="reroll-birth"] {
-  color: #3d3020;
-  background: linear-gradient(#fff7dc, #e7c992);
+  color: #6b5537;
+  border: 1px dashed rgba(102, 80, 51, 0.55);
+  background: transparent;
+  font-size: 0.76rem;
+  font-weight: 600;
+  box-shadow: none;
 }
 
 .p3e-birth-actions [data-action="start-life"] {
@@ -3856,8 +3912,9 @@ body:has(:is(.p3e-game-shell, .p3e-birth-screen)) {
   }
 
   .p3e-birth-hero {
-    min-height: 76px;
-    padding: 9px 12px;
+    /* 0062-B：仍保留語系切換鈕與 44×44 刷新鈕不重疊的最小留白。 */
+    min-height: 96px;
+    padding: 38px 12px 6px;
   }
 
   .p3e-birth-country {

@@ -23,6 +23,28 @@ export function loadJsonCached(url: string): Promise<unknown> {
   return pending;
 }
 
+/**
+ * GPT-WORKBUDDY-0065-A：birth bundle 需要**原始文字**才能驗證可重現內容雜湊。
+ * 與 JSON 快取分開但同樣去重：連點／重繪不會重複下載。
+ */
+const INFLIGHT_TEXT = new Map<string, Promise<string>>();
+
+export function loadTextCached(url: string): Promise<string> {
+  const cached = INFLIGHT_TEXT.get(url);
+  if (cached !== undefined) return cached;
+  const pending = fetch(url)
+    .then(async (response): Promise<string> => {
+      if (!response.ok) throw new Error(`bundle fetch failed: ${response.status}`);
+      return await response.text();
+    })
+    .catch((error: unknown) => {
+      INFLIGHT_TEXT.delete(url);
+      throw error;
+    });
+  INFLIGHT_TEXT.set(url, pending);
+  return pending;
+}
+
 /** 供測試／診斷觀察目前快取了幾個請求（不列舉 URL）。 */
 export function jsonCacheSize(): number {
   return INFLIGHT.size;

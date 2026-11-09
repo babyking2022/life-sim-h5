@@ -25,6 +25,7 @@ import {
   type Sex
 } from "@life-sim/contracts";
 import { canonicalBytes, compareBytes, sha256Hex, utf8Encode } from "@life-sim/engine";
+import { markValidatedDataPack } from "./attest";
 import { fail } from "./errors";
 import { assertLicenseGate } from "./license";
 import {
@@ -68,11 +69,7 @@ export interface ValidatedDataPack {
   readonly packChecksum: string;
 }
 
-const validatedPacks = new WeakSet<object>();
-
-export function isValidatedDataPack(value: unknown): value is ValidatedDataPack {
-  return typeof value === "object" && value !== null && validatedPacks.has(value);
-}
+/** 品牌判定集中在 `./attest`（0065-A）；正式 validator 只負責標記。 */
 
 const byBytes = (a: string, b: string): number => compareBytes(utf8Encode(a), utf8Encode(b));
 
@@ -438,7 +435,7 @@ export function validateDataPack(raw: RawDataPack): ValidatedDataPack {
   /* 深度凍結：pack、manifest、每筆記錄、陣列、bands、displayNames、birthShare、
      birthWeightIndex、datasetChecksums 全部不可變；驗證後任何外部修改都會拋錯。 */
   deepFreeze(pack);
-  validatedPacks.add(pack);
+  markValidatedDataPack(pack);
   return pack;
 }
 

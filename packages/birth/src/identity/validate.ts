@@ -37,7 +37,8 @@ import { assertLicenseGate } from "../license";
 import { parseDataVersion, parseLicense, parseLineage } from "../records";
 import { readArray, readChecksum, readEnum, readExactObject, readInt, readObject, readString } from "../schema";
 import { sumWeights } from "../weights";
-import { deepFreeze, isValidatedDataPack, type ValidatedDataPack } from "../validate";
+import { isValidatedDataPack, markValidatedIdentityPack } from "../attest";
+import { deepFreeze, type ValidatedDataPack } from "../validate";
 
 const ENTITY_ID = /^cr:[A-Z]{3}$/;
 const CULTURE_ID = /^[a-z][a-z0-9_]{1,31}$/;
@@ -80,11 +81,7 @@ export interface ValidatedIdentityPack {
   readonly packChecksum: string;
 }
 
-const validatedIdentityPacks = new WeakSet<object>();
-
-export function isValidatedIdentityPack(value: unknown): value is ValidatedIdentityPack {
-  return typeof value === "object" && value !== null && validatedIdentityPacks.has(value);
-}
+/** 品牌判定集中在 `../attest`（0065-A）；正式 validator 只負責標記。 */
 
 const byBytes = (left: string, right: string): number => compareBytes(utf8Encode(left), utf8Encode(right));
 const createIndex = <T>(): Record<string, T> => Object.create(null) as Record<string, T>;
@@ -666,7 +663,7 @@ export function validateIdentityPack(base: ValidatedDataPack, raw: RawIdentityPa
     packChecksum: manifest.packChecksum
   };
   deepFreeze(pack);
-  validatedIdentityPacks.add(pack);
+  markValidatedIdentityPack(pack);
   return pack;
 }
 

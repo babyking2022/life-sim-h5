@@ -38,7 +38,8 @@ import {
   type P3DSex
 } from "@life-sim/contracts";
 import { canonicalBytes, compareBytes, sha256Hex, utf8Encode } from "@life-sim/engine";
-import { isValidatedDataPack, type ValidatedDataPack } from "../validate";
+import { isValidatedDataPack } from "../attest";
+import type { ValidatedDataPack } from "../validate";
 import { fail } from "./errors";
 import {
   deepFreeze,

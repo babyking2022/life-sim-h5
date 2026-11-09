@@ -1,4 +1,11 @@
 /**
+ * **歷史檔案｜GPT-WORKBUDDY-0062-B 起已不在 runtime 使用，也不進任何打包 chunk。**
+ *
+ * 0062-B 已把人物改成完整 Open Peeps 全身 SVG（`p3e-open-peeps.ts`）。
+ * 這個 0058-B 的 Humation 部件模組沒有任何 import；保留僅供授權追溯，
+ * `assets/generated/humation/LICENSE.md` 與 `SCENE-ATTRIBUTION.md` 亦同步標註。
+ * 請勿在新程式中 import；若要清除歷史檔可直接刪除本檔。
+ *
  * GPT-WORKBUDDY-0058-B｜Humation 最小 SVG 部件核心（**自動產生，勿手改**）。
  *
  * 來源：https://github.com/humation-labs/humation

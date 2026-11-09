@@ -499,11 +499,12 @@ describe("整合規則", () => {
     expect((barrel as Dict).encodeP3ESaveEnvelopeV6Compressed).toBeUndefined();
     // application 公共 barrel 引用正式模組。
     expect(APPLICATION_INDEX_SRC.includes("./p3e-browser-portable-save")).toBe(true);
-    // package.json exports 只含 "."。
+    // package.json exports 只能是完整 barrel "." 與 CTO 授權的 birth-lite
+    // 公開 subpath（GPT-0065-A）；不得再冒出任何會拉進 validators 的入口。
     const packageJson = JSON.parse(
       readFileSync(join(ROOT, "packages/application/package.json"), "utf8")
     ) as { exports: Dict };
-    expect(Object.keys(packageJson.exports)).toEqual(["."]);
+    expect(Object.keys(packageJson.exports).sort()).toEqual([".", "./birth-lite"]);
   });
 
   it("no_DOM_or_storage_tokens", () => {

@@ -8,7 +8,8 @@ import {
 } from "@life-sim/contracts";
 import { ascii, canonicalBytes, concatBytes, createDomainRng, normalizeSeed, sha256Hex } from "@life-sim/engine";
 import { fail } from "./errors";
-import { birthWeightKey, isValidatedDataPack, type ValidatedDataPack } from "./validate";
+import { isValidatedDataPack } from "./attest";
+import { birthWeightKey, type ValidatedDataPack } from "./validate";
 import { pickWeightedIndex } from "./weights";
 
 const SEX_POLICIES: readonly SexPolicy[] = ["random", "female", "male"];

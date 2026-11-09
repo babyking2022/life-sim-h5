@@ -22,9 +22,10 @@ import {
 import { ascii, canonicalBytes, concatBytes, createDomainRng, normalizeSeed, seedDigest, seedHash, sha256Hex, utf8Encode } from "@life-sim/engine";
 import { drawBirth } from "../draw";
 import { fail } from "../errors";
-import { isValidatedDataPack, type ValidatedDataPack } from "../validate";
+import { isValidatedDataPack, isValidatedIdentityPack } from "../attest";
+import type { ValidatedDataPack } from "../validate";
 import { pickWeightedIndex } from "../weights";
-import { isValidatedIdentityPack, type ValidatedIdentityPack } from "./validate";
+import type { ValidatedIdentityPack } from "./validate";
 
 const CROCKFORD = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
 const SEX_POLICIES: readonly SexPolicy[] = ["random", "female", "male"];

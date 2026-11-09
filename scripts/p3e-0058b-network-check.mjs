@@ -112,7 +112,9 @@ try {
     const context = await makeContext(browser);
     const page = await context.newPage();
     const log = track(page);
-    await page.route(/p3e-real-main-.*\.js/, async (route) => {
+    // 0065-A：出生關鍵入口已靜態併成 index-*.js；延遲它就是延遲主 JS，
+    // 用來證明 HTML 骨架不依賴任何 JS／fetch。
+    await page.route(/(?:index|p3e-birth-main|p3e-real-main)-.*\.js/, async (route) => {
       await new Promise((done) => setTimeout(done, 350));
       await route.continue();
     });
@@ -124,7 +126,9 @@ try {
     await page.goto(`${baseUrl}/${QUERY}`, { waitUntil: "domcontentloaded" });
     const skeleton = await page.evaluate(
       () => document.querySelector(".p3e-boot-skeleton") !== null &&
-        document.querySelector(".p3e-boot-skeleton")?.textContent?.includes("正在準備出生資料")
+        /正在(準備出生資料|准备出生资料)/.test(
+          document.querySelector(".p3e-boot-skeleton")?.textContent ?? ""
+        )
     );
     check("static_skeleton_visible_before_main_js", skeleton === true);
 
@@ -143,7 +147,7 @@ try {
     await page.locator('[data-action="start-life"]').click();
     const preparing = await page.locator('[data-action="start-life"]').textContent();
     const preparingDisabled = await page.locator('[data-action="start-life"]').isDisabled();
-    check("start_button_shows_preparing_life", (preparing ?? "").includes("準備人生") && preparingDisabled,
+    check("start_button_shows_preparing_life", /準備人生|准备人生/.test(preparing ?? "") && preparingDisabled,
       `text=${preparing} disabled=${preparingDisabled}`);
     check("no_mp3_request_while_preparing", count(log.requests, isMp3) === 0,
       `mp3=${count(log.requests, isMp3)}`);

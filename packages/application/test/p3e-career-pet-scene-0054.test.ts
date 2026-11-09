@@ -22,7 +22,7 @@ import {
   runP3EPlaySessionCommand,
   type P3EPlaySession
 } from "../src/p3e-session";
-import { petKindOf, sceneAgeStageOf } from "../src/p3e-profile";
+import { petKindOf, sceneAgeStageOf, sceneLifeStageOf } from "../src/p3e-profile";
 
 /**
  * GPT-DEEPSEEK-0054-A｜核心玩法驗收：
@@ -326,7 +326,8 @@ describe("GPT-0054-A 任務一：兩階段選擇、資格與收入", () => {
 });
 
 describe("GPT-0054-A 任務二：寵物", () => {
-  it("狗／貓／不養三個選項都存在，且旗標與場景一致", () => {
+  // 正式 session 長時整合測試，沿用 p3e-life-focus.test.ts 的 timeout 慣例。
+  it("狗／貓／不養三個選項都存在，且旗標與場景一致", { timeout: 120_000 }, () => {
     for (const [optionId, expected] of [
       ["dog", "dog"],
       ["cat", "cat"],
@@ -362,16 +363,19 @@ describe("GPT-0054-A 任務二：寵物", () => {
   });
 });
 
-describe("GPT-0054-A 任務三：scene 投影", () => {
-  it("年齡階段邊界：0–5 child、6–17 student、18–34 young、35–59 middle、60+ senior", () => {
+describe("GPT-0054-A 任務三／GPT-0063-B：scene 投影", () => {
+  it("年齡階段邊界：0–2 baby、3–5 child、6–22 student、23–39 young、40–59 middle、60+ senior", () => {
     for (const [age, stage] of [
-      [0, "child"],
+      [0, "baby"],
+      [2, "baby"],
+      [3, "child"],
       [5, "child"],
       [6, "student"],
-      [17, "student"],
-      [18, "young"],
-      [34, "young"],
-      [35, "middle"],
+      [18, "student"],
+      [22, "student"],
+      [23, "young"],
+      [39, "young"],
+      [40, "middle"],
       [59, "middle"],
       [60, "senior"],
       [99, "senior"]
@@ -380,7 +384,25 @@ describe("GPT-0054-A 任務三：scene 投影", () => {
     }
   });
 
-  it("完整投影：性別 × 年齡階段 × 城鄉 × 有無伴侶 × 寵物，且與 view 其他欄位一致", () => {
+  it("0063-B lifeStage 精確分段：baby／child／primary／teen／university／young／middle／senior", () => {
+    for (const [age, stage] of [
+      [0, "baby"], [2, "baby"],
+      [3, "child"], [5, "child"],
+      [6, "primary"], [11, "primary"],
+      [12, "teen"], [17, "teen"],
+      [18, "university"], [22, "university"],
+      [25, "young"], [39, "young"],
+      [45, "middle"], [59, "middle"],
+      [65, "senior"], [99, "senior"]
+    ] as const) {
+      expect(sceneLifeStageOf(age)).toBe(stage);
+      expect(sceneAgeStageOf(age)).toBe(
+        stage === "primary" || stage === "teen" || stage === "university" ? "student" : stage
+      );
+    }
+  });
+
+  it("完整投影：性別 × 年齡階段 × 城鄉 × 有無伴侶 × 寵物，且與 view 其他欄位一致", { timeout: 120_000 }, () => {
     const matrix = new Set<string>();
     for (let index = 0; index < 6; index += 1) {
       const seed = `gpt-0054-scene-${index}`;
@@ -394,17 +416,23 @@ describe("GPT-0054-A 任務三：scene 投影", () => {
         const scene = session.view.scene;
         expect(["male", "female"]).toContain(scene.playerSex);
         expect(scene.playerSex).toBe(session.state.identity.sex);
-        expect(["child", "student", "young", "middle", "senior"]).toContain(scene.ageStage);
+        expect(scene.age).toBe(session.state.age);
+        expect(["baby", "child", "student", "young", "middle", "senior"]).toContain(scene.ageStage);
         expect(scene.ageStage).toBe(sceneAgeStageOf(session.state.age));
+        expect(scene.lifeStage).toBe(sceneLifeStageOf(session.state.age));
         expect(["urban", "rural"]).toContain(scene.residenceKind);
         expect(typeof scene.hasPartner).toBe("boolean");
         expect(["none", "dog", "cat"]).toContain(scene.petKind);
         expect(["alive", "dead"]).toContain(scene.phase);
         if (scene.hasPartner) {
           expect(["male", "female", null]).toContain(scene.partnerSex);
+          expect(typeof scene.partnerAge).toBe("number");
+          // 未成年玩家旁邊不能出現成年伴侶。
+          if (session.state.age < 18) expect(scene.partnerAge as number).toBeLessThan(18);
           expect(["dating", "married"]).toContain(session.view.profile.relationship.status);
         } else {
           expect(scene.partnerSex).toBeNull();
+          expect(scene.partnerAge).toBeNull();
         }
         matrix.add(`${scene.playerSex}|${scene.ageStage}|${scene.residenceKind}|${scene.hasPartner}|${scene.petKind}`);
       }
@@ -413,7 +441,7 @@ describe("GPT-0054-A 任務三：scene 投影", () => {
     expect(matrix.size).toBeGreaterThan(8);
   });
 
-  it("死亡後投影仍然穩定（phase=dead、age 不再變）", () => {
+  it("死亡後投影仍然穩定（phase=dead、age 不再變）", { timeout: 120_000 }, () => {
     const seed = "gpt-0054-scene-death";
     let session = sessionFor(seed);
     for (let step = 0; step < 500 && session.state.phase !== "death"; step += 1) {

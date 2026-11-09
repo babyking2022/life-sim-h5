@@ -49,6 +49,42 @@ const FORBIDDEN_DEPENDENCIES = new Map([
   ["birth", ["simulation"]]
 ]);
 
+/**
+ * GPT-WORKBUDDY-0065-A：公開 subpath export 白名單。
+ *
+ * 原本規則把「任何 `@life-sim/<pkg>/<sub>`」一律視為私人路徑。0065-A 的
+ * birth-lite 是 CTO 授權的**公開第二入口**，必須由 `package.json#exports`
+ * 明確宣告，讓出生頁可以避開完整 application barrel（不打進 validators）。
+ * 這裡改成讀取各套件 package.json 的 exports key：
+ *
+ * - 只有明確宣告的 subpath 才算公開；
+ * - `/src/` 之類的私人源碼路徑永遠不宣告，既有 self-probe 全部繼續攔到；
+ * - 未宣告的 subpath 仍一律 `dep:private-path`。
+ */
+const declaredPublicSubpaths = new Set();
+try {
+  const packagesDir = join(process.cwd(), "packages");
+  for (const dir of readdirSync(packagesDir, { withFileTypes: true })) {
+    if (!dir.isDirectory()) continue;
+    const manifestPath = join(packagesDir, dir.name, "package.json");
+    if (!existsSync(manifestPath)) continue;
+    const manifest = JSON.parse(readFileSync(manifestPath, "utf8"));
+    const pkgName = typeof manifest.name === "string" ? manifest.name : "";
+    if (!pkgName.startsWith("@life-sim/")) continue;
+    for (const key of Object.keys(manifest.exports ?? {})) {
+      if (key === "." || !key.startsWith("./")) continue;
+      declaredPublicSubpaths.add(`${pkgName}${key.slice(1)}`);
+    }
+  }
+} catch {
+  /* 在非專案根目錄被呼叫（例如單元 self-probe）時，白名單保持空集合。 */
+}
+
+/** 是否為 package.json#exports 明確宣告的公開 subpath。 */
+export function isDeclaredPublicSubpath(specifier) {
+  return declaredPublicSubpaths.has(specifier);
+}
+
 const TEST_DIR_PATTERN = /(^|\/)(tests?|__tests__|__mocks__|__fixtures__)(\/|$)/;
 const TEST_FILE_PATTERN = /\.(test|spec)\.[cm]?tsx?$/;
 const DECLARATION_FILE_PATTERN = /\.d\.[cm]?ts$/;
@@ -534,8 +570,10 @@ export function analyzeSource(source, relPath) {
     const target = targetPackageOf(specifier);
 
     if (target !== null && specifier !== `@life-sim/${target}`) {
-      // 任何 `@life-sim/<pkg>/<sub>` 都是私人路徑。
-      report(node, privatePathRule(specifier), `${mechanism} ${specifier}`);
+      // 只有 package.json#exports 明確宣告的 subpath 是公開入口（0065-A birth-lite）。
+      if (!isDeclaredPublicSubpath(specifier)) {
+        report(node, privatePathRule(specifier), `${mechanism} ${specifier}`);
+      }
       if (target !== ownPackage) deps.add(target);
       continue;
     }

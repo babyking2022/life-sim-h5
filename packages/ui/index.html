@@ -9,6 +9,9 @@
     <!-- GPT-0058-B：極小的首屏骨架樣式內嵌在 HTML，TTFB 後立刻可見，
          不必等主 JS／CSS 下載。真實版面仍由 style.css 負責。 -->
     <style>
+      /* 0065-A：連 body 的 8px 預設邊界也在 HTML 階段就清掉，
+         骨架 → 出生卡之間不會有 8px 的版面跳動（FOUC）。 */
+      html,body{margin:0;padding:0}
       .p3e-boot-skeleton{box-sizing:border-box;min-height:100dvh;margin:0;padding:28px 20px;
         background:#f3e7cb;color:#3f3428;font-family:system-ui,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif}
       .p3e-boot-skeleton h1{font-size:22px;margin:0 0 10px;font-weight:700}

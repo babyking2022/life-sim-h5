@@ -1,0 +1,683 @@
+/* GPT-WORKBUDDY-0065-A | birth-critical CSS.
+   Extracted verbatim from style.css (base + P3-E base + birth card).
+   The complete game CSS stays in style.css and is loaded with the game chunk. */
+
+/* ===== style.css L1-L138 ===== */
+/* ==================================================================
+   P1-C.1 手机直立式 H5 静态互动壳
+   尺寸铁律：可见文字 >= 12px（正文 >= 14px、标题 >= 18px）
+             可点区域 >= 44x44px；下一步 >= 52px；tab >= 56px + safe-area
+             场景 180-240px；手机框 <= 480px；不足高度时垂直滚动
+   所有尺寸用 rem，200% 文字模式随根字级放大；不使用 ellipsis 裁字。
+   ================================================================== */
+
+:root {
+  color-scheme: light;
+  --page: #efe2c6;
+  --backdrop: #d8c9a8;
+  --panel: #fff8e8;
+  --panel-strong: #fffdf4;
+  --ink: #2b241f;
+  --muted: #5d5347;
+  --line: #c9a473;
+  --line-soft: #e5d2ae;
+  --teal: #1f5d54;
+  --teal-soft: #dceee5;
+  --gold: #e0a62f;
+  --gold-ink: #8a520f;
+  --gold-soft: #fdf0c9;
+  --red: #d95f4c;
+  --amber: #d89a2a;
+  --aqua: #3e9e9c;
+  --violet: #8c71bc;
+  --blue: #4f7ea8;
+  --green: #5f8d4e;
+  --rose: #bf6d72;
+  --teal-pin: #2f7d6f;
+  --shadow: 0 3px 0 rgba(94, 62, 31, 0.16);
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+
+  --tap: 2.75rem;        /* 44px */
+  --next-h: 3.25rem;     /* 52px */
+  --tab-h: 3.5rem;       /* 56px */
+  --radius: 14px;
+  --fs-caption: 0.75rem; /* 12px，最小可见文字 */
+  --fs-body: 0.875rem;   /* 14px，正文 */
+  --fs-lead: 0.9375rem;  /* 15px */
+  --fs-title: 1.375rem;  /* 22px，标题 */
+  --fs-heading: 1.125rem;/* 18px，小标题 */
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --page: #1d2825;
+  --backdrop: #101816;
+  --panel: #26342f;
+  --panel-strong: #2d3e37;
+  --ink: #f6edda;
+  --muted: #c9bda8;
+  --line: #8f7551;
+  --line-soft: #4a5b50;
+  --teal: #9ed7be;
+  --teal-soft: #334c42;
+  --gold: #f0bb4d;
+  --gold-ink: #ffd98a;
+  --gold-soft: #4a432e;
+  --shadow: 0 3px 0 rgba(0, 0, 0, 0.28);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  background: var(--backdrop);
+  color: var(--ink);
+}
+
+body {
+  font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
+  font-size: var(--fs-body);
+  line-height: 1.5;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid #15594f;
+  outline-offset: 2px;
+}
+
+:root[data-theme="dark"] button:focus-visible,
+:root[data-theme="dark"] [tabindex]:focus-visible {
+  outline-color: #bde8d5;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.icon {
+  width: 1.25em;
+  height: 1.25em;
+  display: inline-block;
+  flex: none;
+  vertical-align: -0.16em;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+
+/* ===== style.css L2564-L2758 ===== */
+/* ================= P3-E real runtime (H5-CTO-176-A) ================= */
+.p3e-shell {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 16px 14px 40px;
+  color: #111827;
+  background: #f8fafc;
+  font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans TC", sans-serif;
+  min-height: 100vh;
+}
+.p3e-shell *,
+.p3e-shell *::before,
+.p3e-shell *::after {
+  box-sizing: border-box;
+}
+.p3e-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+.p3e-header h1 {
+  margin: 0;
+  font-size: 1.35rem;
+  line-height: 1.25;
+}
+.p3e-status {
+  margin: 0;
+  color: #374151;
+  font-size: 0.92rem;
+}
+
+.p3e-mvp-notice {
+  margin: 0;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid rgba(125, 84, 34, 0.24);
+  border-radius: 0.75rem;
+  color: #63451f;
+  background: rgba(255, 244, 214, 0.82);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+.p3e-alert {
+  margin: 8px 0 0;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+  font-weight: 600;
+}
+.p3e-tabs {
+  display: flex;
+  gap: 6px;
+  margin: 10px 0 14px;
+  flex-wrap: wrap;
+}
+.p3e-tab {
+  font: inherit;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #1f2937;
+  cursor: pointer;
+}
+.p3e-tab[aria-current="page"] {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+  color: #ffffff;
+}
+.p3e-content {
+  display: block;
+}
+.p3e-life {
+  display: grid;
+  gap: 12px;
+}
+.p3e-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 12px 14px;
+  min-width: 0;
+}
+.p3e-card h2 {
+  margin: 0 0 8px;
+  font-size: 1rem;
+}
+.p3e-kv {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  gap: 4px 10px;
+  margin: 0;
+  font-size: 0.92rem;
+}
+.p3e-kv dt {
+  color: #4b5563;
+  overflow-wrap: anywhere;
+}
+.p3e-kv dd {
+  margin: 0;
+  text-align: right;
+  overflow-wrap: anywhere;
+}
+.p3e-money dd {
+  font-variant-numeric: tabular-nums;
+}
+.p3e-pending {
+  border-color: #bfdbfe;
+  background: #eff6ff;
+}
+.p3e-options {
+  display: grid;
+  gap: 8px;
+}
+.p3e-option,
+.p3e-primary {
+  font: inherit;
+  min-height: 44px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+.p3e-option {
+  background: #ffffff;
+  border: 1px solid #93c5fd;
+  color: #1e3a8a;
+  text-align: left;
+}
+.p3e-primary {
+  background: #1d4ed8;
+  border: 1px solid #1d4ed8;
+  color: #ffffff;
+  font-weight: 700;
+  width: 100%;
+}
+.p3e-option:disabled,
+.p3e-primary:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.p3e-option:focus-visible,
+.p3e-primary:focus-visible,
+.p3e-tab:focus-visible {
+  outline: 3px solid #f59e0b;
+  outline-offset: 2px;
+}
+.p3e-controls {
+  display: grid;
+  gap: 8px;
+}
+.p3e-hint {
+  margin: 0;
+  color: #4b5563;
+  font-size: 0.9rem;
+}
+.p3e-death {
+  border-color: #fca5a5;
+  background: #fff7f7;
+}
+.p3e-placeholder {
+  background: #ffffff;
+  border: 1px dashed #94a3b8;
+  border-radius: 12px;
+  padding: 18px 16px;
+  color: #374151;
+}
+.p3e-placeholder h2 {
+  margin: 0 0 6px;
+  font-size: 1rem;
+}
+.p3e-placeholder p {
+  margin: 0;
+}
+.p3e-meta {
+  margin: 2px 0 0;
+  color: #4b5563;
+  font-size: 0.78rem;
+  overflow-wrap: anywhere;
+}
+@media (min-width: 720px) {
+  .p3e-life {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .p3e-pending,
+  .p3e-controls,
+  .p3e-meta,
+  .p3e-death {
+    grid-column: 1 / -1;
+  }
+}
+
+
+/* ===== style.css L3616-L3955 ===== */
+/* ==================================================================
+   Birth certificate card
+   ------------------------------------------------------------------
+   One screen from top to bottom. When the identity / family data is
+   taller than the card, .p3e-birth-grid (and .p3e-birth-story) scroll
+   internally; the document stays fixed at 100dvh.
+   ================================================================== */
+
+.p3e-birth-screen {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  flex: 1 1 auto;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
+  padding: 4px;
+}
+
+#app > .p3e-birth-screen {
+  height: 100dvh;
+  padding: max(8px, env(safe-area-inset-top)) 8px max(8px, env(safe-area-inset-bottom));
+}
+
+.p3e-birth-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+  max-height: 100%;
+  overflow: hidden;
+  border: 3px solid var(--game-paper-edge, #8b6b3d);
+  border-radius: 15px;
+  color: var(--game-ink, #342719);
+  background: var(--game-paper, #fff6dc);
+  box-shadow: 0 4px 0 rgba(76, 49, 22, 0.35), inset 0 0 0 2px rgba(255, 255, 255, 0.54);
+}
+
+.p3e-game-shell > .p3e-birth-card {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.p3e-birth-hero {
+  display: flex;
+  flex: 0 0 auto;
+  flex-direction: column;
+  justify-content: flex-end;
+  /* GPT-0062-B：上方留白給固定在右上角的語系切換鈕，讓標題列的
+     「↻ 刷新出生」44×44 觸控區不與它重疊。 */
+  min-height: 110px;
+  padding: 40px 14px 10px;
+  color: #fff;
+  /* GPT-0054-B：與遊戲場景一致，出生卡也不再引用固定人物像素圖。 */
+  background:
+    linear-gradient(180deg, rgba(18, 72, 108, 0.12), rgba(31, 70, 47, 0.72)),
+    linear-gradient(180deg, #f7dca9 0 42%, #aebd78 42% 72%, #c9a978 72%);
+  text-shadow: 0 2px 2px rgba(25, 24, 17, 0.75);
+}
+
+/* GPT-0062-B：標題列（左：出生地／國名，右：主要刷新動作）。 */
+.p3e-birth-title-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.p3e-birth-title-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.p3e-birth-refresh {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 10px;
+  border: 2px solid rgba(255, 253, 240, 0.88);
+  border-radius: 999px;
+  color: #fffdf0;
+  background: rgba(31, 70, 47, 0.62);
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 800;
+  white-space: nowrap;
+  cursor: pointer;
+  text-shadow: 0 1px 2px rgba(16, 30, 18, 0.65);
+}
+
+.p3e-birth-refresh:hover:not(:disabled) {
+  background: rgba(31, 70, 47, 0.86);
+}
+
+.p3e-birth-refresh:disabled {
+  opacity: 0.72;
+  cursor: progress;
+}
+
+.p3e-birth-refresh-icon {
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.p3e-birth-country {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0;
+  font-size: clamp(1.15rem, 5vw, 1.55rem);
+  font-weight: 900;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+}
+
+.p3e-birth-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 12px;
+  flex: 1 1 auto;
+  min-height: 0;
+  margin: 9px 12px 0;
+  padding-bottom: 6px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+
+.p3e-birth-grid > * {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.p3e-birth-grid dt,
+.p3e-birth-grid small,
+.p3e-birth-grid .p3e-birth-label,
+.p3e-birth-grid .p3e-kv dt {
+  color: var(--game-muted, #705f48);
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.p3e-birth-grid dd,
+.p3e-birth-grid strong,
+.p3e-birth-grid .p3e-kv dd {
+  margin: 1px 0 0;
+  font-size: 0.84rem;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.p3e-birth-grid .p3e-kv {
+  grid-column: 1 / -1;
+}
+
+.p3e-birth-story {
+  flex: 0 1 auto;
+  min-height: 0;
+  max-height: 5.1em;
+  margin: 5px 12px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  color: #594329;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  scrollbar-width: thin;
+}
+
+.p3e-birth-actions {
+  display: grid;
+  /* GPT-0062-B：「開始人生」是唯一主要 CTA，底部重新抽取降為次要。 */
+  grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.55fr);
+  gap: 7px;
+  flex: 0 0 auto;
+  padding: 8px 10px 10px;
+  border-top: 1px solid rgba(112, 82, 47, 0.28);
+  background: rgba(255, 246, 220, 0.98);
+}
+
+.p3e-birth-actions button {
+  min-width: 44px;
+  min-height: 48px;
+  border: 2px solid #665033;
+  border-radius: 10px;
+  padding: 6px 9px;
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+/* GPT-0062-B：弱化底部「重新抽取」，不再是與開始人生同權重的主要按鈕。 */
+.p3e-birth-actions [data-action="reroll-birth"] {
+  color: #6b5537;
+  border: 1px dashed rgba(102, 80, 51, 0.55);
+  background: transparent;
+  font-size: 0.76rem;
+  font-weight: 600;
+  box-shadow: none;
+}
+
+.p3e-birth-actions [data-action="start-life"] {
+  color: #fffdf0;
+  border-color: var(--game-orange-dark, #a84b05);
+  background: linear-gradient(180deg, #ffac25, var(--game-orange, #f58b13));
+}
+
+/* GPT-0058-B：兩階段載入狀態。狀態列固定單行、不擠壓故事區；
+   失敗時多出的「重試載入」按鈕排成三欄，維持 390×844 不整頁下滑。 */
+.p3e-world-status {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 4px 12px 2px;
+  color: #6b5537;
+  font-size: 0.72rem;
+  line-height: 1.25;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.p3e-world-status[data-p3e-world-status="error"] { color: #a33c24; }
+.p3e-birth-actions:has([data-action="retry-world"]) {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.p3e-birth-actions [data-action="retry-world"] {
+  color: #3d3020;
+  background: linear-gradient(#fff7dc, #e7c992);
+}
+.p3e-birth-actions button:disabled {
+  opacity: 0.66;
+  cursor: progress;
+}
+.p3e-boot-error-detail + [data-action="retry-world"] {
+  min-height: 44px;
+  margin-top: 12px;
+  padding: 8px 18px;
+  border: 2px solid #665033;
+  border-radius: 10px;
+  background: linear-gradient(#fff7dc, #e7c992);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+/* --- short screens (320x568): compress gaps, keep readable text --- */
+@media (max-height: 700px) {
+  .p3e-game-shell .p3e-life {
+    grid-template-rows: clamp(140px, 26dvh, 175px) minmax(46px, 1fr) auto auto auto;
+    gap: 3px;
+  }
+
+  .p3e-game-shell .p3e-scene {
+    max-height: 180px;
+  }
+
+  .p3e-game-shell .p3e-hud {
+    min-height: 50px;
+    margin-bottom: 3px;
+  }
+
+  .p3e-game-shell .p3e-story-card > h2 {
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+
+  .p3e-game-shell .p3e-story-card p {
+    font-size: 0.82rem;
+    line-height: 1.35;
+  }
+
+  .p3e-game-shell .p3e-option,
+  .p3e-choice-list .p3e-option {
+    min-height: 48px;
+  }
+
+  .p3e-game-shell .p3e-stat-dock {
+    min-height: 44px;
+  }
+
+  .p3e-game-shell .p3e-stat-item {
+    min-height: 36px;
+  }
+
+  .p3e-game-shell .p3e-primary[data-action="advance"] {
+    min-height: 46px;
+    font-size: 1rem;
+  }
+
+  .p3e-game-shell .p3e-tab {
+    min-height: 44px;
+  }
+
+  .p3e-birth-hero {
+    /* 0062-B：仍保留語系切換鈕與 44×44 刷新鈕不重疊的最小留白。 */
+    min-height: 96px;
+    padding: 38px 12px 6px;
+  }
+
+  .p3e-birth-country {
+    font-size: 1.1rem;
+  }
+
+  .p3e-birth-grid {
+    margin-top: 6px;
+    gap: 4px 9px;
+  }
+
+  .p3e-birth-story {
+    max-height: 3.2em;
+    font-size: 0.78rem;
+  }
+
+  .p3e-birth-actions {
+    padding-top: 5px;
+    padding-bottom: 6px;
+  }
+
+  .p3e-birth-actions button {
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 379px) {
+  .p3e-shell.p3e-game-shell,
+  .p3e-game-shell {
+    padding-right: 5px;
+    padding-left: 5px;
+  }
+
+  .p3e-birth-grid {
+    gap: 5px 8px;
+  }
+}
+
+

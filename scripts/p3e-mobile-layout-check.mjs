@@ -4,6 +4,7 @@ import { readFile, mkdir, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { extname, join, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
+import { display, canonList } from "./p3e-locale-compat.mjs";
 
 /**
  * GPT-0025-B — 手機直立版單欄視覺驗收。
@@ -21,6 +22,16 @@ const dist = resolve(root, ".artifacts/p1c-dist");
 const outDir = resolve(root, ".artifacts/mobile-layout");
 const reportPath = join(outDir, "report.json");
 const GOLDEN_SEED = "p3e-166-playable-runtime-v4";
+
+/**
+ * GPT-0063-A／0063-B：預設顯示語系已改為 zh-CN，但本腳本的文字斷言寫於
+ * 繁中時期。改用共用工具 `scripts/p3e-locale-compat.mjs`：直接讀 runtime 的
+ * PHRASES／CHAR_PAIRS，把「實際文字」與「期待的繁體字面值」正規化成同一個
+ * canonical 簡體再比對，不維護第二份手寫對照表、不做有歧義的簡→繁反轉。
+ * 所有幾何、尺寸、44px、overflow 等非文字條件完全不變，也不是用「強制
+ * zh-TW」掩蓋簡體問題。
+ */
+const toHant = display;
 
 /**
  * GPT-0025-D：字典中最長的標題／問題／選項，用來做「長文案不破版」的壓力測試。
@@ -668,11 +679,11 @@ function evaluateFocusPicker(label, s) {
   check(
     `${prefix}_five_natural_labels`,
     s.optionLabels.length === 5 &&
-      s.optionLabels.some((t) => t.includes("學業")) &&
-      s.optionLabels.some((t) => t.includes("自我實現")) &&
-      s.optionLabels.some((t) => t.includes("家庭")) &&
-      s.optionLabels.some((t) => t.includes("興趣")) &&
-      s.optionLabels.some((t) => t.includes("健康")),
+      s.optionLabels.some((t) => toHant(t).includes("學業")) &&
+      s.optionLabels.some((t) => toHant(t).includes("自我實現")) &&
+      s.optionLabels.some((t) => toHant(t).includes("家庭")) &&
+      s.optionLabels.some((t) => toHant(t).includes("興趣")) &&
+      s.optionLabels.some((t) => toHant(t).includes("健康")),
     JSON.stringify(s.optionLabels)
   );
   // GPT-0037-B P2：必選面板是真正的 dialog，且開啟後焦點在第一個可選重心。
@@ -683,7 +694,7 @@ function evaluateFocusPicker(label, s) {
       typeof d.labelledBy === "string" && d.labelledBy.length > 0 &&
       typeof d.labelText === "string" && d.labelText.includes("人生重心") &&
       typeof d.describedBy === "string" && d.describedBy.length > 0 &&
-      typeof d.descText === "string" && d.descText.includes("暫停") &&
+      typeof d.descText === "string" && toHant(d.descText).includes("暫停") &&
       d.firstOptionFocused && d.focusInsideDialog && d.activeTag !== "BODY",
     `role=${d.role} modal=${d.modal} label="${d.labelText}" desc="${d.descText?.slice(0, 24)}" ` +
       `firstFocused=${d.firstOptionFocused} inside=${d.focusInsideDialog} active=${d.activeTag}`
@@ -718,7 +729,8 @@ function evaluateFocusChosen(label, s, expectedLabel, expectToggleDisabled) {
   check(
     `${prefix}_compact_one_line`,
     s.shellFocus === "study" && s.focusPresent && s.expanded === "false" &&
-      s.lineText.includes(`目前重心：${expectedLabel}`) &&
+      (s.lineText.includes(`目前重心：${expectedLabel}`) ||
+        toHant(s.lineText).includes(`目前重心：${expectedLabel}`)) &&
       s.lineHeight <= 56 && s.focusBoxHeight <= 120,
     `focus=${s.shellFocus} line="${s.lineText}" lineH=${s.lineHeight} boxH=${s.focusBoxHeight} expanded=${s.expanded}`
   );
@@ -756,7 +768,7 @@ function evaluate(label, phase, s) {
   );
   check(
     `${prefix}_hud_order_and_right_controls`,
-    JSON.stringify(c.hudLabels) === JSON.stringify(["年份", "年齡", "資產", "年收入"]) &&
+    JSON.stringify(canonList(c.hudLabels)) === JSON.stringify(canonList(["年份", "年齡", "資產", "年收入"])) &&
       c.soundIsRightOfIncome && c.menuIsRightOfSound &&
       c.soundBox !== null && c.menuBox !== null &&
       c.soundBox.width >= 43.5 && c.soundBox.height >= 43.5 &&
@@ -809,11 +821,11 @@ function evaluate(label, phase, s) {
      death 畫面若仍顯示狀態卡，也必須驗證結構與文字，不得無條件排除。 */
   const pc = s.profileCard;
   const pcRequired = phase !== "death";
-  const pcPresentOk = pc.present && pc.ariaLabel === "角色即時狀態" &&
+  const pcPresentOk = pc.present && toHant(pc.ariaLabel).equals("角色即時狀態") &&
     pc.rowCount === 3 &&
-    pc.rows.some((r) => r.key === "目前居住") &&
-    pc.rows.some((r) => r.key === "情感狀態") &&
-    pc.rows.some((r) => r.key === "目前身分" || r.key === "目前職業") &&
+    pc.rows.some((r) => toHant(r.key).equals("目前居住")) &&
+    pc.rows.some((r) => toHant(r.key).equals("情感狀態")) &&
+    pc.rows.some((r) => toHant(r.key).equals("目前身分") || toHant(r.key).equals("目前職業")) &&
     pc.legacyPartnerLine === 0;
   check(
     `${prefix}_profile_card_structured`,
@@ -1148,7 +1160,7 @@ async function main() {
       `${label}_focus_required_gate_and_new_chrome`,
       gate.required === "true" && gate.held === "true" && gate.running === "false" &&
         gate.advanceDisabled === true && gate.timeDisabled === true && gate.speedDisabled === true &&
-        gate.compareRows === 2 && gate.settingsTitle === "⚙ 設定與存檔" &&
+        gate.compareRows === 2 && toHant(gate.settingsTitle).equals("⚙ 設定與存檔") &&
         gate.standaloneGears === 0,
       `required=${gate.required} held=${gate.held} advance=${gate.advanceDisabled} rows=${gate.compareRows} title=${gate.settingsTitle}`
     );

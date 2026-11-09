@@ -118,7 +118,7 @@ describe("GPT-0058-A 任務一：伴侶性別是角色身分", () => {
     expect(partner).not.toBeNull();
     const partnerSex = partner?.sex as "male" | "female";
 
-    // young(18-34) / middle(35-59) / senior(60+) 三個年齡，性別都必須一樣。
+    // 0063-B 六段年齡：young(23-39) / middle(40-59) / senior(60+) 三個年齡，性別都必須一樣。
     for (const [age, stage] of [
       [25, "young"],
       [45, "middle"],

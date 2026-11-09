@@ -44,10 +44,12 @@ function staticDeps(source) {
 const entry = [...html.matchAll(/<script[^>]+src="([^"]+\.js)"/g)].map((m) => basename(m[1]));
 check("index_html_has_single_entry_script", entry.length === 1, entry.join(","));
 
-// BFS：entry 的靜態閉包 + bootstrap 必經的 p3e-real-main（動態但一定會載）。
+// BFS：entry 的靜態閉包。0065-A 起 birth entry 已靜態併入 entry，
+// 完整 game runtime（p3e-game-main-*）改成按「開始人生」後才動態載入；
+// 這裡保留相容：若 Vite 仍拆出 p3e-birth-main-* 也一併算進關鍵路徑。
 const critical = new Set();
 const queue = [...entry];
-const dynamicBirthChunks = files.filter((name) => name.startsWith("p3e-real-main-"));
+const dynamicBirthChunks = files.filter((name) => name.startsWith("p3e-birth-main-"));
 for (const name of dynamicBirthChunks) queue.push(name);
 while (queue.length > 0) {
   const name = queue.shift();
@@ -82,6 +84,12 @@ check(
   delayed.some((n) => n.startsWith("p3e-game-layer-")) &&
     delayed.some((n) => n.startsWith("p3e-heavy-packs-")),
   `deferred=${delayed.join(",")}`
+);
+const gameChunks = files.filter((n) => n.startsWith("p3e-game-main-"));
+check(
+  "game_runtime_is_deferred_from_birth_critical_path",
+  gameChunks.length > 0 && gameChunks.every((n) => !critical.has(n)),
+  `gameChunks=${gameChunks.join(",")} critical=${[...critical].join(",")}`
 );
 check(
   "html_contains_static_boot_skeleton",

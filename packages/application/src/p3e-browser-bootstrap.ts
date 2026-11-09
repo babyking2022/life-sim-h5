@@ -7,7 +7,8 @@ import {
 } from "@life-sim/birth";
 import { validateEventPack } from "@life-sim/engine";
 import { P3EError } from "@life-sim/simulation";
-import { buildP3EBirthPreview, type P3EBrowserBirthPreview } from "./p3e-birth-preview";
+import { previewBirthFromValidatedPacks } from "./p3e-birth-core";
+import type { P3EBrowserBirthPreview } from "./p3e-birth-preview";
 import {
   createP3EPlaySession,
   restoreP3EPlaySessionPayload,
@@ -163,12 +164,8 @@ function readExactObject(
 /* ------------------------------------------------------------------ */
 
 function previewFromPacks(base: PreparedBrowserPacks["base"], identity: PreparedBrowserPacks["identity"], masterSeed: string): P3EBrowserBirthPreview {
-  const peerGroup = buildPeerGroup(base, identity, {
-    seed: masterSeed,
-    playerSexPolicy: "random"
-  } as never);
-  const certificate = createBirthCertificate(base, identity, peerGroup, masterSeed);
-  return buildP3EBirthPreview(certificate);
+  // GPT-0065-A：與 birth-lite 共用同一個核心，避免兩份出生演算法漂移。
+  return previewBirthFromValidatedPacks(base, identity, masterSeed);
 }
 
 /* ------------------------------------------------------------------ */

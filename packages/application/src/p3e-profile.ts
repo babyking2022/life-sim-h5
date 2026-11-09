@@ -518,28 +518,88 @@ export function relationshipSnapshot(resolution: RelationshipResolution): P3ERel
 /* scene（GPT-DEEPSEEK-0054-A）                                        */
 /* ------------------------------------------------------------------ */
 
-export type P3ESceneAgeStage = "child" | "student" | "young" | "middle" | "senior";
+/**
+ * GPT-WORKBUDDY-0063-B：把粗略的 5 段年齡改成符合 CTO 判定的 6 段。
+ * baby 0–2／child 3–5／student 6–22／young 23–39／middle 40–59／senior 60+。
+ * 0054-A 的 `child 0–5` 會把 0 歲嬰兒畫成縮小成人，本輪必須分開。
+ */
+export type P3ESceneAgeStage = "baby" | "child" | "student" | "young" | "middle" | "senior";
+/**
+ * 更細的生活階段投影（正式 session/view 提供，UI 不得從畫面文字反解析）。
+ * student 6–22 再切成小學 6–11／青少年 12–17／大學 18–22，讓人物尺寸、
+ * 書包與服裝能反映真實成長，而不是整段套用成人商務裝。
+ */
+export type P3ESceneLifeStage =
+  | "baby"
+  | "child"
+  | "primary"
+  | "teen"
+  | "university"
+  | "young"
+  | "middle"
+  | "senior";
 export type P3ESceneResidenceKind = "urban" | "rural";
 export type P3EScenePetKind = "none" | "dog" | "cat";
 
 export interface P3EScene {
   readonly playerSex: "male" | "female";
+  /** 正式 `state.age` 的精確年齡（死亡後凍結在死亡年齡）。 */
+  readonly age: number;
   readonly ageStage: P3ESceneAgeStage;
+  /** 精確生活階段，供場景選用年齡專用全身人物。 */
+  readonly lifeStage: P3ESceneLifeStage;
   readonly residenceKind: P3ESceneResidenceKind;
   readonly hasPartner: boolean;
   readonly partnerSex: "male" | "female" | null;
+  /** 伴侶的投影年齡；沒有伴侶時為 null。 */
+  readonly partnerAge: number | null;
   readonly petKind: P3EScenePetKind;
   /** 死亡後仍是穩定值（age 凍結在死亡年齡）。 */
   readonly phase: "alive" | "dead";
 }
 
-/** 年齡 → 場景階段（child 0–5、student 6–17、young 18–34、middle 35–59、senior 60+）。 */
+/** 年齡 → 場景階段（0063-B 六段）。 */
 export function sceneAgeStageOf(age: number): P3ESceneAgeStage {
+  if (age <= 2) return "baby";
   if (age <= 5) return "child";
-  if (age <= 17) return "student";
-  if (age <= 34) return "young";
+  if (age <= 22) return "student";
+  if (age <= 39) return "young";
   if (age <= 59) return "middle";
   return "senior";
+}
+
+/** 年齡 → 精確生活階段（0063-B：student 再切三段）。 */
+export function sceneLifeStageOf(age: number): P3ESceneLifeStage {
+  if (age <= 2) return "baby";
+  if (age <= 5) return "child";
+  if (age <= 11) return "primary";
+  if (age <= 17) return "teen";
+  if (age <= 22) return "university";
+  if (age <= 39) return "young";
+  if (age <= 59) return "middle";
+  return "senior";
+}
+
+/** FNV-1a 32-bit：只用於伴侶年齡差的穩定推導，不消耗正式年度 RNG。 */
+function stableHash32(text: string): number {
+  let hash = 0x811c9dc5;
+  for (let index = 0; index < text.length; index += 1) {
+    hash ^= text.charCodeAt(index);
+    hash = Math.imul(hash, 0x01000193);
+  }
+  return hash >>> 0;
+}
+
+/**
+ * 伴侶年齡：資料層沒有伴侶出生年，因此用「現任伴侶姓名＋關係建立年」
+ * 穩定推導一個固定年齡差，伴玩家一起長大。玩家未成年時把差距收斂到 ±1，
+ * 保證 6 歲玩家旁邊不會出現成年伴侶；新伴侶才可能有不同年齡差。
+ */
+function partnerAgeOf(age: number, personName: string, sinceYear: number): number {
+  const gap = (stableHash32(`${personName}|${sinceYear}`) % 7) - 3; // -3..+3
+  const bounded = age < 18 ? (stableHash32(`${personName}|${sinceYear}|minor`) % 3) - 1 : gap;
+  // 未成年時連「差一歲」也不能跨到 18 歲，保證不會有成年伴侶。
+  return Math.max(0, Math.min(age + bounded, age < 18 ? 17 : 130));
 }
 
 /** flags → 寵物（互斥；同時存在時以狗優先，正常流程不會發生）。 */
@@ -565,12 +625,18 @@ export function deriveP3EScene(input: {
   const hasPartner = partner.status === "dating" || partner.status === "married";
   // 伴侶性別是角色身分（建立時抽定），不是每次顯示時重新推測。
   const partnerSex = hasPartner ? (input.partnerSex ?? null) : null;
+  const age = input.state.age;
   return Object.freeze({
     playerSex: input.state.identity.sex,
-    ageStage: sceneAgeStageOf(input.state.age),
+    age,
+    ageStage: sceneAgeStageOf(age),
+    lifeStage: sceneLifeStageOf(age),
     residenceKind: input.settlement,
     hasPartner,
     partnerSex,
+    partnerAge: hasPartner
+      ? partnerAgeOf(age, partner.personName ?? "", partner.sinceYear ?? input.state.currentYear)
+      : null,
     petKind: petKindOf(input.state.flags),
     phase: input.state.phase === "death" ? "dead" : "alive"
   });

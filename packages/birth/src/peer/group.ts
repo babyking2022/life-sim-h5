@@ -10,8 +10,9 @@ import {
 import { ascii, canonicalBytes, concatBytes, normalizeSeed, seedHash, sha256Hex } from "@life-sim/engine";
 import { fail } from "../errors";
 import { buildBirthIdentity } from "../identity/draw";
-import { isValidatedIdentityPack, type ValidatedIdentityPack } from "../identity/validate";
-import { isValidatedDataPack, type ValidatedDataPack } from "../validate";
+import { isValidatedDataPack, isValidatedIdentityPack } from "../attest";
+import type { ValidatedIdentityPack } from "../identity/validate";
+import type { ValidatedDataPack } from "../validate";
 import { assertPeerIndex, derivePeerSeed } from "./derive";
 
 const SEX_POLICIES: readonly SexPolicy[] = ["random", "female", "male"];
