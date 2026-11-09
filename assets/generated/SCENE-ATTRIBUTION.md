@@ -49,3 +49,25 @@
   但已不再被任何 CSS 規則引用，因此不會進入首屏打包／請求。
 - AVIF 需支援 `image/avif` 的瀏覽器（Chrome 85+、Edge 85+、Firefox 93+、
   Safari 16+）；兩個瀏覽器驗收腳本的靜態伺服器已加上對應 MIME。
+
+## GPT-WORKBUDDY-0054-B：改用原創分層 SVG（取代上述 AVIF）
+
+- 本輪**沒有 vendor 任何第三方素材**，因此沒有需要附上的 MIT LICENSE、
+  來源 URL 或 commit SHA。具體而言：
+  - 沒有引入 `juanpe500/2d_chars`（僅參考其「分層精靈」概念，自行實作 SVG 圖層）；
+  - 沒有複製 `hbarokha/lifeline` 的程式碼（僅參考年齡映射／資料結構概念）；
+  - 沒有使用任何授權不明的像素圖，也沒有 CDN 熱連結。
+- 遊戲場景與出生卡已**不再引用** `life-sim-village-landscape.avif` 與
+  `life-sim-village-mvp.png`：前者內含固定一家人與雞，且授權狀態為「待確認」。
+  兩張圖仍保留在磁碟供來源追溯，但不會進入打包結果與首屏請求。
+- 新場景由 `packages/ui/src/p3e-scene.ts` 以 `rect`／`circle`／`ellipse`／
+  `path`／`polygon` 即時產生，是**本專案原創向量圖**，以
+  `data:image/svg+xml,...` 作為 `.p3e-scene` 的 CSS 背景圖片；沒有外部網域請求，
+  也沒有用 emoji 或文字代替人物／寵物。
+- 圖層：背景（urban／rural 兩套，皆無任何人或雞）＋玩家（2 性別 × 5 年齡階段，
+  身高／髮型／髮色／服裝各異）＋伴侶（`hasPartner`）＋寵物（dog／cat／none）。
+  外觀是 `(view.scene, seed)` 的純函式（FNV-1a 雜湊挑髮色），
+  **無 `Math.random`、無 `Date`**，同 seed／同狀態永遠得到同一張 SVG。
+- 授權：本輪新增的向量圖形為原創，無第三方權利負擔；上述 AVIF 的
+  「待確認」狀態不適用於新場景，但仍適用於保留在磁碟的舊圖，
+  舊圖若將來重新啟用仍須先補齊授權證據。

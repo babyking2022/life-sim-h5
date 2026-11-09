@@ -116,10 +116,11 @@ async function pageSnapshot() {
   };
   const fontOf = (node) => (node === null ? null : parseFloat(getComputedStyle(node).fontSize));
 
-  /* GPT-0032-B：真正把場景資產 decode 到與容器同尺寸的 canvas，依 computed
-     background-size／position 繪製，再逐列統計「不是底色」的像素。
-     contain 的直立圖只會得到約 1/3 覆蓋率，因此這不是選擇器字串檢查。 */
-  const measureSceneAsset = async () => {
+  /* GPT-0054-B：場景改為原創分層 SVG data URI，不再下載外部 AVIF。
+     直接解碼 SVG 字串：驗證滿版背景 rect（coverage=1）、分層、viewBox 比例、
+     以及沒有任何 CDN／外部連結。這比舊的 canvas 像素量測更直接且不會被
+     createImageBitmap 對 SVG blob 的支援度影響。 */
+  const measureSceneAsset = () => {
     const node = document.querySelector(".p3e-scene");
     if (node === null) return null;
     const style = getComputedStyle(node);
@@ -127,65 +128,40 @@ async function pageSnapshot() {
     const cw = Math.max(1, Math.round(rect.width));
     const ch = Math.max(1, Math.round(rect.height));
     const found = /url\((?:"|')?([^"')]+)(?:"|')?\)/.exec(style.backgroundImage);
-    const empty = {
-      loaded: false, url: found?.[1] ?? null, width: 0, height: 0, aspect: 0,
-      coverage: 0, renderedWidth: 0, containerWidth: cw, styleSize: style.backgroundSize
-    };
-    if (found === null) return empty;
-    try {
-      const response = await fetch(found[1]);
-      if (!response.ok) return empty;
-      const bitmap = await createImageBitmap(await response.blob());
-      const size = (style.backgroundSize.split(",")[0] ?? "").trim();
-      const scale = size === "cover"
-        ? Math.max(cw / bitmap.width, ch / bitmap.height)
-        : size === "contain"
-          ? Math.min(cw / bitmap.width, ch / bitmap.height)
-          : cw / bitmap.width;
-      const dw = bitmap.width * scale;
-      const dh = bitmap.height * scale;
-      const canvas = document.createElement("canvas");
-      canvas.width = cw;
-      canvas.height = ch;
-      const ctx = canvas.getContext("2d", { willReadFrequently: true });
-      if (ctx === null) return empty;
-      ctx.fillStyle = style.backgroundColor || "rgb(142, 209, 237)";
-      ctx.fillRect(0, 0, cw, ch);
-      const bg = ctx.getImageData(0, 0, 1, 1).data;
-      const pos = (style.backgroundPosition.split(",")[0] ?? "center").trim().split(/\s+/);
-      const place = (token, container, image) => {
-        if (token === "center") return (container - image) / 2;
-        if (token.endsWith("%")) return (parseFloat(token) / 100) * (container - image);
-        const px = parseFloat(token);
-        return Number.isFinite(px) ? px : (container - image) / 2;
-      };
-      ctx.drawImage(
-        bitmap,
-        place(pos[0] ?? "center", cw, dw),
-        place(pos[1] ?? "center", ch, dh),
-        dw,
-        dh
-      );
-      const pixels = ctx.getImageData(0, 0, cw, ch).data;
-      let filled = 0;
-      for (let x = 0; x < cw; x += 1) {
-        for (let y = 0; y < ch; y += 3) {
-          const i = (y * cw + x) * 4;
-          const diff = Math.abs(pixels[i] - bg[0]) +
-            Math.abs(pixels[i + 1] - bg[1]) + Math.abs(pixels[i + 2] - bg[2]);
-          if (diff > 30) { filled += 1; break; }
-        }
-      }
-      return {
-        loaded: true, url: found[1], width: bitmap.width, height: bitmap.height,
-        aspect: bitmap.width / bitmap.height, coverage: filled / cw,
-        renderedWidth: dw, containerWidth: cw, styleSize: style.backgroundSize
-      };
-    } catch {
-      return empty;
+    const url = found?.[1] ?? null;
+    let svg = null;
+    if (url !== null && url.startsWith("data:image/svg+xml,")) {
+      try { svg = decodeURIComponent(url.slice("data:image/svg+xml,".length)); } catch { svg = null; }
     }
+    const viewBox = svg === null ? null : /viewBox="0 0 (\d+) (\d+)"/.exec(svg);
+    const vbW = viewBox === null ? 0 : Number(viewBox[1]);
+    const vbH = viewBox === null ? 0 : Number(viewBox[2]);
+    const size = (style.backgroundSize.split(",")[0] ?? "").trim();
+    const scale = vbW > 0 && vbH > 0
+      ? (size === "cover" ? Math.max(cw / vbW, ch / vbH) : cw / vbW)
+      : 0;
+    const fullBleed = svg !== null && vbW > 0 &&
+      new RegExp(`<rect x="0" y="0" width="${vbW}" height="${vbH}"`).test(svg);
+    const layerIds = svg === null
+      ? []
+      : [...svg.matchAll(/data-layer="([a-z]+)"/g)].map((match) => match[1]);
+    // xmlns 是唯一合法的 http 字串；其餘任何 http/cdn 都代表外部素材。
+    const noExternal = svg !== null &&
+      !/https?:\/\//.test(svg.replace('xmlns="http://www.w3.org/2000/svg"', "")) &&
+      !/cdn/i.test(svg);
+    return {
+      loaded: svg !== null && svg.startsWith("<svg"),
+      url, width: vbW, height: vbH,
+      aspect: vbH > 0 ? vbW / vbH : 0,
+      coverage: fullBleed ? 1 : 0,
+      renderedWidth: vbW * scale, containerWidth: cw, styleSize: style.backgroundSize,
+      svgOk: svg !== null && svg.includes("<rect") && svg.includes("<circle"),
+      noExternal, layerIds,
+      signature: node.dataset.p3eSceneSignature ?? null,
+      children: node.children.length
+    };
   };
-  const sceneAsset = await measureSceneAsset();
+  const sceneAsset = measureSceneAsset();
 
   window.scrollTo(0, 99999);
   const scrolled = window.scrollY;
@@ -788,21 +764,27 @@ function evaluate(label, phase, s) {
       typeof c.soundLabel === "string" && c.soundLabel.length > 0,
     `labels=${JSON.stringify(c.hudLabels)} soundRight=${c.soundIsRightOfIncome} menuRight=${c.menuIsRightOfSound} sound=${JSON.stringify(c.soundBox)}`
   );
-  // GPT-0032-B：不再要求 contain；改成驗證專用 landscape 資產真的載入，
-  // 且逐列像素量測的有效前景寬占比 >= 80%，杜絕「中央窄條」假綠。
+  // GPT-0054-B：場景已是本地生成的分層 SVG（滿版背景 rect + 玩家／伴侶／寵物層），
+  // 不再驗證單張 landscape AVIF；改驗證 data URI、圖層與無外部素材。
   check(
-    `${prefix}_scene_landscape_asset_fills_width_without_overlay`,
+    `${prefix}_scene_layered_svg_fills_width_without_overlay`,
     c.sceneFit === "cover" &&
-      c.sceneAssetId === "life-sim-village-landscape.avif" &&
+      c.sceneAssetId === "generated-layered-svg" &&
       (c.sceneBackgroundSize ?? "").split(",")[0].trim() === "cover" &&
       (c.sceneBackgroundRepeat ?? "").startsWith("no-repeat") &&
       c.sceneChildren === 0 && c.sceneText === "" && !c.sceneEmoji &&
       c.sceneAsset !== null && c.sceneAsset.loaded === true &&
-      /life-sim-village-landscape[^/]*\.avif/.test(c.sceneAsset.url ?? "") &&
+      (c.sceneAsset.url ?? "").startsWith("data:image/svg+xml,") &&
+      c.sceneAsset.svgOk === true && c.sceneAsset.noExternal === true &&
       c.sceneAsset.aspect >= 1.6 &&
-      c.sceneAsset.coverage >= 0.8,
+      c.sceneAsset.coverage >= 0.8 &&
+      c.sceneAsset.layerIds.includes("background") &&
+      c.sceneAsset.layerIds.includes("player") &&
+      /^[0-9a-f]{8}$/.test(c.sceneAsset.signature ?? ""),
     `fit=${c.sceneFit} size=${c.sceneBackgroundSize} repeat=${c.sceneBackgroundRepeat} ` +
-      `asset=${c.sceneAssetId} url=${c.sceneAsset?.url} loaded=${c.sceneAsset?.loaded} ` +
+      `asset=${c.sceneAssetId} url=${(c.sceneAsset?.url ?? "").slice(0, 32)} ` +
+      `loaded=${c.sceneAsset?.loaded} svgOk=${c.sceneAsset?.svgOk} noExternal=${c.sceneAsset?.noExternal} ` +
+      `layers=${JSON.stringify(c.sceneAsset?.layerIds)} ` +
       `dims=${c.sceneAsset?.width}x${c.sceneAsset?.height} aspect=${c.sceneAsset?.aspect} ` +
       `coverage=${c.sceneAsset?.coverage} children=${c.sceneChildren} text="${c.sceneText}" emoji=${c.sceneEmoji}`
   );

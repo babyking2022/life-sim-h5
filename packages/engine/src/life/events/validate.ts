@@ -7,6 +7,7 @@ import {
   P3B_LIFE_STAGES,
   P3B_MAX_AGE,
   P3B_MAX_EFFECTS_PER_EVENT,
+  P3B_MAX_DECISION_OPTIONS,
   P3B_MAX_EFFECTS_PER_OPTION,
   P3B_MAX_EVENTS,
   P3B_MAX_ID_LENGTH,
@@ -148,7 +149,7 @@ function readEvent(value: unknown, path: string, contentPackVersion: string): P3
   });
   const contentMode = readEnum(node.contentMode, `${path}.contentMode`, P3B_CONTENT_MODES);
   const effects = readEffectList(node.effects, `${path}.effects`, P3B_MAX_EFFECTS_PER_EVENT);
-  const decision = node.decision === null ? null : readDecisionSpec(node.decision, `${path}.decision`, 5, P3B_MAX_EFFECTS_PER_OPTION);
+  const decision = node.decision === null ? null : readDecisionSpec(node.decision, `${path}.decision`, P3B_MAX_DECISION_OPTIONS, P3B_MAX_EFFECTS_PER_OPTION);
   const sourceId = readString(node.sourceId, `${path}.sourceId`, { min: 2, max: P3B_MAX_ID_LENGTH, pattern: EVENT_ID_PATTERN });
 
   // kind 與 decision 必須一致；openDecision 的 id 必須等於 decision.decisionId。

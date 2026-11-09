@@ -1912,8 +1912,8 @@ describe("H5-CTO-175-A 正式整合", () => {
       expect(commands).toBeLessThanOrEqual(contracts.P3E_MAX_COMMANDS);
     }
 
-    expect(commands).toBe(107);
-    expect(history.records.length).toBe(107);
+    expect(commands).toBe(106);
+    expect(history.records.length).toBe(106);
     const tail = history.records[history.records.length - 1] as P3ELedgerHistoryRecordPair;
     expect(tail.commandRecord.commandHash).toBe(state.commandLog.headHash);
     expect(tail.yearRecord.chainHash).toBe(state.heads.hashChain);
@@ -1922,7 +1922,7 @@ describe("H5-CTO-175-A 正式整合", () => {
     expect(tail.yearRecord.snapshotHash).toBe(state.heads.lastSnapshotHash);
     expect(tail.yearRecord.deltaHash).toBe(state.heads.lastDeltaHash);
     expect(state.stateHash).toBe(
-      "c9d58970a061880c7fc681e59682b4d2b7882f0d9c05c0d68150d985fef1d31c"
+      "606ecda92505fab5ea8bf771a20f8638a7702282b08dd3f1d16cbb021404b8ca"
     );
   });
 

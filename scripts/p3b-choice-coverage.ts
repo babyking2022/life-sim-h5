@@ -253,7 +253,28 @@ function census(flags: readonly string[]): Map<string, number> {
 
 const reachableWithoutFlags = census([]);
 const reachableWithFlags = census(allFlags);
+
+/*
+ * GPT-DEEPSEEK-0054-A：兩階段職業選擇需要「分類旗標存在、但學歷旗標不必然存在」
+ * 這種中間情境才可能被證明可達（entry tier 要求沒有大學、degree tier 要求有大學）。
+ * 因此除了「全部關」與「全部開」，再加上兩種真實會發生的組合：
+ *
+ * - career-field-only：只有 career:field:<category> 六個旗標；
+ * - career-field-degree：上述六個 ＋ edu:university。
+ */
+const CAREER_FIELD_FLAGS = [
+  "career:field:service",
+  "career:field:trade",
+  "career:field:office",
+  "career:field:care",
+  "career:field:tech",
+  "career:field:independent"
+];
+const reachableCareerEntry = census(CAREER_FIELD_FLAGS);
+const reachableCareerDegree = census([...CAREER_FIELD_FLAGS, "edu:university"]);
 const reachable = new Map<string, number>([...reachableWithoutFlags]);
+for (const [eventId, age] of reachableCareerEntry) if (!reachable.has(eventId)) reachable.set(eventId, age);
+for (const [eventId, age] of reachableCareerDegree) if (!reachable.has(eventId)) reachable.set(eventId, age);
 for (const [eventId, age] of reachableWithFlags) if (!reachable.has(eventId)) reachable.set(eventId, age);
 const unreachable = allDecisionEvents.filter((eventId) => !reachable.has(eventId));
 // 每個抉擇事件至少要有一個「有候選」的年齡，且該年齡落在事件宣告的 ageMin..ageMax。

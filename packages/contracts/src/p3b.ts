@@ -23,7 +23,13 @@ export const P3B_RNG_SPEC_VERSION = "1.0.0" as const;
 
 /** 容量上限：所有上限都會在驗證時固定拒絕，避免超大輸入。 */
 export const P3B_MAX_EVENTS = 4096;
-export const P3B_MAX_DECISION_OPTIONS = 5;
+/**
+ * 單一決策的選項上限。
+ *
+ * GPT-DEEPSEEK-0054-A：5 → 8，因為職業分類選擇需要 6 個選項（六個分類）；
+ * 仍是固定上限（不是無界），validation／state 摘要都照這個值檢查。
+ */
+export const P3B_MAX_DECISION_OPTIONS = 8;
 export const P3B_MAX_EFFECTS_PER_EVENT = 16;
 export const P3B_MAX_EFFECTS_PER_OPTION = 8;
 export const P3B_MAX_CONDITION_DEPTH = 8;

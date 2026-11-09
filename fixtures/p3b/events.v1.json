@@ -144,6 +144,846 @@
     {
       "eventSpecVersion": "1.0.0",
       "contentPackVersion": "1.1.0",
+      "conditions": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "flag",
+            "flag": "career:field:care",
+            "present": true
+          },
+          {
+            "op": "not",
+            "condition": {
+              "op": "flag",
+              "flag": "career:chosen",
+              "present": true
+            }
+          },
+          {
+            "op": "any",
+            "conditions": [
+              {
+                "op": "flag",
+                "flag": "edu:university",
+                "present": true
+              },
+              {
+                "op": "flag",
+                "flag": "edu:master",
+                "present": true
+              },
+              {
+                "op": "flag",
+                "flag": "edu:doctorate",
+                "present": true
+              }
+            ]
+          }
+        ]
+      },
+      "priority": 30,
+      "once": true,
+      "cooldownYears": 0,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "openDecision",
+          "decisionId": "dec.adult.career-care-degree"
+        }
+      ],
+      "decision": {
+        "decisionId": "dec.adult.career-care-degree",
+        "promptKey": "p3b.decision.adult.career-care-degree",
+        "options": [
+          {
+            "optionId": "teacher",
+            "labelKey": "p3b.option.adult.career-care-degree.teacher",
+            "effects": [
+              {
+                "type": "flag",
+                "flag": "job:teacher",
+                "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "career:chosen",
+                "action": "add"
+              },
+              {
+                "type": "money",
+                "field": "annualIncomeMicroUsd",
+                "deltaMicroUsd": "22000000000"
+              }
+            ]
+          },
+          {
+            "optionId": "nurse",
+            "labelKey": "p3b.option.adult.career-care-degree.nurse",
+            "effects": [
+              {
+                "type": "flag",
+                "flag": "job:nurse",
+                "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "career:chosen",
+                "action": "add"
+              },
+              {
+                "type": "money",
+                "field": "annualIncomeMicroUsd",
+                "deltaMicroUsd": "26000000000"
+              }
+            ]
+          },
+          {
+            "optionId": "physician",
+            "labelKey": "p3b.option.adult.career-care-degree.physician",
+            "effects": [
+              {
+                "type": "flag",
+                "flag": "job:physician",
+                "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "career:chosen",
+                "action": "add"
+              },
+              {
+                "type": "money",
+                "field": "annualIncomeMicroUsd",
+                "deltaMicroUsd": "42000000000"
+              }
+            ]
+          }
+        ]
+      },
+      "sourceId": "p3b-synthetic-events-v1-source",
+      "eventId": "ev.adult.career-care-degree",
+      "kind": "decision",
+      "localizationKey": "p3b.event.adult.career_care_degree",
+      "ageMin": 18,
+      "ageMax": 55,
+      "lifeStages": [
+        "adulthood"
+      ],
+      "weight": 990
+    },
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.1.0",
+      "conditions": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "flag",
+            "flag": "career:field:care",
+            "present": true
+          },
+          {
+            "op": "not",
+            "condition": {
+              "op": "flag",
+              "flag": "career:chosen",
+              "present": true
+            }
+          },
+          {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "not",
+                "condition": {
+                  "op": "flag",
+                  "flag": "edu:university",
+                  "present": true
+                }
+              },
+              {
+                "op": "not",
+                "condition": {
+                  "op": "flag",
+                  "flag": "edu:master",
+                  "present": true
+                }
+              },
+              {
+                "op": "not",
+                "condition": {
+                  "op": "flag",
+                  "flag": "edu:doctorate",
+                  "present": true
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "priority": 30,
+      "once": true,
+      "cooldownYears": 0,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "openDecision",
+          "decisionId": "dec.adult.career-care-entry"
+        }
+      ],
+      "decision": {
+        "decisionId": "dec.adult.career-care-entry",
+        "promptKey": "p3b.decision.adult.career-care-entry",
+        "options": [
+          {
+            "optionId": "care_worker",
+            "labelKey": "p3b.option.adult.career-care-entry.care_worker",
+            "effects": [
+              {
+                "type": "flag",
+                "flag": "job:care_worker",
+                "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "career:chosen",
+                "action": "add"
+              },
+              {
+                "type": "money",
+                "field": "annualIncomeMicroUsd",
+                "deltaMicroUsd": "11000000000"
+              }
+            ]
+          },
+          {
+            "optionId": "care_assistant",
+            "labelKey": "p3b.option.adult.career-care-entry.care_assistant",
+            "effects": [
+              {
+                "type": "flag",
+                "flag": "job:care_assistant",
+                "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "career:chosen",
+                "action": "add"
+              },
+              {
+                "type": "money",
+                "field": "annualIncomeMicroUsd",
+                "deltaMicroUsd": "9000000000"
+              }
+            ]
+          }
+        ]
+      },
+      "sourceId": "p3b-synthetic-events-v1-source",
+      "eventId": "ev.adult.career-care-entry",
+      "kind": "decision",
+      "localizationKey": "p3b.event.adult.career_care_entry",
+      "ageMin": 18,
+      "ageMax": 55,
+      "lifeStages": [
+        "adulthood"
+      ],
+      "weight": 990
+    },
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.1.0",
+      "conditions": {
+        "op": "not",
+        "condition": {
+          "op": "flag",
+          "flag": "career:chosen",
+          "present": true
+        }
+      },
+      "priority": 20,
+      "once": true,
+      "cooldownYears": 0,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "openDecision",
+          "decisionId": "dec.adult.career-field"
+        }
+      ],
+      "decision": {
+        "decisionId": "dec.adult.career-field",
+        "promptKey": "p3b.decision.adult.career-field",
+        "options": [
+          {
+            "optionId": "field-service",
+            "labelKey": "p3b.option.adult.career-field.field-service",
+            "effects": [
+              {
+                "type": "flag",
+                "flag": "career:field:service",
+                "action": "add"
+              }
+            ]
+          },
+          {
+            "optionId": "field-trade",
+            "labelKey": "p3b.option.adult.career-field.field-trade",
+            "effects": [
+              {
+                "type": "flag",
+                "flag": "career:field:trade",
+                "action": "add"
+              }
+            ]
+          },
+          {
+            "optionId": "field-office",
+            "labelKey": "p3b.option.adult.career-field.field-office",
+            "effects": [
+              {
+                "type": "flag",
+                "flag": "career:field:office",
+                "action": "add"
+              }
+            ]
+          },
+          {
+            "optionId": "field-care",
+            "labelKey": "p3b.option.adult.career-field.field-care",
+            "effects": [
+              {
+                "type": "flag",
+                "flag": "career:field:care",
+                "action": "add"
+              }
+            ]
+          },
+          {
+            "optionId": "field-tech",
+            "labelKey": "p3b.option.adult.career-field.field-tech",
+            "effects": [
+              {
+                "type": "flag",
+                "flag": "career:field:tech",
+                "action": "add"
+              }
+            ]
+          },
+          {
+            "optionId": "field-independent",
+            "labelKey": "p3b.option.adult.career-field.field-independent",
+            "effects": [
+              {
+                "type": "flag",
+                "flag": "career:field:independent",
+                "action": "add"
+              }
+            ]
+          }
+        ]
+      },
+      "sourceId": "p3b-synthetic-events-v1-source",
+      "eventId": "ev.adult.career-field",
+      "kind": "decision",
+      "localizationKey": "p3b.event.adult.career_field",
+      "ageMin": 22,
+      "ageMax": 40,
+      "lifeStages": [
+        "adulthood"
+      ],
+      "weight": 950
+    },
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.1.0",
+      "conditions": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "flag",
+            "flag": "career:field:independent",
+            "present": true
+          },
+          {
+            "op": "not",
+            "condition": {
+              "op": "flag",
+              "flag": "career:chosen",
+              "present": true
+            }
+          },
+          {
+            "op": "any",
+            "conditions": [
+              {
+                "op": "flag",
+                "flag": "edu:university",
+                "present": true
+              },
+              {
+                "op": "flag",
+                "flag": "edu:master",
+                "present": true
+              },
+              {
+                "op": "flag",
+                "flag": "edu:doctorate",
+                "present": true
+              }
+            ]
+          }
+        ]
+      },
+      "priority": 30,
+      "once": true,
+      "cooldownYears": 0,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "openDecision",
+          "decisionId": "dec.adult.career-independent-degree"
+        }
+      ],
+      "decision": {
+        "decisionId": "dec.adult.career-independent-degree",
+        "promptKey": "p3b.decision.adult.career-independent-degree",
+        "options": [
+          {
+            "optionId": "entrepreneur",
+            "labelKey": "p3b.option.adult.career-independent-degree.entrepreneur",
+            "effects": [
+              {
+                "type": "flag",
+                "flag": "job:entrepreneur",
+                "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "career:chosen",
+                "action": "add"
+              },
+              {
+                "type": "money",
+                "field": "annualIncomeMicroUsd",
+                "deltaMicroUsd": "30000000000"
+              }
+            ]
+          },
+          {
+            "optionId": "consultant",
+            "labelKey": "p3b.option.adult.career-independent-degree.consultant",
+            "effects": [
+              {
+                "type": "flag",
+                "flag": "job:consultant",
+                "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "career:chosen",
+                "action": "add"
+              },
+              {
+                "type": "money",
+                "field": "annualIncomeMicroUsd",
+                "deltaMicroUsd": "26000000000"
+              }
+            ]
+          }
+        ]
+      },
+      "sourceId": "p3b-synthetic-events-v1-source",
+      "eventId": "ev.adult.career-independent-degree",
+      "kind": "decision",
+      "localizationKey": "p3b.event.adult.career_independent_degree",
+      "ageMin": 18,
+      "ageMax": 55,
+      "lifeStages": [
+        "adulthood"
+      ],
+      "weight": 990
+    },
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.1.0",
+      "conditions": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "flag",
+            "flag": "career:field:independent",
+            "present": true
+          },
+          {
+            "op": "not",
+            "condition": {
+              "op": "flag",
+              "flag": "career:chosen",
+              "present": true
+            }
+          },
+          {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "not",
+                "condition": {
+                  "op": "flag",
+                  "flag": "edu:university",
+                  "present": true
+                }
+              },
+              {
+                "op": "not",
+                "condition": {
+                  "op": "flag",
+                  "flag": "edu:master",
+                  "present": true
+                }
+              },
+              {
+                "op": "not",
+                "condition": {
+                  "op": "flag",
+                  "flag": "edu:doctorate",
+                  "present": true
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "priority": 30,
+      "once": true,
+      "cooldownYears": 0,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "openDecision",
+          "decisionId": "dec.adult.career-independent-entry"
+        }
+      ],
+      "decision": {
+        "decisionId": "dec.adult.career-independent-entry",
+        "promptKey": "p3b.decision.adult.career-independent-entry",
+        "options": [
+          {
+            "optionId": "farmer",
+            "labelKey": "p3b.option.adult.career-independent-entry.farmer",
+            "effects": [
+              {
+                "type": "flag",
+                "flag": "job:farmer",
+                "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "career:chosen",
+                "action": "add"
+              },
+              {
+                "type": "money",
+                "field": "annualIncomeMicroUsd",
+                "deltaMicroUsd": "7000000000"
+              }
+            ]
+          },
+          {
+            "optionId": "shopkeeper",
+            "labelKey": "p3b.option.adult.career-independent-entry.shopkeeper",
+            "effects": [
+              {
+                "type": "flag",
+                "flag": "job:shopkeeper",
+                "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "career:chosen",
+                "action": "add"
+              },
+              {
+                "type": "money",
+                "field": "annualIncomeMicroUsd",
+                "deltaMicroUsd": "10000000000"
+              }
+            ]
+          },
+          {
+            "optionId": "freelancer",
+            "labelKey": "p3b.option.adult.career-independent-entry.freelancer",
+            "effects": [
+              {
+                "type": "flag",
+                "flag": "job:freelancer",
+                "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "career:chosen",
+                "action": "add"
+              },
+              {
+                "type": "money",
+                "field": "annualIncomeMicroUsd",
+                "deltaMicroUsd": "13000000000"
+              }
+            ]
+          }
+        ]
+      },
+      "sourceId": "p3b-synthetic-events-v1-source",
+      "eventId": "ev.adult.career-independent-entry",
+      "kind": "decision",
+      "localizationKey": "p3b.event.adult.career_independent_entry",
+      "ageMin": 18,
+      "ageMax": 55,
+      "lifeStages": [
+        "adulthood"
+      ],
+      "weight": 990
+    },
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.1.0",
+      "conditions": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "flag",
+            "flag": "career:field:office",
+            "present": true
+          },
+          {
+            "op": "not",
+            "condition": {
+              "op": "flag",
+              "flag": "career:chosen",
+              "present": true
+            }
+          },
+          {
+            "op": "any",
+            "conditions": [
+              {
+                "op": "flag",
+                "flag": "edu:university",
+                "present": true
+              },
+              {
+                "op": "flag",
+                "flag": "edu:master",
+                "present": true
+              },
+              {
+                "op": "flag",
+                "flag": "edu:doctorate",
+                "present": true
+              }
+            ]
+          }
+        ]
+      },
+      "priority": 30,
+      "once": true,
+      "cooldownYears": 0,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "openDecision",
+          "decisionId": "dec.adult.career-office-degree"
+        }
+      ],
+      "decision": {
+        "decisionId": "dec.adult.career-office-degree",
+        "promptKey": "p3b.decision.adult.career-office-degree",
+        "options": [
+          {
+            "optionId": "accountant",
+            "labelKey": "p3b.option.adult.career-office-degree.accountant",
+            "effects": [
+              {
+                "type": "flag",
+                "flag": "job:accountant",
+                "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "career:chosen",
+                "action": "add"
+              },
+              {
+                "type": "money",
+                "field": "annualIncomeMicroUsd",
+                "deltaMicroUsd": "24000000000"
+              }
+            ]
+          },
+          {
+            "optionId": "hr_specialist",
+            "labelKey": "p3b.option.adult.career-office-degree.hr_specialist",
+            "effects": [
+              {
+                "type": "flag",
+                "flag": "job:hr_specialist",
+                "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "career:chosen",
+                "action": "add"
+              },
+              {
+                "type": "money",
+                "field": "annualIncomeMicroUsd",
+                "deltaMicroUsd": "22000000000"
+              }
+            ]
+          }
+        ]
+      },
+      "sourceId": "p3b-synthetic-events-v1-source",
+      "eventId": "ev.adult.career-office-degree",
+      "kind": "decision",
+      "localizationKey": "p3b.event.adult.career_office_degree",
+      "ageMin": 18,
+      "ageMax": 55,
+      "lifeStages": [
+        "adulthood"
+      ],
+      "weight": 990
+    },
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.1.0",
+      "conditions": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "flag",
+            "flag": "career:field:office",
+            "present": true
+          },
+          {
+            "op": "not",
+            "condition": {
+              "op": "flag",
+              "flag": "career:chosen",
+              "present": true
+            }
+          },
+          {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "not",
+                "condition": {
+                  "op": "flag",
+                  "flag": "edu:university",
+                  "present": true
+                }
+              },
+              {
+                "op": "not",
+                "condition": {
+                  "op": "flag",
+                  "flag": "edu:master",
+                  "present": true
+                }
+              },
+              {
+                "op": "not",
+                "condition": {
+                  "op": "flag",
+                  "flag": "edu:doctorate",
+                  "present": true
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "priority": 30,
+      "once": true,
+      "cooldownYears": 0,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "openDecision",
+          "decisionId": "dec.adult.career-office-entry"
+        }
+      ],
+      "decision": {
+        "decisionId": "dec.adult.career-office-entry",
+        "promptKey": "p3b.decision.adult.career-office-entry",
+        "options": [
+          {
+            "optionId": "clerk",
+            "labelKey": "p3b.option.adult.career-office-entry.clerk",
+            "effects": [
+              {
+                "type": "flag",
+                "flag": "job:clerk",
+                "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "career:chosen",
+                "action": "add"
+              },
+              {
+                "type": "money",
+                "field": "annualIncomeMicroUsd",
+                "deltaMicroUsd": "10000000000"
+              }
+            ]
+          },
+          {
+            "optionId": "salesperson",
+            "labelKey": "p3b.option.adult.career-office-entry.salesperson",
+            "effects": [
+              {
+                "type": "flag",
+                "flag": "job:salesperson",
+                "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "career:chosen",
+                "action": "add"
+              },
+              {
+                "type": "money",
+                "field": "annualIncomeMicroUsd",
+                "deltaMicroUsd": "12000000000"
+              }
+            ]
+          }
+        ]
+      },
+      "sourceId": "p3b-synthetic-events-v1-source",
+      "eventId": "ev.adult.career-office-entry",
+      "kind": "decision",
+      "localizationKey": "p3b.event.adult.career_office_entry",
+      "ageMin": 18,
+      "ageMax": 55,
+      "lifeStages": [
+        "adulthood"
+      ],
+      "weight": 990
+    },
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.1.0",
       "conditions": null,
       "priority": 0,
       "once": false,
@@ -235,6 +1075,720 @@
         "adulthood"
       ],
       "weight": 60
+    },
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.1.0",
+      "conditions": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "flag",
+            "flag": "career:field:service",
+            "present": true
+          },
+          {
+            "op": "not",
+            "condition": {
+              "op": "flag",
+              "flag": "career:chosen",
+              "present": true
+            }
+          },
+          {
+            "op": "any",
+            "conditions": [
+              {
+                "op": "flag",
+                "flag": "edu:university",
+                "present": true
+              },
+              {
+                "op": "flag",
+                "flag": "edu:master",
+                "present": true
+              },
+              {
+                "op": "flag",
+                "flag": "edu:doctorate",
+                "present": true
+              }
+            ]
+          }
+        ]
+      },
+      "priority": 30,
+      "once": true,
+      "cooldownYears": 0,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "openDecision",
+          "decisionId": "dec.adult.career-service-degree"
+        }
+      ],
+      "decision": {
+        "decisionId": "dec.adult.career-service-degree",
+        "promptKey": "p3b.decision.adult.career-service-degree",
+        "options": [
+          {
+            "optionId": "hotel_manager",
+            "labelKey": "p3b.option.adult.career-service-degree.hotel_manager",
+            "effects": [
+              {
+                "type": "flag",
+                "flag": "job:hotel_manager",
+                "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "career:chosen",
+                "action": "add"
+              },
+              {
+                "type": "money",
+                "field": "annualIncomeMicroUsd",
+                "deltaMicroUsd": "22000000000"
+              }
+            ]
+          },
+          {
+            "optionId": "chef",
+            "labelKey": "p3b.option.adult.career-service-degree.chef",
+            "effects": [
+              {
+                "type": "flag",
+                "flag": "job:chef",
+                "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "career:chosen",
+                "action": "add"
+              },
+              {
+                "type": "money",
+                "field": "annualIncomeMicroUsd",
+                "deltaMicroUsd": "28000000000"
+              }
+            ]
+          }
+        ]
+      },
+      "sourceId": "p3b-synthetic-events-v1-source",
+      "eventId": "ev.adult.career-service-degree",
+      "kind": "decision",
+      "localizationKey": "p3b.event.adult.career_service_degree",
+      "ageMin": 18,
+      "ageMax": 55,
+      "lifeStages": [
+        "adulthood"
+      ],
+      "weight": 990
+    },
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.1.0",
+      "conditions": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "flag",
+            "flag": "career:field:service",
+            "present": true
+          },
+          {
+            "op": "not",
+            "condition": {
+              "op": "flag",
+              "flag": "career:chosen",
+              "present": true
+            }
+          },
+          {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "not",
+                "condition": {
+                  "op": "flag",
+                  "flag": "edu:university",
+                  "present": true
+                }
+              },
+              {
+                "op": "not",
+                "condition": {
+                  "op": "flag",
+                  "flag": "edu:master",
+                  "present": true
+                }
+              },
+              {
+                "op": "not",
+                "condition": {
+                  "op": "flag",
+                  "flag": "edu:doctorate",
+                  "present": true
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "priority": 30,
+      "once": true,
+      "cooldownYears": 0,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "openDecision",
+          "decisionId": "dec.adult.career-service-entry"
+        }
+      ],
+      "decision": {
+        "decisionId": "dec.adult.career-service-entry",
+        "promptKey": "p3b.decision.adult.career-service-entry",
+        "options": [
+          {
+            "optionId": "waiter",
+            "labelKey": "p3b.option.adult.career-service-entry.waiter",
+            "effects": [
+              {
+                "type": "flag",
+                "flag": "job:waiter",
+                "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "career:chosen",
+                "action": "add"
+              },
+              {
+                "type": "money",
+                "field": "annualIncomeMicroUsd",
+                "deltaMicroUsd": "6000000000"
+              }
+            ]
+          },
+          {
+            "optionId": "cook",
+            "labelKey": "p3b.option.adult.career-service-entry.cook",
+            "effects": [
+              {
+                "type": "flag",
+                "flag": "job:cook",
+                "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "career:chosen",
+                "action": "add"
+              },
+              {
+                "type": "money",
+                "field": "annualIncomeMicroUsd",
+                "deltaMicroUsd": "9000000000"
+              }
+            ]
+          }
+        ]
+      },
+      "sourceId": "p3b-synthetic-events-v1-source",
+      "eventId": "ev.adult.career-service-entry",
+      "kind": "decision",
+      "localizationKey": "p3b.event.adult.career_service_entry",
+      "ageMin": 18,
+      "ageMax": 55,
+      "lifeStages": [
+        "adulthood"
+      ],
+      "weight": 990
+    },
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.1.0",
+      "conditions": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "flag",
+            "flag": "career:field:tech",
+            "present": true
+          },
+          {
+            "op": "not",
+            "condition": {
+              "op": "flag",
+              "flag": "career:chosen",
+              "present": true
+            }
+          },
+          {
+            "op": "any",
+            "conditions": [
+              {
+                "op": "flag",
+                "flag": "edu:university",
+                "present": true
+              },
+              {
+                "op": "flag",
+                "flag": "edu:master",
+                "present": true
+              },
+              {
+                "op": "flag",
+                "flag": "edu:doctorate",
+                "present": true
+              }
+            ]
+          }
+        ]
+      },
+      "priority": 30,
+      "once": true,
+      "cooldownYears": 0,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "openDecision",
+          "decisionId": "dec.adult.career-tech-degree"
+        }
+      ],
+      "decision": {
+        "decisionId": "dec.adult.career-tech-degree",
+        "promptKey": "p3b.decision.adult.career-tech-degree",
+        "options": [
+          {
+            "optionId": "engineer",
+            "labelKey": "p3b.option.adult.career-tech-degree.engineer",
+            "effects": [
+              {
+                "type": "flag",
+                "flag": "job:engineer",
+                "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "career:chosen",
+                "action": "add"
+              },
+              {
+                "type": "money",
+                "field": "annualIncomeMicroUsd",
+                "deltaMicroUsd": "30000000000"
+              }
+            ]
+          },
+          {
+            "optionId": "software_engineer",
+            "labelKey": "p3b.option.adult.career-tech-degree.software_engineer",
+            "effects": [
+              {
+                "type": "flag",
+                "flag": "job:software_engineer",
+                "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "career:chosen",
+                "action": "add"
+              },
+              {
+                "type": "money",
+                "field": "annualIncomeMicroUsd",
+                "deltaMicroUsd": "34000000000"
+              }
+            ]
+          }
+        ]
+      },
+      "sourceId": "p3b-synthetic-events-v1-source",
+      "eventId": "ev.adult.career-tech-degree",
+      "kind": "decision",
+      "localizationKey": "p3b.event.adult.career_tech_degree",
+      "ageMin": 18,
+      "ageMax": 55,
+      "lifeStages": [
+        "adulthood"
+      ],
+      "weight": 990
+    },
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.1.0",
+      "conditions": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "flag",
+            "flag": "career:field:tech",
+            "present": true
+          },
+          {
+            "op": "not",
+            "condition": {
+              "op": "flag",
+              "flag": "career:chosen",
+              "present": true
+            }
+          },
+          {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "not",
+                "condition": {
+                  "op": "flag",
+                  "flag": "edu:university",
+                  "present": true
+                }
+              },
+              {
+                "op": "not",
+                "condition": {
+                  "op": "flag",
+                  "flag": "edu:master",
+                  "present": true
+                }
+              },
+              {
+                "op": "not",
+                "condition": {
+                  "op": "flag",
+                  "flag": "edu:doctorate",
+                  "present": true
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "priority": 30,
+      "once": true,
+      "cooldownYears": 0,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "openDecision",
+          "decisionId": "dec.adult.career-tech-entry"
+        }
+      ],
+      "decision": {
+        "decisionId": "dec.adult.career-tech-entry",
+        "promptKey": "p3b.decision.adult.career-tech-entry",
+        "options": [
+          {
+            "optionId": "lab_technician",
+            "labelKey": "p3b.option.adult.career-tech-entry.lab_technician",
+            "effects": [
+              {
+                "type": "flag",
+                "flag": "job:lab_technician",
+                "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "career:chosen",
+                "action": "add"
+              },
+              {
+                "type": "money",
+                "field": "annualIncomeMicroUsd",
+                "deltaMicroUsd": "14000000000"
+              }
+            ]
+          },
+          {
+            "optionId": "designer",
+            "labelKey": "p3b.option.adult.career-tech-entry.designer",
+            "effects": [
+              {
+                "type": "flag",
+                "flag": "job:designer",
+                "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "career:chosen",
+                "action": "add"
+              },
+              {
+                "type": "money",
+                "field": "annualIncomeMicroUsd",
+                "deltaMicroUsd": "16000000000"
+              }
+            ]
+          }
+        ]
+      },
+      "sourceId": "p3b-synthetic-events-v1-source",
+      "eventId": "ev.adult.career-tech-entry",
+      "kind": "decision",
+      "localizationKey": "p3b.event.adult.career_tech_entry",
+      "ageMin": 18,
+      "ageMax": 55,
+      "lifeStages": [
+        "adulthood"
+      ],
+      "weight": 990
+    },
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.1.0",
+      "conditions": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "flag",
+            "flag": "career:field:trade",
+            "present": true
+          },
+          {
+            "op": "not",
+            "condition": {
+              "op": "flag",
+              "flag": "career:chosen",
+              "present": true
+            }
+          },
+          {
+            "op": "any",
+            "conditions": [
+              {
+                "op": "flag",
+                "flag": "edu:university",
+                "present": true
+              },
+              {
+                "op": "flag",
+                "flag": "edu:master",
+                "present": true
+              },
+              {
+                "op": "flag",
+                "flag": "edu:doctorate",
+                "present": true
+              }
+            ]
+          }
+        ]
+      },
+      "priority": 30,
+      "once": true,
+      "cooldownYears": 0,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "openDecision",
+          "decisionId": "dec.adult.career-trade-degree"
+        }
+      ],
+      "decision": {
+        "decisionId": "dec.adult.career-trade-degree",
+        "promptKey": "p3b.decision.adult.career-trade-degree",
+        "options": [
+          {
+            "optionId": "electrician",
+            "labelKey": "p3b.option.adult.career-trade-degree.electrician",
+            "effects": [
+              {
+                "type": "flag",
+                "flag": "job:electrician",
+                "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "career:chosen",
+                "action": "add"
+              },
+              {
+                "type": "money",
+                "field": "annualIncomeMicroUsd",
+                "deltaMicroUsd": "20000000000"
+              }
+            ]
+          },
+          {
+            "optionId": "site_supervisor",
+            "labelKey": "p3b.option.adult.career-trade-degree.site_supervisor",
+            "effects": [
+              {
+                "type": "flag",
+                "flag": "job:site_supervisor",
+                "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "career:chosen",
+                "action": "add"
+              },
+              {
+                "type": "money",
+                "field": "annualIncomeMicroUsd",
+                "deltaMicroUsd": "24000000000"
+              }
+            ]
+          }
+        ]
+      },
+      "sourceId": "p3b-synthetic-events-v1-source",
+      "eventId": "ev.adult.career-trade-degree",
+      "kind": "decision",
+      "localizationKey": "p3b.event.adult.career_trade_degree",
+      "ageMin": 18,
+      "ageMax": 55,
+      "lifeStages": [
+        "adulthood"
+      ],
+      "weight": 990
+    },
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.1.0",
+      "conditions": {
+        "op": "all",
+        "conditions": [
+          {
+            "op": "flag",
+            "flag": "career:field:trade",
+            "present": true
+          },
+          {
+            "op": "not",
+            "condition": {
+              "op": "flag",
+              "flag": "career:chosen",
+              "present": true
+            }
+          },
+          {
+            "op": "all",
+            "conditions": [
+              {
+                "op": "not",
+                "condition": {
+                  "op": "flag",
+                  "flag": "edu:university",
+                  "present": true
+                }
+              },
+              {
+                "op": "not",
+                "condition": {
+                  "op": "flag",
+                  "flag": "edu:master",
+                  "present": true
+                }
+              },
+              {
+                "op": "not",
+                "condition": {
+                  "op": "flag",
+                  "flag": "edu:doctorate",
+                  "present": true
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "priority": 30,
+      "once": true,
+      "cooldownYears": 0,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "openDecision",
+          "decisionId": "dec.adult.career-trade-entry"
+        }
+      ],
+      "decision": {
+        "decisionId": "dec.adult.career-trade-entry",
+        "promptKey": "p3b.decision.adult.career-trade-entry",
+        "options": [
+          {
+            "optionId": "factory_worker",
+            "labelKey": "p3b.option.adult.career-trade-entry.factory_worker",
+            "effects": [
+              {
+                "type": "flag",
+                "flag": "job:factory_worker",
+                "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "career:chosen",
+                "action": "add"
+              },
+              {
+                "type": "money",
+                "field": "annualIncomeMicroUsd",
+                "deltaMicroUsd": "8000000000"
+              }
+            ]
+          },
+          {
+            "optionId": "driver",
+            "labelKey": "p3b.option.adult.career-trade-entry.driver",
+            "effects": [
+              {
+                "type": "flag",
+                "flag": "job:driver",
+                "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "career:chosen",
+                "action": "add"
+              },
+              {
+                "type": "money",
+                "field": "annualIncomeMicroUsd",
+                "deltaMicroUsd": "9000000000"
+              }
+            ]
+          },
+          {
+            "optionId": "construction_worker",
+            "labelKey": "p3b.option.adult.career-trade-entry.construction_worker",
+            "effects": [
+              {
+                "type": "flag",
+                "flag": "job:construction_worker",
+                "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "career:chosen",
+                "action": "add"
+              },
+              {
+                "type": "money",
+                "field": "annualIncomeMicroUsd",
+                "deltaMicroUsd": "11000000000"
+              }
+            ]
+          }
+        ]
+      },
+      "sourceId": "p3b-synthetic-events-v1-source",
+      "eventId": "ev.adult.career-trade-entry",
+      "kind": "decision",
+      "localizationKey": "p3b.event.adult.career_trade_entry",
+      "ageMin": 18,
+      "ageMax": 55,
+      "lifeStages": [
+        "adulthood"
+      ],
+      "weight": 990
     },
     {
       "eventSpecVersion": "1.0.0",
@@ -690,6 +2244,92 @@
         "adulthood"
       ],
       "weight": 65
+    },
+    {
+      "eventSpecVersion": "1.0.0",
+      "contentPackVersion": "1.1.0",
+      "conditions": null,
+      "priority": 0,
+      "once": true,
+      "cooldownYears": 0,
+      "exclusiveGroup": null,
+      "contentMode": "guardian",
+      "effects": [
+        {
+          "type": "openDecision",
+          "decisionId": "dec.adult.first-pet"
+        }
+      ],
+      "decision": {
+        "decisionId": "dec.adult.first-pet",
+        "promptKey": "p3b.decision.adult.first-pet",
+        "options": [
+          {
+            "optionId": "dog",
+            "labelKey": "p3b.option.adult.first-pet.dog",
+            "effects": [
+              {
+                "type": "flag",
+                "flag": "pet:dog",
+                "action": "add"
+              },
+              {
+                "type": "stat",
+                "stat": "happiness",
+                "delta": 4
+              },
+              {
+                "type": "money",
+                "field": "annualExpenseMicroUsd",
+                "deltaMicroUsd": "6000000000"
+              }
+            ]
+          },
+          {
+            "optionId": "cat",
+            "labelKey": "p3b.option.adult.first-pet.cat",
+            "effects": [
+              {
+                "type": "flag",
+                "flag": "pet:cat",
+                "action": "add"
+              },
+              {
+                "type": "stat",
+                "stat": "happiness",
+                "delta": 3
+              },
+              {
+                "type": "money",
+                "field": "annualExpenseMicroUsd",
+                "deltaMicroUsd": "3000000000"
+              }
+            ]
+          },
+          {
+            "optionId": "none",
+            "labelKey": "p3b.option.adult.first-pet.none",
+            "effects": [
+              {
+                "type": "stat",
+                "stat": "knowledge",
+                "delta": 1
+              }
+            ]
+          }
+        ]
+      },
+      "sourceId": "p3b-synthetic-events-v1-source",
+      "eventId": "ev.adult.first-pet",
+      "kind": "decision",
+      "localizationKey": "p3b.event.adult.first_pet",
+      "ageMin": 16,
+      "ageMax": 70,
+      "lifeStages": [
+        "adulthood",
+        "later_life"
+      ],
+      "weight": 60
     },
     {
       "eventSpecVersion": "1.0.0",

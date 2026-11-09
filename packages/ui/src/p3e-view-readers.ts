@@ -372,7 +372,7 @@ export interface ProfileRelationshipView {
   readonly label: string;
 }
 
-/** role id → 自然繁體標籤與欄位標題（只收錄 DEEPSEEK-0040-A 定義的 24 種）。 */
+/** role id → 自然繁體標籤與欄位標題（0040-A 的 24 種 + 0054-A 的 27 種明確職業）。 */
 const ROLE_LABELS: Readonly<Record<string, { label: string; row: "目前身分" | "目前職業" }>> = Object.freeze({
   infant: { label: "嬰兒", row: "目前身分" },
   preschool_child: { label: "幼兒", row: "目前身分" },
@@ -387,15 +387,37 @@ const ROLE_LABELS: Readonly<Record<string, { label: string; row: "目前身分" 
   software_engineer: { label: "軟體工程師", row: "目前職業" },
   accountant: { label: "會計", row: "目前職業" },
   office_worker: { label: "行政人員", row: "目前職業" },
-  salesperson: { label: "銷售員", row: "目前職業" },
+  /* GPT-0054-B：這三個 0040-A 舊標籤與 0054-A 權威職業目錄／字典不同名
+     （銷售員／農民／店主）。統一改成字典用語，讓「目前職業」、職業按鈕與
+     人生紀錄顯示同一個具體職業名稱，不再同一份工作出現兩種叫法。 */
+  salesperson: { label: "業務銷售", row: "目前職業" },
   designer: { label: "設計師", row: "目前職業" },
   marketer: { label: "行銷人員", row: "目前職業" },
   entrepreneur: { label: "創業者", row: "目前職業" },
-  shopkeeper: { label: "店主", row: "目前職業" },
+  shopkeeper: { label: "自營店主", row: "目前職業" },
   cook: { label: "廚師", row: "目前職業" },
-  farmer: { label: "農民", row: "目前職業" },
+  farmer: { label: "農夫", row: "目前職業" },
   service_worker: { label: "服務業人員", row: "目前職業" },
   teacher: { label: "教師", row: "目前職業" },
+  /* GPT-WORKBUDDY-0054-B：玩家明確選擇的職業（與 contracts/p3e-career.ts 對應）。
+     缺少對照會顯示「狀態更新中」，導致「選完職業後目前職業沒更新」。 */
+  waiter: { label: "服務生", row: "目前職業" },
+  hotel_manager: { label: "旅宿主管", row: "目前職業" },
+  chef: { label: "主廚", row: "目前職業" },
+  factory_worker: { label: "工廠作業員", row: "目前職業" },
+  driver: { label: "職業駕駛", row: "目前職業" },
+  construction_worker: { label: "建築工", row: "目前職業" },
+  electrician: { label: "水電技師", row: "目前職業" },
+  site_supervisor: { label: "工地主任", row: "目前職業" },
+  clerk: { label: "行政人員", row: "目前職業" },
+  hr_specialist: { label: "人力資源專員", row: "目前職業" },
+  care_worker: { label: "照顧服務員", row: "目前職業" },
+  care_assistant: { label: "照護助理", row: "目前職業" },
+  nurse: { label: "護理師", row: "目前職業" },
+  physician: { label: "醫師", row: "目前職業" },
+  lab_technician: { label: "實驗技術員", row: "目前職業" },
+  freelancer: { label: "自由工作者", row: "目前職業" },
+  consultant: { label: "顧問", row: "目前職業" },
   gap_year: { label: "待業", row: "目前身分" },
   retired: { label: "退休", row: "目前身分" }
 });

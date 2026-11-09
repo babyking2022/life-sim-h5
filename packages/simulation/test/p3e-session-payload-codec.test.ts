@@ -56,7 +56,7 @@ import { computeDeathDatasetChecksum, computeDeathPackChecksum } from "../../bir
  * - **正式 product path**（H5-CTO-175-B-R1 固定）：seed `p3e-166-playable-runtime-v4`、
  *   untouched 官方 packs（p2a+p2b+p3b+p3d raw fixture 直接以公開原語驗證）、
  *   決策政策：pending 時 `CHOOSE_DECISION` 取第一個 `optionId`，否則
- *   `ADVANCE_YEAR contentMode=standard` → 107 命令、40 決策、age 67 死亡（2091）；
+ *   `ADVANCE_YEAR contentMode=standard` → 106 命令、40 決策、age 67 死亡（2091）；
  * - **合成 Pair**：正式 hash 原語組出的「內部自洽」Pair——用於 tail binding
  *   的隔離歸因（六個尾端 head 欄位逐一只有一個比較失敗）與 scale 合成鏈。
  *
@@ -616,31 +616,31 @@ describe("H5-CTO-182-A Session Payload Codec V1：正向", () => {
     const genesisInput = genesisInputOf(eventPackOfficial, deathPack, SEED_OFFICIAL);
     const genesisProduct = createP3EGenesis(genesisInput);
     const commands = productPathCommands(genesisProduct, eventPackOfficial, deathPack);
-    expect(commands.length).toBe(107);
-    expect(commands.filter((command) => command.type === "CHOOSE_DECISION").length).toBe(40);
+    expect(commands.length).toBe(106);
+    expect(commands.filter((command) => command.type === "CHOOSE_DECISION").length).toBe(39);
 
     const built = buildHistory(genesisProduct, eventPackOfficial, deathPack, commands);
 
-    // 期望值（GPT-0043-A）：107 命令、40 個決策、age 67 死亡（year 2091）＋四個 hash。
+    // 期望值（GPT-0043-A）：106 命令、39 個決策、age 67 死亡（year 2091）＋四個 hash。
     expect(built.finalState.phase).toBe("death");
     expect(built.finalState.age).toBe(67);
     expect(built.finalState.currentYear).toBe(2091);
     expect(built.finalState.stateHash).toBe(
-      "c9d58970a061880c7fc681e59682b4d2b7882f0d9c05c0d68150d985fef1d31c"
+      "606ecda92505fab5ea8bf771a20f8638a7702282b08dd3f1d16cbb021404b8ca"
     );
     expect(built.finalState.commandLog.headHash).toBe(
-      "5117aed149a2cfc0c7e7b5147a5e19a63b7c3137d69c53e2c9d93275491a5979"
+      "4307185bc61cc8144f8e3b31981318475032e6e7cd58e88b46233e21ae29a26a"
     );
     expect(built.finalState.heads.hashChain).toBe(
-      "a248f7e714b6887eb1f604cb320f5ed31667170fcb579784c6b7f3e5c1fb2750"
+      "42c60438615287f8fffbea8585070d7ee07d33aedf9967773d9b26919046eb78"
     );
     const builtRecords = (built.ledger as { records: unknown[] }).records as Dict[];
-    expect(builtRecords.length).toBe(107);
+    expect(builtRecords.length).toBe(106);
     expect(((builtRecords[builtRecords.length - 1] as Dict).commandRecord as P3ECommandRecord).entryHash).toBe(
-      "2ea5b7e47bbcc964f69b413e4b261c7893e03e3a6a09e7f002e0c00cb6e03b91"
+      "901d0e35a49683014e6772eebe9e775964592560662ae92f92a7661f762e82ce"
     );
     expect(((builtRecords[builtRecords.length - 1] as Dict).yearRecord as Dict).entryHash).toBe(
-      "2ea5b7e47bbcc964f69b413e4b261c7893e03e3a6a09e7f002e0c00cb6e03b91"
+      "901d0e35a49683014e6772eebe9e775964592560662ae92f92a7661f762e82ce"
     );
 
     const wire = encodeP3ESessionPayload({
@@ -653,10 +653,10 @@ describe("H5-CTO-182-A Session Payload Codec V1：正向", () => {
     expect(payload.masterSeed).toBe(SEED_OFFICIAL);
     expect(stable(payload.state)).toBe(stable(built.finalState));
     expect(stable(payload.history)).toBe(stable(built.ledger));
-    expect((payload.history.records as unknown[]).length).toBe(107);
+    expect((payload.history.records as unknown[]).length).toBe(106);
     const decodedRecords = payload.history.records as unknown as Dict[];
     expect(((decodedRecords[decodedRecords.length - 1] as Dict).yearRecord as Dict).entryHash).toBe(
-      "2ea5b7e47bbcc964f69b413e4b261c7893e03e3a6a09e7f002e0c00cb6e03b91"
+      "901d0e35a49683014e6772eebe9e775964592560662ae92f92a7661f762e82ce"
     );
     // byte-identical roundtrip（含 1 個 CHOOSE_DECISION 命令的 canonical 投影）。
     expect(

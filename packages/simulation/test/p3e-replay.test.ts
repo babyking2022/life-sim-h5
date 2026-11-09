@@ -71,7 +71,7 @@ import { computeDeathDatasetChecksum, computeDeathPackChecksum } from "../../bir
  *   checksum 重算；
  * - 決策政策：pending 時 `CHOOSE_DECISION` 取第一個 `optionId`，否則
  *   `ADVANCE_YEAR contentMode=standard`；
- * - 期望：107 命令、40 個 pending choice、age 67 死亡（year 2091），
+ * - 期望：106 命令、39 個 pending choice、age 67 死亡（year 2091），
  *   最終 state／command head／chain／尾端 entry hash 為工作單固定值。
  */
 
@@ -628,8 +628,8 @@ describe("H5-CTO-180-A Ledger Replay V1：正向", () => {
     const genesisInput = genesisInputOf(eventPackOfficial, deathPack, SEED_OFFICIAL);
     const genesisProduct = createP3EGenesis(genesisInput);
     const commands = productPathCommands(genesisProduct, eventPackOfficial, deathPack);
-    expect(commands.length).toBe(107);
-    expect(commands.filter((command) => command.type === "CHOOSE_DECISION").length).toBe(40);
+    expect(commands.length).toBe(106);
+    expect(commands.filter((command) => command.type === "CHOOSE_DECISION").length).toBe(39);
 
     // live history：formal executor + formal history 逐命令 append。
     const built = buildHistory(genesisProduct, eventPackOfficial, deathPack, commands);
@@ -637,42 +637,42 @@ describe("H5-CTO-180-A Ledger Replay V1：正向", () => {
 
     const result = replayP3ELedgerHistory(input);
 
-    // 期望值（GPT-0043-A）：107 命令、40 個決策、age 67 死亡（year 2091）＋四個 hash。
+    // 期望值（GPT-0043-A）：106 命令、39 個決策、age 67 死亡（year 2091）＋四個 hash。
     expect(built.finalState.phase).toBe("death");
     expect(built.finalState.age).toBe(67);
     expect(built.finalState.currentYear).toBe(2091);
     expect(built.finalState.stateHash).toBe(
-      "c9d58970a061880c7fc681e59682b4d2b7882f0d9c05c0d68150d985fef1d31c"
+      "606ecda92505fab5ea8bf771a20f8638a7702282b08dd3f1d16cbb021404b8ca"
     );
     expect(built.finalState.commandLog.headHash).toBe(
-      "5117aed149a2cfc0c7e7b5147a5e19a63b7c3137d69c53e2c9d93275491a5979"
+      "4307185bc61cc8144f8e3b31981318475032e6e7cd58e88b46233e21ae29a26a"
     );
     expect(built.finalState.heads.hashChain).toBe(
-      "a248f7e714b6887eb1f604cb320f5ed31667170fcb579784c6b7f3e5c1fb2750"
+      "42c60438615287f8fffbea8585070d7ee07d33aedf9967773d9b26919046eb78"
     );
     const records = result.history.records as unknown as readonly Dict[];
     const lastPair = records[records.length - 1] as Dict;
     expect((lastPair.commandRecord as P3ECommandRecord).entryHash).toBe(
-      "2ea5b7e47bbcc964f69b413e4b261c7893e03e3a6a09e7f002e0c00cb6e03b91"
+      "901d0e35a49683014e6772eebe9e775964592560662ae92f92a7661f762e82ce"
     );
     expect((lastPair.yearRecord as Dict).entryHash).toBe(
-      "2ea5b7e47bbcc964f69b413e4b261c7893e03e3a6a09e7f002e0c00cb6e03b91"
+      "901d0e35a49683014e6772eebe9e775964592560662ae92f92a7661f762e82ce"
     );
 
     // replay bit-exact：最終 State、全部 78 對 Record 都與 live 完全一致。
-    expect(result.commandsConsumed).toBe(107);
+    expect(result.commandsConsumed).toBe(106);
     expect(result.state.phase).toBe("death");
     expect(result.state.age).toBe(67);
     expect(stable(result.state)).toBe(stable(built.finalState));
-    expect(records.length).toBe(107);
-    for (let index = 0; index < 107; index += 1) {
+    expect(records.length).toBe(106);
+    for (let index = 0; index < 106; index += 1) {
       const pair = records[index] as Dict;
       expect(stable(pair.commandRecord)).toBe(stable((built.live[index] as unknown as Dict).commandRecord));
       expect(stable(pair.yearRecord)).toBe(stable((built.live[index] as unknown as Dict).yearRecord));
     }
     // 全路徑恰好一個 pending choice（其餘 50 個命令都是 ADVANCE_YEAR）。
     const types = records.map((pair) => (pair.commandRecord as P3ECommandRecord).command.type);
-    expect(types.filter((type) => type === "CHOOSE_DECISION").length).toBe(40);
+    expect(types.filter((type) => type === "CHOOSE_DECISION").length).toBe(39);
     expect(types.filter((type) => type === "ADVANCE_YEAR").length).toBe(67);
     expect(result.state.stateHash).toBe(((records[records.length - 1] as Dict).yearRecord as Dict).stateHashAfter);
   });

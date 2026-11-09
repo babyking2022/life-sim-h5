@@ -2,6 +2,7 @@ import { deriveDomainState, Xoshiro128StarStar } from "@life-sim/engine";
 import type { ValidatedIdentityPack } from "@life-sim/birth";
 import type { P3ELifeState } from "@life-sim/contracts";
 import { buildP3ELifePartner, type P3ELifePartner } from "./p3e-partner";
+import { P3E_CAREER_BY_ID, readP3ECareerId } from "@life-sim/contracts";
 
 /**
  * GPT-DEEPSEEK-0040-A｜角色即時狀態 `view.profile`。
@@ -298,6 +299,21 @@ function deriveRoleUnfrozen(input: {
     return { id: "retired", kind: "retired", sinceYear: currentYear - (age - P3E_PROFILE_RETIREMENT_AGE) };
   }
 
+  /* GPT-DEEPSEEK-0054-A：玩家明確選擇的職業優先於任何池子抽取。 */
+  const chosenCareerId = readP3ECareerId(flags);
+  if (chosenCareerId !== null) {
+    const career = P3E_CAREER_BY_ID[chosenCareerId];
+    if (career !== undefined) {
+      // sinceYear：找到選這個職業的那一年（沒有就退回目前年份）。
+      const choice = input.facts.find((fact) => fact.kind === "decision" && fact.optionId === chosenCareerId);
+      return {
+        id: career.id,
+        kind: career.employmentKind,
+        sinceYear: choice?.year ?? currentYear
+      };
+    }
+  }
+
   // 18–22 歲且沒有任何工作選擇：gap_year（大學期間已在上面處理）。
   const hasJob = roleFacts.firstJob !== null || roleFacts.earlyJob !== null;
   if (age <= 22 && !hasJob) {
@@ -497,6 +513,88 @@ export function relationshipSnapshot(resolution: RelationshipResolution): P3ERel
 /* ------------------------------------------------------------------ */
 /* 入口                                                                */
 /* ------------------------------------------------------------------ */
+
+/* ------------------------------------------------------------------ */
+/* scene（GPT-DEEPSEEK-0054-A）                                        */
+/* ------------------------------------------------------------------ */
+
+export type P3ESceneAgeStage = "child" | "student" | "young" | "middle" | "senior";
+export type P3ESceneResidenceKind = "urban" | "rural";
+export type P3EScenePetKind = "none" | "dog" | "cat";
+
+export interface P3EScene {
+  readonly playerSex: "male" | "female";
+  readonly ageStage: P3ESceneAgeStage;
+  readonly residenceKind: P3ESceneResidenceKind;
+  readonly hasPartner: boolean;
+  readonly partnerSex: "male" | "female" | null;
+  readonly petKind: P3EScenePetKind;
+  /** 死亡後仍是穩定值（age 凍結在死亡年齡）。 */
+  readonly phase: "alive" | "dead";
+}
+
+/** 年齡 → 場景階段（child 0–5、student 6–17、young 18–34、middle 35–59、senior 60+）。 */
+export function sceneAgeStageOf(age: number): P3ESceneAgeStage {
+  if (age <= 5) return "child";
+  if (age <= 17) return "student";
+  if (age <= 34) return "young";
+  if (age <= 59) return "middle";
+  return "senior";
+}
+
+/** flags → 寵物（互斥；同時存在時以狗優先，正常流程不會發生）。 */
+export function petKindOf(flags: readonly string[]): P3EScenePetKind {
+  if (flags.includes("pet:dog")) return "dog";
+  if (flags.includes("pet:cat")) return "cat";
+  return "none";
+}
+
+/**
+ * 伴侶性別：由姓名語料判斷（名字在 female／male 池的哪一邊），因此不需要額外 RNG，
+ * 也不需要把性別寫進 canonical state。找不到時回 null（UI 顯示「伴侶」即可）。
+ */
+function partnerSexOf(
+  identityPack: ValidatedIdentityPack,
+  cultureId: string,
+  givenName: string
+): "male" | "female" | null {
+  const pools = (identityPack as unknown as {
+    namePoolsByCulture?: Record<string, { female?: readonly string[]; male?: readonly string[] }>;
+  }).namePoolsByCulture;
+  const pool = pools?.[cultureId];
+  if (pool === undefined) return null;
+  if (pool.female?.includes(givenName) === true) return "female";
+  if (pool.male?.includes(givenName) === true) return "male";
+  return null;
+}
+
+/** 建立 UI 用的場景投影（只讀、深層凍結、可 JSON 序列化）。 */
+export function deriveP3EScene(input: {
+  readonly state: P3ELifeState;
+  readonly relationship: P3ERelationshipSnapshot;
+  /** 現任伴侶的名字（P3ELifePartner.givenName；沒有伴侶時 null）。 */
+  readonly partnerGivenName: string | null;
+  readonly identityPack: ValidatedIdentityPack;
+  readonly cultureId: string;
+  /** P2-D 出生證書的權威城鄉欄位（urban／rural）。 */
+  readonly settlement: "urban" | "rural";
+}): P3EScene {
+  const partner = input.relationship;
+  const hasPartner = partner.status === "dating" || partner.status === "married";
+  const partnerSex =
+    hasPartner && input.partnerGivenName !== null
+      ? partnerSexOf(input.identityPack, input.cultureId, input.partnerGivenName)
+      : null;
+  return Object.freeze({
+    playerSex: input.state.identity.sex,
+    ageStage: sceneAgeStageOf(input.state.age),
+    residenceKind: input.settlement,
+    hasPartner,
+    partnerSex,
+    petKind: petKindOf(input.state.flags),
+    phase: input.state.phase === "death" ? "dead" : "alive"
+  });
+}
 
 /** 建立完整 profile（role／residence／relationship；深層凍結、可 JSON 序列化）。 */
 export function deriveP3EProfile(input: {

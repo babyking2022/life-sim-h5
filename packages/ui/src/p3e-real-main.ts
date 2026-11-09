@@ -34,6 +34,9 @@ import {
   type ProfileResidenceView
 } from "./p3e-view-readers.js";
 import { zhHantCountryName } from "./p3e-country-hant.js";
+import { financeDisplay } from "./p3e-cny.js";
+import { describeSceneLayers, readSceneView, sceneSignature, sceneSvgDataUri } from "./p3e-scene.js";
+import { buildCareerOptionViews, careerListNote, parseCareerDecision } from "./p3e-career-view.js";
 
 /**
  * H5-CTO-176-A／H5-CTO-188-A／GPT-0017-D：真實 P3-E runtime 的瀏覽器垂直切片。
@@ -728,30 +731,10 @@ function describeError(error: unknown): string {
   return "E_UNKNOWN";
 }
 
-function formatMicroUsd(value: string): string {
-  const negative = value.startsWith("-");
-  const digits = negative ? value.slice(1) : value;
-  if (!/^\d+$/.test(digits)) return value;
-  const padded = digits.padStart(7, "0");
-  const whole = padded.slice(0, -6).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-  const cents = padded.slice(-6, -4);
-  return `${negative ? "-" : ""}$${whole}.${cents}`;
-}
-
-/* GPT-0032-B：320px HUD 的 value 必須至少 13px，完整金額會把欄位擠到省略號。
-   顯示層改用萬／億縮寫（量級不失真），完整數值仍放在 title／aria-label，
-   年份／年齡／資產／年收入四項資訊一個都沒有刪。 */
-function formatCompactMicroUsd(value: string): string {
-  const full = formatMicroUsd(value);
-  const matched = /^(-?)\$([\d,]+)\.\d{2}$/.exec(full);
-  if (matched === null) return full;
-  const sign = matched[1] ?? "";
-  const amount = Number((matched[2] ?? "0").replace(/,/g, ""));
-  if (!Number.isFinite(amount)) return full;
-  if (amount >= 100_000_000) return `${sign}$${(amount / 100_000_000).toFixed(1)}億`;
-  if (amount >= 10_000) return `${sign}$${(amount / 10_000).toFixed(1)}萬`;
-  return full;
-}
+/* GPT-WORKBUDDY-0054-B：顯示層固定 1 USD = 7.2 CNY（見 p3e-cny.ts）。
+   內部 microUsd 與百分位演算法完全不動；這裡只把「要畫到 DOM 的字串」換成 CNY。
+   GPT-0032-B 的萬／億縮寫保留（量級不失真），完整值仍放在 title／aria-label。
+   未成年「—」與換算都集中在 financeDisplay，避免在 DOM 分支各自漏接。 */
 
 /* ------------------------------------------------------------------ */
 /* GPT-0025-D：顯示層文案字典（舊表的補充／覆蓋來源）                      */
@@ -2117,10 +2100,10 @@ function render(): void {
   year.append(element("span", undefined, "年份"), element("strong", undefined, String(view.currentYear)));
   const age = element("div", "p3e-hud-item p3e-hud-age");
   age.append(element("span", undefined, "年齡"), element("strong", undefined, `${view.age} 歲`));
-  const balanceFull = minorFinance ? "—" : formatMicroUsd(view.assets.balanceMicroUsd);
-  const incomeFull = minorFinance ? "—" : formatMicroUsd(view.assets.annualIncomeMicroUsd);
-  const balanceValue = minorFinance ? "—" : formatCompactMicroUsd(view.assets.balanceMicroUsd);
-  const incomeValue = minorFinance ? "—" : formatCompactMicroUsd(view.assets.annualIncomeMicroUsd);
+  const balanceFull = financeDisplay(view.assets.balanceMicroUsd, minorFinance, false);
+  const incomeFull = financeDisplay(view.assets.annualIncomeMicroUsd, minorFinance, false);
+  const balanceValue = financeDisplay(view.assets.balanceMicroUsd, minorFinance, true);
+  const incomeValue = financeDisplay(view.assets.annualIncomeMicroUsd, minorFinance, true);
   const balance = element("div", "p3e-hud-item p3e-hud-assets");
   balance.append(element("span", undefined, "資產"), element("strong", undefined, balanceValue));
   balance.setAttribute("aria-label", `資產：${minorFinance ? "尚未擁有個人資產" : balanceFull}`);
@@ -2448,12 +2431,30 @@ function renderProfileCard(view: unknown): HTMLElement {
 
 function renderLife(view: P3EPlaySession["view"], current: P3EPlaySession): HTMLElement {
   const root = element("div", "p3e-life");
-  /* GPT-0032-B：改用專用 16:9 橫向資產，CSS 以 cover 鋪滿場景寬。
-     直立原圖 contain 只會剩中央窄條；場景節點仍不疊文字、emoji 或對話框。 */
+  /* GPT-WORKBUDDY-0054-B：分層動態場景（urban/rural 背景 + 玩家 + 伴侶 + 寵物）。
+     用「原創 SVG 向量圖」當背景圖片，場景節點仍維持 0 個子節點、不疊文字／emoji，
+     左側狀態卡與六段單屏版面完全不受影響。外觀由 view.scene + seed 決定，
+     同 seed／同狀態永遠同一張圖；沒有 CDN、沒有授權不明的固定人物像素圖。 */
+  const sceneView = readSceneView(view);
+  const sceneSeed = readSeed();
   const scene = element("section", `p3e-scene p3e-scene-${view.phase}`);
   scene.setAttribute("aria-label", `${view.currentYear} 年的生活場景`);
   scene.dataset["p3eSceneFit"] = "cover";
-  scene.dataset["p3eSceneAsset"] = "life-sim-village-landscape.avif";
+  scene.dataset["p3eSceneAsset"] = "generated-layered-svg";
+  scene.dataset["p3eSceneResidence"] = sceneView.residenceKind;
+  scene.dataset["p3eSceneAgeStage"] = sceneView.ageStage;
+  scene.dataset["p3eScenePlayerSex"] = sceneView.playerSex;
+  scene.dataset["p3eSceneHasPartner"] = String(sceneView.hasPartner);
+  scene.dataset["p3eScenePet"] = sceneView.petKind;
+  scene.dataset["p3eSceneLayers"] = describeSceneLayers(sceneView, sceneSeed)
+    .filter((layer) => layer.visible)
+    .map((layer) => layer.layer)
+    .join(",");
+  scene.dataset["p3eSceneSignature"] = sceneSignature(sceneView, sceneSeed);
+  scene.style.backgroundImage = `url("${sceneSvgDataUri(sceneView, sceneSeed)}")`;
+  scene.style.backgroundSize = "cover";
+  scene.style.backgroundRepeat = "no-repeat";
+  scene.style.backgroundPosition = "center bottom";
 
   // GPT-0040-B：狀態卡是 scene 的 overlay，但為了不讓 scene 多出子層
   // （破壞既有「場景只剩一張圖」的視覺與指標），改放在 scene-wrap 裡與 scene 疊合。
@@ -2473,7 +2474,7 @@ function renderLife(view: P3EPlaySession["view"], current: P3EPlaySession): HTML
 
   // 重要決定卡／重新開始永遠排在最前面，玩家不必往下捲就能立即點選。
   if (view.phase === "pending_decision" && view.pendingDecision !== null) {
-    story.append(renderPending(view.pendingDecision));
+    story.append(renderPending(view.pendingDecision, view.stats.knowledge));
   }
 
   const last = current.lastOutcome;
@@ -2577,20 +2578,53 @@ function renderTimeControls(view: P3EPlaySession["view"]): HTMLElement {
 }
 
 function renderPending(
-  pending: NonNullable<P3EPlaySession["view"]["pendingDecision"]>
+  pending: NonNullable<P3EPlaySession["view"]["pendingDecision"]>,
+  knowledge: number
 ): HTMLElement {
   const section = element("div", "p3e-pending");
   section.setAttribute("aria-labelledby", "p3e-pending-title");
   const heading = element("h2", undefined, friendlyKey(pending.promptKey !== "" ? pending.promptKey : pending.eventId));
   heading.id = "p3e-pending-title";
   section.append(heading);
-  const options = element("div", "p3e-options p3e-choice-list");
+
+  /* GPT-WORKBUDDY-0054-B：兩階段職業決策改用緊湊兩欄卡片。
+     分類階段顯示領域名稱 + 自然繁中提示；具體職業階段顯示職業名稱 +
+     預估年收入（CNY）。事件包已先依學歷過濾，這裡再對「不屬於本分類／
+     本學歷層級或不在權威目錄」的選項做防禦性停用並給自然說明。
+     決策區自己可捲動，不會把時間控制與下一步按鈕推出螢幕。 */
+  const career = parseCareerDecision(pending.decisionId);
+  const options = element(
+    "div",
+    career === null ? "p3e-options p3e-choice-list" : "p3e-options p3e-choice-list p3e-career-options"
+  );
+  if (career !== null) {
+    section.dataset["p3eCareerStage"] = career.stage;
+    section.append(element("p", "p3e-career-note", careerListNote(career)));
+  }
+  const careerViews =
+    career === null
+      ? null
+      : buildCareerOptionViews(pending.options, career, { translate: friendlyKey, knowledge });
+
   pending.options.forEach((option, index) => {
-    const button = element("button", "p3e-option", friendlyKey(option.labelKey !== "" ? option.labelKey : option.optionId));
+    const button = element("button", "p3e-option");
     button.type = "button";
     button.dataset["action"] = "choose";
     button.dataset["optionId"] = option.optionId;
     button.dataset["optionIndex"] = String(index);
+    const view = careerViews === null ? null : careerViews[index];
+    if (view !== undefined && view !== null) {
+      button.append(element("strong", "p3e-career-name", view.label));
+      if (view.incomeText !== null) button.append(element("span", "p3e-career-income", view.incomeText));
+      if (view.note !== null) button.append(element("small", "p3e-career-hint", view.note));
+      button.disabled = view.disabled;
+      if (view.disabled) {
+        button.dataset["p3eCareerDisabled"] = "true";
+        button.setAttribute("aria-disabled", "true");
+      }
+    } else {
+      button.textContent = friendlyKey(option.labelKey !== "" ? option.labelKey : option.optionId);
+    }
     button.addEventListener("click", () => chooseOption(option.optionId));
     options.append(button);
   });

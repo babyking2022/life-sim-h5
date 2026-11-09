@@ -16,6 +16,13 @@ import {
   P3B_SCHEMA_VERSION
 } from "../packages/contracts/src/p3b";
 import { computeEventsChecksum, computePackChecksum, validateEventPack } from "../packages/engine/src/life/events";
+import {
+  P3E_CAREERS,
+  P3E_CAREER_CATEGORIES,
+  P3E_CAREER_CHOSEN_FLAG,
+  careerFlag,
+  careersOfTier
+} from "../packages/contracts/src/p3e-career";
 
 /**
  * P3-B 合成事件 fixture 產生器（deterministic）。
@@ -456,7 +463,7 @@ interface ChoiceSpec {
 
 const opt = (id: string, label: string, effects: readonly P3BEffect[]): ChoiceOptionSpec => ({ id, label, effects });
 
-const CHOICE_EVENTS: readonly ChoiceSpec[] = [
+const CHOICE_EVENTS_BASE: readonly ChoiceSpec[] = [
   /* ---------------- 3–6 歲：家庭照顧、幼兒園、興趣啟蒙 ---------------- */
   {
     group: "child",
@@ -896,6 +903,24 @@ const CHOICE_EVENTS: readonly ChoiceSpec[] = [
       opt("commute", "通勤兩邊跑", [stat("health", -3), stat("happiness", -1), money("annualIncomeMicroUsd", "6000000000")])
     ]
   },
+  {
+    group: "adult",
+    slug: "first-pet",
+    title: "養寵物",
+    prompt: "生活穩定下來了，要不要養一隻寵物？",
+    ageMin: 16,
+    ageMax: 70,
+    stages: ["adulthood", "later_life"],
+    weight: 60,
+    cooldownYears: 0,
+    once: true,
+    options: [
+      opt("dog", "領養一隻狗", [flag("pet:dog", "add"), stat("happiness", 4), money("annualExpenseMicroUsd", "6000000000")]),
+      opt("cat", "領養一隻貓", [flag("pet:cat", "add"), stat("happiness", 3), money("annualExpenseMicroUsd", "3000000000")]),
+      opt("none", "暫時不養", [stat("knowledge", 1)])
+    ]
+  },
+
   {
     group: "adult",
     slug: "marital-breakup",
@@ -1429,6 +1454,132 @@ const CHOICE_EVENTS: readonly ChoiceSpec[] = [
 ];
 
 /** 既有 22 個事件的繁中文案（與 `packages/ui/src/p3e-real-main.ts` 目前的對照一致）。 */
+/** 職業分類的繁中名稱（只用在選項文案；顯示層字典仍以 key 為準）。 */
+const CAREER_CATEGORY_TEXT: Readonly<Record<string, { readonly label: string; readonly hint: string }>> = {
+  service: { label: "一般服務（餐飲、旅宿、門市）", hint: "先累積現場經驗，之後再往管理走" },
+  trade: { label: "技術工種（工廠、工地、運輸、水電）", hint: "靠技術與體力換取穩定收入" },
+  office: { label: "行政商務（行政、業務、會計、人資）", hint: "辦公室工作，重視細心與溝通" },
+  care: { label: "教育醫療（教師、護理、醫師、照護）", hint: "需要專業訓練，但工作穩定" },
+  tech: { label: "科技工程（工程師、軟體、設計、實驗）", hint: "技術密集、成長空間大" },
+  independent: { label: "創業自由業（創業、接案、自營、務農）", hint: "收入彈性大，風險也高" }
+};
+
+/** 職業的繁中名稱（`p3b.career.<id>` 的值）。 */
+const CAREER_NAME_TEXT: Readonly<Record<string, string>> = {
+  waiter: "服務生",
+  cook: "廚師",
+  hotel_manager: "旅宿主管",
+  chef: "主廚",
+  factory_worker: "工廠作業員",
+  driver: "職業駕駛",
+  construction_worker: "建築工",
+  electrician: "水電技師",
+  site_supervisor: "工地主任",
+  clerk: "行政人員",
+  salesperson: "業務銷售",
+  accountant: "會計",
+  hr_specialist: "人力資源專員",
+  care_worker: "照顧服務員",
+  care_assistant: "照護助理",
+  teacher: "教師",
+  nurse: "護理師",
+  physician: "醫師",
+  lab_technician: "實驗技術員",
+  designer: "設計師",
+  engineer: "工程師",
+  software_engineer: "軟體工程師",
+  farmer: "農夫",
+  shopkeeper: "自營店主",
+  freelancer: "自由工作者",
+  entrepreneur: "創業者",
+  consultant: "顧問"
+};
+
+/**
+ * GPT-DEEPSEEK-0054-A：兩階段職業選擇。
+ *
+ * 階段一 `ev.career-field`：六個分類，選完寫 `career:field:<id>`。
+ * 階段二 `ev.career-<category>-<tier>`：只放該分類、該學歷 tier 的職業，
+ * 因此「不符合學歷條件的職業」根本不會出現在選項裡（模擬層就擋掉）。
+ */
+const CAREER_CHOICE_EVENTS: readonly ChoiceSpec[] = [
+  {
+    group: "adult",
+    slug: "career-field",
+    title: "職涯方向",
+    prompt: "要進入社會了，你想先往哪個方向找工作？",
+    // GPT-DEEPSEEK-0054-A：22 歲之後才問，讓 19–20 歲的升學／工作選擇先發生。
+    ageMin: 22,
+    ageMax: 40,
+    stages: ["adulthood"],
+    weight: 950,
+    cooldownYears: 0,
+    once: true,
+    priority: 20,
+    conditions: { op: "not", condition: { op: "flag", flag: P3E_CAREER_CHOSEN_FLAG, present: true } },
+    options: P3E_CAREER_CATEGORIES.map((category) =>
+      opt(category.id === "service" ? "field-service" : `field-${category.id}`, CAREER_CATEGORY_TEXT[category.id]
+        ?.label as string, [flag(`career:field:${category.id}`, "add")])
+    )
+  },
+  ...P3E_CAREER_CATEGORIES.flatMap((category) =>
+    (["entry", "degree"] as const).map(
+      (tier): ChoiceSpec => ({
+        group: "adult",
+        slug: `career-${category.id}-${tier}`,
+        title: tier === "entry" ? "第一份工作" : "專業工作",
+        prompt:
+          tier === "entry"
+            ? "依你目前的學歷，這些工作現在就能開始，你想做哪一個？"
+            : "依你的學歷，這些工作需要專業訓練，你想做哪一個？",
+        ageMin: 18,
+        ageMax: 55,
+        stages: ["adulthood"],
+        weight: 990,
+        cooldownYears: 0,
+        once: true,
+        priority: 30,
+        conditions: {
+          op: "all",
+          conditions: [
+            { op: "flag", flag: `career:field:${category.id}`, present: true },
+            { op: "not", condition: { op: "flag", flag: P3E_CAREER_CHOSEN_FLAG, present: true } },
+            tier === "entry"
+              ? {
+                  op: "all",
+                  conditions: [
+                    { op: "not", condition: { op: "flag", flag: "edu:university", present: true } },
+                    { op: "not", condition: { op: "flag", flag: "edu:master", present: true } },
+                    { op: "not", condition: { op: "flag", flag: "edu:doctorate", present: true } }
+                  ]
+                }
+              : {
+                  op: "any",
+                  conditions: [
+                    { op: "flag", flag: "edu:university", present: true },
+                    { op: "flag", flag: "edu:master", present: true },
+                    { op: "flag", flag: "edu:doctorate", present: true }
+                  ]
+                }
+          ]
+        },
+        options: careersOfTier(category.id, tier).map((entry) =>
+          opt(entry.id, CAREER_NAME_TEXT[entry.id] as string, [
+            flag(careerFlag(entry.id), "add"),
+            flag(P3E_CAREER_CHOSEN_FLAG, "add"),
+            money("annualIncomeMicroUsd", entry.baseAnnualIncomeMicroUsd.toString())
+          ])
+        )
+      })
+    )
+  )
+];
+
+
+/** 全部決策事件＝既有事件 ＋ 職業兩階段事件（GPT-DEEPSEEK-0054-A）。 */
+const CHOICE_EVENTS: readonly ChoiceSpec[] = [...CHOICE_EVENTS_BASE, ...CAREER_CHOICE_EVENTS];
+
+
 const LEGACY_COPY: Readonly<Record<string, string>> = {
   "ev.adult.burnout": "工作帶來了倦怠感",
   "ev.adult.debt-scare": "債務壓力突然逼近",
@@ -1613,6 +1764,12 @@ function buildCopyDocument(): {
         copy[detailCopyId(kind, stage, index)] = line;
       });
     }
+  }
+  // GPT-DEEPSEEK-0054-A：職業目錄的顯示層名稱（24 個）與分類說明。
+  for (const entry of P3E_CAREERS) copy[entry.labelKey] = CAREER_NAME_TEXT[entry.id] as string;
+  for (const category of P3E_CAREER_CATEGORIES) {
+    copy[category.labelKey] = CAREER_CATEGORY_TEXT[category.id]?.label as string;
+    copy[category.hintKey] = CAREER_CATEGORY_TEXT[category.id]?.hint as string;
   }
   const sorted: Record<string, string> = {};
   for (const key of Object.keys(copy).sort()) sorted[key] = copy[key] as string;

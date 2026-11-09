@@ -28,9 +28,12 @@ import {
 import type { P3ELifePartner } from "./p3e-partner";
 import {
   deriveP3EProfile,
+  deriveP3EScene,
   resolveP3ERelationship,
+  relationshipSnapshot,
   type P3EProfile,
-  type P3EProfileFact
+  type P3EProfileFact,
+  type P3EScene
 } from "./p3e-profile";
 
 /**
@@ -136,6 +139,11 @@ export interface P3EPlaySessionView {
    * 全部是呈現投影，可由 command log 決定性重建。
    */
   readonly profile: P3EProfile;
+  /**
+   * UI 用的場景投影（GPT-DEEPSEEK-0054-A）：性別、年齡階段、城鄉、伴侶、寵物、生死。
+   * UI 不應該自己解析 flags 或猜測人物狀態。
+   */
+  readonly scene: P3EScene;
   /**
    * 具名伴侶（GPT-DEEPSEEK-0036-A）：沒有關係事件時是 null；
    * 由 masterSeed ＋ command log 決定性重建（不消耗年度 RNG）。
@@ -322,7 +330,9 @@ function resolveSessionRelationship(input: {
   readonly identityPack: unknown;
   readonly state: P3ELifeState;
   readonly lifeLog: readonly P3ELifeLogEntry[];
-}): { readonly partner: P3ELifePartner | null; readonly profile: P3EProfile } {
+  /** P2-D 出生證書的城鄉欄位（scene.residenceKind）。 */
+  readonly settlement: "urban" | "rural";
+}): { readonly partner: P3ELifePartner | null; readonly profile: P3EProfile; readonly scene: P3EScene } {
   const profile = deriveP3EProfile({
     state: input.state,
     facts: profileFactsFromLifeLog(input.lifeLog),
@@ -338,7 +348,15 @@ function resolveSessionRelationship(input: {
     playerSex: input.state.identity.sex,
     facts: profileFactsFromLifeLog(input.lifeLog)
   });
-  return { partner: relationship.partner, profile };
+  const scene = deriveP3EScene({
+    state: input.state,
+    relationship: relationshipSnapshot(relationship),
+    partnerGivenName: relationship.partner?.givenName ?? null,
+    identityPack: input.identityPack as never,
+    cultureId: cultureIdOf(input.identityPack as never, input.state),
+    settlement: input.settlement
+  });
+  return { partner: relationship.partner, profile, scene };
 }
 
 
@@ -356,12 +374,22 @@ function profileFactsFromLifeLog(lifeLog: readonly P3ELifeLogEntry[]): readonly 
     }));
 }
 
+/** 從 P2-D 出生證書取權威城鄉欄位；缺漏時回 "urban"（MVP 預設，不拋錯）。 */
+function settlementOf(source: { readonly certificate?: unknown }): "urban" | "rural" {
+  const settlement = (source.certificate as { family?: { settlement?: unknown } } | undefined)?.family?.settlement;
+  return settlement === "rural" ? "rural" : "urban";
+}
+
 /** 建立 view：只讀 State 與 lastOutcome，不查 pack、不重跑任何模擬。 */
 function buildView(
   state: P3ELifeState,
   lastOutcome: P3ECommandOutcome | null,
   lifeLog: readonly P3ELifeLogEntry[],
-  relationship: { readonly partner: P3ELifePartner | null; readonly profile: P3EProfile }
+  relationship: {
+    readonly partner: P3ELifePartner | null;
+    readonly profile: P3EProfile;
+    readonly scene: P3EScene;
+  }
 ): P3EPlaySessionView {
   const pendingDecision =
     state.phase === "pending_decision" && lastOutcome !== null && lastOutcome.kind === "advance_year"
@@ -380,7 +408,8 @@ function buildView(
     lifeLog,
     percentiles: buildPercentiles(state),
     partner: relationship.partner,
-    profile: relationship.profile
+    profile: relationship.profile,
+    scene: relationship.scene
   });
 }
 
@@ -436,7 +465,11 @@ function sealSession(
   ledgerHistory: P3ELedgerHistory,
   lastOutcome: P3ECommandOutcome | null,
   lifeLog: readonly P3ELifeLogEntry[],
-  relationship: { readonly partner: P3ELifePartner | null; readonly profile: P3EProfile }
+  relationship: {
+    readonly partner: P3ELifePartner | null;
+    readonly profile: P3EProfile;
+    readonly scene: P3EScene;
+  }
 ): P3EPlaySession {
   return deepFreeze({
     state,
@@ -473,7 +506,8 @@ export function createP3EPlaySession(input: unknown): P3EPlaySession {
     masterSeed: genesis.masterSeed as string,
     identityPack: genesis.identityPack,
     state,
-    lifeLog
+    lifeLog,
+    settlement: settlementOf(genesis)
   });
   const session = sealSession(state, createP3ELedgerHistory(state), null, lifeLog, relationship);
   GENESIS_BY_SESSION.set(session, genesis);
@@ -526,7 +560,8 @@ export function runP3EPlaySessionCommand(input: unknown): P3EPlaySessionCommandR
     masterSeed: genesis.masterSeed as string,
     identityPack: genesis.identityPack,
     state: result.state,
-    lifeLog
+    lifeLog,
+    settlement: settlementOf(genesis)
   });
 
   const next = sealSession(result.state, ledgerHistory, result.outcome, lifeLog, relationship);
@@ -622,7 +657,8 @@ export function restoreP3EPlaySessionPayload(input: unknown): P3EPlaySession {
     masterSeed: raw.masterSeed as string,
     identityPack: raw.identityPack,
     state: replayed.state,
-    lifeLog
+    lifeLog,
+    settlement: settlementOf({ certificate: raw.certificate } as never)
   });
 
   const session = sealSession(replayed.state, replayed.history, replayed.lastOutcome, lifeLog, relationship);

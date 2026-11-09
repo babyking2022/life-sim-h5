@@ -1413,11 +1413,11 @@ describe("P3-E.1b-1f-0 pendingDecision 形狀", () => {
     }
   });
 
-  it("optionIds：空／超過 5／重複／非法 ID", () => {
+  it("optionIds：空／超過 8／重複／非法 ID", () => {
     const cases: readonly [unknown, string][] = [
       [[], "pendingDecision.optionIds"],
       [[], "pendingDecision.optionIds"],
-      [["a1", "b2", "c3", "d4", "e5", "f6"], "pendingDecision.optionIds"],
+      [["a1", "b2", "c3", "d4", "e5", "f6", "g7", "h8", "i9"], "pendingDecision.optionIds"],
       [["rent", "rent"], "pendingDecision.optionIds[1]"],
       [["rent", "ab"], "pendingDecision.optionIds[1]"],
       [["rent", 42], "pendingDecision.optionIds[1]"],
