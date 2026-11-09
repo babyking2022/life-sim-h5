@@ -1214,6 +1214,7 @@ async function main() {
     return {
       ariaLabel: card.getAttribute("aria-label"),
       inSceneWrap: wrap !== null,
+      lang: document.documentElement.lang || "unknown",
       rows,
       country,
       cardLeft: Math.round(cardBox.left),
@@ -1248,14 +1249,17 @@ async function main() {
       profileCard.docY <= 1 && profileCard.bodyY <= 1,
     `card=[${profileCard?.cardLeft},${profileCard?.cardRight}]w${profileCard?.cardWidth} sceneL=${profileCard?.sceneLeft} sceneW=${profileCard?.sceneWidth} docY=${profileCard?.docY} bodyY=${profileCard?.bodyY}`
   );
-  // GPT-0041-B：死亡畫面若仍顯示狀態卡，居住國名也必須是完整繁中且未省略（不得無條件排除）。
+  // GPT-0041-B：死亡畫面若仍顯示狀態卡，居住國名也必須完整且未省略。
+  // 0062-A 起預設 zh-CN：完整＝該語系的完整國名；zh-TW 才額外要求不得是簡體。
   check(
-    "profile_card_country_full_hant_no_omit_at_death",
+    "profile_card_country_full_no_omit_at_death",
     profileCard === null ||
       (profileCard.country.text.length > 0 &&
-        !profileCard.country.hasSimplified &&
-        profileCard.country.noOmit),
-    `text=${JSON.stringify(profileCard?.country.text)} hasSimplified=${profileCard?.country.hasSimplified} scroll=${profileCard?.country.scrollWidth} client=${profileCard?.country.clientWidth} noOmit=${profileCard?.country.noOmit}`
+        profileCard.country.noOmit &&
+        !profileCard.country.text.includes("…") &&
+        !profileCard.country.text.includes("...") &&
+        (profileCard.lang !== "zh-TW" || !profileCard.country.hasSimplified)),
+    `text=${JSON.stringify(profileCard?.country.text)} lang=${profileCard?.lang} hasSimplified=${profileCard?.country.hasSimplified} scroll=${profileCard?.country.scrollWidth} client=${profileCard?.country.clientWidth} noOmit=${profileCard?.country.noOmit}`
   );
 
   // 年齡→身分路徑：6 歲小學生 / 13 歲初中生 / 18 歲依選擇（職業或升學）

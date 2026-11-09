@@ -362,6 +362,7 @@ async function pageSnapshot() {
   return {
     viewport: { w: vw, h: vh },
     phase: q("[data-p3e-live]")?.getAttribute("data-p3e-phase") ?? "unknown",
+    locale: doc.lang || "unknown",
     overflow: {
       docY: doc.scrollHeight - doc.clientHeight,
       bodyY: body.scrollHeight - body.clientHeight,
@@ -832,13 +833,16 @@ function evaluate(label, phase, s) {
     (!pcRequired || pcPresentOk) && (!pc.present || pcPresentOk),
     `required=${pcRequired} present=${pc.present} aria=${pc.ariaLabel} rows=${pc.rowCount} keys=${JSON.stringify(pc.rows.map((r) => r.key))} legacy=${pc.legacyPartnerLine}`
   );
-  // GPT-0041-B：居住國名必須完整繁中，且 320px 不可省略（不得 ellipsis 隱藏到 title）。
+  // GPT-0041-B：居住國名必須完整（不省略）；語系由 0062-A 起預設 zh-CN，
+  // 因此 zh-CN 下要求的是「完整簡中國名」，zh-TW 下仍要求完整繁中。
   if (pc.present) {
     const c = pc.country;
+    const noEllipsis = c.text.length > 0 && c.noOmit && !c.text.includes("…") && !c.text.includes("...");
+    const localeOk = s.locale === "zh-TW" ? !c.hasSimplified : true;
     check(
-      `${prefix}_profile_card_country_full_hant_no_omit`,
-      c.text.length > 0 && !c.hasSimplified && c.noOmit,
-      `text=${JSON.stringify(c.text)} hasSimplified=${c.hasSimplified} scroll=${c.scrollWidth} client=${c.clientWidth} noOmit=${c.noOmit}`
+      `${prefix}_profile_card_country_full_no_omit`,
+      noEllipsis && localeOk,
+      `text=${JSON.stringify(c.text)} locale=${s.locale} hasSimplified=${c.hasSimplified} scroll=${c.scrollWidth} client=${c.clientWidth} noOmit=${c.noOmit}`
     );
   }
   const pcPosOk = pc.inSceneWrap && pc.leftAligned && pc.withinLeftHalf &&
