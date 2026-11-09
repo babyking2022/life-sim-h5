@@ -3769,6 +3769,44 @@ body:has(:is(.p3e-game-shell, .p3e-birth-screen)) {
   background: linear-gradient(180deg, #ffac25, var(--game-orange, #f58b13));
 }
 
+/* GPT-0058-B：兩階段載入狀態。狀態列固定單行、不擠壓故事區；
+   失敗時多出的「重試載入」按鈕排成三欄，維持 390×844 不整頁下滑。 */
+.p3e-world-status {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 4px 12px 2px;
+  color: #6b5537;
+  font-size: 0.72rem;
+  line-height: 1.25;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.p3e-world-status[data-p3e-world-status="error"] { color: #a33c24; }
+.p3e-birth-actions:has([data-action="retry-world"]) {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+.p3e-birth-actions [data-action="retry-world"] {
+  color: #3d3020;
+  background: linear-gradient(#fff7dc, #e7c992);
+}
+.p3e-birth-actions button:disabled {
+  opacity: 0.66;
+  cursor: progress;
+}
+.p3e-boot-error-detail + [data-action="retry-world"] {
+  min-height: 44px;
+  margin-top: 12px;
+  padding: 8px 18px;
+  border: 2px solid #665033;
+  border-radius: 10px;
+  background: linear-gradient(#fff7dc, #e7c992);
+  font: inherit;
+  font-weight: 800;
+  cursor: pointer;
+}
+
 /* --- short screens (320x568): compress gaps, keep readable text --- */
 @media (max-height: 700px) {
   .p3e-game-shell .p3e-life {

@@ -72,11 +72,34 @@ interface PreparedBrowserPacks {
 /** world handle → 已驗證 pack 參照（私有；不列舉、不序列化）。 */
 const PACKS_BY_WORLD = new WeakMap<object, PreparedBrowserPacks>();
 
+const STAGE_BRAND: unique symbol = Symbol("p3e.browser.birthStage");
+
+/**
+ * 第一階段（GPT-DEEPSEEK-0058-A）：只驗證 base＋identity 的不可偽造 handle。
+ *
+ * 出生卡只需要 base＋identity；events／death 可以晚一點才下載（mortality 約 2.61 MB）。
+ * 這個 handle 沒有任何 pack 欄位、不可偽造、不可序列化。
+ */
+export interface P3EBrowserBirthStage {
+  readonly [STAGE_BRAND]: "P3EBrowserBirthStage";
+}
+
+interface PreparedBirthPacks {
+  readonly base: ReturnType<typeof validateDataPack>;
+  readonly identity: ReturnType<typeof validateIdentityPack>;
+}
+
+/** stage handle → 已驗證 base／identity（私有）。 */
+const PACKS_BY_STAGE = new WeakMap<object, PreparedBirthPacks>();
+
 /* ------------------------------------------------------------------ */
 /* 固定錯誤路徑                                                         */
 /* ------------------------------------------------------------------ */
 
 const RAW_WORLD_KEYS = ["base", "identity", "events", "death"] as const;
+const RAW_BIRTH_KEYS = ["base", "identity"] as const;
+const STAGE_PREVIEW_KEYS = ["stage", "masterSeed"] as const;
+const COMPLETE_KEYS = ["stage", "events", "death"] as const;
 const CREATE_KEYS = ["world", "masterSeed"] as const;
 const PREVIEW_KEYS = ["world", "masterSeed"] as const;
 const RESTORE_KEYS = ["world", "masterSeed", "payload"] as const;
@@ -87,6 +110,10 @@ const PATH_PREVIEW_INPUT = "p3eBrowser.preview.input";
 const PATH_RESTORE_INPUT = "p3eBrowser.restore.input";
 const PATH_CREATE_WORLD = "p3eBrowser.world";
 const PATH_SEED = "p3eBrowser.masterSeed";
+const PATH_BIRTH_INPUT = "p3eBrowser.birth.input";
+const PATH_STAGE_PREVIEW_INPUT = "p3eBrowser.preview.input";
+const PATH_COMPLETE_INPUT = "p3eBrowser.complete.input";
+const PATH_STAGE = "p3eBrowser.stage";
 
 /* ------------------------------------------------------------------ */
 /* descriptor-only exact object                                        */
@@ -132,6 +159,19 @@ function readExactObject(
 }
 
 /* ------------------------------------------------------------------ */
+/* 共用：出生預覽（一次性與分階段共用同一條路徑）                        */
+/* ------------------------------------------------------------------ */
+
+function previewFromPacks(base: PreparedBrowserPacks["base"], identity: PreparedBrowserPacks["identity"], masterSeed: string): P3EBrowserBirthPreview {
+  const peerGroup = buildPeerGroup(base, identity, {
+    seed: masterSeed,
+    playerSexPolicy: "random"
+  } as never);
+  const certificate = createBirthCertificate(base, identity, peerGroup, masterSeed);
+  return buildP3EBirthPreview(certificate);
+}
+
+/* ------------------------------------------------------------------ */
 /* 入口一：prepareP3EBrowserWorld                                      */
 /* ------------------------------------------------------------------ */
 
@@ -155,6 +195,79 @@ export function prepareP3EBrowserWorld(rawPacks: unknown): P3EBrowserWorld {
     Object.defineProperty({}, WORLD_BRAND, { value: "P3EBrowserWorld", enumerable: false })
   ) as P3EBrowserWorld;
   PACKS_BY_WORLD.set(handle, { base, identity, event, death });
+  return handle;
+}
+
+/* ------------------------------------------------------------------ */
+/* 分階段入口：出生卡先顯示、完整世界稍後載入                            */
+/* ------------------------------------------------------------------ */
+
+/**
+ * **第一階段**：只驗證出生卡需要的 base＋identity，回傳不可偽造的 stage handle。
+ *
+ * 用途：首頁先下載 base＋identity（不含 2.61 MB 的 mortality），立刻顯示出生卡；
+ * 背景再下載 events＋death，完成後呼叫 `completeP3EBrowserWorld`。
+ *
+ * input 必須是 descriptor-only exact-object 兩欄：`base`、`identity`（原始 pack JSON）。
+ * 驗證失敗會原樣拋出 birth 套件的資料錯誤（與一次性路徑完全相同）。
+ */
+export function prepareP3EBrowserBirthStage(rawBirthPacks: unknown): P3EBrowserBirthStage {
+  const raw = readExactObject(rawBirthPacks, RAW_BIRTH_KEYS, PATH_BIRTH_INPUT);
+
+  const base = validateDataPack(raw.base as Parameters<typeof validateDataPack>[0]);
+  const identity = validateIdentityPack(base, raw.identity as Parameters<typeof validateIdentityPack>[1]);
+
+  const handle = Object.freeze(
+    Object.defineProperty({}, STAGE_BRAND, { value: "P3EBrowserBirthStage", enumerable: false })
+  ) as P3EBrowserBirthStage;
+  PACKS_BY_STAGE.set(handle, { base, identity });
+  return handle;
+}
+
+/**
+ * 在第一階段（只有 base＋identity）就產生出生卡。
+ *
+ * 與 `previewP3EBrowserBirth` 走**完全相同**的 `buildPeerGroup` →
+ * `createBirthCertificate` → `buildP3EBirthPreview`，因此同一 seed 的輸出逐位元一致
+ * （證書 id／hash、姓名、性別、國家、家庭資料都相同）。
+ */
+export function previewP3EBrowserBirthStage(input: unknown): P3EBrowserBirthPreview {
+  const raw = readExactObject(input, STAGE_PREVIEW_KEYS, PATH_STAGE_PREVIEW_INPUT);
+
+  const stage = raw.stage;
+  const packs = typeof stage === "object" && stage !== null ? PACKS_BY_STAGE.get(stage as object) : undefined;
+  if (packs === undefined) throw new P3EError("E_P3E_ARGUMENT", PATH_STAGE);
+
+  const masterSeed = raw.masterSeed;
+  if (typeof masterSeed !== "string") throw new P3EError("E_P3E_ARGUMENT", PATH_SEED);
+
+  return previewFromPacks(packs.base, packs.identity, masterSeed);
+}
+
+/**
+ * **第二階段**：補上 events＋death，驗證通過才回傳正式 `P3EBrowserWorld`。
+ *
+ * input 必須是 descriptor-only exact-object 三欄：`stage`、`events`、`death`。
+ *
+ * - events／death 驗證失敗 → 原樣拋出內容包錯誤，**不會**建立半套 world，stage 仍然有效
+ *   （出生卡還能繼續顯示）；
+ * - 成功 → 回傳與 `prepareP3EBrowserWorld` 完全等價的 world handle，
+ *   之後的 create／restore／preview 都走同一組已驗證 pack。
+ */
+export function completeP3EBrowserWorld(input: unknown): P3EBrowserWorld {
+  const raw = readExactObject(input, COMPLETE_KEYS, PATH_COMPLETE_INPUT);
+
+  const stage = raw.stage;
+  const packs = typeof stage === "object" && stage !== null ? PACKS_BY_STAGE.get(stage as object) : undefined;
+  if (packs === undefined) throw new P3EError("E_P3E_ARGUMENT", PATH_STAGE);
+
+  const event = validateEventPack(raw.events as Parameters<typeof validateEventPack>[0]);
+  const death = validateDeathPack(raw.death as Parameters<typeof validateDeathPack>[0], packs.base);
+
+  const handle = Object.freeze(
+    Object.defineProperty({}, WORLD_BRAND, { value: "P3EBrowserWorld", enumerable: false })
+  ) as P3EBrowserWorld;
+  PACKS_BY_WORLD.set(handle, { base: packs.base, identity: packs.identity, event, death });
   return handle;
 }
 
@@ -201,13 +314,7 @@ export function previewP3EBrowserBirth(input: unknown): P3EBrowserBirthPreview {
   const masterSeed = raw.masterSeed;
   if (typeof masterSeed !== "string") throw new P3EError("E_P3E_ARGUMENT", PATH_SEED);
 
-  const peerGroup = buildPeerGroup(packs.base, packs.identity, {
-    seed: masterSeed,
-    playerSexPolicy: "random"
-  } as never);
-  const certificate = createBirthCertificate(packs.base, packs.identity, peerGroup, masterSeed);
-
-  return buildP3EBirthPreview(certificate);
+  return previewFromPacks(packs.base, packs.identity, masterSeed);
 }
 
 /* ------------------------------------------------------------------ */

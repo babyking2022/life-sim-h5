@@ -1,7 +1,7 @@
 import { deriveDomainState, Xoshiro128StarStar } from "@life-sim/engine";
 import type { ValidatedIdentityPack } from "@life-sim/birth";
 import type { P3ELifeState } from "@life-sim/contracts";
-import { buildP3ELifePartner, type P3ELifePartner } from "./p3e-partner";
+import { buildP3ELifePartner, type P3ELifePartner, type P3EPartnerSex } from "./p3e-partner";
 import { P3E_CAREER_BY_ID, readP3ECareerId } from "@life-sim/contracts";
 
 /**
@@ -549,42 +549,22 @@ export function petKindOf(flags: readonly string[]): P3EScenePetKind {
   return "none";
 }
 
-/**
- * 伴侶性別：由姓名語料判斷（名字在 female／male 池的哪一邊），因此不需要額外 RNG，
- * 也不需要把性別寫進 canonical state。找不到時回 null（UI 顯示「伴侶」即可）。
- */
-function partnerSexOf(
-  identityPack: ValidatedIdentityPack,
-  cultureId: string,
-  givenName: string
-): "male" | "female" | null {
-  const pools = (identityPack as unknown as {
-    namePoolsByCulture?: Record<string, { female?: readonly string[]; male?: readonly string[] }>;
-  }).namePoolsByCulture;
-  const pool = pools?.[cultureId];
-  if (pool === undefined) return null;
-  if (pool.female?.includes(givenName) === true) return "female";
-  if (pool.male?.includes(givenName) === true) return "male";
-  return null;
-}
-
 /** 建立 UI 用的場景投影（只讀、深層凍結、可 JSON 序列化）。 */
 export function deriveP3EScene(input: {
   readonly state: P3ELifeState;
   readonly relationship: P3ERelationshipSnapshot;
-  /** 現任伴侶的名字（P3ELifePartner.givenName；沒有伴侶時 null）。 */
-  readonly partnerGivenName: string | null;
-  readonly identityPack: ValidatedIdentityPack;
-  readonly cultureId: string;
+  /**
+   * 現任伴侶的性別（GPT-DEEPSEEK-0058-A：直接讀 P3ELifePartner.sex）。
+   * 不再用姓名池反推，因此老化／升級／存檔復原都不會改變。
+   */
+  readonly partnerSex: P3EPartnerSex | null;
   /** P2-D 出生證書的權威城鄉欄位（urban／rural）。 */
   readonly settlement: "urban" | "rural";
 }): P3EScene {
   const partner = input.relationship;
   const hasPartner = partner.status === "dating" || partner.status === "married";
-  const partnerSex =
-    hasPartner && input.partnerGivenName !== null
-      ? partnerSexOf(input.identityPack, input.cultureId, input.partnerGivenName)
-      : null;
+  // 伴侶性別是角色身分（建立時抽定），不是每次顯示時重新推測。
+  const partnerSex = hasPartner ? (input.partnerSex ?? null) : null;
   return Object.freeze({
     playerSex: input.state.identity.sex,
     ageStage: sceneAgeStageOf(input.state.age),

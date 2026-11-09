@@ -351,9 +351,7 @@ function resolveSessionRelationship(input: {
   const scene = deriveP3EScene({
     state: input.state,
     relationship: relationshipSnapshot(relationship),
-    partnerGivenName: relationship.partner?.givenName ?? null,
-    identityPack: input.identityPack as never,
-    cultureId: cultureIdOf(input.identityPack as never, input.state),
+    partnerSex: relationship.partner?.sex ?? null,
     settlement: input.settlement
   });
   return { partner: relationship.partner, profile, scene };

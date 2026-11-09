@@ -71,3 +71,76 @@
 - 授權：本輪新增的向量圖形為原創，無第三方權利負擔；上述 AVIF 的
   「待確認」狀態不適用於新場景，但仍適用於保留在磁碟的舊圖，
   舊圖若將來重新啟用仍須先補齊授權證據。
+
+## GPT-WORKBUDDY-0058-B：vendor 少量 Humation 手繪 SVG 部件（MIT）
+
+上一節「沒有 vendor 任何第三方素材」是 **0054-B 當時**的事實紀錄；
+0058-B 起改為另行 vendor 下列第三方素材，並在此如實記載授權。
+
+### 來源與授權
+
+| 項目 | 值 |
+| --- | --- |
+| 專案 | [humation-labs/humation](https://github.com/humation-labs/humation)（Humation 1，手繪 kawaii avatar engine） |
+| 固定 commit | `85613cfac2d600c05847f403fc275336ab1fa240` |
+| 素材包 | `packages/assets-humation-1`（上游共 86 個部件，slots：head／body／bottom／item／glasses） |
+| 授權 | **MIT License**，程式與素材皆為 MIT；`Copyright (c) 2026 Humation contributors` |
+| 完整授權文字 | `assets/generated/humation/LICENSE.md`（1080 bytes，SHA-256 `53c4b2ca2f1eb373e91020ad6ff50b53ef7ee685937385ded1c3f67495b23c88`） |
+| 取得方式 | 由該 commit 的 raw 檔案下載後原樣保存在本機，**沒有** CDN、API 或執行期熱連結 |
+
+MIT notice 原文（與 `LICENSE.md` 一致）：
+
+```text
+# MIT License
+
+Copyright (c) 2026 Humation contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+### 實際 vendor 的 4 個部件（最小核心，非整套）
+
+只取 4 個必要部件；**沒有**搬入 86 個部件、React 套件、avatar builder、editor 或示範網站。
+原始未修改 SVG 保存在 `assets/generated/humation/`，SHA-256 如下：
+
+| 專案 key | 上游路徑 | 本機檔名 | 原始 bytes | 壓縮後 bytes | SHA-256 |
+| --- | --- | --- | --- | --- | --- |
+| `head/short` | `head/003.svg` | `head_003.svg` | 8,703 | 6,598 | `a3562f2bd861ca763d2f0beabb50c62b6e39627b3d91eba761d1e29c6a8f4fcf` |
+| `head/fluffy-bob` | `head/001.svg` | `head_001.svg` | 11,679 | 8,876 | `6563bca96b0522ed27bbac5c927ac241fcde4f590edb71bd4a8c9403cd0c8f95` |
+| `glasses/round` | `glasses/001.svg` | `glasses_001.svg` | 627 | 467 | `cafcd188ab90288a8072ccda20d6f94c38b56dd69ab7f2a27948f3077bb4b8d7` |
+| `cat/tabby` | `cat/001.svg` | `cat_001.svg` | 6,706 | 6,429 | `a56fa8dbafd57b25e560d4c4a945ecefd06aa1e95d1c090a0115aee43ea04e39` |
+
+合計原始 `27,715 bytes` → 精簡 `22,370 bytes`；產生的 TS 常數模組
+`packages/ui/src/p3e-kawaii-parts.ts` 為 `25,031 bytes`。
+重製腳本：`node scripts/p3e-0058b-vendor-parts.mjs`（只讀本機 vendor SVG，
+不在執行期連網）。壓縮只做「去 `<svg>` 外殼、降數字精度至 2 位、去多餘空白、
+把 `var(--hm-*)` 色彩變數換成 `{{slot}}` 佔位符」，沒有改繪圖筆觸本身。
+
+### 與場景的關係
+
+- `packages/ui/src/p3e-scene.ts` 以 `humationPart(key, colors)` 注入確定性色彩，
+  與 0054-B 既有的原創城市／農村背景、原創身體／服裝／狗／老化特徵組合成單張
+  `data:image/svg+xml,...` 背景圖；仍無外部網域請求、無 emoji 代替人物。
+- `male` 固定 `head/short`＋`original/body/trousers`，`female` 固定
+  `head/fluffy-bob`＋`original/body/dress`；五個年齡階段共用同一性別部件集合，
+  `senior` 只追加 `glasses/round`、皺紋、手杖與灰白髮色。伴侶直接使用
+  `scene.partnerSex`；貓用 `cat/tabby`，狗為本專案原創手繪（上游沒有狗部件）。
+- 上游 AVIF／舊 PNG 的「授權待確認」狀態**不因本節改變**：那些檔案仍只留在磁碟
+  供追溯，不被打包、不被請求；若要重新啟用仍須先補齊授權證據。
+- 未使用備選 `Hantuhan/peepstudio`（Open Peeps, CC0）；也沒有使用任何授權不明的圖片。

@@ -69,6 +69,11 @@ export interface P3ELifePartner {
   readonly givenName: string;
   readonly surname: string;
   readonly cultureId: string;
+  /**
+   * 伴侶性別（GPT-DEEPSEEK-0058-A）：建立時一次抽定，之後升級／老化／
+   * 存檔復原／重播都沿用；只有結束關係後的新伴侶才會換身分。
+   */
+  readonly sex: P3EPartnerSex;
   readonly status: P3ELifePartnerStatus;
   /** 關係建立的年份（`currentYear`）。 */
   readonly sinceYear: number;
@@ -139,10 +144,13 @@ export interface P3EPartnerChoice {
   readonly year: number;
 }
 
-/** 取樣時使用的性別（伴侶對玩家的相反性別）。 */
-type PartnerSex = "female" | "male";
+/** 伴侶性別（MVP：建立時與玩家相反，之後不再改變）。 */
+export type P3EPartnerSex = "female" | "male";
 
-const PARTNER_SPEC = "1.0.0";
+/** 取樣時使用的性別（伴侶對玩家的相反性別）。 */
+type PartnerSex = P3EPartnerSex;
+
+const PARTNER_SPEC = "1.1.0";
 
 /** 文化池缺失時的穩定 fallback（語料一定有 `han`）。 */
 const FALLBACK_CULTURE_ID = "han";
@@ -220,15 +228,16 @@ function drawName(
   optionId: string,
   sinceYear: number,
   attempt: number
-): { displayName: string; givenName: string; surname: string; cultureId: string } {
+): { displayName: string; givenName: string; surname: string; cultureId: string; sex: P3EPartnerSex } {
   const culture = resolveCulture(pack, playerCultureId);
   const rng = partnerRng(masterSeed, eventId, decisionId, optionId, sinceYear, attempt);
-  const givenPool = oppositeSex(playerSex) === "female" ? culture.pools.female : culture.pools.male;
+  const sex = oppositeSex(playerSex);
+  const givenPool = sex === "female" ? culture.pools.female : culture.pools.male;
   const surname = culture.pools.surname[Number(rng.uniformBigInt(BigInt(culture.pools.surname.length)))] as string;
   const givenName = givenPool[Number(rng.uniformBigInt(BigInt(givenPool.length)))] as string;
   const displayName =
     culture.profile.surnameOrder === "family_first" ? `${surname}${givenName}` : `${givenName} ${surname}`;
-  return { displayName, givenName, surname, cultureId: culture.cultureId };
+  return { displayName, givenName, surname, cultureId: culture.cultureId, sex };
 }
 
 /**
@@ -253,7 +262,7 @@ function derivePartnerName(
   optionId: string,
   sinceYear: number,
   forbiddenNames: readonly string[]
-): { displayName: string; givenName: string; surname: string; cultureId: string } {
+): { displayName: string; givenName: string; surname: string; cultureId: string; sex: P3EPartnerSex } {
   const chosen = drawName(pack, playerCultureId, playerSex, masterSeed, eventId, decisionId, optionId, sinceYear, 0);
   if (!forbiddenNames.includes(chosen.displayName)) return chosen;
   for (let attempt = 1; attempt < P3E_PARTNER_NAME_MAX_ATTEMPTS; attempt += 1) {
@@ -297,6 +306,7 @@ export function buildP3ELifePartner(input: {
     givenName: name.givenName,
     surname: name.surname,
     cultureId: name.cultureId,
+    sex: name.sex,
     status: input.latestStatus,
     sinceYear: input.first.year,
     eventId: input.first.eventId,

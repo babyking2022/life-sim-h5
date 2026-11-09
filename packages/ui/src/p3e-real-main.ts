@@ -1,9 +1,10 @@
 import {
   clearP3EBrowserAutosaveSession,
+  completeP3EBrowserWorld,
   createP3EBrowserSession,
   exportP3EBrowserPortableSave,
-  prepareP3EBrowserWorld,
-  previewP3EBrowserBirth,
+  prepareP3EBrowserBirthStage,
+  previewP3EBrowserBirthStage,
   restoreP3EBrowserAutosaveSession,
   restoreP3EBrowserPortableSave,
   runP3EPlaySessionCommand,
@@ -14,6 +15,7 @@ import {
   p3eLifeFocusLabel,
   readP3ELifeFocus,
   type P3EBrowserBirthPreview,
+  type P3EBrowserBirthStage,
   type P3EBrowserWorld,
   type P3ELifeFocusId,
   type P3EPlaySession
@@ -24,19 +26,100 @@ import {
   isEnteringDecision,
   type DecisionPlayIntent
 } from "./p3e-play-intent.js";
-import {
-  readComparisonView,
-  readProfileRelationship,
-  readProfileResidence,
-  readProfileRole,
-  type ComparisonView,
-  type PartnerIdentity,
-  type ProfileResidenceView
+import type {
+  ComparisonView,
+  PartnerIdentity,
+  ProfileResidenceView
 } from "./p3e-view-readers.js";
-import { zhHantCountryName } from "./p3e-country-hant.js";
-import { financeDisplay } from "./p3e-cny.js";
-import { describeSceneLayers, readSceneView, sceneSignature, sceneSvgDataUri } from "./p3e-scene.js";
-import { buildCareerOptionViews, careerListNote, parseCareerDecision } from "./p3e-career-view.js";
+import { birthCountryRecords, buildBirthStageInput, loadBirthPacks } from "./p3e-birth-packs.js";
+
+/* ------------------------------------------------------------------ */
+/* GPT-WORKBUDDY-0058-B｜任務二第 6 項：遊戲專用程式的延遲 chunk         */
+/* ------------------------------------------------------------------ */
+
+/**
+ * 出生卡的關鍵路徑只有 index.html → bootstrap.ts → 本模組 →
+ * `p3e-birth-packs.ts`（14 個小 JSON）。下面所有遊戲專用純函式都改成
+ * 經由 `ensureGameLayer()` 動態載入；Vite 會把它們（含 25 KB 的 Humation
+ * 部件、職業目錄、CNY 換算、國家名表、mp3 URL）拆成獨立 chunk。
+ *
+ * 用同名的薄 wrapper 轉發，讓既有 render／決策程式碼完全不用改呼叫點；
+ * 在 layer 尚未 ready 的極端情況（不會發生，因為進入遊戲前一定 await）
+ * 也只回安全的佔位值，不拋錯、不顯示 internal key。
+ */
+type GameLayer = typeof import("./p3e-game-layer.js");
+let gameLayer: GameLayer | null = null;
+
+async function ensureGameLayer(): Promise<GameLayer> {
+  if (gameLayer === null) gameLayer = await import("./p3e-game-layer.js");
+  return gameLayer;
+}
+
+const SAFE_SCENE = Object.freeze({
+  playerSex: "female",
+  ageStage: "child",
+  residenceKind: "rural",
+  hasPartner: false,
+  partnerSex: null,
+  petKind: "none",
+  phase: "alive"
+}) as ReturnType<GameLayer["readSceneView"]>;
+
+function financeDisplay(value: string, minor: boolean, compact: boolean): string {
+  return gameLayer === null ? "—" : gameLayer.financeDisplay(value, minor, compact);
+}
+function readSceneView(view: unknown): ReturnType<GameLayer["readSceneView"]> {
+  return gameLayer === null ? SAFE_SCENE : gameLayer.readSceneView(view);
+}
+function sceneSignature(...args: Parameters<GameLayer["sceneSignature"]>): string {
+  return gameLayer === null ? "" : gameLayer.sceneSignature(...args);
+}
+function sceneSvgDataUri(...args: Parameters<GameLayer["sceneSvgDataUri"]>): string {
+  return gameLayer === null ? "" : gameLayer.sceneSvgDataUri(...args);
+}
+function describeSceneLayers(
+  ...args: Parameters<GameLayer["describeSceneLayers"]>
+): ReturnType<GameLayer["describeSceneLayers"]> {
+  return gameLayer === null
+    ? (Object.freeze([]) as ReturnType<GameLayer["describeSceneLayers"]>)
+    : gameLayer.describeSceneLayers(...args);
+}
+function parseCareerDecision(
+  ...args: Parameters<GameLayer["parseCareerDecision"]>
+): ReturnType<GameLayer["parseCareerDecision"]> {
+  return gameLayer === null ? null : gameLayer.parseCareerDecision(...args);
+}
+function careerListNote(...args: Parameters<GameLayer["careerListNote"]>): string {
+  return gameLayer === null ? "" : gameLayer.careerListNote(...args);
+}
+function buildCareerOptionViews(
+  ...args: Parameters<GameLayer["buildCareerOptionViews"]>
+): ReturnType<GameLayer["buildCareerOptionViews"]> | null {
+  return gameLayer === null ? null : gameLayer.buildCareerOptionViews(...args);
+}
+function readComparisonView(view: unknown, age: number): ComparisonView {
+  if (gameLayer !== null) return gameLayer.readComparisonView(view, age);
+  const empty = Object.freeze({ available: false, text: "—", reason: null });
+  return Object.freeze({ income: empty, wealth: empty, source: "missing", note: "", basisYear: null });
+}
+function readProfileRelationship(
+  ...args: Parameters<GameLayer["readProfileRelationship"]>
+): ReturnType<GameLayer["readProfileRelationship"]> {
+  return gameLayer === null ? null : gameLayer.readProfileRelationship(...args);
+}
+function readProfileResidence(
+  ...args: Parameters<GameLayer["readProfileResidence"]>
+): ReturnType<GameLayer["readProfileResidence"]> {
+  return gameLayer === null ? null : gameLayer.readProfileResidence(...args);
+}
+function readProfileRole(
+  ...args: Parameters<GameLayer["readProfileRole"]>
+): ReturnType<GameLayer["readProfileRole"]> {
+  return gameLayer === null ? null : gameLayer.readProfileRole(...args);
+}
+function zhHantCountryName(iso3: string): string {
+  return gameLayer === null ? "" : gameLayer.zhHantCountryName(iso3);
+}
 
 /**
  * H5-CTO-176-A／H5-CTO-188-A／GPT-0017-D：真實 P3-E runtime 的瀏覽器垂直切片。
@@ -83,39 +166,22 @@ import { buildCareerOptionViews, careerListNote, parseCareerDecision } from "./p
  */
 
 /* ------------------------------------------------------------------ */
-/* fixtures（以 URL 形式載入，避免把 3MB pack 打進初始 JS）                 */
+/* fixtures（GPT-0058-B：兩階段載入，避免把 3MB pack 打進初始 JS）          */
 /* ------------------------------------------------------------------ */
 
-const PACK_URLS = {
-  p2aManifest: new URL("../../../fixtures/p2a/manifest.v1.json", import.meta.url).href,
-  p2aCountryRegistry: new URL("../../../fixtures/p2a/country-registry.v1.json", import.meta.url).href,
-  p2aIndicators: new URL("../../../fixtures/p2a/indicators.v1.json", import.meta.url).href,
-  p2aBirthWeights: new URL("../../../fixtures/p2a/birth-weights.v1.json", import.meta.url).href,
-  p2aSensitiveNames: new URL("../../../fixtures/p2a/sensitive-names.v1.json", import.meta.url).href,
-  p2aLicenses: new URL("../../../fixtures/p2a/licenses.v1.json", import.meta.url).href,
-  p2aLineage: new URL("../../../fixtures/p2a/lineage.v1.json", import.meta.url).href,
-  p2bManifest: new URL("../../../fixtures/p2b/manifest.v1.json", import.meta.url).href,
-  p2bCountryVitals: new URL("../../../fixtures/p2b/country-vitals.v1.json", import.meta.url).href,
-  p2bHouseholdProfiles: new URL("../../../fixtures/p2b/household-profiles.v1.json", import.meta.url).href,
-  p2bNameCorpus: new URL("../../../fixtures/p2b/name-corpus.v1.json", import.meta.url).href,
-  p2bStoryTemplates: new URL("../../../fixtures/p2b/story-templates.v1.json", import.meta.url).href,
-  p2bLicenses: new URL("../../../fixtures/p2b/licenses.v1.json", import.meta.url).href,
-  p2bLineage: new URL("../../../fixtures/p2b/lineage.v1.json", import.meta.url).href,
-  p3bManifest: new URL("../../../fixtures/p3b/manifest.v1.json", import.meta.url).href,
-  p3bEvents: new URL("../../../fixtures/p3b/events.v1.json", import.meta.url).href,
-  // GPT-0025-D：顯示層繁中字典維持獨立 JSON 資產（new URL + fetch），
-  // 不靜態 import 進主 JS，也不進 P3-B 事件 checksum。
-  p3bEventCopy: new URL("../../../fixtures/p3b/event-copy.zh-Hant.v1.json", import.meta.url).href,
-  p3dManifest: new URL("../../../fixtures/p3d/manifest.v1.json", import.meta.url).href,
-  p3dCauseRegistry: new URL("../../../fixtures/p3d/cause-registry.v1.json", import.meta.url).href,
-  p3dCauseWeights: new URL("../../../fixtures/p3d/cause-weights.v1.json", import.meta.url).href,
-  p3dMortality: new URL("../../../fixtures/p3d/mortality.v1.json", import.meta.url).href,
-  p3dLicenses: new URL("../../../fixtures/p3d/licenses.v1.json", import.meta.url).href,
-  p3dLineage: new URL("../../../fixtures/p3d/lineage.v1.json", import.meta.url).href
-} as const;
+/**
+ * 第一階段的 14 個 base／identity URL 在 `p3e-birth-packs.ts`；
+ * events／death（含 2.61MB mortality）與 mp3 在延遲 chunk
+ * `p3e-heavy-packs.ts`／`p3e-game-layer.ts`。這個模組不再持有任何
+ * mortality／mp3 的字串，出生卡關鍵路徑因此不會引用它們。
+ */
 
 const DEFAULT_SEED = "p3e-166-playable-runtime-v4";
 const SEED_PATTERN = /^[A-Za-z0-9._-]{1,64}$/;
+/** application 的 autosave key（見 `p3e-browser-autosave-store`）；只用來判斷是否為回訪玩家。 */
+const AUTOSAVE_PRESENCE_KEY = "life-sim:p3e:v6:autosave";
+const WORLD_FAILURE_HEADING =
+  "遊戲啟動失敗：完整人生資料還沒準備好。請重新整理頁面，或按下方按鈕重試一次。";
 /** UI 自有的 active seed key（與 application autosave 的 `life-sim:p3e:v6:autosave` 分開）。 */
 const ACTIVE_SEED_KEY = "life-sim:p3e:active-seed";
 
@@ -135,7 +201,7 @@ const NATURE_SOUND_VOLUME = 0.15;
  * 以 `new URL(..., import.meta.url)` 讓 Vite 把音檔包成本機 hashed asset，
  * 執行期路徑永遠是本站，不會向 GitHub／Freesound 發請求。
  */
-const NATURE_SOUND_URL = new URL("../../../assets/audio/birds.mp3", import.meta.url).href;
+/** 音檔 URL 移到延遲 chunk `p3e-game-layer.ts`：出生卡關鍵路徑不引用 mp3。 */
 
 /**
  * GPT-0036-B：官方 106 命令 golden 的「重播驗證模式」。
@@ -476,6 +542,22 @@ type PersistenceStatus =
 /* ------------------------------------------------------------------ */
 
 let world: P3EBrowserWorld | null = null;
+/**
+ * GPT-WORKBUDDY-0058-B：兩階段 world 準備狀態。
+ *
+ * - `birthStage`：第一階段（base＋identity）的公開 application handle，
+ *   出生卡只需這個，不必等 2.61MB mortality；
+ * - `fullWorldPromise`：第二階段的**唯一** promise；重繪／連點都共用，
+ *   因此 events／death 永遠只驗證一次、JSON 請求也由 fetch cache 去重；
+ * - `startPending`：玩家已按「開始人生」但世界還沒好，完成後自動開局一次；
+ * - `fullWorldError`：人類可理解的失敗訊息（不顯示 internal key）。
+ */
+let birthStage: P3EBrowserBirthStage | null = null;
+let fullWorldPromise: Promise<P3EBrowserWorld> | null = null;
+let fullWorldError: string | null = null;
+let startPending = false;
+/** 背景準備失敗時記住「玩家本來就想開局」，重試成功後自動接續一次。 */
+let retryStartIntent = false;
 let session: P3EPlaySession | null = null;
 /**
  * GPT-0025-D：驗證過的顯示層繁中字典（null-prototype，避免 `__proto__` 之類
@@ -923,7 +1005,8 @@ function createNatureSoundAudio(): HTMLAudioElement {
   audio.preload = "none";
   audio.loop = true;
   audio.volume = NATURE_SOUND_VOLUME;
-  audio.src = NATURE_SOUND_URL;
+  // 只有進入遊戲（game layer 已載入）後才可能走到這裡；不讓空 src 觸發請求。
+  if (gameLayer !== null) audio.src = gameLayer.NATURE_SOUND_URL;
   audio.addEventListener("play", syncNatureSoundDom);
   audio.addEventListener("pause", syncNatureSoundDom);
   natureSoundRequested = true;
@@ -1416,86 +1499,134 @@ function recoverAutosave(): void {
 }
 
 /* ------------------------------------------------------------------ */
-/* 資料載入（pack 只驗證一次）                                           */
+/* 資料載入（GPT-0058-B：兩階段 + 請求去重）                              */
 /* ------------------------------------------------------------------ */
 
-async function loadJson(url: string): Promise<unknown> {
-  const response = await fetch(url);
-  if (!response.ok) throw new Error(`fixture fetch failed: ${response.status}`);
-  return response.json();
+/** 把技術錯誤轉成玩家看得懂的一句話，不印出 internal key／HTTP 代碼。 */
+function friendlyWorldError(error: unknown): string {
+  const raw = describeError(error);
+  if (raw.startsWith("fixture fetch failed") || raw.includes("Failed to fetch")) {
+    return "人生資料下載失敗，請檢查網路後重試。";
+  }
+  if (raw.includes("E_P3E_COPY_PACK") || raw.includes("p3b-copy")) {
+    return "事件文案資料不完整，請重新載入一次。";
+  }
+  return "人生資料還沒準備好，請稍後重試。";
 }
 
-async function loadWorld(): Promise<P3EBrowserWorld> {
-  const keys = Object.keys(PACK_URLS) as (keyof typeof PACK_URLS)[];
-  const loaded = await Promise.all(keys.map((key) => loadJson(PACK_URLS[key])));
-  const data: Record<string, unknown> = {};
-  keys.forEach((key, index) => {
-    data[key] = loaded[index];
-  });
+function isCopyBootError(error: unknown): boolean {
+  return error instanceof Error && error.name === "CopyBootError";
+}
 
-  const events = data["p3bEvents"] as { records: unknown[]; contentPackVersion?: unknown };
-  const p3bManifest = data["p3bManifest"] as { contentPackVersion?: unknown };
+function markCopyBootError(): Error {
+  // 固定口語中文，不把底層錯誤碼／HTTP 狀態／internal key 帶到畫面。
+  const wrapped = new Error("E_P3E_COPY_PACK：事件文案資料載入或驗證未通過，請重新整理頁面再試一次。");
+  wrapped.name = "CopyBootError";
+  return wrapped;
+}
 
-  // GPT-0025-D：同一批載入的繁中字典必須與 P3-B events／manifest 的
-  // contentPackVersion 完全一致，且通過最小驗證後才寫進模組狀態。
-  // 驗證失敗會 throw → boot() 顯示啟動錯誤，不會降到 internal key。
-  const packVersion = p3bManifest?.contentPackVersion;
-  if (
-    typeof packVersion !== "string" ||
-    packVersion.length === 0 ||
-    events?.contentPackVersion !== packVersion
-  ) {
-    throw new Error("E_P3E_COPY_PACK：事件包與 manifest 版本不一致，請重新整理頁面。");
-  }
-  const validatedCopy = validateEventCopy(data["p3bEventCopy"], packVersion);
-  eventCopy = validatedCopy;
-  eventCopyKeys = Object.keys(validatedCopy).length;
+/**
+ * 第二階段：events＋death 背景載入 → 驗證 → 產生正式 world。
+ *
+ * - 只會有一個 promise（`fullWorldPromise`）；連點／重繪／reroll 都共用；
+ * - 所有 JSON 請求走 `loadJsonCached`，2.61MB mortality 永遠只下載一次；
+ * - 同時預先載入遊戲層 chunk，讓「開始人生」不需再等一次網路；
+ * - 驗證失敗不留半套 world，但**出生卡仍然可看**，並提供重試。
+ */
+async function ensureFullWorld(): Promise<P3EBrowserWorld> {
+  if (world !== null) return world;
+  if (fullWorldPromise !== null) return fullWorldPromise;
+  const stage = birthStage;
+  if (stage === null) throw new Error("birth stage not ready");
 
-  // GPT-0040-B：把國家注册表記錄留下來，供「目前居住」查繁中國名與旗幟。
-  const registryRaw = data["p2aCountryRegistry"];
-  const registryRecords =
-    isPlainRecord(registryRaw) && Array.isArray(registryRaw["records"])
-      ? (registryRaw["records"] as unknown[])
-      : [];
-  countryRegistry = registryRecords.filter(
-    (record): record is Record<string, unknown> => isPlainRecord(record)
-  ) as ReadonlyArray<Readonly<Record<string, unknown>>>;
+  const pending = (async (): Promise<P3EBrowserWorld> => {
+    const gamePromise = ensureGameLayer();
+    const heavyModule = await import("./p3e-heavy-packs.js");
+    const heavy = await heavyModule.loadHeavyPacks();
 
-  return prepareP3EBrowserWorld({
-    base: {
-      manifest: data["p2aManifest"],
-      datasets: {
-        "country-registry": data["p2aCountryRegistry"],
-        indicators: data["p2aIndicators"],
-        "birth-weights": data["p2aBirthWeights"],
-        "sensitive-names": data["p2aSensitiveNames"],
-        licenses: data["p2aLicenses"],
-        lineage: data["p2aLineage"]
-      }
-    },
-    identity: {
-      manifest: data["p2bManifest"],
-      datasets: {
-        "country-vitals": data["p2bCountryVitals"],
-        "household-profiles": data["p2bHouseholdProfiles"],
-        "name-corpus": data["p2bNameCorpus"],
-        "story-templates": data["p2bStoryTemplates"],
-        licenses: data["p2bLicenses"],
-        lineage: data["p2bLineage"]
-      }
-    },
-    events: { manifest: data["p3bManifest"], events: events.records },
-    death: {
-      manifest: data["p3dManifest"],
-      datasets: {
-        "cause-registry": data["p3dCauseRegistry"],
-        "cause-weights": data["p3dCauseWeights"],
-        mortality: data["p3dMortality"],
-        licenses: data["p3dLicenses"],
-        lineage: data["p3dLineage"]
-      }
+    const events = heavy.p3bEvents as { records: unknown[]; contentPackVersion?: unknown } | null;
+    const p3bManifest = heavy.p3bManifest as { contentPackVersion?: unknown } | null;
+    // GPT-0025-D：字典必須與 events／manifest 的 contentPackVersion 一致。
+    const packVersion = p3bManifest?.contentPackVersion;
+    if (
+      typeof packVersion !== "string" ||
+      packVersion.length === 0 ||
+      events?.contentPackVersion !== packVersion
+    ) {
+      throw markCopyBootError();
     }
-  });
+    let validatedCopy: Readonly<Record<string, string>>;
+    try {
+      validatedCopy = validateEventCopy(heavy.p3bEventCopy, packVersion);
+    } catch {
+      throw markCopyBootError();
+    }
+    eventCopy = validatedCopy;
+    eventCopyKeys = Object.keys(validatedCopy).length;
+
+    const packs = heavyModule.buildCompleteWorldPacks(heavy);
+    const completed = completeP3EBrowserWorld({
+      stage,
+      events: packs.events,
+      death: packs.death
+    });
+    await gamePromise;
+    world = completed;
+    fullWorldError = null;
+    // 出生卡還在畫面上：重繪一次，讓 copyKeys／world-stage dataset 跟上。
+    if (session === null && birthPreview !== null && !startPending) renderBirth();
+    return completed;
+  })();
+
+  fullWorldPromise = pending;
+  try {
+    return await pending;
+  } catch (error) {
+    // 清掉失敗的 world promise 才能重試；JSON 快取仍保留已成功的部分。
+    fullWorldPromise = null;
+    fullWorldError = friendlyWorldError(error);
+    throw error;
+  }
+}
+
+/** 背景準備失敗：文案字典錯誤沿用既有啟動錯誤頁，其餘留在出生卡並給重試。 */
+function onWorldFailure(error: unknown): void {
+  fullWorldError = friendlyWorldError(error);
+  retryStartIntent = retryStartIntent || startPending;
+  startPending = false;
+  if (isCopyBootError(error)) {
+    renderBootError(describeError(error));
+    return;
+  }
+  if (session === null && birthPreview !== null) {
+    renderBirth();
+    return;
+  }
+  // 回訪玩家還在骨架階段：顯示可理解的錯誤頁與重試按鈕。
+  if (session === null) renderBootError(fullWorldError, WORLD_FAILURE_HEADING);
+}
+
+/** 重試按鈕：不重新建立 session，只重跑第二階段（成功後才繼續原本的開局意圖）。 */
+function retryWorld(): void {
+  if (busy) return;
+  const seed = birthSeed;
+  const wantsStart = retryStartIntent || startPending;
+  retryStartIntent = false;
+  fullWorldError = null;
+  fullWorldPromise = null;
+  startPending = false;
+  if (session === null && birthPreview !== null && seed !== null) renderBirth();
+  void ensureFullWorld()
+    .then(() => {
+      if (session !== null) return;
+      if (wantsStart && seed !== null && birthPreview !== null) {
+        beginLife(seed);
+        return;
+      }
+      // 沒有出生卡（回訪玩家停在骨架／錯誤頁）：重新走一次啟動決策來 restore。
+      void boot();
+    })
+    .catch(onWorldFailure);
 }
 
 function startLife(seed: string): P3EPlaySession {
@@ -1508,16 +1639,17 @@ function startLife(seed: string): P3EPlaySession {
 /* ------------------------------------------------------------------ */
 
 /**
- * 顯示出生卡：用正式 `previewP3EBrowserBirth` 產生資料，**不建立 session**，
- * clock 保持暫停。seed 會立刻寫進 UI 自有 active seed key，reload 回到同一張卡。
+ * 顯示出生卡：用 application 公開的**第一階段** API
+ * `previewP3EBrowserBirthStage`（與正式開局逐位元一致）產生資料，
+ * **不建立 session**、不等 mortality、clock 保持暫停。
  */
 function showBirth(seed: string): void {
-  const currentWorld = world;
-  if (currentWorld === null) throw new Error("world not ready");
+  const stage = birthStage;
+  if (stage === null) throw new Error("birth stage not ready");
   birthSeed = seed;
   activeSeed = seed;
   writeActiveSeed(seed);
-  birthPreview = previewP3EBrowserBirth({ world: currentWorld, masterSeed: seed });
+  birthPreview = previewP3EBrowserBirthStage({ stage, masterSeed: seed });
   session = null;
   // 回到出生卡時解除上一條命可能還在的必選暫停，clock 仍保持暫停。
   resetDecisionPlayIntent(null);
@@ -1529,7 +1661,7 @@ function showBirth(seed: string): void {
 
 /** 重新抽取：換一個真正隨機的 seed，出生資料（國名／姓名／家庭）一起更新。 */
 function rerollBirth(): void {
-  if (busy || world === null) return;
+  if (busy || birthStage === null) return;
   busy = true;
   try {
     alertText = null;
@@ -1542,10 +1674,40 @@ function rerollBirth(): void {
   }
 }
 
-/** 開始人生：才建立正式 age 0 session（與 preview 同一個 seed）並寫入 autosave。 */
+/**
+ * 開始人生（GPT-0058-B 狀態機）：
+ * - 完整世界已 ready → 立刻開局；
+ * - 尚未完成 → 按鈕顯示「準備人生…」，完成後**自動開局一次**；
+ * - 連點不會建立第二個 session（`startPending` + `session !== null` 雙閘門）；
+ * - 失敗 → 出生卡顯示人類可理解訊息與重試按鈕；
+ * - 失敗後再按「開始人生」一律視為**明確重試**，統一走 `retryWorld()`，
+ *   不會在錯誤訊息尚未清除時暗中再起一份 world promise。
+ */
 function startLifeFromCard(): void {
   const seed = birthSeed;
-  if (busy || seed === null || world === null) return;
+  if (busy || seed === null || session !== null) return;
+  if (fullWorldError !== null) {
+    retryWorld();
+    return;
+  }
+  if (world === null) {
+    if (startPending) return;
+    startPending = true;
+    renderBirth();
+    void ensureFullWorld()
+      .then(() => {
+        if (startPending && session === null) beginLife(seed);
+      })
+      .catch(onWorldFailure);
+    return;
+  }
+  beginLife(seed);
+}
+
+/** 真正建立 age 0 session；整个流程只允許執行一次。 */
+function beginLife(seed: string): void {
+  if (session !== null || world === null) return;
+  startPending = false;
   busy = true;
   try {
     session = startLife(seed);
@@ -1600,6 +1762,12 @@ function renderBirth(): void {
   screen.dataset["p3eCommandCount"] = "0";
   screen.dataset["p3ePersistenceStatus"] = persistenceStatus;
   screen.dataset["p3ePersistenceError"] = persistenceError ?? "";
+  // GPT-0058-B：讓 smoke／網路攔截測試能直接觀察兩階段載入狀態。
+  const worldStage = fullWorldError !== null
+    ? "error"
+    : world !== null ? "ready" : startPending ? "preparing" : "loading";
+  screen.dataset["p3eWorldStage"] = worldStage;
+  screen.dataset["p3eWorldError"] = fullWorldError ?? "";
 
   const card = element("article", "p3e-birth-card");
   card.setAttribute("aria-labelledby", "p3e-birth-country");
@@ -1649,13 +1817,39 @@ function renderBirth(): void {
   reroll.type = "button";
   reroll.dataset["action"] = "reroll-birth";
   reroll.addEventListener("click", rerollBirth);
-  const start = element("button", "p3e-primary", "開始人生");
+  // 世界還在背景準備時顯示「準備人生…」；失敗時另有明確的重試按鈕。
+  const start = element(
+    "button",
+    "p3e-primary",
+    startPending ? "準備人生…" : fullWorldError !== null ? "重試並開始人生" : "開始人生"
+  );
   start.type = "button";
   start.dataset["action"] = "start-life";
+  start.disabled = startPending;
   start.addEventListener("click", startLifeFromCard);
   actions.append(reroll, start);
+  if (fullWorldError !== null) {
+    const retry = element("button", "p3e-primary", "重試載入");
+    retry.type = "button";
+    retry.dataset["action"] = "retry-world";
+    retry.addEventListener("click", retryWorld);
+    actions.append(retry);
+  }
+  const status = element(
+    "p",
+    "p3e-world-status",
+    fullWorldError !== null
+      ? fullWorldError
+      : startPending
+        ? "正在準備完整人生資料，完成後會自動開始。"
+        : world !== null
+          ? "人生資料已準備完成。"
+          : "正在背景準備人生資料，出生資料已可查看。"
+  );
+  status.dataset["p3eWorldStatus"] = worldStage;
+  status.setAttribute("role", "status");
 
-  card.append(hero, grid, story, actions);
+  card.append(hero, grid, story, status, actions);
   screen.append(card);
   app.replaceChildren(screen);
   // 出生卡階段也可以觀察音訊狀態，但這裡完全不建立 Audio、不下載音檔。
@@ -2636,7 +2830,7 @@ function renderPending(
 /* 啟動                                                                */
 /* ------------------------------------------------------------------ */
 
-function renderBootError(message: string): void {
+function renderBootError(message: string, headingText?: string): void {
   alertText = message;
   const shell = element("main", "p3e-shell");
   shell.dataset["p3eLive"] = "false";
@@ -2644,7 +2838,11 @@ function renderBootError(message: string): void {
   shell.dataset["p3eCopyKeys"] = String(eventCopyKeys);
   // GPT-0025-D：文案字典驗證失敗時，明確告訴玩家發生什麼事，
   // 且停在這裡不進遊戲，避免任何 internal key 被當成文字顯示。
-  const heading = element("p", "p3e-alert", "遊戲啟動失敗：必要的事件文案載入或驗證未通過。為了不讓畫面出現內部代碼，人生還沒有開始。請重新整理頁面再試一次。");
+  const heading = element(
+    "p",
+    "p3e-alert",
+    headingText ?? "遊戲啟動失敗：必要的事件文案載入或驗證未通過。為了不讓畫面出現內部代碼，人生還沒有開始。請重新整理頁面再試一次。"
+  );
   heading.id = "p3e-boot-error";
   heading.setAttribute("role", "alert");
   heading.setAttribute("aria-live", "assertive");
@@ -2658,7 +2856,13 @@ function renderBootError(message: string): void {
     "p3e-boot-error-detail",
     friendlyDetail === "" ? "請檢查網路連線後再試一次。" : friendlyDetail
   );
-  shell.append(element("h1", undefined, "人生模擬"), heading, detail);
+  // GPT-0058-B：失敗時也要給玩家一個人類可理解、可實際重試的動作，
+  // 而不是只能重新整理整個頁面（仍保留上方「重新整理」文案相容既有驗收）。
+  const retry = element("button", "p3e-primary", "重試載入");
+  retry.type = "button";
+  retry.dataset["action"] = "retry-world";
+  retry.addEventListener("click", retryWorld);
+  shell.append(element("h1", undefined, "人生模擬"), heading, detail, retry);
   app.replaceChildren(shell);
 }
 
@@ -2677,19 +2881,65 @@ function renderBootError(message: string): void {
  * 任何 restore 失敗都沿用既有保護：`persistenceEnabled = false`，不覆寫原存檔，
  * 並顯示「清除存檔並重新開始」；儲存不可用時全程 ephemeral。
  */
+/**
+ * 回訪玩家（已有 autosave）不需要先看到出生卡：維持 HTML 骨架直到完整世界
+ * ready 再 restore，避免「出生卡閃一下才進遊戲」。這裡只檢查 key 是否存在，
+ * **不讀取／不解析存檔內容**；真正的 restore 仍走 application 公開 API。
+ */
+function hasStoredAutosave(store: Storage | null): boolean {
+  if (store === null) return false;
+  try {
+    return store.getItem(AUTOSAVE_PRESENCE_KEY) !== null;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * 啟動（GPT-WORKBUDDY-0058-B）：兩階段，出生卡不被死亡資料阻塞。
+ *
+ * 1. index.html 的靜態骨架在 HTML 到達時就已可見（不依賴 JS）；
+ * 2. **第一階段**只抓 base＋identity 14 個小 JSON，驗證後立刻顯示出生卡；
+ * 3. **第二階段** events＋death（含 2.61MB mortality）在出生卡顯示後
+ *    背景載入；「開始人生」會等它完成，或顯示「準備人生…」後自動開局；
+ * 4. 回訪玩家（有 autosave）等完整世界 ready 才 restore，避免半套 session。
+ *
+ * seed 與 restore 的既有優先順序、壞存檔保護、ephemeral 降級全部保留。
+ */
 async function boot(): Promise<void> {
   try {
-    world = await loadWorld();
+    // ===== 第一階段：base＋identity =====
+    const birthData = await loadBirthPacks();
+    birthStage = prepareP3EBrowserBirthStage(buildBirthStageInput(birthData));
+    countryRegistry = birthCountryRecords(birthData).filter(
+      (record): record is Record<string, unknown> => isPlainRecord(record)
+    ) as ReadonlyArray<Readonly<Record<string, unknown>>>;
     storage = acquireStorage();
     const pinned = readPinnedSeed();
     const stored = readActiveSeed();
     const knownSeed = pinned ?? stored;
 
+    // 新使用者：立刻把骨架換成真正的出生卡，這裡完全沒等到 mortality。
+    // 已有存檔的回訪玩家：維持骨架，等完整世界 ready 再 restore（不閃出生卡）。
+    const previewSeed = knownSeed ?? randomSeed();
+    if (!hasStoredAutosave(storage)) showBirth(previewSeed);
+
+    // ===== 第二階段：背景準備完整世界（不阻塞上面的出生卡）=====
+    let full: P3EBrowserWorld;
+    try {
+      full = await ensureFullWorld();
+    } catch (error) {
+      onWorldFailure(error);
+      return;
+    }
+    world = full;
+    await ensureGameLayer();
+
     if (storage === null) {
       // 儲存不可用：可預覽、可玩的暫時性命＋非阻塞警告（ephemeral）。
       persistenceStatus = "unavailable";
       persistenceEnabled = false;
-      showBirth(knownSeed ?? randomSeed());
+      showBirth(knownSeed ?? previewSeed);
       return;
     }
 
@@ -2711,10 +2961,10 @@ async function boot(): Promise<void> {
         return;
       }
       if (restored === null) {
-        // 確認沒有舊存檔：全新使用者用安全隨機 seed 建立出生預覽
-        // （只有預覽，不建立 age 0 session、不寫 autosave）。
+        // 確認沒有舊存檔：維持剛剛顯示的出生卡（新安全隨機 seed）。
         persistenceStatus = "missing";
-        showBirth(randomSeed());
+        if (birthPreview === null) showBirth(previewSeed);
+        else renderBirth();
         return;
       }
       activeSeed = DEFAULT_SEED;
@@ -2737,9 +2987,10 @@ async function boot(): Promise<void> {
         masterSeed: knownSeed
       });
       if (restored === null) {
-        // 有 active seed 但還沒有存檔（例如出生卡階段 reload）：回到同一張卡。
+        // 有 active seed 但還沒有存檔（例如出生卡階段 reload）：同一張卡。
         persistenceStatus = "missing";
-        showBirth(knownSeed);
+        if (birthPreview === null) showBirth(knownSeed);
+        else renderBirth();
         return;
       }
       session = restored;
@@ -2758,6 +3009,7 @@ async function boot(): Promise<void> {
     syncClockAfterSession();
     render();
   } catch (error) {
+    // 第一階段（base／identity）就失敗：沒有出生卡可顯示，沿用既有啟動錯誤頁。
     renderBootError(describeError(error));
   }
 }

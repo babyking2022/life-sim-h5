@@ -6,9 +6,38 @@
     <meta name="theme-color" content="#f3e7cb" />
     <meta name="description" content="人生 · 可玩的 P3-E 人生模擬（出生→逐年推進→決策→死亡→重生）" />
     <title>人生 · 可玩版</title>
+    <!-- GPT-0058-B：極小的首屏骨架樣式內嵌在 HTML，TTFB 後立刻可見，
+         不必等主 JS／CSS 下載。真實版面仍由 style.css 負責。 -->
+    <style>
+      .p3e-boot-skeleton{box-sizing:border-box;min-height:100dvh;margin:0;padding:28px 20px;
+        background:#f3e7cb;color:#3f3428;font-family:system-ui,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif}
+      .p3e-boot-skeleton h1{font-size:22px;margin:0 0 10px;font-weight:700}
+      .p3e-boot-skeleton p{font-size:14px;margin:0 0 20px;opacity:.78}
+      .p3e-boot-skeleton-card{display:grid;gap:12px;max-width:420px;padding:22px;border-radius:18px;
+        background:#fffaf0;box-shadow:0 8px 26px rgba(80,60,40,.10)}
+      .p3e-boot-skeleton-line{display:block;height:12px;border-radius:8px;background:linear-gradient(90deg,#eadfc8,#f6eddc,#eadfc8);
+        background-size:200% 100%;animation:p3e-boot-shimmer 1.4s linear infinite}
+      .p3e-boot-skeleton-line:nth-child(1){width:56%;height:20px}
+      .p3e-boot-skeleton-line:nth-child(3){width:78%}
+      .p3e-boot-skeleton-line:nth-child(4){width:66%}
+      @keyframes p3e-boot-shimmer{from{background-position:200% 0}to{background-position:-200% 0}}
+      @media (prefers-reduced-motion:reduce){.p3e-boot-skeleton-line{animation:none}}
+    </style>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <!-- GPT-0058-B：頁面載入立即顯示的輕量啟動畫面（不需任何 fetch）。 -->
+      <main class="p3e-boot-skeleton" data-p3e-live="false" data-p3e-phase="loading" aria-busy="true" role="status">
+        <h1>人生模擬</h1>
+        <p>正在準備出生資料…</p>
+        <div class="p3e-boot-skeleton-card" aria-hidden="true">
+          <span class="p3e-boot-skeleton-line"></span>
+          <span class="p3e-boot-skeleton-line"></span>
+          <span class="p3e-boot-skeleton-line"></span>
+          <span class="p3e-boot-skeleton-line"></span>
+        </div>
+      </main>
+    </div>
     <script type="module" src="/src/bootstrap.ts"></script>
   </body>
 </html>

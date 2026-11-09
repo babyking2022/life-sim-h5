@@ -1,32 +1,36 @@
 /**
- * GPT-WORKBUDDY-0054-B｜任務一：分層動態場景（純函式、無 DOM、無第三方素材）。
+ * GPT-WORKBUDDY-0058-B｜任務一：可愛手繪分層場景（純函式、無 DOM、無 CDN）。
  *
- * ## 為什麼是 SVG 而不是繼續用那張 AVIF
+ * ## 與 0054-B 的差異
  *
- * 原本 `life-sim-village-landscape.avif` 是**單張固定一家人 + 雞**的插畫
- * （見 `assets/generated/SCENE-ATTRIBUTION.md`，且該資產授權狀態「待確認」）。
- * 任務要求：背景不得再含固定人物／雞，人物、伴侶、寵物要能隨狀態增減。
- * 因此這裡改為**原創向量分層圖**，以 `data:image/svg+xml` 當作 `.p3e-scene`
- * 的背景圖片（DOM 裡仍是 0 個子節點，不干擾左側狀態卡與既有版面）：
+ * 0054-B 的人物是 `rect`／`circle` 拼出的僵硬幾何人形。本輪依
+ * `work/GPT-0058/WORKBUDDY-DAYU-0058-B.md`，改用 Humation
+ * （https://github.com/humation-labs/humation，MIT，commit 85613cf）的
+ * **手繪 kawaii 視覺語言**：只 vendor 4 個必要 SVG 部件（2 個頭型、
+ * 1 副老花眼鏡、1 隻貓）到 `p3e-kawaii-parts.ts`，身體／狗／背景仍為
+ * 本專案原創圓潤曲線，全部以粗描邊統一風格。沒有搬入 86 個部件、
+ * React 套件或編輯器；授權全文與來源見 `assets/generated/humation/`。
  *
- * - `background`：urban／rural 兩套，只有景物，**沒有任何人或雞**；
- * - `player`：male/female × child/student/young/middle/senior，身高、髮型／
- *   髮色、服裝都不同；
- * - `partner`：`hasPartner` 時才出現，站在玩家右側、不遮玩家也不遮左側資訊卡；
- * - `pet`：dog／cat 才出現，none 完全不畫。
+ * ## 性別身分穩定（本輪核心）
  *
- * ## 決定性
+ * - head 部件**只由 sex 決定**：male → `humation/head/short`，
+ *   female → `humation/head/fluffy-bob`；child／student／young／middle／
+ *   senior 五階段都用同一個部件，伴侶亦同。
+ * - 老化只改：髮色（灰白）、皺紋、眼鏡、身高比例、衣服顏色、手杖；
+ *   **絕不因進入 senior 而切換到另一性別的頭型／身形集合**。
+ * - 伴侶直接使用 `scene.partnerSex`（DeepSeek 0058-A 已把 sex 固定在
+ *   `P3ELifePartner` 並投影到 `view.scene`），不再用姓名或玩家性別推測。
+ *   只有投影畸形（partnerSex === null）時才走安全預設。
  *
- * 外觀完全是 `(scene, seed)` 的純函式：用 FNV-1a 雜湊挑髮色，
- * **沒有 Math.random、沒有 Date、沒有每次 render 重抽**。同 seed／同狀態
- * 永遠得到同一張 SVG；不同 seed 可以有不同髮色但仍穩定。
+ * ## 圖層與決定性
  *
- * ## 視覺輸出
- *
- * 輸出是真正的圖片（SVG 向量圖），人物／寵物都是 `rect/circle/path/polygon`
- * 畫出來的，不是 emoji、不是文字、不是 CSS 色塊假裝。全部素材為本任務原創，
- * 沒有 CDN 熱連結、沒有 vendor 任何授權不明的像素圖。
+ * `background`（urban／rural，無任何人或雞）＋`player`＋`partner`（hasPartner）
+ * ＋`pet`（dog／cat／none）。外觀是 `(scene, seed)` 的純函式：FNV-1a 挑髮色，
+ * 無 `Math.random`、無 `Date`、無外部請求。輸出為單張
+ * `data:image/svg+xml` 背景圖，`.p3e-scene` 仍保持 0 個子節點。
  */
+
+import { humationPart, type HumationColors, type HumationPartKey } from "./p3e-kawaii-parts.js";
 
 /* ------------------------------------------------------------------ */
 /* 型別                                                                */
@@ -67,6 +71,17 @@ export interface SceneLayerDescriptor {
   readonly visible: boolean;
   /** 穩定外觀指紋：同 seed／同狀態相同，狀態改變時可觀察到差異。 */
   readonly key: string;
+}
+
+/** 單一角色的真實 SVG 部件 key 清單（供矩陣測試直接斷言，不看 DOM）。 */
+export interface ScenePartDescriptor {
+  readonly role: "player" | "partner";
+  readonly sex: SceneSex;
+  readonly ageStage: SceneAgeStage;
+  readonly head: string;
+  readonly glasses: string | null;
+  readonly body: string;
+  readonly parts: readonly string[];
 }
 
 /* ------------------------------------------------------------------ */
@@ -126,6 +141,10 @@ export function hash32(text: string): number {
 const HAIR_COLORS: readonly string[] = [
   "#3a2a20", "#5a3a22", "#7b4b2a", "#2f2a28", "#8a6a3f", "#4b3326"
 ];
+const SENIOR_HAIR = "#d9d3c6";
+const STROKE = "#4a3b32";
+const SKIN = "#f8d3ad";
+const BLUSH = "#e98f9b";
 
 interface StageShape {
   readonly height: number;
@@ -151,18 +170,27 @@ interface Appearance {
   readonly backpack: boolean;
   readonly glasses: boolean;
   readonly cane: boolean;
+  readonly headPart: HumationPartKey;
+  readonly partKeys: readonly string[];
   readonly key: string;
 }
 
-/** 伴侶沒給性別時用與玩家相反的性別（也是確定性，不是隨機）。 */
+/**
+ * 性別專用的 Humation 頭型部件。**五個年齡階段共用同一個 key**，
+ * 老化不會切到另一性別的部件集合。
+ */
+export function headPartOf(sex: SceneSex): HumationPartKey {
+  return sex === "male" ? "head/short" : "head/fluffy-bob";
+}
+
+/** 伴侶沒給性別時的安全預設（正常路徑一律直接用 scene.partnerSex）。 */
 function oppositeSex(sex: SceneSex): SceneSex {
   return sex === "male" ? "female" : "male";
 }
 
 /**
- * 外觀只由 (seed, role, sex, stage) 決定：**不會因為交了伴侶或養了寵物
- * 就改玩家的髮型／髮色**。這比「同狀態同外觀」更強：同一個人在不同
- * 關係狀態下看起來仍是同一個人，伴侶／寵物只是疊加的新圖層。
+ * 外觀只由 (seed, role, sex, stage) 決定：不會因為交了伴侶或養了寵物
+ * 就改玩家的髮型／髮色。同一個人在不同關係狀態下仍是同一個人。
  */
 function appearanceOf(
   sex: SceneSex,
@@ -171,15 +199,26 @@ function appearanceOf(
   role: "player" | "partner"
 ): Appearance {
   const variant = hash32(`${seed}|${role}|${sex}|${stage}`) % HAIR_COLORS.length;
-  const longHair = sex === "female" && stage !== "senior";
-  const hairColor = stage === "senior" ? "#d9d3c6" : (HAIR_COLORS[variant] as string);
+  const hairColor = stage === "senior" ? SENIOR_HAIR : (HAIR_COLORS[variant] as string);
   const topColor =
     stage === "child" ? (sex === "female" ? "#e98f9b" : "#e88b5a")
       : stage === "student" ? (sex === "female" ? "#7fa9c9" : "#5b8fb9")
         : stage === "young" ? (sex === "female" ? "#c2607a" : "#3f7d6a")
           : stage === "middle" ? (sex === "female" ? "#8f5a86" : "#40566f")
             : (sex === "female" ? "#9c8a76" : "#8a7b63");
-  const skirt = sex === "female" && (stage === "student" || stage === "young" || stage === "middle");
+  // 性別外觀旗標固定，不隨年齡翻轉；只作為 variant 指紋的一部分。
+  const longHair = sex === "female";
+  const skirt = sex === "female";
+  const glasses = stage === "senior";
+  const headPart = headPartOf(sex);
+  const bodyPart = `original/body/${skirt ? "dress" : "trousers"}`;
+  const partKeys: readonly string[] = Object.freeze([
+    `humation/${headPart}`,
+    bodyPart,
+    ...(glasses ? ["humation/glasses/round"] : []),
+    ...(stage === "student" ? ["original/item/school-bag"] : []),
+    ...(stage === "senior" ? ["original/item/cane", "original/face/wrinkles"] : [])
+  ]);
   return {
     shape: STAGE_SHAPE[stage],
     hairColor,
@@ -188,35 +227,45 @@ function appearanceOf(
     longHair,
     skirt,
     backpack: stage === "student",
-    glasses: stage === "senior",
+    glasses,
     cane: stage === "senior",
+    headPart,
+    partKeys,
     key: `${sex}/${stage}/${hairColor}/${topColor}/${longHair}/${skirt}`
   };
 }
 
+function partColors(look: Appearance): HumationColors {
+  return Object.freeze({
+    stroke: STROKE,
+    hair: look.hairColor,
+    skin: SKIN,
+    clothes: look.topColor,
+    bottom: look.bottomColor,
+    background: "none"
+  });
+}
+
 /* ------------------------------------------------------------------ */
-/* SVG 图层                                                            */
+/* SVG 圖層                                                            */
 /* ------------------------------------------------------------------ */
 
 export const SCENE_VIEWBOX_WIDTH = 390;
 export const SCENE_VIEWBOX_HEIGHT = 220;
-/** 地面线（人物脚底），与 390x844／430x932 的 190–230px 场景高度相称。 */
+/** 地面線（人物腳底），與 390×844／430×932 的 190–230px 場景高度相稱。 */
 const GROUND_Y = 196;
 
-/** 左侧状态卡在 390px 宽时约占 x=16..173；人物全部排在安全区右侧。 */
+/** 左側狀態卡在 390px 寬時約占 x=16..173；人物全部排在安全區右側。 */
 export const SCENE_SAFE_LEFT_X = 190;
 export const PLAYER_CENTER_X = 232;
 export const PARTNER_CENTER_X = 300;
 export const PET_CENTER_X = 352;
 
-const SKIN = "#f3c99c";
-const EYE = "#3a2c24";
-
 function rect(x: number, y: number, w: number, h: number, fill: string, extra = ""): string {
   return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${fill}"${extra}/>`;
 }
 
-/** 背景：只有景物，没有任何固定人物或鸡；urban / rural 显著不同。 */
+/** 背景：只有景物，沒有任何固定人物或雞；urban / rural 顯著不同。 */
 function backgroundLayer(scene: SceneView): string {
   const dead = scene.phase === "dead";
   const sky = dead ? "#c6b7a6" : "#f7dca9";
@@ -229,7 +278,7 @@ function backgroundLayer(scene: SceneView): string {
 
   let scenery: string;
   if (scene.residenceKind === "urban") {
-    // 城市：天际线、窗户、路灯、人行道、花坛。
+    // 城市：天際線、窗戶、路燈、人行道、花壇。
     const buildings: string[] = [];
     const widths = [42, 34, 50, 30, 44, 38, 46];
     let x = 4;
@@ -256,7 +305,7 @@ function backgroundLayer(scene: SceneView): string {
       rect(0, GROUND_Y + 2, 28, 14, "#6f8a55") +
       rect(360, GROUND_Y + 2, 30, 14, "#6f8a55");
   } else {
-    // 农村：远山、梯田、瓦顶屋舍、树、篱笆；仍然没有人或鸡。
+    // 農村：遠山、梯田、瓦頂屋舍、樹、籬笆；仍然沒有人或雞。
     let fields = "";
     for (let i = 0; i < 5; i += 1) {
       fields += rect(0, 132 + i * 13, SCENE_VIEWBOX_WIDTH, 6, i % 2 === 0 ? "#a8b46d" : "#94a35d");
@@ -268,13 +317,13 @@ function backgroundLayer(scene: SceneView): string {
       fields +
       rect(0, GROUND_Y - 24, SCENE_VIEWBOX_WIDTH, 24, "#aebd78") +
       rect(0, GROUND_Y, SCENE_VIEWBOX_WIDTH, SCENE_VIEWBOX_HEIGHT - GROUND_Y, ground) +
-      // 两栋瓦顶屋舍（三角形屋顶 + 门窗）。
+      // 兩棟瓦頂屋舍（三角形屋頂 + 門窗）。
       `<polygon points="24,128 66,100 108,128" fill="#a5573f"/>` +
       rect(32, 128, 68, 44, "#e4cf9f") + rect(58, 144, 18, 28, "#8a6a44") +
       rect(38, 138, 14, 12, "#8ec4d6") + rect(84, 138, 12, 12, "#8ec4d6") +
       `<polygon points="270,134 306,110 342,134" fill="#a5573f"/>` +
       rect(278, 134, 56, 38, "#e4cf9f") + rect(300, 148, 14, 24, "#8a6a44") +
-      // 树。
+      // 樹。
       rect(196, 142, 9, 32, "#7b5b3a") + `<circle cx="200" cy="136" r="22" fill="#6f9a5a"/>` +
       `<circle cx="188" cy="128" r="13" fill="#7faa67"/>` +
       fence +
@@ -283,9 +332,11 @@ function backgroundLayer(scene: SceneView): string {
   return `${head}${scenery}</g>`;
 }
 
-/** 人物：身高、发型／发色、服装随性别与年龄阶段显著变化。 */
+/**
+ * 人物：Humation 手繪頭型部件 + 原創圓潤身體。
+ * 頭型由 sex 固定；年齡只改髮色、皺紋、眼鏡、身高比例、衣服、手杖。
+ */
 function personLayer(
-  scene: SceneView,
   seed: string,
   role: "player" | "partner",
   sex: SceneSex,
@@ -293,140 +344,178 @@ function personLayer(
   centerX: number
 ): string {
   const look = appearanceOf(sex, stage, seed, role);
-  const { height, headRadius, bodyHeight } = look.shape;
-  const topY = GROUND_Y - height;
-  const headCY = topY + headRadius;
-  const bodyY = topY + headRadius * 2;
-  const legY = bodyY + bodyHeight;
-  const legH = GROUND_Y - legY;
-  const bodyW = Math.round(headRadius * 1.7);
-  const bodyX = Math.round(centerX - bodyW / 2);
-  const headX = centerX;
+  const { height, headRadius } = look.shape;
+  const headSize = Math.round(headRadius * 2.55);
+  const headScale = headSize / 80;
+  const headLeft = Math.round(centerX - headSize / 2);
+  const headTop = GROUND_Y - height;
+  const bodyTop = Math.round(headTop + headSize * 0.82);
+  const legHeight = Math.round(height * 0.26);
+  const bodyBottom = GROUND_Y - legHeight;
+  const bodyHalf = Math.round(headRadius * 0.98);
+  const colors = partColors(look);
   const parts: string[] = [];
 
-  // 影子。
-  parts.push(`<ellipse cx="${centerX}" cy="${GROUND_Y + 2}" rx="${Math.round(headRadius * 1.5)}" ry="4" fill="rgba(44,38,26,0.22)"/>`);
-  // 学生背包（在身体后面）。
+  // 影子與學生背包（在身體後面）。
+  parts.push(`<ellipse cx="${centerX}" cy="${GROUND_Y + 2}" rx="${Math.round(headRadius * 1.5)}" ry="4" fill="rgba(74,59,50,0.20)"/>`);
   if (look.backpack) {
-    parts.push(rect(bodyX - 8, bodyY + 4, 9, Math.round(bodyHeight * 0.8), "#c9763f"));
+    parts.push(`<g data-part="original/item/school-bag"><path d="M${centerX - bodyHalf - 9} ${bodyTop + 5} q-5 0 -5 7 l0 ${Math.max(8, bodyBottom - bodyTop - 14)} q0 6 6 6 l5 0 Z" fill="#c9763f" stroke="${STROKE}" stroke-width="1.4" stroke-linejoin="round"/></g>`);
   }
-  // 腿／裙子。
+
+  // 腿／裙：性別固定，完全不隨年齡切換。
   if (look.skirt) {
-    parts.push(`<polygon points="${bodyX},${legY - 2} ${bodyX + bodyW},${legY - 2} ${bodyX + bodyW + 7},${legY + Math.round(legH * 0.72)} ${bodyX - 7},${legY + Math.round(legH * 0.72)}" fill="${look.bottomColor}"/>`);
-    parts.push(rect(Math.round(centerX - 6), legY + Math.round(legH * 0.6), 4, Math.round(legH * 0.4), SKIN));
-    parts.push(rect(Math.round(centerX + 2), legY + Math.round(legH * 0.6), 4, Math.round(legH * 0.4), SKIN));
+    parts.push(`<g data-part="original/body/dress"><path d="M${centerX - bodyHalf} ${bodyBottom - 2} L${centerX + bodyHalf} ${bodyBottom - 2} L${centerX + bodyHalf + 7} ${GROUND_Y - 6} Q${centerX} ${GROUND_Y} ${centerX - bodyHalf - 7} ${GROUND_Y - 6} Z" fill="${look.bottomColor}" stroke="${STROKE}" stroke-width="1.6" stroke-linejoin="round"/></g>`);
+    for (const dx of [-6, 2]) {
+      parts.push(rect(centerX + dx, GROUND_Y - legHeight, 4, legHeight - 3, SKIN, ` rx="2" stroke="${STROKE}" stroke-width="1"`));
+    }
   } else {
-    parts.push(rect(Math.round(centerX - bodyW / 2 + 1), legY, Math.round(bodyW / 2 - 2), legH, look.bottomColor));
-    parts.push(rect(Math.round(centerX + 1), legY, Math.round(bodyW / 2 - 2), legH, look.bottomColor));
-    parts.push(rect(Math.round(centerX - bodyW / 2 - 1), GROUND_Y - 4, Math.round(bodyW / 2), 4, "#4a3c31"));
-    parts.push(rect(Math.round(centerX + 1), GROUND_Y - 4, Math.round(bodyW / 2), 4, "#4a3c31"));
+    parts.push(`<g data-part="original/body/trousers">`);
+    for (const dx of [-bodyHalf + 1, 1]) {
+      parts.push(rect(centerX + dx, bodyBottom - 3, Math.max(4, bodyHalf - 2), legHeight + 1, look.bottomColor, ` rx="3" stroke="${STROKE}" stroke-width="1.3"`));
+    }
+    parts.push(`</g>`);
   }
-  // 身体。
-  parts.push(rect(bodyX, bodyY, bodyW, bodyHeight, look.topColor));
-  // 领口／钮扣。
-  parts.push(rect(Math.round(centerX - 2), bodyY, 4, Math.min(9, bodyHeight), "#f3e6c8"));
-  // 手臂。
-  parts.push(rect(bodyX - 5, bodyY + 3, 5, Math.round(bodyHeight * 0.72), look.topColor));
-  parts.push(rect(bodyX + bodyW, bodyY + 3, 5, Math.round(bodyHeight * 0.72), look.topColor));
-  parts.push(`<circle cx="${bodyX - 2}" cy="${bodyY + Math.round(bodyHeight * 0.78)}" r="3.4" fill="${SKIN}"/>`);
-  parts.push(`<circle cx="${bodyX + bodyW + 2}" cy="${bodyY + Math.round(bodyHeight * 0.78)}" r="3.4" fill="${SKIN}"/>`);
-  // 头。
-  parts.push(`<circle cx="${headX}" cy="${headCY}" r="${headRadius}" fill="${SKIN}"/>`);
-  // 发型：男性短发（弧形），女性长发（两侧长条 + 顶部）。
-  if (look.longHair) {
-    parts.push(rect(Math.round(headX - headRadius - 2), headCY - 4, 5, Math.round(headRadius * 1.9), look.hairColor));
-    parts.push(rect(Math.round(headX + headRadius - 3), headCY - 4, 5, Math.round(headRadius * 1.9), look.hairColor));
-    parts.push(`<path d="M${headX - headRadius} ${headCY} a${headRadius} ${headRadius} 0 0 1 ${headRadius * 2} 0 Z" fill="${look.hairColor}"/>`);
+  // 圓頭鞋。
+  for (const dx of [-bodyHalf + 1, 2]) {
+    parts.push(`<ellipse cx="${centerX + dx + Math.max(2, bodyHalf / 2)}" cy="${GROUND_Y - 1}" rx="5" ry="3" fill="${STROKE}"/>`);
+  }
+
+  // 身體：圓肩、圓下襬的手繪曲線（不是方塊）。
+  const left = centerX - bodyHalf;
+  const right = centerX + bodyHalf;
+  parts.push(`<path d="M${left + 2} ${bodyTop + 3} Q${left} ${bodyTop - 2} ${centerX - 4} ${bodyTop - 2} Q${centerX} ${bodyTop - 3} ${centerX + 4} ${bodyTop - 2} Q${right} ${bodyTop - 2} ${right - 2} ${bodyTop + 3} L${right + 1} ${bodyBottom - 3} Q${centerX} ${bodyBottom + 3} ${left - 1} ${bodyBottom - 3} Z" fill="${look.topColor}" stroke="${STROKE}" stroke-width="1.7" stroke-linejoin="round"/>`);
+  parts.push(`<path d="M${centerX - 3} ${bodyTop - 1} q3 7 6 0" fill="none" stroke="#f7e7cc" stroke-width="1.6" stroke-linecap="round"/>`);
+  // 圓潤手臂 + 圓手。
+  for (const side of [-1, 1]) {
+    const sx = centerX + side * (bodyHalf + 1);
+    parts.push(`<path d="M${sx} ${bodyTop + 5} q${side * 5} 7 ${side * 3} ${Math.max(9, bodyBottom - bodyTop - 9)}" fill="none" stroke="${look.topColor}" stroke-width="6" stroke-linecap="round"/>`);
+    parts.push(`<path d="M${sx} ${bodyTop + 5} q${side * 5} 7 ${side * 3} ${Math.max(9, bodyBottom - bodyTop - 9)}" fill="none" stroke="${STROKE}" stroke-width="1.2" stroke-linecap="round" opacity="0.5"/>`);
+    parts.push(`<circle cx="${sx + side * 3}" cy="${bodyTop + 5 + Math.max(9, bodyBottom - bodyTop - 9)}" r="3.6" fill="${SKIN}" stroke="${STROKE}" stroke-width="1.2"/>`);
+  }
+
+  // 頭：Humation 手繪部件（80×80 → headSize）。
+  const headTransform = `translate(${headLeft} ${headTop}) scale(${headScale.toFixed(4)})`;
+  parts.push(`<g data-part="humation/${look.headPart}" transform="${headTransform}">${humationPart(look.headPart, colors)}</g>`);
+  // 老化特徵只疊加，不換部件：腮紅／皺紋／眼鏡。
+  if (stage === "senior") {
+    parts.push(`<g data-part="original/face/wrinkles" transform="${headTransform}"><path d="M14 53 q4 -2 8 1 M58 53 q4 -3 8 0 M36 66 q4 2 8 0" fill="none" stroke="${STROKE}" stroke-width="1.4" stroke-linecap="round" opacity="0.45"/></g>`);
+    parts.push(`<g data-part="humation/glasses/round" transform="${headTransform}">${humationPart("glasses/round", colors)}</g>`);
   } else {
-    parts.push(`<path d="M${headX - headRadius} ${headCY + 1} a${headRadius} ${headRadius} 0 0 1 ${headRadius * 2} 0 Z" fill="${look.hairColor}"/>`);
-    parts.push(rect(Math.round(headX - headRadius), headCY - 1, 3, 3, look.hairColor));
-    parts.push(rect(Math.round(headX + headRadius - 3), headCY - 1, 3, 3, look.hairColor));
+    parts.push(`<g data-part="original/face/blush" transform="${headTransform}"><ellipse cx="20" cy="52" rx="6" ry="3.4" fill="${BLUSH}" opacity="0.32"/><ellipse cx="60" cy="52" rx="6" ry="3.4" fill="${BLUSH}" opacity="0.32"/></g>`);
   }
-  // 眼睛。
-  const eyeY = headCY + 2;
-  parts.push(`<circle cx="${Math.round(headX - headRadius * 0.36)}" cy="${eyeY}" r="1.5" fill="${EYE}"/>`);
-  parts.push(`<circle cx="${Math.round(headX + headRadius * 0.36)}" cy="${eyeY}" r="1.5" fill="${EYE}"/>`);
-  // 老年眼镜 + 手杖。
-  if (look.glasses) {
-    parts.push(`<circle cx="${Math.round(headX - headRadius * 0.36)}" cy="${eyeY}" r="3.6" fill="none" stroke="#6b6257" stroke-width="1"/>`);
-    parts.push(`<circle cx="${Math.round(headX + headRadius * 0.36)}" cy="${eyeY}" r="3.6" fill="none" stroke="#6b6257" stroke-width="1"/>`);
-  }
+  // 手杖（年齡特徵，不影響性別部件）。
   if (look.cane) {
-    parts.push(rect(Math.round(centerX + bodyW + 8), bodyY + 6, 2, GROUND_Y - bodyY - 6, "#7b5b3a"));
+    const caneX = centerX + bodyHalf + 12;
+    parts.push(`<g data-part="original/item/cane"><path d="M${caneX} ${bodyTop + 10} L${caneX} ${GROUND_Y - 2} M${caneX} ${bodyTop + 10} q0 -6 -6 -6" fill="none" stroke="#7b5b3a" stroke-width="2.4" stroke-linecap="round"/></g>`);
   }
-  return `<g data-layer="${role}" data-sex="${sex}" data-age-stage="${stage}" data-variant="${look.key}">${parts.join("")}</g>`;
+
+  return `<g data-layer="${role}" data-sex="${sex}" data-age-stage="${stage}" data-variant="${look.key}" data-parts="${look.partKeys.join(" ")}">${parts.join("")}</g>`;
 }
 
-/** 宠物：狗（垂耳 + 直尾）与猫（尖耳 + 卷尾）形状明显不同；none 不输出。 */
+/** 寵物：貓用 Humation 手繪部件；狗為原創圓潤手繪（Humation 沒有狗部件）。 */
 function petLayer(pet: Exclude<ScenePetKind, "none">): string {
-  const x = PET_CENTER_X - 14;
-  const bodyY = GROUND_Y - 18;
-  const fur = pet === "dog" ? "#a9713f" : "#d99a55";
-  const dark = pet === "dog" ? "#7d4f2a" : "#a9703a";
-  const parts: string[] = [];
-  parts.push(`<ellipse cx="${x + 14}" cy="${GROUND_Y + 1}" rx="16" ry="3" fill="rgba(44,38,26,0.2)"/>`);
-  // 四条腿。
-  for (const lx of [x + 3, x + 10, x + 18, x + 25]) parts.push(rect(lx, bodyY + 12, 4, 7, dark));
-  // 身体。
-  parts.push(rect(x + 1, bodyY, 27, 14, fur));
+  const size = 38;
+  const x = PET_CENTER_X - size / 2;
+  const y = GROUND_Y - size + 2;
+  const scale = size / 80;
+  const shadow = `<ellipse cx="${PET_CENTER_X}" cy="${GROUND_Y + 1}" rx="17" ry="3" fill="rgba(74,59,50,0.20)"/>`;
   if (pet === "cat") {
-    parts.push(rect(x + 7, bodyY + 3, 3, 8, dark));
-    parts.push(rect(x + 16, bodyY + 3, 3, 8, dark));
-    parts.push(`<path d="M${x + 28} ${bodyY + 10} q10 -2 7 -12" fill="none" stroke="${dark}" stroke-width="3" stroke-linecap="round"/>`);
-  } else {
-    parts.push(`<rect x="${x + 28}" y="${bodyY + 2}" width="10" height="3" fill="${dark}"/>`);
+    return `<g data-layer="pet" data-pet="cat" data-part="humation/cat/tabby">${shadow}` +
+      `<g data-part="humation/cat/tabby" transform="translate(${x} ${y}) scale(${scale.toFixed(4)})">` +
+      humationPart("cat/tabby", Object.freeze({
+        stroke: STROKE, hair: "#a9713f", skin: SKIN,
+        clothes: "#ffffff", bottom: STROKE, background: "none"
+      })) +
+      `</g><polygon points="${PET_CENTER_X + 12},${GROUND_Y - 9} ${PET_CENTER_X + 16},${GROUND_Y - 3} ${PET_CENTER_X + 8},${GROUND_Y - 3}" fill="#e2a94d" stroke="${STROKE}" stroke-width="0.8"/></g>`;
   }
-  // 头。
-  parts.push(`<circle cx="${x + 2}" cy="${bodyY + 5}" r="9" fill="${fur}"/>`);
-  if (pet === "cat") {
-    parts.push(`<polygon points="${x - 5},${bodyY - 2} ${x - 1},${bodyY - 11} ${x + 3},${bodyY - 3}" fill="${fur}"/>`);
-    parts.push(`<polygon points="${x + 4},${bodyY - 3} ${x + 8},${bodyY - 11} ${x + 10},${bodyY - 1}" fill="${fur}"/>`);
-  } else {
-    parts.push(`<ellipse cx="${x - 5}" cy="${bodyY + 6}" rx="3.5" ry="7" fill="${dark}"/>`);
+  // 狗：圓身、垂耳、翹尾、項圈，全部曲線與粗描邊，與 Humation 風格一致。
+  const cx = PET_CENTER_X;
+  const bodyY = GROUND_Y - 20;
+  const fur = "#b98249";
+  const dark = "#8a5a30";
+  const parts: string[] = [shadow];
+  parts.push(`<path d="M${cx + 18} ${bodyY + 4} q12 -3 9 -15" fill="none" stroke="${dark}" stroke-width="4" stroke-linecap="round"/>`);
+  for (const lx of [cx - 10, cx - 3, cx + 7, cx + 14]) {
+    parts.push(rect(lx, bodyY + 12, 5, 10, dark, ` rx="2.5" stroke="${STROKE}" stroke-width="1"`));
   }
-  parts.push(`<circle cx="${x - 1}" cy="${bodyY + 3}" r="1.4" fill="${EYE}"/>`);
-  parts.push(`<circle cx="${x + 4}" cy="${bodyY + 3}" r="1.4" fill="${EYE}"/>`);
-  return `<g data-layer="pet" data-pet="${pet}">${parts.join("")}</g>`;
+  parts.push(`<path d="M${cx - 15} ${bodyY + 2} q0 -8 10 -8 l14 0 q10 0 10 8 l0 10 q0 6 -10 6 l-14 0 q-10 0 -10 -6 Z" fill="${fur}" stroke="${STROKE}" stroke-width="1.7" stroke-linejoin="round"/>`);
+  parts.push(`<circle cx="${cx - 15}" cy="${bodyY + 1}" r="11" fill="${fur}" stroke="${STROKE}" stroke-width="1.7"/>`);
+  parts.push(`<ellipse cx="${cx - 24}" cy="${bodyY + 3}" rx="4.6" ry="9" fill="${dark}" stroke="${STROKE}" stroke-width="1.2"/>`);
+  parts.push(`<ellipse cx="${cx - 7}" cy="${bodyY + 3}" rx="4.2" ry="8" fill="${dark}" stroke="${STROKE}" stroke-width="1.2"/>`);
+  parts.push(`<circle cx="${cx - 19}" cy="${bodyY - 1}" r="1.6" fill="${STROKE}"/>`);
+  parts.push(`<circle cx="${cx - 11}" cy="${bodyY - 1}" r="1.6" fill="${STROKE}"/>`);
+  parts.push(`<ellipse cx="${cx - 15}" cy="${bodyY + 5}" rx="3" ry="2.2" fill="${STROKE}"/>`);
+  parts.push(`<polygon points="${cx + 2},${bodyY + 11} ${cx + 6},${bodyY + 17} ${cx - 2},${bodyY + 17}" fill="#e2a94d" stroke="${STROKE}" stroke-width="0.8"/>`);
+  return `<g data-layer="pet" data-pet="dog" data-part="original/pet/dog">${parts.join("")}</g>`;
 }
 
 /* ------------------------------------------------------------------ */
-/* 公开入口                                                            */
+/* 公開入口                                                            */
 /* ------------------------------------------------------------------ */
 
-/** 这一帧有哪些层、各自的稳定外观指纹（供测试／smoke 断言，不解析 SVG）。 */
-export function describeSceneLayers(scene: SceneView, seed = ""): readonly SceneLayerDescriptor[] {
-  const partnerSex = scene.partnerSex ?? oppositeSex(scene.playerSex);
-  const partnerStage: SceneAgeStage =
+function partnerIdentity(scene: SceneView): { sex: SceneSex; stage: SceneAgeStage } {
+  // 正常路徑：直接用 application 投影的伴侶性別，不重新推測。
+  const sex = scene.partnerSex ?? oppositeSex(scene.playerSex);
+  const stage: SceneAgeStage =
     scene.ageStage === "child" || scene.ageStage === "student" ? "young" : scene.ageStage;
+  return { sex, stage };
+}
+
+/** 每個角色實際用到的 SVG 部件 key（矩陣測試直接檢查這個，而不是只看 DOM 有圖）。 */
+export function describeSceneParts(scene: SceneView, seed = ""): readonly ScenePartDescriptor[] {
+  const descriptor = (role: "player" | "partner", sex: SceneSex, stage: SceneAgeStage): ScenePartDescriptor => {
+    const look = appearanceOf(sex, stage, seed, role);
+    return Object.freeze({
+      role,
+      sex,
+      ageStage: stage,
+      head: `humation/${look.headPart}`,
+      glasses: look.glasses ? "humation/glasses/round" : null,
+      body: `original/body/${look.skirt ? "dress" : "trousers"}`,
+      parts: look.partKeys
+    });
+  };
+  const list = [descriptor("player", scene.playerSex, scene.ageStage)];
+  if (scene.hasPartner) {
+    const partner = partnerIdentity(scene);
+    list.push(descriptor("partner", partner.sex, partner.stage));
+  }
+  return Object.freeze(list);
+}
+
+/** 這一幀有哪些層、各自的穩定外觀指紋（供測試／smoke 斷言，不解析 SVG）。 */
+export function describeSceneLayers(scene: SceneView, seed = ""): readonly SceneLayerDescriptor[] {
+  const player = appearanceOf(scene.playerSex, scene.ageStage, seed, "player");
+  const partner = partnerIdentity(scene);
   return Object.freeze([
     Object.freeze({ layer: "background" as const, visible: true, key: `${scene.residenceKind}/${scene.phase}` }),
     Object.freeze({
       layer: "player" as const,
       visible: true,
-      key: appearanceOf(scene.playerSex, scene.ageStage, seed, "player").key
+      key: `${player.headPart}/${player.hairColor}/${player.key}`
     }),
     Object.freeze({
       layer: "partner" as const,
       visible: scene.hasPartner,
-      key: scene.hasPartner ? appearanceOf(partnerSex, partnerStage, seed, "partner").key : "none"
+      key: scene.hasPartner
+        ? `${headPartOf(partner.sex)}/${appearanceOf(partner.sex, partner.stage, seed, "partner").key}`
+        : "none"
     }),
     Object.freeze({
       layer: "pet" as const,
       visible: scene.petKind !== "none",
-      key: scene.petKind
+      key: scene.petKind === "cat" ? "humation/cat/tabby" : scene.petKind
     })
   ]);
 }
 
-/** 产生完整分层 SVG（原创向量图，无任何外部资源、无 emoji、无文字）。 */
+/** 產生完整分層 SVG（單張本機圖片，無外部資源、無 emoji、無文字）。 */
 export function buildSceneSvg(scene: SceneView, seed = ""): string {
   const layers: string[] = [backgroundLayer(scene)];
-  layers.push(personLayer(scene, seed, "player", scene.playerSex, scene.ageStage, PLAYER_CENTER_X));
+  layers.push(personLayer(seed, "player", scene.playerSex, scene.ageStage, PLAYER_CENTER_X));
   if (scene.hasPartner) {
-    const partnerSex = scene.partnerSex ?? oppositeSex(scene.playerSex);
-    const partnerStage: SceneAgeStage =
-      scene.ageStage === "child" || scene.ageStage === "student" ? "young" : scene.ageStage;
-    layers.push(personLayer(scene, seed, "partner", partnerSex, partnerStage, PARTNER_CENTER_X));
+    const partner = partnerIdentity(scene);
+    layers.push(personLayer(seed, "partner", partner.sex, partner.stage, PARTNER_CENTER_X));
   }
   if (scene.petKind !== "none") layers.push(petLayer(scene.petKind));
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${SCENE_VIEWBOX_WIDTH} ${SCENE_VIEWBOX_HEIGHT}" ` +
@@ -434,7 +523,7 @@ export function buildSceneSvg(scene: SceneView, seed = ""): string {
     `<title>Layered life scene</title>${layers.join("")}</svg>`;
 }
 
-/** CSS `background-image` 用的 data URI（本地生成，无 CDN、无第三方档案）。 */
+/** CSS `background-image` 用的 data URI（本地生成，無 CDN、無第三方檔案）。 */
 export function sceneSvgDataUri(scene: SceneView, seed = ""): string {
   // encodeURIComponent 不會逃逸 ( ) ' ，但 SVG 裡的 rgba(...) 含括號；
   // 補齊這三個字元才能放進 CSS url("...")，也讓 url() 擷取正則不截斷。
@@ -445,7 +534,7 @@ export function sceneSvgDataUri(scene: SceneView, seed = ""): string {
   return `data:image/svg+xml,${encoded}`;
 }
 
-/** 稳定签名：同 seed／同状态相同；用于 smoke 验证 reload 后外观不变。 */
+/** 穩定簽名：同 seed／同狀態相同；用於 smoke 驗證 reload 後外觀不變。 */
 export function sceneSignature(scene: SceneView, seed = ""): string {
   return hash32(buildSceneSvg(scene, seed)).toString(16).padStart(8, "0");
 }
