@@ -1162,10 +1162,45 @@ const CHOICE_EVENTS_BASE: readonly ChoiceSpec[] = [
     stages: ["adulthood"],
     weight: 50,
     cooldownYears: 6,
+    /*
+     * GPT-DEEPSEEK-0073-B：長輩照顧是**一次性的持久事實**。
+     * 只要做過安排（接來同住／請看護／手足輪流），這個決定就不再出現；
+     * 不是靠 cooldown 讓同一件事被問第二次。
+     */
+    once: true,
+    conditions: {
+      op: "not",
+      condition: {
+        op: "any",
+        conditions: [
+          { op: "flag", flag: "care:parents-live", present: true },
+          { op: "flag", flag: "care:parents-arranged", present: true }
+        ]
+      }
+    },
     options: [
-      opt("live", "接來一起住", [stat("relationships", 5), stat("health", -3), stat("happiness", -1), money("annualExpenseMicroUsd", "6000000000")]),
-      opt("nurse", "請看護協助", [money("balanceMicroUsd", "-15000000000"), stat("relationships", 2), stat("health", 1)]),
-      opt("share", "兄弟姊妹輪流照顧", [stat("relationships", 3), money("balanceMicroUsd", "-4000000000"), stat("happiness", 1)])
+      opt("live", "接來一起住（之後由你照顧）", [
+        stat("relationships", 5),
+        stat("health", -3),
+        stat("happiness", -1),
+        money("annualExpenseMicroUsd", "6000000000"),
+        flag("care:parents-live", "add"),
+        flag("care:parents-arranged", "remove")
+      ]),
+      opt("nurse", "請看護到府協助", [
+        money("balanceMicroUsd", "-15000000000"),
+        stat("relationships", 2),
+        stat("health", 1),
+        flag("care:parents-arranged", "add"),
+        flag("care:parents-live", "remove")
+      ]),
+      opt("share", "由兄弟姊妹輪流照顧", [
+        stat("relationships", 3),
+        money("balanceMicroUsd", "-4000000000"),
+        stat("happiness", 1),
+        flag("care:parents-arranged", "add"),
+        flag("care:parents-live", "remove")
+      ])
     ]
   },
   {
@@ -1264,10 +1299,40 @@ const CHOICE_EVENTS_BASE: readonly ChoiceSpec[] = [
     stages: ["adulthood"],
     weight: 50,
     cooldownYears: 6,
+    // GPT-DEEPSEEK-0073-B：與 40–50 歲那一次共用同一組持久旗標，安排完成就不再問。
+    once: true,
+    conditions: {
+      op: "not",
+      condition: {
+        op: "any",
+        conditions: [
+          { op: "flag", flag: "care:parents-live", present: true },
+          { op: "flag", flag: "care:parents-arranged", present: true }
+        ]
+      }
+    },
     options: [
-      opt("self", "親自照顧", [stat("relationships", 5), stat("health", -4), stat("happiness", -1)]),
-      opt("hire", "請外籍看護", [money("balanceMicroUsd", "-20000000000"), stat("relationships", 3), stat("health", 1)]),
-      opt("facility", "送到安養機構", [money("balanceMicroUsd", "-15000000000"), stat("relationships", 1), stat("happiness", -2)])
+      opt("self", "繼續由你親自照顧", [
+        stat("relationships", 5),
+        stat("health", -4),
+        stat("happiness", -1),
+        flag("care:parents-live", "add"),
+        flag("care:parents-arranged", "remove")
+      ]),
+      opt("hire", "請外籍看護分擔", [
+        money("balanceMicroUsd", "-20000000000"),
+        stat("relationships", 3),
+        stat("health", 1),
+        flag("care:parents-arranged", "add"),
+        flag("care:parents-live", "remove")
+      ]),
+      opt("facility", "安排住進安養機構", [
+        money("balanceMicroUsd", "-15000000000"),
+        stat("relationships", 1),
+        stat("happiness", -2),
+        flag("care:parents-arranged", "add"),
+        flag("care:parents-live", "remove")
+      ])
     ]
   },
   {
@@ -1346,10 +1411,46 @@ const CHOICE_EVENTS_BASE: readonly ChoiceSpec[] = [
     stages: ["later_life"],
     weight: 55,
     cooldownYears: 12,
+    /*
+     * GPT-DEEPSEEK-0073-B：退休只決定一次。三種結果都寫持久旗標，
+     * 之後不會再被問第二次（不是 cooldown 到期就重問）。
+     */
+    once: true,
+    conditions: {
+      op: "not",
+      condition: {
+        op: "any",
+        conditions: [
+          { op: "flag", flag: "retired", present: true },
+          { op: "flag", flag: "working:senior", present: true },
+          { op: "flag", flag: "retire:part", present: true }
+        ]
+      }
+    },
     options: [
-      opt("full", "完全退休", [stat("health", 4), stat("happiness", 3), money("balanceMicroUsd", "-9000000000"), flag("retired", "add")]),
-      opt("keep", "繼續工作", [money("annualIncomeMicroUsd", "8000000000"), stat("health", -4), flag("working:senior", "add")]),
-      opt("part", "轉成兼職", [money("annualIncomeMicroUsd", "3000000000"), stat("happiness", 2), stat("health", 1)])
+      opt("full", "完全退休", [
+        stat("health", 4),
+        stat("happiness", 3),
+        money("balanceMicroUsd", "-9000000000"),
+        flag("retired", "add"),
+        flag("working:senior", "remove"),
+        flag("retire:part", "remove")
+      ]),
+      opt("keep", "繼續工作", [
+        money("annualIncomeMicroUsd", "8000000000"),
+        stat("health", -4),
+        flag("working:senior", "add"),
+        flag("retired", "remove"),
+        flag("retire:part", "remove")
+      ]),
+      opt("part", "轉成兼職", [
+        money("annualIncomeMicroUsd", "3000000000"),
+        stat("happiness", 2),
+        stat("health", 1),
+        flag("retire:part", "add"),
+        flag("retired", "remove"),
+        flag("working:senior", "remove")
+      ])
     ]
   },
   {
@@ -1362,10 +1463,48 @@ const CHOICE_EVENTS_BASE: readonly ChoiceSpec[] = [
     stages: ["later_life"],
     weight: 50,
     cooldownYears: 8,
+    /*
+     * GPT-DEEPSEEK-0073-B：老後住所是**互斥的持久狀態**。
+     * - 三個狀態（機構／與子女同住／獨居）最多只會存在一個；
+     * - 一旦選定（任何一個），這個決定永不再出現；
+     * - 每個選項都先移除另外兩個狀態，再加入自己。
+     */
+    once: true,
+    conditions: {
+      op: "not",
+      condition: {
+        op: "any",
+        conditions: [
+          { op: "flag", flag: "senior:care", present: true },
+          { op: "flag", flag: "senior:family", present: true },
+          { op: "flag", flag: "senior:alone", present: true }
+        ]
+      }
+    },
     options: [
-      opt("care", "住進養護機構", [stat("health", 3), stat("relationships", 2), money("balanceMicroUsd", "-20000000000"), flag("senior:care", "add")]),
-      opt("family", "與子女同住", [stat("relationships", 4), stat("happiness", 2), flag("senior:family", "add")]),
-      opt("alone", "維持獨居", [stat("happiness", -2), stat("health", -2), money("balanceMicroUsd", "5000000000")])
+      opt("care", "住進養護機構（已安排入住）", [
+        stat("health", 3),
+        stat("relationships", 2),
+        money("balanceMicroUsd", "-20000000000"),
+        flag("senior:care", "add"),
+        flag("senior:family", "remove"),
+        flag("senior:alone", "remove")
+      ]),
+      opt("family", "搬去與子女同住", [
+        stat("relationships", 4),
+        stat("happiness", 2),
+        flag("senior:family", "add"),
+        flag("senior:care", "remove"),
+        flag("senior:alone", "remove")
+      ]),
+      opt("alone", "留在原本的住處獨居", [
+        stat("happiness", -2),
+        stat("health", -2),
+        money("balanceMicroUsd", "5000000000"),
+        flag("senior:alone", "add"),
+        flag("senior:care", "remove"),
+        flag("senior:family", "remove")
+      ])
     ]
   },
   {

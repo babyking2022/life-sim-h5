@@ -11,7 +11,7 @@
       "manifestFile": "manifest.v1.json",
       "eventsFile": "events.v1.json",
       "eventPackId": "p3b-synthetic-events-v1",
-      "eventPackChecksum": "f4b0eb579bde226c5b58f0f50cd4f267c29d0fdbc4372892d4d12294a4891e93",
+      "eventPackChecksum": "d3252ce65c01823b45f3e65924c069741b6e5c4b4fd5283e02f06e6e4d04092a",
       "contentPackVersion": "1.1.0",
       "years": 20,
       "optionPolicy": "canonical-first",
@@ -27,8 +27,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "2ff1f418e1a8990928bdedb39e93db8d48974ef546403c0d898ea8a104d94de9",
-          "hashChain": "ecda3cceb24e87498fc2576be67696f8e5c412279fee3f5663db95126af96591",
+          "stateHash": "64a848c1b1baf98a593e8de83b0305f5cdcd73f1ad01db4ea8b80829b0f1841d",
+          "hashChain": "cc9f5993f8568aa268f40e81f94f0a662dd1b72aab3995dc4641c846dcb69c38",
           "commandCount": 22,
           "entries": 20,
           "snapshots": 20,
@@ -70,7 +70,7 @@
           ],
           "lastEntryHash": "e318c47434ee55330c9b404483cfbd20f0d77c83568d28dcb5b74bb5d8ce342c",
           "lastSnapshotHash": "02021300b527b8a0e7d177c98939c401095b9a9034fba9749e14655e7ba1dfc3",
-          "lastDeltaHash": "cb4ab67859c76223c0ac6925fb990492701c458e11d5b1ea56bf85c7a3a19c1a",
+          "lastDeltaHash": "77a48b911329897d3740106fbbbecd83cea5fd6285cf55793068639006936f4d",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -96,7 +96,7 @@
             "ev.any.quiet-year",
             "ev.adult.after-school"
           ],
-          "selectionTrailDigest": "291daf3168de3953ccf9de5f7c08c632ac03fe45fef00e4a9fd48184cedbfab1"
+          "selectionTrailDigest": "6da4543336af0e77ec11a841f2e8aaa05addddadb551fddd72fadf0d517a27a3"
         },
         {
           "id": "p3b-main-002-female",
@@ -109,8 +109,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "308cb98a04b5231c87f753a0b8236693b244e244ef1d1b7660d8fa8e1f220379",
-          "hashChain": "d1d64bb3a52ad160b3fba718e6175374506b7aba8d5d3cdb6e4d0aa6ae6d88eb",
+          "stateHash": "ada00a0763db20f488b467acbd8a5ecf506ac4957b047bd6e38b98bbb602ae19",
+          "hashChain": "3a7230b1bb130f41967d9c171f77133f0ed747d77146a77fbcb748e984fe5f49",
           "commandCount": 22,
           "entries": 20,
           "snapshots": 20,
@@ -152,7 +152,7 @@
           ],
           "lastEntryHash": "e318c47434ee55330c9b404483cfbd20f0d77c83568d28dcb5b74bb5d8ce342c",
           "lastSnapshotHash": "02021300b527b8a0e7d177c98939c401095b9a9034fba9749e14655e7ba1dfc3",
-          "lastDeltaHash": "25e5ddec8d650475f66e20c27d719add9ff1bd6f295b2cb20bb58d32eb752c63",
+          "lastDeltaHash": "5585bdbdd457a3d53b2672dac081bceac9fc849ce45f79058d979f5f770f7298",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -178,7 +178,7 @@
             "ev.any.quiet-year",
             "ev.adult.after-school"
           ],
-          "selectionTrailDigest": "0e3987206230070d7370dc969a05ef1337646df18ca5bc317fe00421b3193f83"
+          "selectionTrailDigest": "95f16481f65e6bd3c0f72c5673ee0253f9d3c59a771bfc98beda74150abe2895"
         },
         {
           "id": "p3b-main-003-male",
@@ -191,8 +191,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "c53ed76908ac6ecf4640289df32621af1fcf41049589fb549598e4965ba28c99",
-          "hashChain": "db98d1d69f912946e5496a3ea331c3c838d33ffb399ec1317a06d884165eebed",
+          "stateHash": "590e01845aabc2f8babaf171e63802639b186a91d813a19e883d9737a03494b8",
+          "hashChain": "4f05045cfc4b2f2b46f51eb5bfa1eaf6016f8927ab30bc3b4cd932ae1070d0ea",
           "commandCount": 22,
           "entries": 20,
           "snapshots": 20,
@@ -234,7 +234,7 @@
           ],
           "lastEntryHash": "e318c47434ee55330c9b404483cfbd20f0d77c83568d28dcb5b74bb5d8ce342c",
           "lastSnapshotHash": "02021300b527b8a0e7d177c98939c401095b9a9034fba9749e14655e7ba1dfc3",
-          "lastDeltaHash": "0a73fa11377009274e62167337105b0128258e128ed65fb17af008702dec496a",
+          "lastDeltaHash": "7af226d233b964b48b4e23b4e73b2f2edf05375ca6e0c4a298fd7e9908dd7ea3",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -260,7 +260,7 @@
             "ev.any.quiet-year",
             "ev.adult.after-school"
           ],
-          "selectionTrailDigest": "6e4f1e537c85eb0da5a951ae6f00fee9f42da29bed04b4e2629437b3b4723e16"
+          "selectionTrailDigest": "7a8d29014703c4bf6aee0869b63e2ba91556c60b1ecac7f645e6c4bc369f4a91"
         },
         {
           "id": "p3b-main-004-random",
@@ -273,8 +273,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "ba22424140ce7325ce9ec39f436ff18ecd8cc37f057b7cccb9710f16885a96ab",
-          "hashChain": "f3722875148384635bfe76fc5ae80e4b3a2b14f482f73d09295520394480a4c2",
+          "stateHash": "a33b9c55ed64cd1063a1187503e2b6ebe8e5483485dee030222b26120a560d69",
+          "hashChain": "7c3c5bb0f2e533d2fcd643145104a0ed87ecd52d7d5f57f6fa51c3b2a666bc45",
           "commandCount": 18,
           "entries": 20,
           "snapshots": 20,
@@ -315,7 +315,7 @@
           ],
           "lastEntryHash": "bf8a16de519e4098ce9e9a7064e6c2736c079c1ae200ad9b90e5907985165e5b",
           "lastSnapshotHash": "bca18bf95870e6d9bb154abc8d358e03e7b03f80e165c15720debab9e1cb30f2",
-          "lastDeltaHash": "5829a86bed652c949435b1bcaf14f2799b4ec7f8ce0e07d4af8946dff213e2d2",
+          "lastDeltaHash": "638fd4280082d052b57d24a657e6680f864f17ccd4b363b20d1e35080c06aa36",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -341,7 +341,7 @@
             "ev.any.small-win",
             "ev.adult.first-job"
           ],
-          "selectionTrailDigest": "5a6251f97a155ebde2d45d3083b2a93e2b8de0d8fa9da748531f4403a9fc7023"
+          "selectionTrailDigest": "9ea7e6ceefd425aa98efcf5c93c4cde25021220430d98e6b463280a0dc8edf6b"
         },
         {
           "id": "p3b-main-005-female",
@@ -354,8 +354,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "8b0463321343f34a79232144330f1e89bc9a58ddc3aca62e884e9da2d03bd092",
-          "hashChain": "aa5c3111bc7e49c221fed6995ab4db52b28567ad9b41b24a1252cde842ff3f83",
+          "stateHash": "2b13861f15f5c6cd0e21019990aa5f6bdfb410467ab600a0ea4bc627fd65d84b",
+          "hashChain": "ea4239d9a7bbff6707d60f5dbff3ac2c116316f9be43f6ca77ab36ab97729565",
           "commandCount": 18,
           "entries": 20,
           "snapshots": 20,
@@ -396,7 +396,7 @@
           ],
           "lastEntryHash": "bf8a16de519e4098ce9e9a7064e6c2736c079c1ae200ad9b90e5907985165e5b",
           "lastSnapshotHash": "bca18bf95870e6d9bb154abc8d358e03e7b03f80e165c15720debab9e1cb30f2",
-          "lastDeltaHash": "5d03c79ed935f54c15a47712551168618db7b1d06b092de252395da6d226a157",
+          "lastDeltaHash": "012696965da09771acc398cfc0e8c59ae36338f60397c3e6d64d7b03d37e11d7",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -422,7 +422,7 @@
             "ev.any.small-win",
             "ev.adult.first-job"
           ],
-          "selectionTrailDigest": "bc23170ba7bf00b477fba43e2fc08c857f4e5ee792e5e6beba0acd88016e98fc"
+          "selectionTrailDigest": "545dbb6f0d66043245b44d29646228d6e0558e7dc85741d528dca96d0ad6e9c6"
         },
         {
           "id": "p3b-main-006-male",
@@ -435,8 +435,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "12606e8dccd2994722481dfb99a7e49f4abd1bebbffe9ee818e7a4781f81a2e7",
-          "hashChain": "3ba389c7a5d8df5360693c10129b3e60820b8cd32ffb8719944917cbe17c90ab",
+          "stateHash": "0acc61bcebeff1574c032bb630a1134995438defc3a8c368746920f97ad86ecb",
+          "hashChain": "ef9c5f89cb387ee619b0d5b00405b9bf08aec36492d715518dc63afa9b8f1786",
           "commandCount": 18,
           "entries": 20,
           "snapshots": 20,
@@ -477,7 +477,7 @@
           ],
           "lastEntryHash": "bf8a16de519e4098ce9e9a7064e6c2736c079c1ae200ad9b90e5907985165e5b",
           "lastSnapshotHash": "bca18bf95870e6d9bb154abc8d358e03e7b03f80e165c15720debab9e1cb30f2",
-          "lastDeltaHash": "85eeced60260e7ed3c9bb153cb68772d825b483344b5183de9c5b6175511f0e3",
+          "lastDeltaHash": "f1d0f24de22d66bc7787ebb703446e7d6c5d79b3795b6652081e2754ca560a4f",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -503,7 +503,7 @@
             "ev.any.small-win",
             "ev.adult.first-job"
           ],
-          "selectionTrailDigest": "69d5a942e137445a6b4b7e5cab4b97eb15b2499a3060595709a94754f5ef68c2"
+          "selectionTrailDigest": "6756fdc85879c6d7a1714bd22d8d9f84675f78946d5ffd8316ca634418bf7efb"
         },
         {
           "id": "p3b-main-007-random",
@@ -516,8 +516,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "a94565617e3dd7f678eeb78ee84b0cf57a91c4dc8e77b63ba862b917fd57a3a1",
-          "hashChain": "3bed309ab2962dac72524cdb5a317742b365e7e41c6ee6e9f4c823c3d2221453",
+          "stateHash": "b51f8dd40c35f616eb80851c018358c187f5e681ec1a2a972e7661350a2c02d1",
+          "hashChain": "6377af4ca03df70d26c3e214b7693d6e197c67948455c77a2ddc6dd41f01a900",
           "commandCount": 22,
           "entries": 20,
           "snapshots": 20,
@@ -557,7 +557,7 @@
           ],
           "lastEntryHash": "d54006b6d44705cc7b4e9a0a4cc42c7503bac73ecac9bdb4d3e20f9062a8dfe3",
           "lastSnapshotHash": "73f82a12180c643646f69f42d09da7709c507f8c6be03859cbd461b3acb5c0c5",
-          "lastDeltaHash": "b414a089ccb7d87b598dd197d62e1cff68014a25b5af43b5c1a5aed03d7b793f",
+          "lastDeltaHash": "592c94e20f95203ca8d0279e67840a7a6bb85c78d90e76eb01562193b594912b",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -583,7 +583,7 @@
             "ev.adult.after-school",
             "ev.any.small-win"
           ],
-          "selectionTrailDigest": "b1936b554e4807fae2ac916e50418ffc43cdade3f8e96f0289c387db13dc5a11"
+          "selectionTrailDigest": "e1f843742645b567786bfb125de547d6d76685708734f720120937397e6b4588"
         },
         {
           "id": "p3b-main-008-female",
@@ -596,8 +596,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "20281ef81bea788441d5edd906aac5b5b1d3d0ffbe758e93a6391d582a166d25",
-          "hashChain": "621e09376024765014fabd181f386b992f1d84bda35e7fa437d4c4ffa1e22952",
+          "stateHash": "b284e20fc1c06c076ee4251156230aca8891b776de2507625fde96ef836db698",
+          "hashChain": "3d332c027ab4aef78257202230a795d68bd03ac97a81ff0a01e0ae1581a0ff46",
           "commandCount": 22,
           "entries": 20,
           "snapshots": 20,
@@ -637,7 +637,7 @@
           ],
           "lastEntryHash": "d54006b6d44705cc7b4e9a0a4cc42c7503bac73ecac9bdb4d3e20f9062a8dfe3",
           "lastSnapshotHash": "73f82a12180c643646f69f42d09da7709c507f8c6be03859cbd461b3acb5c0c5",
-          "lastDeltaHash": "f959f5f3b621094958877010385d9c575d50360aeeff7d65aff820353d3ba673",
+          "lastDeltaHash": "85205496daef2912302026445cecb50dc78ee9972b6079135c036e80f1884f92",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -663,7 +663,7 @@
             "ev.adult.after-school",
             "ev.any.small-win"
           ],
-          "selectionTrailDigest": "ae1dd3034f792a47a6929a68e7fa23f2fe639ea4d01a4bf4ee172a7d333b23e6"
+          "selectionTrailDigest": "4186a57313efa12ed505b9a357fd00852a458b38ae78b766b7542f1db0ced1da"
         },
         {
           "id": "p3b-main-009-male",
@@ -676,8 +676,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "155249309e67b99927da5cfc21cdf0a819ebe010fa7c9e1fd1c4897e8b813592",
-          "hashChain": "ed89543bee64f5bb4bcf8c4a3b3bbb4b93ddd7714f5c0bf1fc8dfa701b0bc84b",
+          "stateHash": "d4f78f7ba9a227dec5acaa04318d06a3fc7b2d060d958c65a5d7f2f03525c059",
+          "hashChain": "cd42e1e5d0e6fa935e72eefe37280b3cd706a1f513ba223c0a81a972ac753296",
           "commandCount": 22,
           "entries": 20,
           "snapshots": 20,
@@ -717,7 +717,7 @@
           ],
           "lastEntryHash": "d54006b6d44705cc7b4e9a0a4cc42c7503bac73ecac9bdb4d3e20f9062a8dfe3",
           "lastSnapshotHash": "73f82a12180c643646f69f42d09da7709c507f8c6be03859cbd461b3acb5c0c5",
-          "lastDeltaHash": "d89a468fb2b808e43a0ee1c8f799b09d5bec77a92c5d9c8e33199b396fb42493",
+          "lastDeltaHash": "6088018be77ffd9f7e724dbc3bb9cdc746438cf433a7e71b56a04342b94c0848",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -743,7 +743,7 @@
             "ev.adult.after-school",
             "ev.any.small-win"
           ],
-          "selectionTrailDigest": "ecac877ada98c4571e504049d5ca7ae9fe5769679548e10d11a5d6324e1f7d27"
+          "selectionTrailDigest": "58bac54cec040d593a012850882b55b7d6f262e8f7b2611442166ae89a841dd0"
         },
         {
           "id": "p3b-main-010-random",
@@ -756,8 +756,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "03d2af76f2e11e775aca169383143c3166ce7119f3532133d8f690175e641e1a",
-          "hashChain": "75c168443b7c16ce2a5a24d45aa2642c9634585163914c557bb6c94563a9133f",
+          "stateHash": "325bc3afbedbf7d5e80fa93ed1e6d675bc72a5ab92d7213b92ade9393717d4a1",
+          "hashChain": "75a61bdf19961908637bfdb3f378b2607dd5b3e13ee1db08b3c47b34c414bee3",
           "commandCount": 20,
           "entries": 20,
           "snapshots": 20,
@@ -796,7 +796,7 @@
           ],
           "lastEntryHash": "fd582d5c8e767d7a79f328ad1d51a164bb86dc121cc0d32bb48d57c61dbcb80a",
           "lastSnapshotHash": "430bb259e1dbb4f53c0c137c0cee1694e23d28a80730ee36a3b9f5564ff9612b",
-          "lastDeltaHash": "7b76696c0d4f7bd75d6bf5bc07ef60ae5175373786094655b93f612ae1c91ff4",
+          "lastDeltaHash": "c02c9475adb5a26ccaf3cd95e54809b725f49820fc4f73c1e48ac555269bcc28",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -822,7 +822,7 @@
             "ev.adult.after-school",
             "ev.any.small-win"
           ],
-          "selectionTrailDigest": "219cfecf2249718c4681b3a750c517ff49e35909761c248c865af41e73aaf97f"
+          "selectionTrailDigest": "9b8d12be935ff05f9388d814dc2de0fd0881d575acdd5164de70699794d49048"
         },
         {
           "id": "p3b-main-011-female",
@@ -835,8 +835,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "164cbec4aca0299bac959d6d1eda14ebc66b18a6a4d5c52e0033d61144328abd",
-          "hashChain": "79e6b533146e034dffe43fec85bc9ed53a36c73a79c1a8378a0765f7b41220b0",
+          "stateHash": "250f0f07f752ed74be055c07843565db07ac4e854ff5ef6f07cba76e8ca3f391",
+          "hashChain": "eed0aa9eb47d92324fd65d36f4be4b62a70b51141663c3226ec2b3f39cfe85d1",
           "commandCount": 20,
           "entries": 20,
           "snapshots": 20,
@@ -875,7 +875,7 @@
           ],
           "lastEntryHash": "fd582d5c8e767d7a79f328ad1d51a164bb86dc121cc0d32bb48d57c61dbcb80a",
           "lastSnapshotHash": "430bb259e1dbb4f53c0c137c0cee1694e23d28a80730ee36a3b9f5564ff9612b",
-          "lastDeltaHash": "3900fb8b9fbdad4b2f90d26d3a756261c5768fdea06e7ba21b6db5af057ef198",
+          "lastDeltaHash": "e2a99aed1f3e426bfbb572110dad4073dadc1dfe5b82906c74b34a3499f6ccbd",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -901,7 +901,7 @@
             "ev.adult.after-school",
             "ev.any.small-win"
           ],
-          "selectionTrailDigest": "ab9a3b87cab342a4841780fe853eee0fbce40f91f9e42dc75fe2d55ade954aa9"
+          "selectionTrailDigest": "348eb18de3083d6e19606e629c5b0a8eed841dbf29c0fe69507a93059e69c1ec"
         },
         {
           "id": "p3b-main-012-male",
@@ -914,8 +914,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "376a024408db9126fe1056a4bc4bfcffd167eca99a1fc3022cf777c6108d710c",
-          "hashChain": "fb50d272a0fb26fbfc510735db325b52c98a538e8fd458ae0785b47373ed94bd",
+          "stateHash": "f8e39a4028ac8ee5d2af0e24ef46ecd66c3d0f92187eebec5c3c66bee79ff755",
+          "hashChain": "bf81de4f35844984f93af717ffe8ee3c9237f50b853e411b989ed4719d81a0a1",
           "commandCount": 20,
           "entries": 20,
           "snapshots": 20,
@@ -954,7 +954,7 @@
           ],
           "lastEntryHash": "fd582d5c8e767d7a79f328ad1d51a164bb86dc121cc0d32bb48d57c61dbcb80a",
           "lastSnapshotHash": "430bb259e1dbb4f53c0c137c0cee1694e23d28a80730ee36a3b9f5564ff9612b",
-          "lastDeltaHash": "f73f5fc0d5d81c48ec3ef77486a95721c5ea28a9ae2dcea3fd1ee5dac844bf9c",
+          "lastDeltaHash": "920c6252ee82fa90561b2a0fb5e251130360f9d23f323cca0bc1e30491055f35",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -980,7 +980,7 @@
             "ev.adult.after-school",
             "ev.any.small-win"
           ],
-          "selectionTrailDigest": "1cf99cc24b9b30114a5ac1d6c266a8da7e111caa838ecac541c7d627338c69e4"
+          "selectionTrailDigest": "38bd184120e5b18e6d8c156e4c7b1fd176ab388295db65f08d220637701ac0e9"
         },
         {
           "id": "p3b-main-013-random",
@@ -993,8 +993,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "811bf8e3f51288a7299b1a0cd36df45624c23c9f4f5f2fb04b9ed6dd4646b7fd",
-          "hashChain": "c55d50750e4cf751085fbeb00ac4c6a9bc12b2c8ff00c6984cb6c04cc0f2dc89",
+          "stateHash": "e2afcfb19abfbb622f5f2a5b6942a2dc39bb41e082b4d16ca46064b7a90a5ce3",
+          "hashChain": "e0225d6bd29f6ae26b80a95d8e6b53146461f53a680665c760c6583bbeee22f5",
           "commandCount": 22,
           "entries": 20,
           "snapshots": 20,
@@ -1034,7 +1034,7 @@
           ],
           "lastEntryHash": "45f9204cc4b0740f2efc77968edfeb2ad45588accf6b55e250501aafe2c014ed",
           "lastSnapshotHash": "0b0a0f16f76ef69d6b5e63f2abc8ac6f7668bc70f4dc0829e51fc86ceb8aa0b9",
-          "lastDeltaHash": "c9f10bd2d18ac89d50d87323b69b88d1b5298bd8a7c4b04ebdeb176d6027dd4f",
+          "lastDeltaHash": "467ab8200d84765bc80ee2e5a3910f208ef32371e5949b51c481db7e527e9648",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -1060,7 +1060,7 @@
             "ev.any.setback",
             "ev.adult.after-school"
           ],
-          "selectionTrailDigest": "4b049711628b1b7210e4af34dbf9a694adb1a1e4d21ef97b33188ab82a4aa926"
+          "selectionTrailDigest": "33105c63dc3aa6ee55072f76209332c6addecf4f88c624c555fc94305350548d"
         },
         {
           "id": "p3b-main-014-female",
@@ -1073,8 +1073,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "7aee3fed08a0695a017c19a4c3f43c7812335f1acccf879861782f9d23785151",
-          "hashChain": "84a1638c91f138855e0951cabe01f847dd643e4f9a2895fa57e43845d226e0ad",
+          "stateHash": "7f1e6bf3a2da413f9ce7efd8ebbdaa048f439d3312722e599fc9b707e67eff1d",
+          "hashChain": "81bfe5899ae0c0bf9f4bbf89a51f0b96b521e33ebcb8e75841687af9e6cb7637",
           "commandCount": 22,
           "entries": 20,
           "snapshots": 20,
@@ -1114,7 +1114,7 @@
           ],
           "lastEntryHash": "45f9204cc4b0740f2efc77968edfeb2ad45588accf6b55e250501aafe2c014ed",
           "lastSnapshotHash": "0b0a0f16f76ef69d6b5e63f2abc8ac6f7668bc70f4dc0829e51fc86ceb8aa0b9",
-          "lastDeltaHash": "527b831f9098612985de8eb898fd82c80300caf54fbbce8ec61a383518b3b401",
+          "lastDeltaHash": "cc07d83fcfbd2fe1e1d533fda67b6332679cb03cfc8e0b67cbaf34dff7c5df14",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -1140,7 +1140,7 @@
             "ev.any.setback",
             "ev.adult.after-school"
           ],
-          "selectionTrailDigest": "9323370b4c6ff770bdf5584b0dfec060efaee7381d62e8dc8f14e6730c174d80"
+          "selectionTrailDigest": "b384effc7689a3a1bccd9177389dba50dd2aefca6d9c97d0bff1baf607afdd9f"
         },
         {
           "id": "p3b-main-015-male",
@@ -1153,8 +1153,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "9abf5b779e46f30f29e7c4003f04d2cc2ad2f140a1c5753c78707dad70bf1d8f",
-          "hashChain": "f4e555865c28cfa50e0ea53a92f044fd3420619c48abc969cac6f566dcc7ad5a",
+          "stateHash": "6530c2d001fe45755b2d9d4acd6ad1deba517b2315a36761e58b27cc2d12a600",
+          "hashChain": "f5e13db05bc9a48136692c7a728d46a37803f995a4a2bbd4d3b3cb11d50f1843",
           "commandCount": 22,
           "entries": 20,
           "snapshots": 20,
@@ -1194,7 +1194,7 @@
           ],
           "lastEntryHash": "45f9204cc4b0740f2efc77968edfeb2ad45588accf6b55e250501aafe2c014ed",
           "lastSnapshotHash": "0b0a0f16f76ef69d6b5e63f2abc8ac6f7668bc70f4dc0829e51fc86ceb8aa0b9",
-          "lastDeltaHash": "779a8abe01b6f8954806ecac4abdecba01dfab52cbb8368af7621e9b3c1da689",
+          "lastDeltaHash": "bce8de46012750bc7c1bee518a41ace34e380b6a0733191423f2a43ae9ce75dc",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -1220,7 +1220,7 @@
             "ev.any.setback",
             "ev.adult.after-school"
           ],
-          "selectionTrailDigest": "e7b4dce1d6cf39c30ac935f72dc49fad8dbbeffe283cf74acd4950382ddb9828"
+          "selectionTrailDigest": "24a2cd6423466d85556f88b967119849096ef8b798efea441469188eb9637a00"
         },
         {
           "id": "p3b-main-016-random",
@@ -1233,8 +1233,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "48c0423ec62f4abfb6f64308140f1698847bb9772e40d9f8ccdc125d100751a5",
-          "hashChain": "d9e84fbafa986c80c67023cce12ee1091186722d954f770264a8a3e5eb619c3f",
+          "stateHash": "90ee48a385f7599682e79b931345de222666c29f1ea6b126754462d836d9ecc1",
+          "hashChain": "6e7d834b9aca242ad6a54108cece7946cd1a84e025be4f403de041836d5c3dd5",
           "commandCount": 24,
           "entries": 20,
           "snapshots": 20,
@@ -1274,7 +1274,7 @@
           ],
           "lastEntryHash": "7b89fee23ba3f11103a7008fc94efa16aacb02891f1e854631cdec58138ff5e8",
           "lastSnapshotHash": "f5e61aa29274c1358341d05359453f72f4567f64503d28dfb4dc50e692fdb029",
-          "lastDeltaHash": "e1e5ae2232a0c97d49e0bb384c2147a3023e39110515fc8b526b1a5b84926a37",
+          "lastDeltaHash": "539ee0aea632a01fdddd83484aafec4395ed1492fb056008c8c67c33daafaf45",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -1300,7 +1300,7 @@
             "ev.adult.after-school",
             "ev.any.setback"
           ],
-          "selectionTrailDigest": "f489089513797cc5458fba679bd50a2f68d4e008db5445111eda2539f905089b"
+          "selectionTrailDigest": "1063cf4a1f1dd0d1f0c5e9328063196f3f941d09a93a3095927833545ffcb142"
         },
         {
           "id": "p3b-main-017-female",
@@ -1313,8 +1313,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "7490f05ec3062a9fe0d8f37d176c20a0d20d4127ecec73f962a31d6bea628f0d",
-          "hashChain": "cc5dbc9a439d08650287c41194521f2e951088bc35846d33b4f11e3aa54ebe01",
+          "stateHash": "ad14a6bd6302a0166861c663a6a6549ac533cc9c2e0f82367692b6b6f9b65794",
+          "hashChain": "31bb8b536a49d6284027b28d8956a045d1ae87004c02b20c5177fc45af91a6ee",
           "commandCount": 24,
           "entries": 20,
           "snapshots": 20,
@@ -1354,7 +1354,7 @@
           ],
           "lastEntryHash": "7b89fee23ba3f11103a7008fc94efa16aacb02891f1e854631cdec58138ff5e8",
           "lastSnapshotHash": "f5e61aa29274c1358341d05359453f72f4567f64503d28dfb4dc50e692fdb029",
-          "lastDeltaHash": "af49053415f4f3af0688f8ee99fdc1548b5b0bde571b6c4229f45354ca64ac3f",
+          "lastDeltaHash": "6cf11752f928ed6432b0349b234da95f792ff1fe7562434bf559569a5da38bbc",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -1380,7 +1380,7 @@
             "ev.adult.after-school",
             "ev.any.setback"
           ],
-          "selectionTrailDigest": "e1b867dc47bb89e55bcec832a5fe935df16a3fc128f7c1cf5c092caf5170453b"
+          "selectionTrailDigest": "6c3eb1477de456b9c5c7c38efebfda4537e5c87e18fdb70628c3ad51c93c0463"
         },
         {
           "id": "p3b-main-018-male",
@@ -1393,8 +1393,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "c8f92514b00a4497eca6cf3d4d73bd92652705d0f8c65ba43aacf632414553aa",
-          "hashChain": "3b6a13ecbf241c01186122fc20a2e5dc5d1d551d2c81a873ab1aacd752ed06c0",
+          "stateHash": "7a9eb17e7d37b463892091684a3c5218151918a0508d6607593bb7f12719db8d",
+          "hashChain": "1bdfdb037dc6b1f50634d88ca0c50ac47e42da2daa3fbc8602065dcc584ddde3",
           "commandCount": 24,
           "entries": 20,
           "snapshots": 20,
@@ -1434,7 +1434,7 @@
           ],
           "lastEntryHash": "7b89fee23ba3f11103a7008fc94efa16aacb02891f1e854631cdec58138ff5e8",
           "lastSnapshotHash": "f5e61aa29274c1358341d05359453f72f4567f64503d28dfb4dc50e692fdb029",
-          "lastDeltaHash": "bb401449996981a1ed5b27e9ba0197bdce9eaad8590e5ab722e5e5e21ee125d8",
+          "lastDeltaHash": "66cf504a9d09e30e1b7d152e30b087f8e13828ec27228ffaaeb1d8b89f7aa849",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -1460,7 +1460,7 @@
             "ev.adult.after-school",
             "ev.any.setback"
           ],
-          "selectionTrailDigest": "d334c6c7312820f1183e9d7128a2ab27e3da14b688122f195d4a3d0c790a1f6a"
+          "selectionTrailDigest": "1395670697d0bd4b019d8dc0d87863bcd0d9b2f7bcba21c9311fd4e9bf22a166"
         },
         {
           "id": "p3b-main-019-random",
@@ -1473,8 +1473,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "dc08733034274ad208a3fde6909ab462a0ed77d807ba358e56e2ba83dadbdd7a",
-          "hashChain": "76ff941b7c538a6c218065de13af8f3fe72ed72edd1dcb7a7b7f39800c58d669",
+          "stateHash": "25fb9b790208151d69887e6d718383b3d973ede444e8c48d8d1d16a17fe4d50a",
+          "hashChain": "58f543a4780a197a421385f5de49990c4d185f065d846cd29c517d2318a3e05f",
           "commandCount": 26,
           "entries": 20,
           "snapshots": 20,
@@ -1514,7 +1514,7 @@
           ],
           "lastEntryHash": "06941cf5c2b3e3a2b040f7f63da832f358e372643a3cda67d9dd7a8689ddcce6",
           "lastSnapshotHash": "cc8247ff162213af7460ebd6ebdc9375e828fa126b30871b72ae9aa5631e47dd",
-          "lastDeltaHash": "31f08328da7ae1a6e844f7057a9b75035278564c57cb21b4c5c961b75eb49fd6",
+          "lastDeltaHash": "ada0f68949aa3a7876f423b6f0234b144d3fceb8b1bcbdb69ab19d766e871d33",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -1540,7 +1540,7 @@
             "ev.adult.after-school",
             "ev.any.setback"
           ],
-          "selectionTrailDigest": "62553d68df7be5522ece89269a556493d7877a5fb65c29303fe395ef6adf246e"
+          "selectionTrailDigest": "0e8ffacfa28e87a24fda396a98dde2314f3cc3f1d34a45d846da43cb8b7c0a2b"
         },
         {
           "id": "p3b-main-020-female",
@@ -1553,8 +1553,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "f9557176dbf1f220051f84e5744cd42bd4959457f0c397bbadc8fdcd7f902043",
-          "hashChain": "827271d5726caa1bce94a37088ba6afbab0cda6d0291dfc94c386db76ae7f5f2",
+          "stateHash": "482c029e1604776032ad6dcc17d171e12d53134c744c666e2d6515d29966c1cc",
+          "hashChain": "0a984390c8571607140ae6dcae7d1aae3dbf80ce2c8046a416f8bd07270c9801",
           "commandCount": 26,
           "entries": 20,
           "snapshots": 20,
@@ -1594,7 +1594,7 @@
           ],
           "lastEntryHash": "06941cf5c2b3e3a2b040f7f63da832f358e372643a3cda67d9dd7a8689ddcce6",
           "lastSnapshotHash": "cc8247ff162213af7460ebd6ebdc9375e828fa126b30871b72ae9aa5631e47dd",
-          "lastDeltaHash": "a570f59dd0c312bab13bd3ae7aa3303d3e05d2131b1108e73dba1c709ad6035b",
+          "lastDeltaHash": "b6401847d73ffffe62e792012662df137d42baf8fd164c6dc9705deb0d8939a3",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -1620,7 +1620,7 @@
             "ev.adult.after-school",
             "ev.any.setback"
           ],
-          "selectionTrailDigest": "7e22403555fc54b1ab212dd842c5c811c9a0c023037ba263e4a17ae6355a58d1"
+          "selectionTrailDigest": "5ae393a5d63897b3d6b5abe0a71880f997e17867e5f000bf31d1090fdbd26162"
         },
         {
           "id": "p3b-main-021-male",
@@ -1633,8 +1633,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "eeac91f98467dd0e9a1ae7cfaef476cde284ab91455d151b4c515e74dc123819",
-          "hashChain": "38f937b33f626589a65883ebb8dca4d11a1aaa537ba55150ec3edcbb62327d80",
+          "stateHash": "896198ec3eb6b98eba629ef08020f00ea9747bfbd648c94a55809592a346702d",
+          "hashChain": "e61f2f5749aa0d92975d3045e893563847474b7dfcbe6de4c5bef52429d87d81",
           "commandCount": 26,
           "entries": 20,
           "snapshots": 20,
@@ -1674,7 +1674,7 @@
           ],
           "lastEntryHash": "06941cf5c2b3e3a2b040f7f63da832f358e372643a3cda67d9dd7a8689ddcce6",
           "lastSnapshotHash": "cc8247ff162213af7460ebd6ebdc9375e828fa126b30871b72ae9aa5631e47dd",
-          "lastDeltaHash": "debb1b919dbbf8431efd21693cc2ab399dd1b4811db999dfe8262c3245bee3e5",
+          "lastDeltaHash": "95cfe41c039783cecb8431b1056aefbe9830679dfd1f9dab9d9c4ea233439cae",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -1700,7 +1700,7 @@
             "ev.adult.after-school",
             "ev.any.setback"
           ],
-          "selectionTrailDigest": "57c2cf30687dcecb191448829bbc1b1cd521d845690c33cd47c0a524f20cb56e"
+          "selectionTrailDigest": "3d0d0a40659b6d1797cb1d1fa547b371a30baeaed6e0f5d099c56ad996e94115"
         },
         {
           "id": "p3b-main-022-random",
@@ -1713,8 +1713,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "39968b388141c32a5302f1ba95080475bcf1a6bda4002a54bf2401f4847d5405",
-          "hashChain": "721dea03cb1912c637c10f770de4a76a1b101395cd6bfcae73a5b769b78bd0f7",
+          "stateHash": "b0383658bfd8ba9086dd65f142e8ee2efcf4305d87e588c4955268b07e2f87c1",
+          "hashChain": "ec70b968ac28ef0d2e5c6b85ad4574e3a595a97982981b435e2d20454d09f1d7",
           "commandCount": 24,
           "entries": 20,
           "snapshots": 20,
@@ -1756,7 +1756,7 @@
           ],
           "lastEntryHash": "c7990a1c9c3e0968bfabb2d3187647b5ac0a3d444a3dbe23fe1da8eca209c36c",
           "lastSnapshotHash": "f2bdd8bc86e97ead7ea31fdc2e496aebcaa9c46dc4ae7cf0144a371a9d6b4fc2",
-          "lastDeltaHash": "07022a0ee7b079d253438098062b2bc19d7c7c916c10f051e54c70fb3dd2aed1",
+          "lastDeltaHash": "9cb87e43e2a1bc6f9f9639983fc60e1f05b6718b794dd99028fa466bf359683a",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -1782,7 +1782,7 @@
             "ev.adult.after-school",
             "ev.adult.first-job"
           ],
-          "selectionTrailDigest": "67f9442a52c3e8b6c91a26909ca5cc10a17d813540bf3fe4d2dffcb69d0d7906"
+          "selectionTrailDigest": "1af92092599b6c4ed5a0b696d8d6b196e5a97e12ee95438e191820ce0871e71a"
         },
         {
           "id": "p3b-main-023-female",
@@ -1795,8 +1795,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "d6f226ea662dce9dfff82794757b476935a21e7f086dea4324aa073701108712",
-          "hashChain": "18a62c23d04ea2bdc7700a1a40ebf6989fc81be75f18a459b5a8c833624e580a",
+          "stateHash": "2db07ccc7502dcb709411a2be4351e93f006f1ee13fbd6789a4960a6cea2525a",
+          "hashChain": "279fd3f661e0348ab571415944b121c135f2b1cd8f573f3bcc0bffabeec399c3",
           "commandCount": 24,
           "entries": 20,
           "snapshots": 20,
@@ -1838,7 +1838,7 @@
           ],
           "lastEntryHash": "c7990a1c9c3e0968bfabb2d3187647b5ac0a3d444a3dbe23fe1da8eca209c36c",
           "lastSnapshotHash": "f2bdd8bc86e97ead7ea31fdc2e496aebcaa9c46dc4ae7cf0144a371a9d6b4fc2",
-          "lastDeltaHash": "f7e0a98acb61b86badca2f17b2ecd6104a16678d9bb3a2e5d39e8e52f37d55ab",
+          "lastDeltaHash": "48d2476c1de921980fb124efe80b52a5cd64a2ae38e0865855099fccf5bbda9f",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -1864,7 +1864,7 @@
             "ev.adult.after-school",
             "ev.adult.first-job"
           ],
-          "selectionTrailDigest": "445d3cf993adf300228bb5ad5bb59e295898cbb03820090fad9fe4fca6626858"
+          "selectionTrailDigest": "9ec16d21befe137cde3eed8596f94845fef34c21f19e16a1eca3b6be01a017e0"
         },
         {
           "id": "p3b-main-024-male",
@@ -1877,8 +1877,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "4605b1a59e1d2f4fcda38400e9d31ed25c8a6ce7c0e4b81028d41d5263dc0fa3",
-          "hashChain": "b515b50eb964d45415efdbb9fd8802e9239dc3ac141efaace89501ffaa089b49",
+          "stateHash": "e57b6d3de42aa613d80637fe4224bf6ca0bb509868c059a1f52b7152eae2e9cc",
+          "hashChain": "c75a15365e0c855ff5b65b344e362af5915c46af20ba49902a0483fd55cb5d90",
           "commandCount": 24,
           "entries": 20,
           "snapshots": 20,
@@ -1920,7 +1920,7 @@
           ],
           "lastEntryHash": "c7990a1c9c3e0968bfabb2d3187647b5ac0a3d444a3dbe23fe1da8eca209c36c",
           "lastSnapshotHash": "f2bdd8bc86e97ead7ea31fdc2e496aebcaa9c46dc4ae7cf0144a371a9d6b4fc2",
-          "lastDeltaHash": "e18543f8cc54f7e90bb80f6bd35bc1a825a869fb401b15f6e7cf59e54af5436b",
+          "lastDeltaHash": "699ab7096ecf24f31b81b83fe109bf9dbb4f293d9cbd09548eb8a79f6da9deb3",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -1946,7 +1946,7 @@
             "ev.adult.after-school",
             "ev.adult.first-job"
           ],
-          "selectionTrailDigest": "1394bc0379cac78a856629efa9baab448c40b1979d557164e593f29d7ed70467"
+          "selectionTrailDigest": "3913d4a626751c698b1d902063e9600420f7f38d164d419b9408da6dd0acb723"
         },
         {
           "id": "p3b-main-025-random",
@@ -1959,8 +1959,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "0f54e2101c5610aa2b72951a7d86540f224a216d29ccdf53abc3eccccc313778",
-          "hashChain": "8646e3db5b03df39680ab0960b4c6d8c728ac202482381413b6c8367f2e77aa5",
+          "stateHash": "8d5c9b5abb963042719050fff3b21c7aca07a55b2d055fdb0451a40276095d26",
+          "hashChain": "f52228afcab0e02393a63306adfef8ef322c2a029cb44257a7d694d39f62a379",
           "commandCount": 22,
           "entries": 20,
           "snapshots": 20,
@@ -2001,7 +2001,7 @@
           ],
           "lastEntryHash": "450628f7d46db43dd94b43264a64c5391907acef2bc48dc9a32f6c22aec55c81",
           "lastSnapshotHash": "f87fef68d44f72ecf7bab55c2c1d28ff5371a07cf7e84a1d9ee9690e2f18c279",
-          "lastDeltaHash": "b2851b4527eabc1544c4199f8beb98a4f4a2f12591cf51a2fb17fbba52633cb5",
+          "lastDeltaHash": "7b3644373b2dfc418e23f94b8325484706836d21399ee300851c9a66191c48a3",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -2027,7 +2027,7 @@
             "ev.adult.after-school",
             "ev.any.small-win"
           ],
-          "selectionTrailDigest": "37a0d90ac3d44e97d96b7cf7b78b0e44b32e3df431fa02d7a6c0bde722888cb4"
+          "selectionTrailDigest": "8c4c050e26d45fdb87b8e5e112e911399198c9a5f7253303aa081c08855e3446"
         },
         {
           "id": "p3b-main-026-female",
@@ -2040,8 +2040,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "e55faceef36d4f32ad8f6c8c1938aea55347ecea72106663d068fa695b68b84d",
-          "hashChain": "23f7f78dfcfda6e72152aee866e11a908be86b6ced6a2310eeb396fcb5894f71",
+          "stateHash": "427598c494aa6bf9ce74a692712830db342ce5bf4366bcebcb85e7f869ce9ccd",
+          "hashChain": "3e418eb412c6cb0926deeddcf83ee937351bbc1a8ddbb7ed559d1dad6856599e",
           "commandCount": 22,
           "entries": 20,
           "snapshots": 20,
@@ -2082,7 +2082,7 @@
           ],
           "lastEntryHash": "450628f7d46db43dd94b43264a64c5391907acef2bc48dc9a32f6c22aec55c81",
           "lastSnapshotHash": "f87fef68d44f72ecf7bab55c2c1d28ff5371a07cf7e84a1d9ee9690e2f18c279",
-          "lastDeltaHash": "bd19ed87b9b19f8aec429974eb2d3570cd4830cc623f53ed792012ffccd21230",
+          "lastDeltaHash": "b9beeea7c18fe148c04ef7cf5ca04710a8d923e86740ca2c2dae7d9589ba3724",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -2108,7 +2108,7 @@
             "ev.adult.after-school",
             "ev.any.small-win"
           ],
-          "selectionTrailDigest": "71bd8d09bcc0e8c7183abef61fcc93d8cc68baa5238388d7ef00c61386bcabc0"
+          "selectionTrailDigest": "ebc82f127d8d0a23a8b9ad61c40a54f3443bc83df4bb8685ff281a629cc9380d"
         },
         {
           "id": "p3b-main-027-male",
@@ -2121,8 +2121,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "46e5a21356e56dd4fdd66b4b2b7e93f33fbf55e5c60a5d915aab7fb7ba676324",
-          "hashChain": "afacb7b9233b7a576420a2ab03471ea2b313149ae8e607c0a44ed0f21d7bf5f7",
+          "stateHash": "88af637eaf77e4556906361aed24c2d3abd954130df525989f8566b6bf4a27a4",
+          "hashChain": "00460b5db551d8b3f52fa871a41caaca84a92288b5ba1fa6efe61b4e1b7466e8",
           "commandCount": 22,
           "entries": 20,
           "snapshots": 20,
@@ -2163,7 +2163,7 @@
           ],
           "lastEntryHash": "450628f7d46db43dd94b43264a64c5391907acef2bc48dc9a32f6c22aec55c81",
           "lastSnapshotHash": "f87fef68d44f72ecf7bab55c2c1d28ff5371a07cf7e84a1d9ee9690e2f18c279",
-          "lastDeltaHash": "b770185768ca0b74f413b241046e97a0bc531511fc2c6287b92206a92dd19ab7",
+          "lastDeltaHash": "e4875cc482b2d34ad1a25b323af6afc9e6c45d66c1ba09ce76d5ddeb3a826e05",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -2189,7 +2189,7 @@
             "ev.adult.after-school",
             "ev.any.small-win"
           ],
-          "selectionTrailDigest": "f5014d2814cc8e383209fd64441e70718e83e74af49308411a74a0029e076e27"
+          "selectionTrailDigest": "0e8a18305803164358ffcdb154f47129496ef96d6a8a991adba16396084643c3"
         },
         {
           "id": "p3b-main-028-random",
@@ -2202,8 +2202,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "b5faa1222156e870afdd2a9cf8b18cd8ec247ebcf3e71d28a759a45ac097ef23",
-          "hashChain": "939cdb90ed6c44e071e295ff5526287fd0a90cf3559e5eb6ffeda2a3c3bbec42",
+          "stateHash": "9e99c5d58b85c9c4ee5f276b8e1308b5271097cdc4d46fd6bf33a3e05d6fa92f",
+          "hashChain": "c9101dc5af89ee786f26cb4af7c3adee52ba6c8b342309a4144c079e8574c073",
           "commandCount": 18,
           "entries": 20,
           "snapshots": 20,
@@ -2241,7 +2241,7 @@
           ],
           "lastEntryHash": "8cdc344448e7289f0cf5d7a2455a561589fef2ffc8d36f5710cb544b6c63d0aa",
           "lastSnapshotHash": "cab9b82cc71f0032a36a6c0666c2306f37b0defeab5ba633ed19f84400fd0ec8",
-          "lastDeltaHash": "c2ca21d4e71d856f6a6fa7e1038aa1b7a8acd84fc7f5d9c325b29d30dd4434b4",
+          "lastDeltaHash": "efd77c994103d8adb552c0d9232d530268183a783f5af8d96b7504f7b624283c",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -2267,7 +2267,7 @@
             "ev.adult.after-school",
             "ev.any.small-win"
           ],
-          "selectionTrailDigest": "66f1442ed3139da6b6ba90f69c93a3685ce0ce0d92f858e82cb6d09a54dbddd9"
+          "selectionTrailDigest": "fb1f7d4e641704df5429b6c4cb061ddfb7e74d60a66aac64d33455709b69a3b3"
         },
         {
           "id": "p3b-main-029-female",
@@ -2280,8 +2280,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "64ef3f2a4aee5e39cdad57beccf014e52c97013a003ed4fd179d6004d9408ee0",
-          "hashChain": "e9f32f764e7d13140c33e1f45ef482759f3753f5503cae502fec4bae21dca06a",
+          "stateHash": "9b2c1ec607f768abd779028a2d1bb5c4bf76ac803f96b9159574145070b904ff",
+          "hashChain": "fcc46bbbbba96128ec5ab69e0582c4224903b6cfea5fb1a593196eb59abcc5aa",
           "commandCount": 18,
           "entries": 20,
           "snapshots": 20,
@@ -2319,7 +2319,7 @@
           ],
           "lastEntryHash": "8cdc344448e7289f0cf5d7a2455a561589fef2ffc8d36f5710cb544b6c63d0aa",
           "lastSnapshotHash": "cab9b82cc71f0032a36a6c0666c2306f37b0defeab5ba633ed19f84400fd0ec8",
-          "lastDeltaHash": "97569e0f86560d0fb0241888035bb22504e23b6aef06411ff90e73739d858f58",
+          "lastDeltaHash": "775289899800af729236709c7a46c9f9f3715c7e233610bc68605b0b9a236c9e",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -2345,7 +2345,7 @@
             "ev.adult.after-school",
             "ev.any.small-win"
           ],
-          "selectionTrailDigest": "d7799429528b98cee7aa3877c2966b8953900949fc421407d057bdf88da17a69"
+          "selectionTrailDigest": "8663f6ae295cd51855be272ca37095a56da6d05421f3d914389a3d66f0bb7c20"
         },
         {
           "id": "p3b-main-030-male",
@@ -2358,8 +2358,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "300310019170d103a3219a051d5194ad599e35d44417d0a655ca88df36603d25",
-          "hashChain": "7e348db46fa776d57b99b5d56444bba1bf8f93ce212380d39190b09b91888c3c",
+          "stateHash": "a2138eb01b1e8144b712bd6226f7fa62732a674ac108c6a3268907562d702268",
+          "hashChain": "6245bec58e32459a8d9059c33360ecad33783ed55b4a15608df4732558fe0f51",
           "commandCount": 18,
           "entries": 20,
           "snapshots": 20,
@@ -2397,7 +2397,7 @@
           ],
           "lastEntryHash": "8cdc344448e7289f0cf5d7a2455a561589fef2ffc8d36f5710cb544b6c63d0aa",
           "lastSnapshotHash": "cab9b82cc71f0032a36a6c0666c2306f37b0defeab5ba633ed19f84400fd0ec8",
-          "lastDeltaHash": "5a0b691b1da75d449d8f0da9c11ae5371e60132a5d3cafe535fb287b7ad555ad",
+          "lastDeltaHash": "43e5f28c4e7779247a9494de04db3183a301c640a7dd2bfb21c98bd70e446371",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -2423,7 +2423,7 @@
             "ev.adult.after-school",
             "ev.any.small-win"
           ],
-          "selectionTrailDigest": "05b2935636a896631b059e6dc162aeefa13b5da0960f008e5753f3ae24642510"
+          "selectionTrailDigest": "b63ba9350455bf7e3da1b742824e4c5046de6f3afed0c8753e9c28216a66f52d"
         },
         {
           "id": "p3b-main-031-random",
@@ -2436,8 +2436,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "0a6589b5fe4b8b2f9b47e44e7312a4cf9f6f32f8e682b9b7430d99b2aaef1459",
-          "hashChain": "e8e0532abafa384429e23ac0eccc9f0673002d08084a8548d8f66082d8849959",
+          "stateHash": "d929be71f062646e610f419b13084a1b93e77ff764e9ffc65bc77f9ba8666b32",
+          "hashChain": "9c9602c2c3dda74c76fdf735d38e03e354249e1b450da2fe658cc562e0fa965a",
           "commandCount": 26,
           "entries": 20,
           "snapshots": 20,
@@ -2477,7 +2477,7 @@
           ],
           "lastEntryHash": "ed40d838d7cac4f3d0f19fc7a79785b49a16c4614bd7f4a41b73abb02e7f4cf2",
           "lastSnapshotHash": "7b7e69c9079ec21e7d748e86112c4eccf4c5d8ac10cb5b64cdab2d755064a51a",
-          "lastDeltaHash": "ac2ce8ed632dfa1e1ed0b99f11f3ee86bc1ee4a02266f8f985e2838e0dde9d1b",
+          "lastDeltaHash": "c403cb34b3654d4c4f6b7db1132845f079604789e5acb64799c4c6515ca7c9da",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -2503,7 +2503,7 @@
             "ev.adult.after-school",
             "ev.adult.first-pet"
           ],
-          "selectionTrailDigest": "53280f36a4cee2caf3bde5a9c6eb580c7c10594a7dbcc1ac337e1d0ca748f7e0"
+          "selectionTrailDigest": "e995cc459e116c8aaaaac5c95d09aeb27ff337fc231e672e0af2d8d84e773423"
         },
         {
           "id": "p3b-main-032-female",
@@ -2516,8 +2516,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "dcb2125f4dd5a6b07f0a5ac6d666c848d8db0cee52c78089870080676f9052f7",
-          "hashChain": "122f6dcbeb662ca495ea7c43c606e73b1bb06deca49347409c55f6bb7237e7e9",
+          "stateHash": "7b05267cc8e95d98e3d9d5dfcda173a52406ad34d0562ac0d2a700d2d0d353a5",
+          "hashChain": "bb0d5e3a55226cf923f1d5bcb8c86f4e2a0eff38cd41b62d408fb54d16370161",
           "commandCount": 26,
           "entries": 20,
           "snapshots": 20,
@@ -2557,7 +2557,7 @@
           ],
           "lastEntryHash": "ed40d838d7cac4f3d0f19fc7a79785b49a16c4614bd7f4a41b73abb02e7f4cf2",
           "lastSnapshotHash": "7b7e69c9079ec21e7d748e86112c4eccf4c5d8ac10cb5b64cdab2d755064a51a",
-          "lastDeltaHash": "bbc4b805f60256b7feba8ef8300c55e387b69cdc56b2d3a2cb480a8ca94f018e",
+          "lastDeltaHash": "4aacdd0e07044a7498a93c7c94599c666bb482ea32e0a9fc55d56fe7e5f8cf56",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -2583,7 +2583,7 @@
             "ev.adult.after-school",
             "ev.adult.first-pet"
           ],
-          "selectionTrailDigest": "2070911cabe04919ca5404ed153a88bc41c3bc4e4fe0b0a90948ae0f3701e9da"
+          "selectionTrailDigest": "1adebe5b0a7195f2358a00169934671533e276d46fdad0dc93f865790c03e687"
         },
         {
           "id": "p3b-main-033-male",
@@ -2596,8 +2596,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "d7e1f843937d6fc3a679404f7c9c894a9973d09f2dc08e202f958b90f574c57a",
-          "hashChain": "ccbce151b5516c038e29c9c30df70661e3f33c01d512174e49eac4b324bc8f1a",
+          "stateHash": "83cd87c2c7da6e67a1829e50080d89765ee6b35c75574b19d677068ef80c160c",
+          "hashChain": "d3a321fe2346fa8d882f8d86b16f9df1344caf2867291e45177fa1b78e82f0ff",
           "commandCount": 26,
           "entries": 20,
           "snapshots": 20,
@@ -2637,7 +2637,7 @@
           ],
           "lastEntryHash": "ed40d838d7cac4f3d0f19fc7a79785b49a16c4614bd7f4a41b73abb02e7f4cf2",
           "lastSnapshotHash": "7b7e69c9079ec21e7d748e86112c4eccf4c5d8ac10cb5b64cdab2d755064a51a",
-          "lastDeltaHash": "3d5117ebd22891407b72f2a59a20cd5d13e38ec7f99aebef68388f1b9fdaef5d",
+          "lastDeltaHash": "26e0bc83f207d7c1ab999c292b5b848dd5e682f68d60972abd15b525d1b03953",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -2663,7 +2663,7 @@
             "ev.adult.after-school",
             "ev.adult.first-pet"
           ],
-          "selectionTrailDigest": "e492a02fd1ba30158e7dfd591678e4478e90fad8e4253740ed0c9d848cbe9e4f"
+          "selectionTrailDigest": "d484694df1393d370c528e0a4f7c9cb28e83bcf21a10519882be7349fac2bd29"
         },
         {
           "id": "p3b-main-034-random",
@@ -2676,8 +2676,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "af9ec46f4332285f3fdcdbb33943ddb9bc034942024e8adecd2e963d0c91e011",
-          "hashChain": "bca32782826edd9460001100d61db8178e14ede9fe097db2a7330e812fffb472",
+          "stateHash": "1d5b0a61f18e5a8d58e118f6f7d23b00c8882311b5794a41d46cca9eeb40576c",
+          "hashChain": "1345e1e8a021e49f842af62a933858d21e2e9dc2ccabd2dfbe20f99c2aab2f9f",
           "commandCount": 18,
           "entries": 20,
           "snapshots": 20,
@@ -2716,7 +2716,7 @@
           ],
           "lastEntryHash": "06753142dfbcf3430e2073f6d278a607742c1b9613af13d52d036525f008957d",
           "lastSnapshotHash": "9ef0415e5d3be0878b1d6eb996b0fae1842b5dfa25114b200854efca784a0033",
-          "lastDeltaHash": "c46be413c9f5897371683683cf9941006ef852a8e95e0f10934699dc8846e02a",
+          "lastDeltaHash": "94548538db60d7bd0251fb08305df206c22e3037bc37ba6e910b753d34dfee83",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -2742,7 +2742,7 @@
             "ev.any.setback",
             "ev.adult.first-job"
           ],
-          "selectionTrailDigest": "86c93440a57665708b764345154d1758be4772c6991f3341dde20238c6fe815b"
+          "selectionTrailDigest": "8df15dbf7d60719f2eecca7917d0f7d5cfa8f5850898bcf35c18ff60611ad48c"
         },
         {
           "id": "p3b-main-035-female",
@@ -2755,8 +2755,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "eaa8c8aac4bf4f929174fa21f3d7b7e918bda902338ff68787b62e8928b42f9b",
-          "hashChain": "60bb05df0555327506e01debfffd92178b5fb3f72312d0d4879449b1c25c4250",
+          "stateHash": "441d6809ea509b49cbd48fbd2623888a9c080d34eb44ff28c00aa5a21e0e1bcd",
+          "hashChain": "1972240ef0664139dbd1d998013be457eb493c213f384db9bf095395bd57369e",
           "commandCount": 18,
           "entries": 20,
           "snapshots": 20,
@@ -2795,7 +2795,7 @@
           ],
           "lastEntryHash": "06753142dfbcf3430e2073f6d278a607742c1b9613af13d52d036525f008957d",
           "lastSnapshotHash": "9ef0415e5d3be0878b1d6eb996b0fae1842b5dfa25114b200854efca784a0033",
-          "lastDeltaHash": "ce8ef05717fa449e6a1c4d2b4b4f0d856977b8552ae36cd7084d266cdb58037a",
+          "lastDeltaHash": "364aa7cc201b67ef6286b57535fd5141573d22644a4c5b985d8b2208a1e4a85b",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -2821,7 +2821,7 @@
             "ev.any.setback",
             "ev.adult.first-job"
           ],
-          "selectionTrailDigest": "26b9eba847bfb81d448c9540e67f7457db56479e67df954b77710e0a46d56ba6"
+          "selectionTrailDigest": "84509414627a4a1f6b39b41484242e55100d2814946cd4cb28f4f73f9b85ce67"
         },
         {
           "id": "p3b-main-036-male",
@@ -2834,8 +2834,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "3d3d9be898431afecf94dee748eb7c08f5b1bd13170ffdaccd2267640dc0404b",
-          "hashChain": "126ef6ac315341d0e7b610f6c10f528cd46b3439d003f038866bf95ddc70da3b",
+          "stateHash": "8dc1c7bc87ed47b9d4a78393abe4dedffca8ec4c51b941c36939eb34dabbc84e",
+          "hashChain": "7f6b2f82de31283d70111088ad158f5f2604db49ef48e062421cbca9051eb402",
           "commandCount": 18,
           "entries": 20,
           "snapshots": 20,
@@ -2874,7 +2874,7 @@
           ],
           "lastEntryHash": "06753142dfbcf3430e2073f6d278a607742c1b9613af13d52d036525f008957d",
           "lastSnapshotHash": "9ef0415e5d3be0878b1d6eb996b0fae1842b5dfa25114b200854efca784a0033",
-          "lastDeltaHash": "75894e6e05050786e7f135848c1cf85ccc897893c13b01dc7969ee11c4beb719",
+          "lastDeltaHash": "7bff00cb4eec53a019af894de3520a1fa3bc3014c7ccb64133c895bb143c334a",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -2900,7 +2900,7 @@
             "ev.any.setback",
             "ev.adult.first-job"
           ],
-          "selectionTrailDigest": "411fced0f2f44f8c144cc559edd84b83414abc12f0a7324268b6f19565453d31"
+          "selectionTrailDigest": "2169fbf9613ed5ca36529721e94a424419bb189b3558d92de8680bd8ce329c45"
         },
         {
           "id": "p3b-main-037-random",
@@ -2913,8 +2913,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "8507152cc77b3873d903ce31c2795f72b7fab16460ede23054f4d534a6a76068",
-          "hashChain": "21a8bc2180ddc65f7cacd5713b717a882de83d40f779837224f4d29b95d29748",
+          "stateHash": "d00f9a77ea9b7f9e7bf95514dfa3592c8ca043e8f86d6efecd451029496f6b72",
+          "hashChain": "b84d1998cbc322189b2a095092f6a697979e282b1b9f811fd2cd0dc5e2fa9972",
           "commandCount": 22,
           "entries": 20,
           "snapshots": 20,
@@ -2954,7 +2954,7 @@
           ],
           "lastEntryHash": "ff79360da68f0786988aba015870d4a7367673c3f3aa2e7937c0f497a577098f",
           "lastSnapshotHash": "9d43292b2c0b4d0f6a070075f732cd2494ff5c2edccdd4d9bfa92a6cc992d158",
-          "lastDeltaHash": "ebaa303f55387bf8c49560b6d275f17a4860ad120846da471365f33c5038d243",
+          "lastDeltaHash": "4811b6b84f22669f990df8b446fe4350e43f502c45231397e88c192061ed1692",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -2980,7 +2980,7 @@
             "ev.adult.first-pet",
             "ev.any.setback"
           ],
-          "selectionTrailDigest": "ca9d274c754233954ebcbd542e745945367ef4a24a4e8c33e14546d9cf2ee02a"
+          "selectionTrailDigest": "880d2ad793dcc3114267eaacc0f554644a8c72761524a13879c08e6b7cf16e23"
         },
         {
           "id": "p3b-main-038-female",
@@ -2993,8 +2993,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "61c4c7b95c20d903823da9ee6d82a7e01770f531734fda4d776bed5c4ae49a9d",
-          "hashChain": "522c7dc2201a96799e55bed7db2b60175ed826cbcb82b7219212ebf9f05345c9",
+          "stateHash": "35890cbf0f07c77bcd8fe40e4e8bba56728dc9e3dbb6ecb5b9a8c8892d52754b",
+          "hashChain": "ecebfeeaa5e1488167272afce45ce0cffd57b3ab781e1aad14e13d3472936eec",
           "commandCount": 22,
           "entries": 20,
           "snapshots": 20,
@@ -3034,7 +3034,7 @@
           ],
           "lastEntryHash": "ff79360da68f0786988aba015870d4a7367673c3f3aa2e7937c0f497a577098f",
           "lastSnapshotHash": "9d43292b2c0b4d0f6a070075f732cd2494ff5c2edccdd4d9bfa92a6cc992d158",
-          "lastDeltaHash": "9adf5a924ededb25220f839bb207f1d1451d49ebd19a40bebc0cdf16b518f0ca",
+          "lastDeltaHash": "ec79e82485ed930b9e068398540952104b624a9616886a70b199a831a828931f",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -3060,7 +3060,7 @@
             "ev.adult.first-pet",
             "ev.any.setback"
           ],
-          "selectionTrailDigest": "89b11b60f8ded202c4eba207f82e8b78808a99fa06bcb291f684c4cd671ec5da"
+          "selectionTrailDigest": "0a875f443598d2052d7bac439bb21ef88bf890537ef6784fc40b5b89a7119d06"
         },
         {
           "id": "p3b-main-039-male",
@@ -3073,8 +3073,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "83f6c18397d089b97e5b73180287bf617f6594f0243930f0f1772a1ac2f06a6f",
-          "hashChain": "fd8a8e431ce0d2d524cbcf8e70c88bd6007c3e5b192075e169d64b0ebae47ac9",
+          "stateHash": "4e128d07ab547873c68b561b91b604c0239b5e767db242bc624df707d4cf3367",
+          "hashChain": "184be6d7e78d22854d62c855ce96c17371df996b786f47a7c53298edf0d7165a",
           "commandCount": 22,
           "entries": 20,
           "snapshots": 20,
@@ -3114,7 +3114,7 @@
           ],
           "lastEntryHash": "ff79360da68f0786988aba015870d4a7367673c3f3aa2e7937c0f497a577098f",
           "lastSnapshotHash": "9d43292b2c0b4d0f6a070075f732cd2494ff5c2edccdd4d9bfa92a6cc992d158",
-          "lastDeltaHash": "63b9daae0be626173903a8643a4c4422ee64c5c3001c2ff307404b09dddd9ea1",
+          "lastDeltaHash": "09266c51bf775a2cb6b5b7c66c52afdebf81f06eb6eac28892d0d9e6e9096c84",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -3140,7 +3140,7 @@
             "ev.adult.first-pet",
             "ev.any.setback"
           ],
-          "selectionTrailDigest": "f3d386671b7f80561c4742d61ba6829f76e02136e14de239a1f3b5da2f1dcbbc"
+          "selectionTrailDigest": "e987eee2064c2ee80fbd905f96af52b571a3352db6ddb947b80984ae71ed1179"
         },
         {
           "id": "p3b-main-040-random",
@@ -3153,8 +3153,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "d179be398a5e4c8e7da6285e19bd67b8fd9276fe9cb8764bbc67fba09686f561",
-          "hashChain": "7f41651ffebb5457b2df307f99c066c450e4db6f347ffedb67836ad5d2739140",
+          "stateHash": "0f1b7b1c864d032821d11a068313171f7a231a324846f655d55e81b5ce48b470",
+          "hashChain": "1c95e815f5fb9afbc514f80b4376a6644383553cd534c1fda5b3575d52d27485",
           "commandCount": 18,
           "entries": 20,
           "snapshots": 20,
@@ -3191,7 +3191,7 @@
           ],
           "lastEntryHash": "9d2376f62a22f89f9edb237da7db2c0c33e842af87abb43cd72b1aeda9d8960c",
           "lastSnapshotHash": "26affeb03afb64a7f3def0612d0309087056e11e6c4a77ab83e984fe2281c139",
-          "lastDeltaHash": "483ab067470219cc2e2f9d4ccd9d19f75dfd872f105b19e41b6c58e201166df8",
+          "lastDeltaHash": "be40aa671c6641f3a6074eb43ae48ad58e7ef1587e412ef74f9392bd921b7821",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -3217,7 +3217,7 @@
             "ev.any.setback",
             "ev.adult.first-pet"
           ],
-          "selectionTrailDigest": "21a1f5feaa196fac957623d10940fd26c61664e336cd8bc20a73de5e3fcb0305"
+          "selectionTrailDigest": "1103dc639c8c984dc8553fbb2fd84e04d7c6d2a6eb2b0e32521d02ce6f2fb804"
         },
         {
           "id": "p3b-main-041-female",
@@ -3230,8 +3230,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "a6284542efc9cca07f690a0aabd173fde780b17e85a0b0a124ad44f3aad4b516",
-          "hashChain": "259e4aea051260f6f1e00bdeba6237712d69dd5080929928aaaaf8c422349376",
+          "stateHash": "4fc53ae7889467a9653b238cd58a010fbd1d214356ac0deac9a65698f9fe34ea",
+          "hashChain": "6ac95acdbcb44e7328eb6ce6d23a5825f940615723b2a011294aca9e8ba6e47c",
           "commandCount": 18,
           "entries": 20,
           "snapshots": 20,
@@ -3268,7 +3268,7 @@
           ],
           "lastEntryHash": "9d2376f62a22f89f9edb237da7db2c0c33e842af87abb43cd72b1aeda9d8960c",
           "lastSnapshotHash": "26affeb03afb64a7f3def0612d0309087056e11e6c4a77ab83e984fe2281c139",
-          "lastDeltaHash": "617aba0450f02769bdd86d93765b27de7d59033aee07a35925236b5b1f93861c",
+          "lastDeltaHash": "afbe97b61c8fe801fd4231a6c3b6e0e29f7aec40a040e289257ff02e319472f0",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -3294,7 +3294,7 @@
             "ev.any.setback",
             "ev.adult.first-pet"
           ],
-          "selectionTrailDigest": "89c07947a612588be4f93e02514ddce48233d6bbca912328c9d4f359831e943f"
+          "selectionTrailDigest": "7a57dcaf9c21ae4ee043b5bbbdd0a26bacc3963bf4043bbc6eb63798d3213734"
         },
         {
           "id": "p3b-main-042-male",
@@ -3307,8 +3307,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "416005559409bcce3f3230e37e25057f6f092c96cbd209d8ba58cabe7a564377",
-          "hashChain": "c5c663587e032023dfaffe11b0d821e3116b4dd9017dba0e69040dc26b52e77c",
+          "stateHash": "c49a3578d43c7c20bf79e429045bbe92c734b334436951226523013542db165c",
+          "hashChain": "e1ac9096c47d0df9a5c0e505d3692f9389835b82b2e09501acdb30f4a3f31258",
           "commandCount": 18,
           "entries": 20,
           "snapshots": 20,
@@ -3345,7 +3345,7 @@
           ],
           "lastEntryHash": "9d2376f62a22f89f9edb237da7db2c0c33e842af87abb43cd72b1aeda9d8960c",
           "lastSnapshotHash": "26affeb03afb64a7f3def0612d0309087056e11e6c4a77ab83e984fe2281c139",
-          "lastDeltaHash": "6cc9efc8e7e1629fc79726f27ae3a9ebb961bc4490049aad545a0a1f7ec28e30",
+          "lastDeltaHash": "0d2161fcaa69c6cd288e7614a93518593d8db2305f5de33c15ff7b65a35f5973",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -3371,7 +3371,7 @@
             "ev.any.setback",
             "ev.adult.first-pet"
           ],
-          "selectionTrailDigest": "31ed7979779110fab45053d4caee3786b0b57bab2c571f710f2da8fcc7c6e676"
+          "selectionTrailDigest": "dc909d5a91ce7491d41b5e31caa7bffb921429713257d4b5c1edab7cf5124455"
         },
         {
           "id": "p3b-main-043-random",
@@ -3384,8 +3384,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "89a9a23940d7801dbb3bb7bf5587a9031c92d66e17b194eb23bcc1e1c9b00ae9",
-          "hashChain": "7dd8876a539015ef45284a34030b4874bb4b77b7200a516f7a18bf444a1f3951",
+          "stateHash": "ead449ffba28d156f0f895e5a03a11c8dde613f9c993e893686d113cbd702103",
+          "hashChain": "e595ba58d85757369a77a7e6f5d689e7b1f455aa7def114ebc27c066def725df",
           "commandCount": 22,
           "entries": 20,
           "snapshots": 20,
@@ -3425,7 +3425,7 @@
           ],
           "lastEntryHash": "fed8625b8381262865606d0b278dccc6ebaf4c04066fc937f8646599064226e5",
           "lastSnapshotHash": "1b98ac899d90ccace447fd5ce35e783369296ef997bc310d20a5ad475a2727d3",
-          "lastDeltaHash": "57247536b57efe2ca22caa5ff207d0166dd834739ed4086d48698cf5985beec9",
+          "lastDeltaHash": "713ec3a4c495b757ea6134ee355b46bace03d901e4b26e776e2bcd0a6affd211",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -3451,7 +3451,7 @@
             "ev.adult.after-school",
             "ev.adult.first-job"
           ],
-          "selectionTrailDigest": "d3a7d4c61dc7cb7be373eb5d71667e9a54c631c68f20911371382b25db3fcb6d"
+          "selectionTrailDigest": "3bca1a916793e604ccfb116cead54c55dca2e4fddeb58afd7bd770b3128d9657"
         },
         {
           "id": "p3b-main-044-female",
@@ -3464,8 +3464,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "99a10f5e7df27d9275cb6c5f201d316105badd6d10bb5904eeb092b61eaf3971",
-          "hashChain": "1f5ee87cbe74d34ad5758cf73de77ea7b088cf3771fccb942596311082ba068d",
+          "stateHash": "9cab78011067a81a293869d4d2baf9eb939fc87153b349f1ce282813c04aed4f",
+          "hashChain": "b899ac2d719fa14a177d7ad9f950b0f8ee45fc83aaae183276367f37309bed1b",
           "commandCount": 22,
           "entries": 20,
           "snapshots": 20,
@@ -3505,7 +3505,7 @@
           ],
           "lastEntryHash": "fed8625b8381262865606d0b278dccc6ebaf4c04066fc937f8646599064226e5",
           "lastSnapshotHash": "1b98ac899d90ccace447fd5ce35e783369296ef997bc310d20a5ad475a2727d3",
-          "lastDeltaHash": "f3953c15657590e3c527d0296242e1b85a3e0734b01276a53dabda0d9a317b10",
+          "lastDeltaHash": "68f28f72e8f9f90aeeb2c2be7f71e4d3ddd1495cc3f260764d32be5020ae453f",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -3531,7 +3531,7 @@
             "ev.adult.after-school",
             "ev.adult.first-job"
           ],
-          "selectionTrailDigest": "5753a3d25238e725f3e8876745a8b9c9ec309ee99cec9d3e2a114ef25ff7643e"
+          "selectionTrailDigest": "4e65ded50ec623525f183fcdd65b13166d52cddb684f05a6f089dfd0f05f4fd6"
         },
         {
           "id": "p3b-main-045-male",
@@ -3544,8 +3544,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "e367eb2ba039705681fde63a99207b3288fcdd8847c952fc9f0a0b258d4b4111",
-          "hashChain": "f1c42e1d1ca5206d8f8e3b24d4fc846c9bff15c5c3a96d958f66febe45104bb8",
+          "stateHash": "5667984390323df5c9117ddcbdfbb83a392e5cebf7c16a72162eb27e63e5de58",
+          "hashChain": "be75b0ef0952b93203f2526d119f9608db503c35cbe24f54d26891ea2197c316",
           "commandCount": 22,
           "entries": 20,
           "snapshots": 20,
@@ -3585,7 +3585,7 @@
           ],
           "lastEntryHash": "fed8625b8381262865606d0b278dccc6ebaf4c04066fc937f8646599064226e5",
           "lastSnapshotHash": "1b98ac899d90ccace447fd5ce35e783369296ef997bc310d20a5ad475a2727d3",
-          "lastDeltaHash": "07c9686aa3413cecbb817fa00c1cccc9a0702bb87057c07c17c979367945f159",
+          "lastDeltaHash": "c308da5c4ab9fba4288937d528c38012ba1e5cb951a1fd849cd590df1ff08784",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -3611,7 +3611,7 @@
             "ev.adult.after-school",
             "ev.adult.first-job"
           ],
-          "selectionTrailDigest": "fc863822798ecd4a61d895b77b025bf296a9543758b95a114e4f0a33b9a1a0d4"
+          "selectionTrailDigest": "0492a054029e1a62ed71cea76d4fa053b1f320298058d089e7c9bc35a983be0c"
         },
         {
           "id": "p3b-main-046-random",
@@ -3624,8 +3624,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "b5b10f154749fe8359e5203e7c790b3e11d74ebda9b7ae5bb7d1ab472e93140f",
-          "hashChain": "18d3f24c76ac94d9e53780d4ad80d1687211e3c77464f338993d5d278b2e34a4",
+          "stateHash": "d71a51a251bbd320ba2aaf8f4ec613ee50b140e14e90f3491481bea45ed77851",
+          "hashChain": "dce218acf66382454acb4c04223b4c187b0b713a004e00fe58e20d2e8968ada0",
           "commandCount": 26,
           "entries": 20,
           "snapshots": 20,
@@ -3664,7 +3664,7 @@
           ],
           "lastEntryHash": "f4b48b6cc0317ca1df0156c0ede8918449891e035c379921511d6d67ed909c0f",
           "lastSnapshotHash": "1ec45868dee0080428cb17a3a5828360c956d3a36056fc34f78cb7be51fd86dd",
-          "lastDeltaHash": "589490f61541777d1f9d4da6b1e9531075a1bbdef530c8caa950cd2c09afe37e",
+          "lastDeltaHash": "61931ea4b2f0e5631e783e141b70bad1b4db3b659704dd4d0cab8a7a5f86c158",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -3690,7 +3690,7 @@
             "ev.adult.first-pet",
             "ev.any.quiet-year"
           ],
-          "selectionTrailDigest": "45fd17b1a41df3dabc295cc48edbb621f20d692851030c36397c6dee467acf07"
+          "selectionTrailDigest": "871e4332ad797bf3c017d8641d174cbc2b197d2020cdc98e9ea1f525b16ea573"
         },
         {
           "id": "p3b-main-047-female",
@@ -3703,8 +3703,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "f56c3bac2afc6a66785f33507eae1c15c40673923ddbb6a1b20f367191aba477",
-          "hashChain": "38fdb8eb9a33b69b24f0084dfb35fe1c73e8db457496a6fd0e80676c1ac4c4b6",
+          "stateHash": "0503d8ca5ced2e81e05b0dd4fc4d9d5fb2ed6aa13defa2426ce7ba75578fe3aa",
+          "hashChain": "07143ed0df5a91915180d5eca02781fd82cf755e452f1a0d0d1a621384e9cacd",
           "commandCount": 26,
           "entries": 20,
           "snapshots": 20,
@@ -3743,7 +3743,7 @@
           ],
           "lastEntryHash": "f4b48b6cc0317ca1df0156c0ede8918449891e035c379921511d6d67ed909c0f",
           "lastSnapshotHash": "1ec45868dee0080428cb17a3a5828360c956d3a36056fc34f78cb7be51fd86dd",
-          "lastDeltaHash": "cb2a17fc47b444abaf701cba51cd35e8aa2bd8e369dcca47e64746122b90a08e",
+          "lastDeltaHash": "20ea0a010c66e6b80b1394d9f6fc0aa0780703e93e81da90c63240829e74a37a",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -3769,7 +3769,7 @@
             "ev.adult.first-pet",
             "ev.any.quiet-year"
           ],
-          "selectionTrailDigest": "bf0ecee29c47f976397a2affbf74e12b9c07c12870e0a3cb3125dfa3de4b6fd9"
+          "selectionTrailDigest": "095de10c434d2bb97509c8bcd3dd2f9a599a996855c85493419a00ee2a2840b1"
         },
         {
           "id": "p3b-main-048-male",
@@ -3782,8 +3782,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "bee88e023ba6ec09777e9685c0dfeceb747670fa8fd457433c14f5bd4d9cfe04",
-          "hashChain": "6d295c815834186f1014026bbeeff2f3fd6aed96933251c224a45e4aef3bed47",
+          "stateHash": "5e3a644c44789155b894b0933edaaecac999ecc5e5a3be57cf2c239e7d798822",
+          "hashChain": "c190802e9b26a86f10c6a859d9dc5916a30b6f167a28808b8c92679d193b36b8",
           "commandCount": 26,
           "entries": 20,
           "snapshots": 20,
@@ -3822,7 +3822,7 @@
           ],
           "lastEntryHash": "f4b48b6cc0317ca1df0156c0ede8918449891e035c379921511d6d67ed909c0f",
           "lastSnapshotHash": "1ec45868dee0080428cb17a3a5828360c956d3a36056fc34f78cb7be51fd86dd",
-          "lastDeltaHash": "810371fa51e2e1b2eabaf7f605b9eac1e9a72f7434c31edf3ca9d14d05b17aaa",
+          "lastDeltaHash": "ec13f6aa042897369097c78ff3ee4525ec0ae76359d1803c4b9439c804860018",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -3848,7 +3848,7 @@
             "ev.adult.first-pet",
             "ev.any.quiet-year"
           ],
-          "selectionTrailDigest": "3c77eadbe075d2a42bebd013dcebf62665ef6c92439da437528fef9687d52c1a"
+          "selectionTrailDigest": "4a79236442e3682e5ce75dc2d4941511ed030798e476fb4f8b12561fd0ab2e87"
         },
         {
           "id": "p3b-main-049-random",
@@ -3861,8 +3861,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "02e3816ada341fe8b24c6b8ade39b37684202bddbba690f5998ce68be5e4d33e",
-          "hashChain": "cd2e13f0c4ca9eef0eb60791c97971c3792bc6d37b27af6ace238eb21b4302ef",
+          "stateHash": "dc904ac857c221ea82f00c724d83e197fdeb473d1e26c36a5a2bbf2ff14643b7",
+          "hashChain": "4823a1feae0ce553da28ff2ec07c47fd7d8ffdacc6bf555026c20f8c7ec2fe40",
           "commandCount": 18,
           "entries": 20,
           "snapshots": 20,
@@ -3899,7 +3899,7 @@
           ],
           "lastEntryHash": "1b2291def56cf41330a990daa5a1ef56550bd6b8fc6dc9b686330b3108360086",
           "lastSnapshotHash": "10feec9dc7a26a9755863ea002a41ce6c3fd49fb9db9533b6d46144aced0c1d8",
-          "lastDeltaHash": "1434c887180e5014a33c9e52face2074f464efa00051cde2447cb93c9dc60464",
+          "lastDeltaHash": "e4abdd96bc30397a0748cb2f5382d4ebcf6aa156be72b81d38b46a280ee77ec9",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -3925,7 +3925,7 @@
             "ev.any.quiet-year",
             "ev.any.setback"
           ],
-          "selectionTrailDigest": "27e8f05f15dc8b8673eaf8d8b542b4371cce29369e4b76f4a0801d4764bdbf09"
+          "selectionTrailDigest": "5fd094d8a93c31095efa46861100304733fa9dc3cb42a261a1307ee6d14c70ca"
         },
         {
           "id": "p3b-main-050-female",
@@ -3938,8 +3938,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "bafc95756fbedbd2f8935e92d4dbf3922f5f53309c94646945668988262e9bb8",
-          "hashChain": "d866f396c0aaf70c315e467bffab7159e657488237a3537321843694e0cf00cb",
+          "stateHash": "b55bdbffbb2b1fc623779883d131e0124128f587feb866ecc073f7bc58cb5588",
+          "hashChain": "eb766373f2540b074c6965b93aa65b7569d39d6118c6d0b6440774cc5ac379dc",
           "commandCount": 18,
           "entries": 20,
           "snapshots": 20,
@@ -3976,7 +3976,7 @@
           ],
           "lastEntryHash": "1b2291def56cf41330a990daa5a1ef56550bd6b8fc6dc9b686330b3108360086",
           "lastSnapshotHash": "10feec9dc7a26a9755863ea002a41ce6c3fd49fb9db9533b6d46144aced0c1d8",
-          "lastDeltaHash": "61d009d0cec5522e3c0dca24efd79c5719819aa3a1a6d6a13f80c8706a164132",
+          "lastDeltaHash": "c081849f837756470117a7527e5abe71d70cf58af3ef9a38fc37731ac11ac23a",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -4002,7 +4002,7 @@
             "ev.any.quiet-year",
             "ev.any.setback"
           ],
-          "selectionTrailDigest": "a567ed6adcb8b28d3e3154375114c0aa79b01aca99f75ad7f114e198b8dc3ef2"
+          "selectionTrailDigest": "2ef069a58a401aa334c44791451788ab9fade2ce6439e99f8fa684997ad02139"
         },
         {
           "id": "p3b-main-051-male",
@@ -4015,8 +4015,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "43eeae0cd7b251e37b4c336d77274a1bd95a12aa30300024fda6e467c1fc2ab1",
-          "hashChain": "47558b9a314c1f0c2a5ec05e639c742c434c90a9698dab610fb8e3d3632bae47",
+          "stateHash": "61ec7f57cb50df110b17d296edef2db5c46cdb8644dd7b1bb7e7e6b1f015d403",
+          "hashChain": "55313d4148144e7e47c901ed5389552c55906e5ed82cfb626c2f5920f19d70ae",
           "commandCount": 18,
           "entries": 20,
           "snapshots": 20,
@@ -4053,7 +4053,7 @@
           ],
           "lastEntryHash": "1b2291def56cf41330a990daa5a1ef56550bd6b8fc6dc9b686330b3108360086",
           "lastSnapshotHash": "10feec9dc7a26a9755863ea002a41ce6c3fd49fb9db9533b6d46144aced0c1d8",
-          "lastDeltaHash": "3297e23f5611521ac9eedd4d7143108d3ddf1e263898d5b3f6ee909d6b130cdc",
+          "lastDeltaHash": "23b40a5f9ee11ba411daaadd9b696c6c3cde2c115f70b97770ba0dd8ba9f49e8",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -4079,7 +4079,7 @@
             "ev.any.quiet-year",
             "ev.any.setback"
           ],
-          "selectionTrailDigest": "d92785beb06f5df4906978c402bd534c9996e542a8be2435b651e81a90a282ce"
+          "selectionTrailDigest": "d26517ebe24611f686ec4643c00036af0b1b57d1fb9d42ba1c5d43307926cc79"
         },
         {
           "id": "p3b-main-052-random",
@@ -4092,8 +4092,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "c9eec64aaa06bcae60fb61686e26260b76abfb44e36989584962e4723d8bd5de",
-          "hashChain": "bc063ab753a1b497da5b5b34ae8a14c41ca66386b60e72e422a42814b4e2f1fa",
+          "stateHash": "ea46912f6a66ee59b1525a5cd814711e43bb749b73e6b3fb5fcbbc416edea9a7",
+          "hashChain": "5571b959d83b25a3f6f7559d459091ef21c8cbcf5c4d4dbcb28352f64e31b142",
           "commandCount": 26,
           "entries": 20,
           "snapshots": 20,
@@ -4132,7 +4132,7 @@
           ],
           "lastEntryHash": "9fa2b8432b5982d749b6b5c32ebcd5ddef3600dba30bcc56d583e0f87b92f728",
           "lastSnapshotHash": "c211ae186474edd204e83b310f0d5727fa9d24aeef94f28992130f53215d7dae",
-          "lastDeltaHash": "7def385fd69e2c697dea2ab8c66025f6929d3bd1e81abe66ca6de9728d85ac5d",
+          "lastDeltaHash": "dac5258a9a16066f5ca80ace275fb21d9602fa8b4680b8f42ffbd7199e42dad7",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -4158,7 +4158,7 @@
             "ev.adult.after-school",
             "ev.any.small-win"
           ],
-          "selectionTrailDigest": "1c0828b06cd9c7808db5bceec6e2d7fdc94e5824fabfd6ae93630cdefa2d36a0"
+          "selectionTrailDigest": "d8f0b6a536e34a7ddccd775f82976e7df4c6c8b206de7bb1a9a4844a45642bd1"
         },
         {
           "id": "p3b-main-053-female",
@@ -4171,8 +4171,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "cdcdd990d917dab8adb93f14e9bed65402f0b32cdd084ca99ff8bcd60f65c4d1",
-          "hashChain": "eae9734c030aca0f76594c1fc0f38d95a6d5a6c07e81b8b0a525ad85c4ad07d7",
+          "stateHash": "ef5f7ea2c19bd0e7b1576bb691f7fdc668e31644efa2979c26ca589b9530e029",
+          "hashChain": "6f2bd8043ff8d97676e80dd1e2e42f8bd56b4f52fa45e7648460d813e9ce5504",
           "commandCount": 26,
           "entries": 20,
           "snapshots": 20,
@@ -4211,7 +4211,7 @@
           ],
           "lastEntryHash": "9fa2b8432b5982d749b6b5c32ebcd5ddef3600dba30bcc56d583e0f87b92f728",
           "lastSnapshotHash": "c211ae186474edd204e83b310f0d5727fa9d24aeef94f28992130f53215d7dae",
-          "lastDeltaHash": "d0bb6814c28942c2a2193493ee82468c790f34566915a2e300d105dacf77d7d2",
+          "lastDeltaHash": "385842e6b71934425f87d0ddf483c6eeb0ee217f33f640308745dab7c3f7dba3",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -4237,7 +4237,7 @@
             "ev.adult.after-school",
             "ev.any.small-win"
           ],
-          "selectionTrailDigest": "da6db34ff5b689099ca5bb0b9036147f508533acfc0d77dd21930bcb8c27a9f8"
+          "selectionTrailDigest": "2bb2c39b40d92a66c5f9711d3af85a2520e1a81015e68fdc46d5badd19563e4c"
         },
         {
           "id": "p3b-main-054-male",
@@ -4250,8 +4250,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "4d7c22851cba9b446c74f20c46b1218a1797ddadcc1411c3da6783cbe6b981a4",
-          "hashChain": "32c3806ce716031ec2d421d202997326eb7eaca4b96649ebf8118e70c650c48e",
+          "stateHash": "7d4fc4ac430ea8bfd5ee9f2a75f83239349aaa96347a1ad6c2ac1c8c5d43db8f",
+          "hashChain": "d95d28b50e947c87947a37a7a6150517b53dc2f143a936fa6381d3e99cc357fa",
           "commandCount": 26,
           "entries": 20,
           "snapshots": 20,
@@ -4290,7 +4290,7 @@
           ],
           "lastEntryHash": "9fa2b8432b5982d749b6b5c32ebcd5ddef3600dba30bcc56d583e0f87b92f728",
           "lastSnapshotHash": "c211ae186474edd204e83b310f0d5727fa9d24aeef94f28992130f53215d7dae",
-          "lastDeltaHash": "9cd6ba1940faa88c736a58382cdd5c7a6bd7b881daf31c6f9f4620b3e447df2b",
+          "lastDeltaHash": "df479b1e6c3232c23d2e6d518f5138ad12069c6dd0165536db6679610eb82745",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -4316,7 +4316,7 @@
             "ev.adult.after-school",
             "ev.any.small-win"
           ],
-          "selectionTrailDigest": "2a8886dd95247d8be67b4491b1cb10dfe82e1fe9b9a827bd9d97ebc7ad11b08b"
+          "selectionTrailDigest": "3424cccc3caa2bc6028fcee6f19bab3fb14cd5c9e516696dc7dbdc4466a4fb3c"
         },
         {
           "id": "p3b-main-055-random",
@@ -4329,8 +4329,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "324f1dd9097404ef44cdf60179a70af479a685346752e65a0eaff7c832999fc4",
-          "hashChain": "4f8e3dfdd2808c4aebadae99d521d70fe4c164b67878c718ac39a839874f1108",
+          "stateHash": "a8eb0d4a639e924b4a1291c3a123ea9a52e9dc3286ea34d2ac9ce1873db17b14",
+          "hashChain": "174de7816f1f21d3fb4c8d22b67e35e1e745a9e8f82569c132a801b593d5db2c",
           "commandCount": 24,
           "entries": 20,
           "snapshots": 20,
@@ -4371,7 +4371,7 @@
           ],
           "lastEntryHash": "06532777d41a79821b9b3b7ec84ad25b9cae2499639a8d57623f2569fc0f0538",
           "lastSnapshotHash": "21690ced6862f3b4c35f4e342ff092680782f0f0b8f2c71a05039c5f63326804",
-          "lastDeltaHash": "896e50a7566a627074256fa343dbc3446240fe44d538e3defff641df03046b8e",
+          "lastDeltaHash": "82d635e66f8872192d316cf15c4da5bc64eea5aeb9dbace0460c0b62442544c5",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -4397,7 +4397,7 @@
             "ev.any.small-win",
             "ev.adult.after-school"
           ],
-          "selectionTrailDigest": "3fbc60db9851219b611bb4f088d2cbb1a30a9eb28da4572637dcb7ab9b7fc9d8"
+          "selectionTrailDigest": "b2beada824061d317a0a1cf5aa4a55e1d5696c2661d1ae57c9064a868286d6d8"
         },
         {
           "id": "p3b-main-056-female",
@@ -4410,8 +4410,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "acb99c47938c3f022e3fd741f95e910938ea2138b6d7ec428771a946c31a9d38",
-          "hashChain": "59a0ef0343360d4d6da6c1c42ff75e1079737954bb2f9eac9c3c57d4512ffba4",
+          "stateHash": "724f94356272ca8a2610bdefb8ad3aa076fadfd05a307678d117b6412af5fc1a",
+          "hashChain": "279737d240f1fd941b7c2914bdeca2ce80c34931e78d2c42a0db80f027190f5d",
           "commandCount": 24,
           "entries": 20,
           "snapshots": 20,
@@ -4452,7 +4452,7 @@
           ],
           "lastEntryHash": "06532777d41a79821b9b3b7ec84ad25b9cae2499639a8d57623f2569fc0f0538",
           "lastSnapshotHash": "21690ced6862f3b4c35f4e342ff092680782f0f0b8f2c71a05039c5f63326804",
-          "lastDeltaHash": "ba7e7725b7d720a3e5eff991223e9501437ea802c174ed9e29e8875a6f50b359",
+          "lastDeltaHash": "29dfff6af40bb293befb0b75d33e82161796130716296f05253cf3e4357c8ad9",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -4478,7 +4478,7 @@
             "ev.any.small-win",
             "ev.adult.after-school"
           ],
-          "selectionTrailDigest": "48216cd88f6f4acff4717d6c5f7610a648acfe027ade61000747cd7c9b80c877"
+          "selectionTrailDigest": "144fbf82a42ede9d29bbbaed90bf34798e09c58f42dd941fa639acf5b0ade026"
         },
         {
           "id": "p3b-main-057-male",
@@ -4491,8 +4491,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "cb3f56a57cae04bdcf2f96da88744a9e2e875747d801616d9124bbcaeb7678ba",
-          "hashChain": "edc418207cd72c23a90399eac338db9461469db0c71f21b0ce28fe6de784740d",
+          "stateHash": "ccf1652f8ed40283da0a88a6b9d308883db6f42e63e078356109935b64013317",
+          "hashChain": "4b372fdbfa564177c3482fad51c6fbb7bb1eaa36fda9a5496816667c63837c74",
           "commandCount": 24,
           "entries": 20,
           "snapshots": 20,
@@ -4533,7 +4533,7 @@
           ],
           "lastEntryHash": "06532777d41a79821b9b3b7ec84ad25b9cae2499639a8d57623f2569fc0f0538",
           "lastSnapshotHash": "21690ced6862f3b4c35f4e342ff092680782f0f0b8f2c71a05039c5f63326804",
-          "lastDeltaHash": "973ef19c499f70f45c441f200b99cf4c9507225f635ee3a73d11afc4e0a090b6",
+          "lastDeltaHash": "652ad7001067904201874f0a02258950c561a97f6749e7c6460f714172b33fcf",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -4559,7 +4559,7 @@
             "ev.any.small-win",
             "ev.adult.after-school"
           ],
-          "selectionTrailDigest": "81aa58745099e3ad540b7afefae8c0bb6a3b4a993a6fe4a9f35d8ebc3b248e86"
+          "selectionTrailDigest": "4bd06857cf3ec33f8f295ec55909be9873b53110de413ce08254a267adaa317d"
         },
         {
           "id": "p3b-main-058-random",
@@ -4572,8 +4572,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "3cd8fd5d2cb195dbafc725a839b27922ebc2486e25b04e012d7989bdd0e05f1a",
-          "hashChain": "fe36cf59e0fdd2e8ada1898c86b3a223afa2e989d22f55f1f1f1c6ff6f476779",
+          "stateHash": "00defd3f41be29207f3bd80e552d5a1d42600c0a049a28917c36ab30f7c43ff2",
+          "hashChain": "96e625b6a9ccd699ad145d0cf93b39b177bebc074d4620e5ef1ce98332eb78f3",
           "commandCount": 20,
           "entries": 20,
           "snapshots": 20,
@@ -4613,7 +4613,7 @@
           ],
           "lastEntryHash": "c0ea3b565be21898cc9cb3ea67752f1ed92ad6f9c77b8160e858892dc4494dd4",
           "lastSnapshotHash": "fe5e03df2f283b72a3bff69e103f8fae0cecb69fea709a1ba4ee831a12fbb909",
-          "lastDeltaHash": "043ec811d3050d7b682384579d3f457b668d54976ac50a46d0c0ffdd5b065942",
+          "lastDeltaHash": "98e5dd6c6d7d1b79c407fd704537266b4a2b09c68172b9be043384ceea31fbb7",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -4639,7 +4639,7 @@
             "ev.any.setback",
             "ev.adult.first-job"
           ],
-          "selectionTrailDigest": "32eb834a77d520b67318ee69f388ce341bbaa191052d0d6cdaa17931ea975f33"
+          "selectionTrailDigest": "a5c8000ee22c39422a66315f4301c2d7a7f636f687f6d76a94c142ab35c8fa1a"
         },
         {
           "id": "p3b-main-059-female",
@@ -4652,8 +4652,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "9f601ef0a22e3fde0362d90b39b67e62a09a1f35af74eb382bf3662d8b01a290",
-          "hashChain": "96ca38545336f85b4ac62ddf6664093132e375e133c150f753fdc920a92323d5",
+          "stateHash": "39962675567d2861fbf885fbd9f82e25443944e725212a9e31ae97775a35ad75",
+          "hashChain": "5b1bacafec4ad9a08d1303676aa563a74c8c2216a131a7113d25626cd303d0d2",
           "commandCount": 20,
           "entries": 20,
           "snapshots": 20,
@@ -4693,7 +4693,7 @@
           ],
           "lastEntryHash": "c0ea3b565be21898cc9cb3ea67752f1ed92ad6f9c77b8160e858892dc4494dd4",
           "lastSnapshotHash": "fe5e03df2f283b72a3bff69e103f8fae0cecb69fea709a1ba4ee831a12fbb909",
-          "lastDeltaHash": "fa87c3e661f8fa9b7468f86916c75c0ccdfdebe656cb954a6689033b456fdee6",
+          "lastDeltaHash": "641529e77dd1d52b77264b900852a3d7948a868b13f6a0bff6f76572344322d3",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -4719,7 +4719,7 @@
             "ev.any.setback",
             "ev.adult.first-job"
           ],
-          "selectionTrailDigest": "257239435ba3aa4eee9e1648c3d63cfeb523f23dc9290f5e3469534abf618db6"
+          "selectionTrailDigest": "bdfa1f51f9ee98bfc0403766737febdae160df670e7a75926da3b7b8f1bc099b"
         },
         {
           "id": "p3b-main-060-male",
@@ -4732,8 +4732,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "c4d1f00d704f2532e30f579b2d12cf04e039ffdb96e5ea209f3819d88d3b90ce",
-          "hashChain": "9a1684c97fcfec6b9ff24ac52eb5f3a07b2abcb0afb081aebedce1e41ee62c77",
+          "stateHash": "db2ba8199226fc6f407e09df00aa9ffb4152d1ae2af4699a296b8269bead1ebd",
+          "hashChain": "7201eb8565a3809113ee40305f061d0068452b609626ffa1e154f55b61a76156",
           "commandCount": 20,
           "entries": 20,
           "snapshots": 20,
@@ -4773,7 +4773,7 @@
           ],
           "lastEntryHash": "c0ea3b565be21898cc9cb3ea67752f1ed92ad6f9c77b8160e858892dc4494dd4",
           "lastSnapshotHash": "fe5e03df2f283b72a3bff69e103f8fae0cecb69fea709a1ba4ee831a12fbb909",
-          "lastDeltaHash": "1cb033d6ef30c105492c68778614db92cbdd325a97dc8c9dad6545bf67e16ec2",
+          "lastDeltaHash": "58951c4a86a6d59bfc96b71b10a76be8c8350ba6b3ce65fcf148047c7852e4d6",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -4799,7 +4799,7 @@
             "ev.any.setback",
             "ev.adult.first-job"
           ],
-          "selectionTrailDigest": "6310dadca91fe834200d3f61fd4405db3cde48fb79f823a07a7aea5c7ef691b7"
+          "selectionTrailDigest": "6a4e2fcd1f6c8814abf481f8a82ebc02ce9338b4afe9a099790ed0ce311d96d7"
         },
         {
           "id": "p3b-main-061-random",
@@ -4812,8 +4812,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "a03998d2b3b953213dd91ad20743d1550280d22666594de298934425197de102",
-          "hashChain": "1bc55f35c2db0d358c888516b4236c326e8d47463f3ee5a1a13c55adb95e54bd",
+          "stateHash": "c93b0cd5741966d4d66769d119060ca962ba1a4ecaf6940649681f24b9c91b62",
+          "hashChain": "ac73b7cb49cdbc9edee7f237e9ab119a45e77ff86c02220160bd6d1317a36ca7",
           "commandCount": 20,
           "entries": 20,
           "snapshots": 20,
@@ -4852,7 +4852,7 @@
           ],
           "lastEntryHash": "5769929c92f5f6de8c1d5cc4b545da0ff29d76572b5d27189775d7eab522096b",
           "lastSnapshotHash": "84eaef3448258c3b4d462ee5a0839814a4265c3925767272f4abf0e8bae9b3da",
-          "lastDeltaHash": "19db4e46cfbe4c585523239b315ae14efff84b0fb27113d2dd29160270877d3f",
+          "lastDeltaHash": "868d461e7d986c89c4e2325b62efa054bac0f69edd30b71b37a6e362ef4e5d4d",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -4878,7 +4878,7 @@
             "ev.adult.after-school",
             "ev.any.small-win"
           ],
-          "selectionTrailDigest": "32db885d998b7b53b9bd16908d958010ab552d3c18be789575fa275f78a87cab"
+          "selectionTrailDigest": "a87ec4d51c56ad52813979c9e65b9905092a63c07fa66647f092017fbc17f70f"
         },
         {
           "id": "p3b-main-062-female",
@@ -4891,8 +4891,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "034bc300669d03dcb9e1b74d0e1e12f0a01293d638f714af7309deeb0d11d4c9",
-          "hashChain": "11fc1232f91e18878e79ad78188c1e5de8d2a82e96eada90790b22af90b874c9",
+          "stateHash": "37646f5374bc07b75cfdb0ba2895b77440412ec3d092b69485f81ec7ce7ff1b2",
+          "hashChain": "cb8ae248ded29fc47110bcca49820ef7c318d52785f47d2b49a9460db9b7be1c",
           "commandCount": 20,
           "entries": 20,
           "snapshots": 20,
@@ -4931,7 +4931,7 @@
           ],
           "lastEntryHash": "5769929c92f5f6de8c1d5cc4b545da0ff29d76572b5d27189775d7eab522096b",
           "lastSnapshotHash": "84eaef3448258c3b4d462ee5a0839814a4265c3925767272f4abf0e8bae9b3da",
-          "lastDeltaHash": "8a6fe928eaa91500290fe917771d76b998fff6d338e84bd711a3d32dd4c256ec",
+          "lastDeltaHash": "d1e73b52fcf6642debefc910128178ca47a157b7e18b20449feada1dbc8d1b30",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -4957,7 +4957,7 @@
             "ev.adult.after-school",
             "ev.any.small-win"
           ],
-          "selectionTrailDigest": "cc2766cffb027b0c02eb3d6a7c0d2beeb2bff6369a44221e2077f5f2f305a29b"
+          "selectionTrailDigest": "cf34efbc6c06f836f99e22b0faf751512785aa8bd44e619385ae26f953ff90ec"
         },
         {
           "id": "p3b-main-063-male",
@@ -4970,8 +4970,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "68003d6563619d8965bcd2d1d7c14e4e17d6c98ddcf1010f567230141c510d3d",
-          "hashChain": "c06f49339899e32c9522b5f59241c5196627ecb7b4b3930778a4d80cf3414da9",
+          "stateHash": "62cc770bfb2899e061d8b56cadc7c4677248dfa74e9d40b520b452f451e3b0b2",
+          "hashChain": "0fdf74ed0745740aaced0274ea3dfa482e1d3a5b756b52071a5a7e53fcaca689",
           "commandCount": 20,
           "entries": 20,
           "snapshots": 20,
@@ -5010,7 +5010,7 @@
           ],
           "lastEntryHash": "5769929c92f5f6de8c1d5cc4b545da0ff29d76572b5d27189775d7eab522096b",
           "lastSnapshotHash": "84eaef3448258c3b4d462ee5a0839814a4265c3925767272f4abf0e8bae9b3da",
-          "lastDeltaHash": "2a08a0d9d9971fdf4ff7604a7b1f18a1982c70ee50158890a8d7810051c1d3e3",
+          "lastDeltaHash": "7e9b4d0173fec79034a5895b2538dff3b2f57a5dd8314144668d394f7f2a2d9c",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -5036,7 +5036,7 @@
             "ev.adult.after-school",
             "ev.any.small-win"
           ],
-          "selectionTrailDigest": "df0276dcd4d67ca30821e6d9ee5ebe4e260138fcce20fcf5549b779ad1a75157"
+          "selectionTrailDigest": "66da1ffba0054a8361ff7b10759787d5b443c8d25af1038ccb4ba11b96673a30"
         },
         {
           "id": "p3b-main-064-random",
@@ -5049,8 +5049,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "3fc99fcbe1eb76a1162c57d4d1027780ef861dfde37a1da05289493766988e79",
-          "hashChain": "261653687990f12ea611e18faa39e6efddf24732cd3da4b10aa1cde1f6ae1264",
+          "stateHash": "6d8aca4269dbd519af3c1c0864952ccd07b3333ccd84e7de59c1dd1b9b0768b3",
+          "hashChain": "442bf40b9d7d246c003f075c5243ba5747d62b0903e6d73fbe659e3197158183",
           "commandCount": 16,
           "entries": 20,
           "snapshots": 20,
@@ -5089,7 +5089,7 @@
           ],
           "lastEntryHash": "439a206b155e66ddc301b86e35ad526dc6b798c584288154b79f39e827143ebe",
           "lastSnapshotHash": "73f8859c0d9099cb3b6d0aebc36e6b1773fdd03d0fa89dfa3e9066a56e3d4720",
-          "lastDeltaHash": "f35801f8b69526904942487745ca833219b12de4045a534051cb6e9aecc56212",
+          "lastDeltaHash": "6efb375492272d80f242b06b77af24e0dc206d49b5839ea9d7b0e65995add90b",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -5115,7 +5115,7 @@
             "ev.any.small-win",
             "ev.adult.after-school"
           ],
-          "selectionTrailDigest": "353e070fbf21e406fa56aa2baa2db9f931a5df7b773497b81b09c31579019635"
+          "selectionTrailDigest": "f5eb9287878326a79a5e34a0f643625c74ec1337c8946bb6a7cfee29a27abe43"
         },
         {
           "id": "p3b-main-065-female",
@@ -5128,8 +5128,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "1d34c91d648223c02b5fd77d6a8d0070cce4f26a41cb9eb2ff01a9fbd845a562",
-          "hashChain": "c1ab519c6a4bf43a1feb50a16bda37e96abc4bbc3e1a73ba0eccd092f1daf7d9",
+          "stateHash": "3f84138abe80315a1e55aa162d7244dab8da7dfe49d1afabf333ee9a8f35e4f8",
+          "hashChain": "b138ffe14d316566f12309a3db0ab883a8a38b4a92e413a14c2d2f5b6218b4a4",
           "commandCount": 16,
           "entries": 20,
           "snapshots": 20,
@@ -5168,7 +5168,7 @@
           ],
           "lastEntryHash": "439a206b155e66ddc301b86e35ad526dc6b798c584288154b79f39e827143ebe",
           "lastSnapshotHash": "73f8859c0d9099cb3b6d0aebc36e6b1773fdd03d0fa89dfa3e9066a56e3d4720",
-          "lastDeltaHash": "ab2151478e9bf1d7ad657899f6862d90d4183e6f18b8a78325cba42794e92969",
+          "lastDeltaHash": "6016e00e18d26614626db25a781e3548774ccf1033a907640c61bc92ceefbcc2",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -5194,7 +5194,7 @@
             "ev.any.small-win",
             "ev.adult.after-school"
           ],
-          "selectionTrailDigest": "93f78619c8bfacfbb50dd4044b72f9afdf5484334b6a857910dafcd55e7ccae1"
+          "selectionTrailDigest": "f244fb9643fcaf3d2fa7fb4b6c775b6722bd0bd5fa9b664a7638ba79783f8400"
         },
         {
           "id": "p3b-main-066-male",
@@ -5207,8 +5207,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "910f0ee38c2655de1a9c54cca17f91c6f6cb8e8754d3e0e6b02df81df674647a",
-          "hashChain": "29a3ef6b38aa389ffbc8ea6f049f90a327b94ddd6a5ff6504d7327cb3fc3d882",
+          "stateHash": "b67951109413b3f61f5776396edeccfd31cb950ad7debe9a6dfc53e3482af70a",
+          "hashChain": "82a30c489736d0fc6c2b00e33beea2b2d45eb9a03fee6caab9f6f88fe4b206f1",
           "commandCount": 16,
           "entries": 20,
           "snapshots": 20,
@@ -5247,7 +5247,7 @@
           ],
           "lastEntryHash": "439a206b155e66ddc301b86e35ad526dc6b798c584288154b79f39e827143ebe",
           "lastSnapshotHash": "73f8859c0d9099cb3b6d0aebc36e6b1773fdd03d0fa89dfa3e9066a56e3d4720",
-          "lastDeltaHash": "4eb6b2aa3adb2b83ce779b6b4cda84b3228a84d0869b6498e6b2e9b8f1456a88",
+          "lastDeltaHash": "7b1272eacc3f640af52a64739c90cd06d19913ee56cbcb7bbfd75ab2ef19a11f",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -5273,7 +5273,7 @@
             "ev.any.small-win",
             "ev.adult.after-school"
           ],
-          "selectionTrailDigest": "ad7a7e337ac17944f34764eb36f99badf824e037aec892d2c82e77eb2b488a42"
+          "selectionTrailDigest": "e715ec9fb6cdf431ba1cb4ee7b2b792d26ff1f08f5f04f0774b81ae1999a492d"
         },
         {
           "id": "p3b-main-067-random",
@@ -5286,8 +5286,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "a0f0576409f3680096258ef0a4749482e793e58087afbf6065a3bebb86300226",
-          "hashChain": "74f4d9bb2c4ac6910c9bb37e8ac51521148db988333dac52e73161411d986713",
+          "stateHash": "370fac8df8340c6a7be5767ae256861f4a08ae0cd1bd51017b3a6c7ced996fc6",
+          "hashChain": "ee68036bc56d494ac73325b3ef84f1f7ac240df16270fb65e93ec4387dc00bc3",
           "commandCount": 20,
           "entries": 20,
           "snapshots": 20,
@@ -5328,7 +5328,7 @@
           ],
           "lastEntryHash": "1cc362b6511bfc53e579f30755f9d505b0e6bc9bb2e8f99078210d192c0c86eb",
           "lastSnapshotHash": "56ed6e16fea7dfbedff374abb04b9d675f54142c85384646d3de6b7030795d4b",
-          "lastDeltaHash": "e982295133ca5260555f2731aaf2239a7c29dc86bf3ed83e16cf22e0fe454353",
+          "lastDeltaHash": "5b39917778065a824d69cb30546611a574cc25df75ef701b8f314898b0631215",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -5354,7 +5354,7 @@
             "ev.any.small-win",
             "ev.adult.first-job"
           ],
-          "selectionTrailDigest": "6749abfc857c351221d10693b32ad84e3c0156506ec3ae3e997e7f0dfec19a6e"
+          "selectionTrailDigest": "802a57d138e6929b0adcc1f8bfde6f29394809c656eec0154759a59fd5fe09fb"
         },
         {
           "id": "p3b-main-068-female",
@@ -5367,8 +5367,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "9344eca657967dc3176262dec930007c7586e5955fb1c9662dec33b6bfe2eb94",
-          "hashChain": "0412decfd3c3df302fc77aaa81d28e1ceea3dcc1225624623e8188a192357085",
+          "stateHash": "75914656d3a27c6af5e8fbaa93d6f785b2afec19662e2fac0fc898bb15518594",
+          "hashChain": "8bc4db9154ce9cc19281b34ada5d6788f5138e0b79e0637032d209f12481ee8d",
           "commandCount": 20,
           "entries": 20,
           "snapshots": 20,
@@ -5409,7 +5409,7 @@
           ],
           "lastEntryHash": "1cc362b6511bfc53e579f30755f9d505b0e6bc9bb2e8f99078210d192c0c86eb",
           "lastSnapshotHash": "56ed6e16fea7dfbedff374abb04b9d675f54142c85384646d3de6b7030795d4b",
-          "lastDeltaHash": "0fff5d1d967ecb71fff7344dc8ed6e7b90f38d621caacb0de1bd97fb016cc448",
+          "lastDeltaHash": "e0fd577a5620e2efb124618ae1a4ff5cacb86f7a504a63a478deaf616df1aa7b",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -5435,7 +5435,7 @@
             "ev.any.small-win",
             "ev.adult.first-job"
           ],
-          "selectionTrailDigest": "0a4024b413ac4f4a318ba5eb52a3bd2cb2509ce0dc47dda1e903250cabbcd286"
+          "selectionTrailDigest": "1fd897126ae7eaf66196b4c904a53da2f5a32b638cb78b4f71a129e502c0af07"
         },
         {
           "id": "p3b-main-069-male",
@@ -5448,8 +5448,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "b0d537e645e05b14fef2ab1219ae39bbd860b4dbe0305e16f0353e116fdedba1",
-          "hashChain": "663daa5a8a92661622f411d150fc8ae67352ee9770dd4688c5c5c863100ee703",
+          "stateHash": "82f7e748de44d43b95ae1df17c07094b2e6bb0c73c4971de796dc619c474c899",
+          "hashChain": "d5ee30bfa90de0783e4c6bf75f7192061f158de616c02372e29b23b18fd4db9f",
           "commandCount": 20,
           "entries": 20,
           "snapshots": 20,
@@ -5490,7 +5490,7 @@
           ],
           "lastEntryHash": "1cc362b6511bfc53e579f30755f9d505b0e6bc9bb2e8f99078210d192c0c86eb",
           "lastSnapshotHash": "56ed6e16fea7dfbedff374abb04b9d675f54142c85384646d3de6b7030795d4b",
-          "lastDeltaHash": "bd6c5f73283261224b6508ed9af108f41975eead39f9dc4ea7ab13271ab5f00d",
+          "lastDeltaHash": "2dd026e18cd4d69d3c5a2600ba8e51a6528d0c57e24c9624d3dbde15420b7b7a",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -5516,7 +5516,7 @@
             "ev.any.small-win",
             "ev.adult.first-job"
           ],
-          "selectionTrailDigest": "c08507f292bfc04ce6056763ffe6954d0c85fbaabd969813449ab7544278d273"
+          "selectionTrailDigest": "a8d13a46c94b2c1f08f9819fff303f330f65d1a3b0d29c0ccba45aa216c18a60"
         },
         {
           "id": "p3b-main-070-random",
@@ -5529,8 +5529,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "2502557953b4f18aaae8f94ddb9ecd7bd0fd97e98dc792be944d6d7a67d97ada",
-          "hashChain": "af1178b53c82ee4d2054cb967342802f19f6e5bba191a9a61b19ea8f22f596ad",
+          "stateHash": "20241e8d4f2d4cc50f11c6639256c66893b3524dc84c5b14d501768db4e50ab4",
+          "hashChain": "40d72900c8cba899dd94ae72464831c4f7689e3c1d0874f34beb51ca8497e8ca",
           "commandCount": 18,
           "entries": 20,
           "snapshots": 20,
@@ -5568,7 +5568,7 @@
           ],
           "lastEntryHash": "9ba9eb6abfd6665aa4561ea1f1f9d20bb968797bd195981059ab85d02808844c",
           "lastSnapshotHash": "16c6f1b4cadc591bf356a9c87dcdd065ef6f9b5ee4d763f8679e9e7268e99cf2",
-          "lastDeltaHash": "26ffb16213398547045cf2f07f14944c9c27c34a8610353d880bf0fc955a7f2e",
+          "lastDeltaHash": "f0918f4ffbbc4121e70a2fd68b5cdfbfdd6deb19871a93cca6e2bc7edd722e3d",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -5594,7 +5594,7 @@
             "ev.adult.after-school",
             "ev.any.small-win"
           ],
-          "selectionTrailDigest": "061c37495cabd7d99740749c91dfc09f301601ada82ea6678462b5b3de31befd"
+          "selectionTrailDigest": "f6c50153e3dc8ef2cb25908ea644871b1bc68c002f898dbe050124a4427bf273"
         },
         {
           "id": "p3b-main-071-female",
@@ -5607,8 +5607,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "35e02969dd89f812f3f6ef30b7b0da55c750c531c05bb5a43fb6a797be3a5231",
-          "hashChain": "9a753070374f3dba69c133d96432e020c0583ee0e2ad598709571ececce866ec",
+          "stateHash": "93acccc3d4d06710c1f61bccd8512d436bcadc725f9f621dc6ae42c64a801c25",
+          "hashChain": "d483f760988379899b088bd529dc8dba370e2541d53722548b5676afc2a3d726",
           "commandCount": 18,
           "entries": 20,
           "snapshots": 20,
@@ -5646,7 +5646,7 @@
           ],
           "lastEntryHash": "9ba9eb6abfd6665aa4561ea1f1f9d20bb968797bd195981059ab85d02808844c",
           "lastSnapshotHash": "16c6f1b4cadc591bf356a9c87dcdd065ef6f9b5ee4d763f8679e9e7268e99cf2",
-          "lastDeltaHash": "40598faf1c5e6d02eeaa07df51037ac1273c4a8d3ba5310de7287290334eb2f8",
+          "lastDeltaHash": "8f6129879a9acc6cc78ecb55edc431993c47a2a08180a182363a21f8e6a33e42",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -5672,7 +5672,7 @@
             "ev.adult.after-school",
             "ev.any.small-win"
           ],
-          "selectionTrailDigest": "ea67b93551ba19450a8d5454fe96b8ff82a84e82e9bd8cd2fcded7e3223b8fea"
+          "selectionTrailDigest": "aabfcd7d05f29aee56ff2a2beca9e27870e2588dcd51561877bc24ee031bbd7d"
         },
         {
           "id": "p3b-main-072-male",
@@ -5685,8 +5685,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "d2e30e2b3a87d0ad86bc2ea157b641c19fcb26b5975268c0c9a27c6b776fd442",
-          "hashChain": "aab9232c9e1e027a1e13d516b57468d4fce2f208a2d83041eb89158c4818b639",
+          "stateHash": "5f209717a7cbb2b15c68c8bd05eeb99d366c189b28f647c383913fdd3b805b5b",
+          "hashChain": "419f58de7a0cab60f3542585911ac50c11dcaed7b2dd628b89f92d2bdffc36d8",
           "commandCount": 18,
           "entries": 20,
           "snapshots": 20,
@@ -5724,7 +5724,7 @@
           ],
           "lastEntryHash": "9ba9eb6abfd6665aa4561ea1f1f9d20bb968797bd195981059ab85d02808844c",
           "lastSnapshotHash": "16c6f1b4cadc591bf356a9c87dcdd065ef6f9b5ee4d763f8679e9e7268e99cf2",
-          "lastDeltaHash": "d78121e1ec19a6dcf531bf6d19247e02267ee87c64fd4972ddc7093ca5ca8563",
+          "lastDeltaHash": "deb9c74f55c10be768819e3cf1fc4b6cfc2227b06436db41ba26e9988c0ee141",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -5750,7 +5750,7 @@
             "ev.adult.after-school",
             "ev.any.small-win"
           ],
-          "selectionTrailDigest": "327e1ec253a8057b9d14d05e82eedc66bfa79baebabbf3a951ebb3e41e88318f"
+          "selectionTrailDigest": "bedf999e891732547b20a517a34b2cd01c7da3e18c5fd07fe6b1b853533b80f5"
         },
         {
           "id": "p3b-main-073-random",
@@ -5763,8 +5763,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "5fda36a0cfe65f68ebe1c692a57a2be3748c35fb0cb0906339a4e05ddd4cf5b4",
-          "hashChain": "3ac008083396193754d901b4710ff9c155cc56069023ef97ce5c376eac63e788",
+          "stateHash": "cf23130f0333ce5e7e7ef971e75a8b448d389d1157d51d60af315e1979b255dd",
+          "hashChain": "8f4193f8480a184ce3ba49f875d005f20ee9c960525870f7326ea2035fb068bb",
           "commandCount": 24,
           "entries": 20,
           "snapshots": 20,
@@ -5804,7 +5804,7 @@
           ],
           "lastEntryHash": "021d200030a23395ee6d87d283a898ae3f2ffbe6634eded56248d54819c0a010",
           "lastSnapshotHash": "535d2e125c1f0c49fa83d0752bd3fb6a87558e66c42c65c37cb5b364b7574093",
-          "lastDeltaHash": "0408d90d343a2d5c979ab47898770d6f9221f7f1852d5bf0c1e72b223cc66a07",
+          "lastDeltaHash": "39c1df34a4c1b6accbaa7c8ae57add48450efb030771d5cec868503646d27029",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -5830,7 +5830,7 @@
             "ev.adult.first-pet",
             "ev.any.small-win"
           ],
-          "selectionTrailDigest": "6cf39b06ba557a1be2060eae82a0c230ab843f5cd1b498fddd32cf23b0cc2864"
+          "selectionTrailDigest": "f7e03f299b8cb098c4b8ed15ae0ab2681fe121395358b39d401420cf7154e89f"
         },
         {
           "id": "p3b-main-074-female",
@@ -5843,8 +5843,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "8b4ffe3e7d1fbcf6c703b92af199818f42b2da26994187bb25e4e41bb04f8649",
-          "hashChain": "5ab2e14eefbbe4221351388808ce738d3e5298e46802f64d7b9ba2b1b831f91a",
+          "stateHash": "4a15d6c5426002ae418cb1130bb22a2eaf3f3863e219e9fc5046ff713e191376",
+          "hashChain": "2a81edf3cc9bd73efd9db1e3b94410b364ceb4a8c44904c8afaa7a091965e7c0",
           "commandCount": 24,
           "entries": 20,
           "snapshots": 20,
@@ -5884,7 +5884,7 @@
           ],
           "lastEntryHash": "021d200030a23395ee6d87d283a898ae3f2ffbe6634eded56248d54819c0a010",
           "lastSnapshotHash": "535d2e125c1f0c49fa83d0752bd3fb6a87558e66c42c65c37cb5b364b7574093",
-          "lastDeltaHash": "3f8edd123c7653442a602242a849b1df9d312181395947af6a2b0422664c4f3c",
+          "lastDeltaHash": "5183bd9d0ee4619bee4122eed53a87e632439a0920f117e79a6baa8417cb8012",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -5910,7 +5910,7 @@
             "ev.adult.first-pet",
             "ev.any.small-win"
           ],
-          "selectionTrailDigest": "2c186dd8910edbc38576dad6b80338665aaff4b9fcf780355d480b4224e4cf01"
+          "selectionTrailDigest": "bdf5d3c0628e49d46204142c5bbb292eb82734ed1c4d3d2018af58ac6de69ceb"
         },
         {
           "id": "p3b-main-075-male",
@@ -5923,8 +5923,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "5147f279f2439a6885610c7bc2be2e6ec99b45431ec8af734bfbf349c438ed07",
-          "hashChain": "790c62614229cb65a6b27d61634a1e2fa1d1ad4220bb28c92e7ee3852c7e03b8",
+          "stateHash": "96e3e050ffb39dd92d45d10e9b83110127355c8a365b5d05d791ad129ecd2597",
+          "hashChain": "f68319b61f07d9372d0b10378235fbe5eb2b859103ccf952bb8c44bbf7345f7d",
           "commandCount": 24,
           "entries": 20,
           "snapshots": 20,
@@ -5964,7 +5964,7 @@
           ],
           "lastEntryHash": "021d200030a23395ee6d87d283a898ae3f2ffbe6634eded56248d54819c0a010",
           "lastSnapshotHash": "535d2e125c1f0c49fa83d0752bd3fb6a87558e66c42c65c37cb5b364b7574093",
-          "lastDeltaHash": "f8ac88194b3e448dd2deb39d944bf729f734148c09a141565a02677fd917bb13",
+          "lastDeltaHash": "341d73c1dfde226e07dc0506a47f6590d3f02a475b4c88428632bbee2167bd9d",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -5990,7 +5990,7 @@
             "ev.adult.first-pet",
             "ev.any.small-win"
           ],
-          "selectionTrailDigest": "765a84978425c2623629d7a5e3bcb2a455a02617088a6e228fa07457cb510191"
+          "selectionTrailDigest": "0d1e4b1059d30387c50614841e7c559ea7bd7f7cfaa97087771f347046a410b2"
         },
         {
           "id": "p3b-main-076-random",
@@ -6003,8 +6003,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "5ca626ba948b29fa697eb0ba1523120a45f1abf087a9c459c6eb26238d96b398",
-          "hashChain": "5546225e6f67936da9ab67ae3ac6df3a8b02b7bac429d134af510de14b33f58f",
+          "stateHash": "e9a4a1151a010967a6070296a0fa8436d9ba5e5e4118df69a5104700156bf3cd",
+          "hashChain": "38fea8353002c33e7d7d1f4c502b140a4914364a189e1ad9dd3563b0ea029413",
           "commandCount": 20,
           "entries": 20,
           "snapshots": 20,
@@ -6043,7 +6043,7 @@
           ],
           "lastEntryHash": "5be73e0a771a0bfc1b1b659efa1a99f6495f86ebbf1f2a49e95a4bf6730c260d",
           "lastSnapshotHash": "dd2b8933ff977d47bc34abb7a4fcf5eb418c59a5789e73d5d69165739abaacf7",
-          "lastDeltaHash": "1fa8e1649d032138da872b90e7b74413ca227f5256d77254a9f3db7a8a779bf0",
+          "lastDeltaHash": "d8dc98664cc427d5428c423ea06f7ae8267d8a8ddf951fa276c8fb8064e038c5",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -6069,7 +6069,7 @@
             "ev.any.small-win",
             "ev.any.small-win"
           ],
-          "selectionTrailDigest": "27d077d4bfd1bc8242b996d1952a271821693dd0c94b9766f46ca63588691d6f"
+          "selectionTrailDigest": "40303e43d0e7a1b71d0393d292692aa05368f5141f1db3790b7f99c722197f7f"
         },
         {
           "id": "p3b-main-077-female",
@@ -6082,8 +6082,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "140539be4518463382a33efc1b3a87df0a7984f8c00b55bb4bd512351f41f46a",
-          "hashChain": "d4e67ce9d2fbdda44ba42ada0a0506eaa31a073634ca727eb725d673aa5a9552",
+          "stateHash": "fe91ea526f382b012f8118324e3ea4fac0ac4b6e100fb3433da2a89dda5df53f",
+          "hashChain": "8eb68ca28e4fe6b35229bac83a3a11a09e98a7c4e0bb798e728e25629d799cc1",
           "commandCount": 20,
           "entries": 20,
           "snapshots": 20,
@@ -6122,7 +6122,7 @@
           ],
           "lastEntryHash": "5be73e0a771a0bfc1b1b659efa1a99f6495f86ebbf1f2a49e95a4bf6730c260d",
           "lastSnapshotHash": "dd2b8933ff977d47bc34abb7a4fcf5eb418c59a5789e73d5d69165739abaacf7",
-          "lastDeltaHash": "bbbd98b226e37e236e2d00fce4f033ec81d5999e0600ffcc356e689d8c07722f",
+          "lastDeltaHash": "2a1a84e5473dee5039d8c51ac1904cd2b96a8b59640642ded7534da7fa347d98",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -6148,7 +6148,7 @@
             "ev.any.small-win",
             "ev.any.small-win"
           ],
-          "selectionTrailDigest": "24ed2038928b2c6eaa9536a1b5aae56a2cc695018c815fb3aea7c79eb0124897"
+          "selectionTrailDigest": "edcac0e8e548a67bae50eb9aa6d2e4298b78cb2bbac9ddfda2481ea38cd9ba19"
         },
         {
           "id": "p3b-main-078-male",
@@ -6161,8 +6161,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "a2f1b1789f2be449b7a541afbc4e3d58bc78337de74c1e58c4823139a5162f1a",
-          "hashChain": "872ae430ecf907101ab7ce46f313ba84e55dd28f08bbe0dfb8be7de17793e5a3",
+          "stateHash": "45cd84880652c07fe74dc0acee955eb5f8012b84f5c3f15a32c8ee7c8ce457dd",
+          "hashChain": "80faf2f6f734c129c8865825136b6bb5825f91341931f07b0c51ad7aad3c2a00",
           "commandCount": 20,
           "entries": 20,
           "snapshots": 20,
@@ -6201,7 +6201,7 @@
           ],
           "lastEntryHash": "5be73e0a771a0bfc1b1b659efa1a99f6495f86ebbf1f2a49e95a4bf6730c260d",
           "lastSnapshotHash": "dd2b8933ff977d47bc34abb7a4fcf5eb418c59a5789e73d5d69165739abaacf7",
-          "lastDeltaHash": "c4428e880b04ff7acebd1718e2e777249f5b8c50278dacaf780a79d9edb3668e",
+          "lastDeltaHash": "69fb978c44f1acf744b9522c0e0cf66259215c7941206a3ce68d15a2a95b34d9",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -6227,7 +6227,7 @@
             "ev.any.small-win",
             "ev.any.small-win"
           ],
-          "selectionTrailDigest": "702d2a118665cc54e787fc68a2e7acdd41df5a5c3893cb13c104a23e875fe1dc"
+          "selectionTrailDigest": "549f376d78e1bc5a30346ebee78920129f1063f9dfabdaf8a56d489c03ca4167"
         },
         {
           "id": "p3b-main-079-random",
@@ -6240,8 +6240,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "b7c04636a6892c2ae09d68cb2739c166f70bd5332d625cf99e6c3637327832da",
-          "hashChain": "a9157ef1e38286dfd934e4c060b7d2952ff688e56c4ba87813657792d3d7bc5f",
+          "stateHash": "10e2160f47dc904559c680c1d0ee6e605418125501f482aecabeacc47f4d2bf0",
+          "hashChain": "9e15993886d9c2e10de33441bd78f0e663f3ea2e9bcd9e973a8f391b83face46",
           "commandCount": 26,
           "entries": 20,
           "snapshots": 20,
@@ -6281,7 +6281,7 @@
           ],
           "lastEntryHash": "93f40bf95a8901c21f1d4de34861e72c31a12b8b0ff329ecd22291002bb23c9c",
           "lastSnapshotHash": "b439afe5389932d4d18c7badd475c9c35f42cedd135c64428990ede6b2abc9f1",
-          "lastDeltaHash": "cf0b7c72eb62b097a338635bf39865640b80357bed7d774d4f570b2e60b6e4f8",
+          "lastDeltaHash": "c35760cea9ddb06422958229c03e5e20089b695de94f334fef22dab0e45433ce",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -6307,7 +6307,7 @@
             "ev.adult.after-school",
             "ev.any.small-win"
           ],
-          "selectionTrailDigest": "31a601f0d59052e0b27cced19665732ca5583483bf6d2595aeefa17fd74219f3"
+          "selectionTrailDigest": "e0b21ad6a4cfdf1001cbdb8bf690b8e0d059aaff03986f3bdc24480056e0b71e"
         },
         {
           "id": "p3b-main-080-female",
@@ -6320,8 +6320,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "6a49ec92408667ff0c62ca55968b4069350ae0ae193dcbfd799803db8a7b707c",
-          "hashChain": "7dbfebc92ab281aa5d302e8c9ff6efd90115e0ed6dd9f4f584423f74e76f09ed",
+          "stateHash": "da1d4a77c0eb3172295655c8b7e418cc384a7ffc6a1e6a9395ae976b0319605d",
+          "hashChain": "306675a7e580c11c78ad69415fc9fd85ed9b4dbe1883b44b6fcbb67a99ed852a",
           "commandCount": 26,
           "entries": 20,
           "snapshots": 20,
@@ -6361,7 +6361,7 @@
           ],
           "lastEntryHash": "93f40bf95a8901c21f1d4de34861e72c31a12b8b0ff329ecd22291002bb23c9c",
           "lastSnapshotHash": "b439afe5389932d4d18c7badd475c9c35f42cedd135c64428990ede6b2abc9f1",
-          "lastDeltaHash": "8246ce8ccacf26c828bb1c6e5a2c86021896058722066f9bc0a5ceabece58b65",
+          "lastDeltaHash": "d925bd6b338716e53885e5f32f7793bf651c595fbae479ecba8e88d07f4affcb",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -6387,7 +6387,7 @@
             "ev.adult.after-school",
             "ev.any.small-win"
           ],
-          "selectionTrailDigest": "34c71bb2368cb2856d637328755ba66d0398d115e713e2499da81b290e40646e"
+          "selectionTrailDigest": "944a9d9adb7018d8b52ad324d68fdebba89af0e9f7556aca4223254cfdeda12b"
         },
         {
           "id": "p3b-main-081-male",
@@ -6400,8 +6400,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "ac5f26ecadf215ea22fdecb1db1988c3ae194971bd7ac3281cb6b9d67252aae7",
-          "hashChain": "5efabb4cbf6d0949d97839e3ebe9f7c228a0da35ffb2c6325d60ac4a281f33cc",
+          "stateHash": "520cfc97995e022bea93ff881d49df7684a1d8a07e2f076c50245ca3e1f90d49",
+          "hashChain": "8e84bc5ebd692274db03cf7dc49ce63aafc6e25604ef88556e99b2d7758d710a",
           "commandCount": 26,
           "entries": 20,
           "snapshots": 20,
@@ -6441,7 +6441,7 @@
           ],
           "lastEntryHash": "93f40bf95a8901c21f1d4de34861e72c31a12b8b0ff329ecd22291002bb23c9c",
           "lastSnapshotHash": "b439afe5389932d4d18c7badd475c9c35f42cedd135c64428990ede6b2abc9f1",
-          "lastDeltaHash": "4d343101c7460a6137c5a67ce63f1166244220b55e7746f1487041c17ee8bf0b",
+          "lastDeltaHash": "29c59ef3b8e3c0d4ff48a6e233bc8dfa274cb8a845b4b95a428849de3cfe5df6",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -6467,7 +6467,7 @@
             "ev.adult.after-school",
             "ev.any.small-win"
           ],
-          "selectionTrailDigest": "d7c0c65bb5f6dd14d96be8b5421c42a46127562f0535430f67529205e011917a"
+          "selectionTrailDigest": "b7eed64c992737122b4da75959f481f64836a104bdf8f39c55b87ad314b97299"
         },
         {
           "id": "p3b-main-082-random",
@@ -6480,8 +6480,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "289b3b39a43c1c1cbffa9f8f23f55cb62cec00cbe61c0c40c02ce813fa4a6364",
-          "hashChain": "04c16cbfecc5fb3322e4a5238a7c075b645a00cecf26115fb29819b3d00feedc",
+          "stateHash": "31f69b9c628228b14edda4d99f2764a63a3e688a5d88c658e8a982282b615436",
+          "hashChain": "ba38d5d99a8f7910f17cebc04c0c9e15c0e9cda0f43b0a3c26e0bb0f961693df",
           "commandCount": 18,
           "entries": 20,
           "snapshots": 20,
@@ -6520,7 +6520,7 @@
           ],
           "lastEntryHash": "db9e0600a67f2244b7de08b88480c14bb4781fc5477387d5dda9d2888e44948b",
           "lastSnapshotHash": "46e1b2dd1848ede42693eb81a9a1c4457cc2af0b4109eb0126f6f8ecd054a65a",
-          "lastDeltaHash": "817ee341dc7c3fdd43e206fe71e1cd30745169da001377f5c227a931a5d9a70c",
+          "lastDeltaHash": "d05d46655b738bb5d1eafc195c86b0cf5c400637650bbc223e16ef6b27220722",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -6546,7 +6546,7 @@
             "ev.adult.after-school",
             "ev.any.small-win"
           ],
-          "selectionTrailDigest": "368886e36a34aa8381f113a279a1142145f8afafcb41188b1dc9f1d8e85c7a5b"
+          "selectionTrailDigest": "919f8fe72fae16d7f1f817b5b595df25cff4c8135edcf8ba96419de9ecfee5ff"
         },
         {
           "id": "p3b-main-083-female",
@@ -6559,8 +6559,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "f4e6ff1c4d276668932b56f480a4de1bcb48450cdc23d4b8d961dd8a7c73711e",
-          "hashChain": "98f7f37926e184fda4b13946fc3b41e3c66e3025ace1c8c9a18d407162d38668",
+          "stateHash": "7b122438dcbad788bed0be7b7379831369e13028de23e8f1a55e41d6672e0508",
+          "hashChain": "cfc2a275e2f11f97fb00da95b8f632301f06378d5b93a4c1b20a1cb2af3cad65",
           "commandCount": 18,
           "entries": 20,
           "snapshots": 20,
@@ -6599,7 +6599,7 @@
           ],
           "lastEntryHash": "db9e0600a67f2244b7de08b88480c14bb4781fc5477387d5dda9d2888e44948b",
           "lastSnapshotHash": "46e1b2dd1848ede42693eb81a9a1c4457cc2af0b4109eb0126f6f8ecd054a65a",
-          "lastDeltaHash": "968d5afc1ab1c4729d9c4d5ae9edcd335b5e896b153e5c6da56765cf724407ec",
+          "lastDeltaHash": "665967dd2b57c0b50e7f333b1b209b1f67348428d27d834eb8b47dad10ee7482",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -6625,7 +6625,7 @@
             "ev.adult.after-school",
             "ev.any.small-win"
           ],
-          "selectionTrailDigest": "0c4818b2178fc297179f979f83726367e7043c578c57f45022f7b0c728db691b"
+          "selectionTrailDigest": "745bbc33d4ebb5b8823f2f8df3ccae387040c0a44ae7e419a1f5a4149f603afd"
         },
         {
           "id": "p3b-main-084-male",
@@ -6638,8 +6638,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "6f641458d75c33bc9b0c8bf0758bf0c143dc0e0952ddd25d7493d26e9db69d32",
-          "hashChain": "0ad6a392fec5ed6f706c184d61e3c85ca36a4f4018398fbe9d2d91d5c20ff9df",
+          "stateHash": "fa70f9f4c0722e3c344a7047ca793e805da37901838e5791053db2b1b32ba91a",
+          "hashChain": "d39791bde8528fb0e7591edda68a03362df42ca7b6dfb9b681639f82d4002937",
           "commandCount": 18,
           "entries": 20,
           "snapshots": 20,
@@ -6678,7 +6678,7 @@
           ],
           "lastEntryHash": "db9e0600a67f2244b7de08b88480c14bb4781fc5477387d5dda9d2888e44948b",
           "lastSnapshotHash": "46e1b2dd1848ede42693eb81a9a1c4457cc2af0b4109eb0126f6f8ecd054a65a",
-          "lastDeltaHash": "2d8bd6176a72ada537ce930555689a1fcfd331ac69ecce9062781c0906f478a1",
+          "lastDeltaHash": "a1502a2794292f227d766c9917ef4cee9c17191923cafd116b97f272e1a98a79",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -6704,7 +6704,7 @@
             "ev.adult.after-school",
             "ev.any.small-win"
           ],
-          "selectionTrailDigest": "a642b288001620573b18ff31c20f55b1791d2e98d6675fa0c657c81179eb1c4e"
+          "selectionTrailDigest": "53f9047567aca11acee24dac79ae7807288c63465b3db58b4444cb23d328e4e1"
         },
         {
           "id": "p3b-main-085-random",
@@ -6717,8 +6717,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "04a2b7299a62a2d2ee65f563f21e01c6ebda25c535aafabc81f7f19950199956",
-          "hashChain": "c92029a0c2cab572ba036d424d230e92ac80c82c0b1f4ebc36fc3ae0e8634b5a",
+          "stateHash": "2f7e80459362c27ee3c9a3ac4c390945befa269964b5d80715f453330bf41eeb",
+          "hashChain": "ad9212b608e7851d5413f9a57a5d208d392c6bedf1b3cc983f0656f8d1b090d7",
           "commandCount": 20,
           "entries": 20,
           "snapshots": 20,
@@ -6758,7 +6758,7 @@
           ],
           "lastEntryHash": "b44a5dd8cdfdc7efe60830245cee5a4871bb46f063ee046d181a6ef5bdc1b278",
           "lastSnapshotHash": "1f09194104fc43600a07fd6107b9160fe32e1418bb99dbb57ab16c99faed677a",
-          "lastDeltaHash": "ec214913c3f700928f34ae63de9962db85577c539a3ab9250cf9132457772254",
+          "lastDeltaHash": "64fc58272655ca84845216ef96c36d3f39243659c16e2fd26ef2e4518e0717e8",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -6784,7 +6784,7 @@
             "ev.any.small-win",
             "ev.adult.first-job"
           ],
-          "selectionTrailDigest": "99d2b095051723b5b0f3f1181b19efe6ceacf08464b4b7a87a2c090033b07331"
+          "selectionTrailDigest": "dd56428ca2b4f8599c1aff6b08af44b4017ba9412692292b364bd9f556137356"
         },
         {
           "id": "p3b-main-086-female",
@@ -6797,8 +6797,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "dcc69a2702badfc630e185c0ebb09a3f68da7dd350986b847a9ba98a7df7d496",
-          "hashChain": "1f007c534da3e823e876f0c4e9fcd9150660fac894d9840773da733114f6d604",
+          "stateHash": "6b72aa85efe26fa93995b5598d3def514eafe84d69f9e18df422afe39db38fdf",
+          "hashChain": "18f7eef47dd08e5f18cbf83313dbc269316a5cb95d7569116dedf9550d524e67",
           "commandCount": 20,
           "entries": 20,
           "snapshots": 20,
@@ -6838,7 +6838,7 @@
           ],
           "lastEntryHash": "b44a5dd8cdfdc7efe60830245cee5a4871bb46f063ee046d181a6ef5bdc1b278",
           "lastSnapshotHash": "1f09194104fc43600a07fd6107b9160fe32e1418bb99dbb57ab16c99faed677a",
-          "lastDeltaHash": "3b9d5193a3febfdddaf42a987b1ae7ba80c06d03b74083eb7d3aff2bf8beb06d",
+          "lastDeltaHash": "2a7fe7508506e8c03e93372ce151efd70cfe9ec6b0ae52c198ca9324cf7bb2d3",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -6864,7 +6864,7 @@
             "ev.any.small-win",
             "ev.adult.first-job"
           ],
-          "selectionTrailDigest": "48be1cc3982b427f83f2596e78bc964ca3722261d2bdf95bbd126954825a68fc"
+          "selectionTrailDigest": "d683561725bb12cd70caa66f5c4359e44aeae2114d1fb7281dd28655061d6cb2"
         },
         {
           "id": "p3b-main-087-male",
@@ -6877,8 +6877,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "d202282aeca6c6dd1ea0248d12b7224a95905334811a5beebb00c2cb255f26c1",
-          "hashChain": "b5e902868ab0d489e5f9cab2a628bf3f0feb301ba0891700ba52397539e23555",
+          "stateHash": "2ae3054e5a98dfdf323f09f701453a3fd00f6c84e91183f12dd67f52e8efae3d",
+          "hashChain": "3843b8276c38c9dcd976f5546a1cb46c66e974fd55e94f5fbba55968e48d0733",
           "commandCount": 20,
           "entries": 20,
           "snapshots": 20,
@@ -6918,7 +6918,7 @@
           ],
           "lastEntryHash": "b44a5dd8cdfdc7efe60830245cee5a4871bb46f063ee046d181a6ef5bdc1b278",
           "lastSnapshotHash": "1f09194104fc43600a07fd6107b9160fe32e1418bb99dbb57ab16c99faed677a",
-          "lastDeltaHash": "b5149e1ba09dc4f9d659eb5e9c920b53263c6c7b135ab4a175fc03128e892c09",
+          "lastDeltaHash": "a6b60cb37b2c9004029b9adb1adff8498478e33a0780c9c0e12719cb47fed92f",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -6944,7 +6944,7 @@
             "ev.any.small-win",
             "ev.adult.first-job"
           ],
-          "selectionTrailDigest": "6fbef176bad8ca4028ecfa0c113687414df8d5827f2c601e838197190df358a4"
+          "selectionTrailDigest": "eb9dd5e4abfcc803e69529e27b55d778982719018d629268ab3ebf791cda41ff"
         },
         {
           "id": "p3b-main-088-random",
@@ -6957,8 +6957,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "25507833d092f92ffa085d5b2f6e13460e7eb814966a64a5b369abf4384cadd3",
-          "hashChain": "f94d8932241952505fd8f91e82dbc200cc3895e2ceedc944bd86246a390364f8",
+          "stateHash": "0620cacfbbab2dc3241fe4f53568383cab34510d4e0ba4c627885cd2886f1200",
+          "hashChain": "acf1c0771c25cdd0d91d5c2ce4b5f1c384146267ae8c92ef1d1a53669d717e9c",
           "commandCount": 18,
           "entries": 20,
           "snapshots": 20,
@@ -6996,7 +6996,7 @@
           ],
           "lastEntryHash": "44e1874f23002c7a7122fa920cda977b713832a0716ac25a66f058eea3da82bf",
           "lastSnapshotHash": "bf960d069338938d029058c4b78e79c084bee81d9240c75fb417d4e3fc6fb681",
-          "lastDeltaHash": "a43697d5a43c319a2f506f18976a8418568dda98f132bc9dd2ae7e06b90947c3",
+          "lastDeltaHash": "1b187fa3216fd8176d5bc29789813c8d36009f7b5c8a10f426c1da11d6c5215c",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -7022,7 +7022,7 @@
             "ev.adult.after-school",
             "ev.any.small-win"
           ],
-          "selectionTrailDigest": "60b904ebad12b5a91b6dc441ffeaf2177fc0573951c06c59ce4b05061edb55d3"
+          "selectionTrailDigest": "77db4e2baed44306c0504e8e2b21b6b84dd77962222b843a975e3e92d153c645"
         },
         {
           "id": "p3b-main-089-female",
@@ -7035,8 +7035,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "c8bf1b27b95fcc248be78331bce6c14d7c39d57b59e49ad5009fdf2cd1953b5d",
-          "hashChain": "7ca2f7098e01490a3420e7365b7e0fd76d6f21b66dedc81b893b94603262ce4e",
+          "stateHash": "df04964e08581215f46ae61baa54070c0fd2eaaec2e497465b711af4d9e5e528",
+          "hashChain": "09049768a9d3957d0255ec53d5e4d81ec715b4d0da8c83d6c2ae07884454cc19",
           "commandCount": 18,
           "entries": 20,
           "snapshots": 20,
@@ -7074,7 +7074,7 @@
           ],
           "lastEntryHash": "44e1874f23002c7a7122fa920cda977b713832a0716ac25a66f058eea3da82bf",
           "lastSnapshotHash": "bf960d069338938d029058c4b78e79c084bee81d9240c75fb417d4e3fc6fb681",
-          "lastDeltaHash": "54817c45405ab67a4fde3414cf1e050fcf256bce8ef7108da3cafe17bd7bf850",
+          "lastDeltaHash": "a7f4145cfcfa88fbeed205bf167ea55f535b2497aa57fbfbc36c75ce57236b55",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -7100,7 +7100,7 @@
             "ev.adult.after-school",
             "ev.any.small-win"
           ],
-          "selectionTrailDigest": "d2c39aa9fff7da43c88c841e5eb7a4be23858eb821ae76c74ae666a6a7c7dc97"
+          "selectionTrailDigest": "4b0c65d5f399e5c0df56b7539f5b7869b98aa66a81398965ae86f6eb6c566d23"
         },
         {
           "id": "p3b-main-090-male",
@@ -7113,8 +7113,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "e35feab70fb925fc62914314ebfdd06e0ad253227d8dcfca85d5ad3b4e1d933b",
-          "hashChain": "6df0611b29572c6b690c7c3475d5d2827424643966cb6df1a4caa3e2d8cdc029",
+          "stateHash": "7e0700d9213f5a8e862709d60d3b9c23efff305da62de1a52eaa9bf8a9060004",
+          "hashChain": "ae50349e442183a3e77380d9aaf83513f0e0622a1facc023868f37419544cb5b",
           "commandCount": 18,
           "entries": 20,
           "snapshots": 20,
@@ -7152,7 +7152,7 @@
           ],
           "lastEntryHash": "44e1874f23002c7a7122fa920cda977b713832a0716ac25a66f058eea3da82bf",
           "lastSnapshotHash": "bf960d069338938d029058c4b78e79c084bee81d9240c75fb417d4e3fc6fb681",
-          "lastDeltaHash": "f00b13259d1f4042512817494ecf2c86785a596fa193835d567d840e489e3577",
+          "lastDeltaHash": "4ea0072ba7b68a8140906276681e7b98dec4e59211d472ee3147972d0e41af7d",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -7178,7 +7178,7 @@
             "ev.adult.after-school",
             "ev.any.small-win"
           ],
-          "selectionTrailDigest": "05f2a3518a3eea6342d95b52b543c2f0dac5a5d66a7d72c9b36c36bd09525229"
+          "selectionTrailDigest": "056a2cd55ce70227d5ebaf2688e12573923601fe6879c1ad085e2492c5c88010"
         },
         {
           "id": "p3b-main-091-random",
@@ -7191,8 +7191,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "73bd9fb39d5672f09f9283276460b0325e6edbd78c9d2d3eaac252f1666bb715",
-          "hashChain": "9b706a91ae804aacd6e5e179a0ae70f07467980ed32b14d71bcddc304d045206",
+          "stateHash": "4321499d2982048d77c6d6c519078fdb873dabf79d260e483ee75701a70b2ae5",
+          "hashChain": "51d11ff5b65a2a1fafe593540d2bf66db5cee92527d04a5fde3263371495a928",
           "commandCount": 18,
           "entries": 20,
           "snapshots": 20,
@@ -7233,7 +7233,7 @@
           ],
           "lastEntryHash": "1bfdb7c2cbf0fa76283eabc6e815cbec3cf059048b82f6fb2f7859c90f386d24",
           "lastSnapshotHash": "07bf9635d86b7642926f5828823036995b480e5aa26a53e8acdaada16dc2a258",
-          "lastDeltaHash": "f8bbb38616865746bd2846fa9da7a9098947b276afbf6dfe3f71cdc06df122c9",
+          "lastDeltaHash": "c7d34b9b6263e320342f6c7ebb9ad5e8a570f10b70b0e9259dde22868c9db148",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -7259,7 +7259,7 @@
             "ev.any.small-win",
             "ev.adult.first-job"
           ],
-          "selectionTrailDigest": "a3b52035ec0af78bd9ee52e03d4025e7250dd524d353f20498e831fbe709da7d"
+          "selectionTrailDigest": "a697b9dd2b6b21c215fb8f53b96d97f223892d9324ae57706c6ef0717cb935ca"
         },
         {
           "id": "p3b-main-092-female",
@@ -7272,8 +7272,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "0a4270a4b82751ae20a190eaf52333b9932e38ba479d98145db70616b297e4b0",
-          "hashChain": "e4c55a0201180de19e79969ae8aca61fe1957882a95fb92cc4185dc1d56bcf2e",
+          "stateHash": "eee76b374db32ad04916c6a8e3d610278249e42713235d91d3030f8046bffef2",
+          "hashChain": "8e32bd184301dde758f2fca538120965ddc0d7b08d966df770d7cef361b37b41",
           "commandCount": 18,
           "entries": 20,
           "snapshots": 20,
@@ -7314,7 +7314,7 @@
           ],
           "lastEntryHash": "1bfdb7c2cbf0fa76283eabc6e815cbec3cf059048b82f6fb2f7859c90f386d24",
           "lastSnapshotHash": "07bf9635d86b7642926f5828823036995b480e5aa26a53e8acdaada16dc2a258",
-          "lastDeltaHash": "67e2164fe52f95a92a325121609c2fde8985c546fd15ac44aaf4bddf2e35cceb",
+          "lastDeltaHash": "d6c9e993985ddca6819ae05c87ebf61c898d72a27cc5ba904e681ae692f3b21d",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -7340,7 +7340,7 @@
             "ev.any.small-win",
             "ev.adult.first-job"
           ],
-          "selectionTrailDigest": "2c09ebe982102aec8cc3a37b0a55c3bfb2f02a5e63557153c86ca5fce0936f87"
+          "selectionTrailDigest": "cd22b1b56f964c486f23e6c610685547c3d9697c7a495517d36af893706ee9cb"
         },
         {
           "id": "p3b-main-093-male",
@@ -7353,8 +7353,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "82064b02fb4061ac68815e2ae6e631ea9b396a6fdb8a3c547cae5a1ef55e0c15",
-          "hashChain": "cd98c30323a4df9e9eedd771ad8d1ecc53f4d09a14d0bff81a71c6489d7e7984",
+          "stateHash": "a60445b628ca98af6584b43d22b6077bd4e7c6e330de57fcac94d8b8477dabf2",
+          "hashChain": "994633879e61558dc9e9d222bd2b2991f7f39d06f5d41568c9fc83803abedaf0",
           "commandCount": 18,
           "entries": 20,
           "snapshots": 20,
@@ -7395,7 +7395,7 @@
           ],
           "lastEntryHash": "1bfdb7c2cbf0fa76283eabc6e815cbec3cf059048b82f6fb2f7859c90f386d24",
           "lastSnapshotHash": "07bf9635d86b7642926f5828823036995b480e5aa26a53e8acdaada16dc2a258",
-          "lastDeltaHash": "ab7a96459fb6493984072e88e5a6fa04de596e040b16d96ac834fcff163c0837",
+          "lastDeltaHash": "5203b87c7b6aad2091e8f0224d4adfd4dcbf5d22f235956c1684cddc1c269602",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -7421,7 +7421,7 @@
             "ev.any.small-win",
             "ev.adult.first-job"
           ],
-          "selectionTrailDigest": "49117482850b07fe39146b2726e0d4c1c7f576060758315c2f779130d0a09bea"
+          "selectionTrailDigest": "458354d4ef9c3c351fb78e7a561ea67990f8bf4ca57760280f4471a738b5f3d2"
         },
         {
           "id": "p3b-main-094-random",
@@ -7434,8 +7434,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "c6a2fe30107b56f4c90dc50034eab74febec14a154a048d2ade005714800b99c",
-          "hashChain": "f0fed7187a6b071fc8f2e6b4e71a112386a0806101fb595732f80de32d804a31",
+          "stateHash": "7e0e542c5248989e7c6c47b5e1ad3171b48b5d3b1c46e5ec369aec6c315e4f22",
+          "hashChain": "ebe617b6b152fe9767d982e7d2da25dc314bfe5c3d418848b611cbdaa6410437",
           "commandCount": 24,
           "entries": 20,
           "snapshots": 20,
@@ -7477,7 +7477,7 @@
           ],
           "lastEntryHash": "f1cce27803b0b2d844f56ffb1b28640f5a7be7f5a41315e8278a7ea91141c0c8",
           "lastSnapshotHash": "09bbf7f734e2a6241a761fa96d8782458fa8c2dafec53a7cb896b86634dd10e1",
-          "lastDeltaHash": "633da4ee1b88f2dbc7e255ff387fce48577771a583f99fbe0740e29b3aaa2911",
+          "lastDeltaHash": "d84d706b5137ea9f7e902b13f766986a96a0e96738e639c737f096b66661bdcf",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -7503,7 +7503,7 @@
             "ev.any.small-win",
             "ev.adult.first-pet"
           ],
-          "selectionTrailDigest": "17028fd4c84e1c2897100e9483729636e5ef6367007c96a7c9a557a9b2bcb5a9"
+          "selectionTrailDigest": "0cd4b4a846d973308aa7234605b47e585da2f034e9295b165d21af852c3a64c8"
         },
         {
           "id": "p3b-main-095-female",
@@ -7516,8 +7516,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "81e0f7917b91a11ee64fbd8d6765b87d6977d39c99818aa51f326b19ae304c60",
-          "hashChain": "7f41d377833cf4794222d7281adabae30d4764233967fadf0a3e381304fc9680",
+          "stateHash": "44edd8e41b7cba6b38d814bc899a06f35abfe4196ab0dd148f54639b10352c8d",
+          "hashChain": "4a5ee680d731cf9b340c7002a02b9db856b05b622f21cb37d449bc2f7434e531",
           "commandCount": 24,
           "entries": 20,
           "snapshots": 20,
@@ -7559,7 +7559,7 @@
           ],
           "lastEntryHash": "f1cce27803b0b2d844f56ffb1b28640f5a7be7f5a41315e8278a7ea91141c0c8",
           "lastSnapshotHash": "09bbf7f734e2a6241a761fa96d8782458fa8c2dafec53a7cb896b86634dd10e1",
-          "lastDeltaHash": "c0308d704817ea4c3bcba1ae095c8e745d59c45415bf2c5417e543a216265d4f",
+          "lastDeltaHash": "e5f254a1102f3949808f35bcc86e55810ee7ad3c00870bb62bcc58ee5bcb3cf4",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -7585,7 +7585,7 @@
             "ev.any.small-win",
             "ev.adult.first-pet"
           ],
-          "selectionTrailDigest": "e849d2cf837b3694e3539da8b3e5d263d9feb51822c2df2aa25969f87334fbda"
+          "selectionTrailDigest": "868caa3c5982051c538ff572d6dcf83ba89c80799945361ab543411e43a58b7d"
         },
         {
           "id": "p3b-main-096-male",
@@ -7598,8 +7598,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "1514ae9ede0428ded52cf2ab7cff0dd434a8d561985c819a1cb58e8289645436",
-          "hashChain": "20445aed87ebd2ba761f71e6a15790652a72ef2da09092c343d860df110b095d",
+          "stateHash": "28242902b1dd38ac927636948a4183cef0010559e3e093b2eaf74dc6231968b1",
+          "hashChain": "15d3c864766a1d8a9aacd7badc6ae6bdefde591fcfc9b64b155bb779242d8927",
           "commandCount": 24,
           "entries": 20,
           "snapshots": 20,
@@ -7641,7 +7641,7 @@
           ],
           "lastEntryHash": "f1cce27803b0b2d844f56ffb1b28640f5a7be7f5a41315e8278a7ea91141c0c8",
           "lastSnapshotHash": "09bbf7f734e2a6241a761fa96d8782458fa8c2dafec53a7cb896b86634dd10e1",
-          "lastDeltaHash": "2380fd7dbac3406c92e5e7eed63f5009da638268bd065562ebed4664e46e77c8",
+          "lastDeltaHash": "b94c3997effeae714ac20376c0bc056835f2fd8f08c2c7075e7f0ef7851466cd",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -7667,7 +7667,7 @@
             "ev.any.small-win",
             "ev.adult.first-pet"
           ],
-          "selectionTrailDigest": "1437aca5f3daa387e637d08a956ce9b5159c6862f6f7ac050134c1987d3cfe1a"
+          "selectionTrailDigest": "db778011600a939799463f45f189e24ad85d473c4869681b6730c04fba81b219"
         },
         {
           "id": "p3b-main-097-random",
@@ -7680,8 +7680,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "f1331f141f1c0333730021a14264034b9ad0ed79e14023bcea5056f1a7f3455e",
-          "hashChain": "504d6e04590c429e3a4caa672ef7c0f995bc8cf6ae0207a9270f4c9bd64289c4",
+          "stateHash": "e9f877fc51b92682ec9fb431d5e468a302dc18d36d81fe9c3918e6459a160ee8",
+          "hashChain": "e0d64f016dad4cfc2c1e27fc701ab99b8e64278ba7bd80de4a45f0cb5390e629",
           "commandCount": 16,
           "entries": 20,
           "snapshots": 20,
@@ -7719,7 +7719,7 @@
           ],
           "lastEntryHash": "62b34bf26f000e098178544bc1738f687d00e0f126a67e472f0578e693de4487",
           "lastSnapshotHash": "f6dd88a84f8d1271181acbdd5e8048b44b2012c88b49968a68d30f154f668095",
-          "lastDeltaHash": "cba0f764748d07daf69c2c2491727baf017c440f33b230f36f6908fc0d825923",
+          "lastDeltaHash": "0943aca7bba214fee93e8770a940570931c18fc14360cefa85e4a7542027ca76",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -7745,7 +7745,7 @@
             "ev.any.setback",
             "ev.adult.after-school"
           ],
-          "selectionTrailDigest": "bd400c16146c1f5bbf6e0a27a28b6f7701a9dec5fb38b8e6be5adcada94c9110"
+          "selectionTrailDigest": "b3b03d6b47a927dd06f01b7c3edde65ccb887fb4f20539eeb5e728179533453c"
         },
         {
           "id": "p3b-main-098-female",
@@ -7758,8 +7758,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "7fc63861484fe940c6503e8a167c3938bb7b1c839c7a723d8710a25040366ac7",
-          "hashChain": "ccd0ade1ca3211b0c5d52c2e0eec1c33d2ef5c9b87061ee2ca59f1d5bb820b58",
+          "stateHash": "9671326e7ad2872be3acbb75dec688834527e475e9e14678615417a9861aeae7",
+          "hashChain": "187704c2d9b190205045267057d2718eeccedf7297ebf2b10351c813fbb97d31",
           "commandCount": 16,
           "entries": 20,
           "snapshots": 20,
@@ -7797,7 +7797,7 @@
           ],
           "lastEntryHash": "62b34bf26f000e098178544bc1738f687d00e0f126a67e472f0578e693de4487",
           "lastSnapshotHash": "f6dd88a84f8d1271181acbdd5e8048b44b2012c88b49968a68d30f154f668095",
-          "lastDeltaHash": "c5c2bcf5eacd85777e9cb92ebae5b89621e7d60b13643169be5c01863491e226",
+          "lastDeltaHash": "2f15e6a250319d18bc7cd4e0f56fc996c41ed59dbff1e871175b6fd4f30a734f",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -7823,7 +7823,7 @@
             "ev.any.setback",
             "ev.adult.after-school"
           ],
-          "selectionTrailDigest": "eed62011c63f8b5678fec9966f7df3282c5cb63c524d6b5576a6b5ec76ecb166"
+          "selectionTrailDigest": "0136614641bac266574bd6eaa6566ff22c4f31d2ad4beeb2e9c7608e14f2442c"
         },
         {
           "id": "p3b-main-099-male",
@@ -7836,8 +7836,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "54aadd46a710278b87aaee744a5fc821f32b97c975ef056c9dd2fea4264e2403",
-          "hashChain": "3bb82efb9ad66e33eff41f9e3ea58436dac987e04b619369bd9774838a0dcf7c",
+          "stateHash": "5cca9fe8163a159f6347196335871de1558e0c62fbe179494216865644bdf956",
+          "hashChain": "107e369f7f20ae790e7e29117a4403f06354eb45eaee235fcd9b5d9c060d7cbe",
           "commandCount": 16,
           "entries": 20,
           "snapshots": 20,
@@ -7875,7 +7875,7 @@
           ],
           "lastEntryHash": "62b34bf26f000e098178544bc1738f687d00e0f126a67e472f0578e693de4487",
           "lastSnapshotHash": "f6dd88a84f8d1271181acbdd5e8048b44b2012c88b49968a68d30f154f668095",
-          "lastDeltaHash": "c304fd9b1c2e5f43eb80a47cf31de665c22233b16fc372dc6d7882f0c1a1fd45",
+          "lastDeltaHash": "8bddbda55d1ebad02de07095798f7bb3195bc66123d5214801bf8f01cee2b9fe",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -7901,7 +7901,7 @@
             "ev.any.setback",
             "ev.adult.after-school"
           ],
-          "selectionTrailDigest": "6b03021cb2e79a73af0764faa3a429a136061e30892c074ebe2b80f095688498"
+          "selectionTrailDigest": "635d26e58eb8a5a6c638f66f95d6cd466b28b3313f8e2f809eedfc5b5212c6ef"
         },
         {
           "id": "p3b-main-100-random",
@@ -7914,8 +7914,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "1b6727bc18fd5ef914c50958552f6f1bc0d5dfc77c49b0efbf5773c0070bdbe8",
-          "hashChain": "5b15021935a0b6ea5d9059cdce4a1148293d35ae8ce0a84f949462ba8cb9a939",
+          "stateHash": "747df7109c372773d2e2c80076e495b657c7a1e7589b49154b569f665fa8703a",
+          "hashChain": "b9e84073aed42c9af856e3c534e0422be0709a09e28d4b6a7bb2ddd3e34b59c5",
           "commandCount": 24,
           "entries": 20,
           "snapshots": 20,
@@ -7956,7 +7956,7 @@
           ],
           "lastEntryHash": "feba964dd357de4456a70e4d3e4c2439e266e149d81d51c0772659b04cfe082d",
           "lastSnapshotHash": "f8c9cc10d857171f7b95c92ca96a613d777b756b97e212affaf67ae7971e41e5",
-          "lastDeltaHash": "e4473f9e649c627a83b1404ce2ad7b854ab3782bd75e3a33451cd9f2b52a12d4",
+          "lastDeltaHash": "6059fce3611019321217be5ee3b4e0c5faba5ee5a55c9c7797ff265693ff63e9",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -7982,7 +7982,7 @@
             "ev.adult.first-pet",
             "ev.adult.after-school"
           ],
-          "selectionTrailDigest": "3e096cea10ddd33e339c62e544ec764a222fd64ecaa2d541a5c591fe95440005"
+          "selectionTrailDigest": "c5a169e95e5f632c24c9d2c271500f11464282aefc9041bd52baf58bdc65ba2f"
         },
         {
           "id": "p3b-main-101-female",
@@ -7995,8 +7995,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "774f1f5ddd465057a91b6e034b8009a51bad44b7afba8348c1e7fd36af31989e",
-          "hashChain": "6a5036df982994b9531b8139400a8e92d3f7c3d5dcabaa2fdf592fb1bbc71a8b",
+          "stateHash": "aed6ea83f472d29f08929ece2a80a2eec800994dbb8a589e2e8d48d38e5dcbe7",
+          "hashChain": "4a5c61f16c808f42da5068f94580bce1a7fe69b84d5d798becd6178c9cd2b9a1",
           "commandCount": 24,
           "entries": 20,
           "snapshots": 20,
@@ -8037,7 +8037,7 @@
           ],
           "lastEntryHash": "feba964dd357de4456a70e4d3e4c2439e266e149d81d51c0772659b04cfe082d",
           "lastSnapshotHash": "f8c9cc10d857171f7b95c92ca96a613d777b756b97e212affaf67ae7971e41e5",
-          "lastDeltaHash": "d3dac185c1fddafe48f7a7b712bbbeadef3c6aa4eedca40c62710a001c2bc854",
+          "lastDeltaHash": "7d1e905369f6d2d76ed451dbe0942216ba02871a1d952c19978e2dc31b42d389",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -8063,7 +8063,7 @@
             "ev.adult.first-pet",
             "ev.adult.after-school"
           ],
-          "selectionTrailDigest": "50b737216ec5863cb381a09f088f4da8453187312476b42655cdb217c6823efa"
+          "selectionTrailDigest": "03fe4b7b1c1039b7776314dad85d10c86a5b982c43cccb97c87f74e91dd937b4"
         },
         {
           "id": "p3b-main-102-male",
@@ -8076,8 +8076,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "063a2e6044986719ed2bfa728df69df05d50563aabb2bc842e0ca451a2e90c35",
-          "hashChain": "e0e5daf4441f37f267f04aabbc1518cf56334e428ff3ca4b2fddbe58a2d5340f",
+          "stateHash": "b718d48cc132b802c0b8fd89ca095b68d3e7f937efd4879bb722a9fde9ad3baf",
+          "hashChain": "051c7a15e19914c25f628967bbede1d21b978497d43b909d242b675b2aa5a189",
           "commandCount": 24,
           "entries": 20,
           "snapshots": 20,
@@ -8118,7 +8118,7 @@
           ],
           "lastEntryHash": "feba964dd357de4456a70e4d3e4c2439e266e149d81d51c0772659b04cfe082d",
           "lastSnapshotHash": "f8c9cc10d857171f7b95c92ca96a613d777b756b97e212affaf67ae7971e41e5",
-          "lastDeltaHash": "e371f9135f03f5e03d02ba2c4abdd425c5d723c95e0ee12ba564f06898914cb9",
+          "lastDeltaHash": "d1a8919be8f1734b6cb51633a2129dc239d250c7ae458eac24c8c01f63f99364",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -8144,7 +8144,7 @@
             "ev.adult.first-pet",
             "ev.adult.after-school"
           ],
-          "selectionTrailDigest": "09cc02e0e4a3b78fb4d2e07a60be23dc18bbf255864f5eab7b6fc42e065fb72a"
+          "selectionTrailDigest": "d51df5da3a26a44628ec70635d06689b18bd6f0fa5d2c35b9f06b0b246d69afe"
         },
         {
           "id": "p3b-main-103-random",
@@ -8157,8 +8157,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "f2a0a808e9b6dbfba622ebeacb18c97b93c752a15a8333eec782e6339b6d5dab",
-          "hashChain": "1f8bc97a59195aeffbce6d547732b237e7253199077661afb7e4c8b27b34a40d",
+          "stateHash": "e39f79b1eb172917d1a533e55a4add149c8a2df51c236dabde100749e16a412d",
+          "hashChain": "2f325efe51b92b2cfff1b569c98543acd3a7fa758def75997bce9b452e3d6e22",
           "commandCount": 16,
           "entries": 20,
           "snapshots": 20,
@@ -8198,7 +8198,7 @@
           ],
           "lastEntryHash": "37135fa4219956ca7bb5bc1358abc36702a7412a562fddf6dd91214771add03d",
           "lastSnapshotHash": "8acbcb65c0e59920daaa943a1b8d9debce100f7c3f8ceee0e8c9c7d23b17c9a5",
-          "lastDeltaHash": "56872a8910216dafa14832c56f5ff9f3ee7f1898a6ab7a053bae11ef9f206e7f",
+          "lastDeltaHash": "bf11eafe9efdc1b0a072e4f64596910d1d84c9ef389943ae26e53df37e2003bc",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -8224,7 +8224,7 @@
             "ev.adult.first-pet",
             "ev.any.setback"
           ],
-          "selectionTrailDigest": "b0ce1972bddc8139ce5a210297b18cade63f4f58f2ff7582432d54bf91001a54"
+          "selectionTrailDigest": "05339dd9e09843cfba55cc29f4cdb0a1d2f5dd4c2372977640879a7251fde099"
         },
         {
           "id": "p3b-main-104-female",
@@ -8237,8 +8237,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "dc5b2f378ab71c78c1321b5cc049794af3da67a8bef3b89cb38775a6f17a246c",
-          "hashChain": "d5b5431a1b41da249d6c017f80967c4e24a9b6134e53f4cb45a5b055d748373f",
+          "stateHash": "7a9154c214bd89ed64cccb027efc93b608e30ba0a8da9076fd167fdf9ee763a7",
+          "hashChain": "c557173d613f80ba08de151b5a2ff083028282b91ab7e6abacbd48a86b36faf9",
           "commandCount": 16,
           "entries": 20,
           "snapshots": 20,
@@ -8278,7 +8278,7 @@
           ],
           "lastEntryHash": "37135fa4219956ca7bb5bc1358abc36702a7412a562fddf6dd91214771add03d",
           "lastSnapshotHash": "8acbcb65c0e59920daaa943a1b8d9debce100f7c3f8ceee0e8c9c7d23b17c9a5",
-          "lastDeltaHash": "fe61cb07a4ca53e05b80a49d0a51a883762244434ed6030f9a0570af03aa9154",
+          "lastDeltaHash": "11e73859837481f5db15537829a55ca90d0b944ec79846f1c04092f50f04e112",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -8304,7 +8304,7 @@
             "ev.adult.first-pet",
             "ev.any.setback"
           ],
-          "selectionTrailDigest": "1e76ffa558e35ae2df48296ba05e8090ed54e8d85d514d0f82ebffc5b66f8f91"
+          "selectionTrailDigest": "e13f7d35a40cc989f80b319ade992ac8212c3b83657a664ceda0e92cdd9448fb"
         },
         {
           "id": "p3b-main-105-male",
@@ -8317,8 +8317,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "life",
-          "stateHash": "196903ab6e04b297884939ce7c6c7fd05a05f7115225985fff57b955dbde7229",
-          "hashChain": "1ebdac74e5c5a60ad811176123c4116ad07e755a6e7cff70d3ce01de656cda3a",
+          "stateHash": "e53fab4b03d8193d1a69c354a6419437529aeb86ad3e1ccbe52c94d6819f144f",
+          "hashChain": "a4e2037498b0c31c84f91ef6ed0bb91f19d1a3a3b84e621b5c4fa9fa696e2918",
           "commandCount": 16,
           "entries": 20,
           "snapshots": 20,
@@ -8358,7 +8358,7 @@
           ],
           "lastEntryHash": "37135fa4219956ca7bb5bc1358abc36702a7412a562fddf6dd91214771add03d",
           "lastSnapshotHash": "8acbcb65c0e59920daaa943a1b8d9debce100f7c3f8ceee0e8c9c7d23b17c9a5",
-          "lastDeltaHash": "b74862a27276fa99593fa63cb805341a60eea88e6b5fedec34487299400b93a5",
+          "lastDeltaHash": "570b56dc7344ad79e067213e969c3903c45066a2a8283284933020cf9d422e7b",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "fast_forward",
@@ -8384,7 +8384,7 @@
             "ev.adult.first-pet",
             "ev.any.setback"
           ],
-          "selectionTrailDigest": "f225e60b248d3e71edbd0519da110c1240a05f56b08a1592091505153a902272"
+          "selectionTrailDigest": "c3afe8eba710ea62fcc19fa47467d036aed0dbdbc6e2bf07f59c146247709fbf"
         },
         {
           "id": "p3b-main-106-random",
@@ -8397,8 +8397,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "c1944aaed0c42819efa0ec5b64900d83489de3cdaf23dd42e979574f42d5cbf7",
-          "hashChain": "f592e756fc119f86cbbc7a123299cbe18b62543a3d147b886f2d32f97c429192",
+          "stateHash": "36797b7d15416962ae89aedfef5d750e2bb86430091d8cd77deffa0120ce103e",
+          "hashChain": "3b6e6b08f93783568d0a8cf17007a2bdd6f1b2879c4bdb5f2c897075d7ccf210",
           "commandCount": 16,
           "entries": 20,
           "snapshots": 20,
@@ -8438,7 +8438,7 @@
           ],
           "lastEntryHash": "f73311143b3d8cca2e295f4ef082f3f6553fc739dc3cc3ac5893c810e8dcbff3",
           "lastSnapshotHash": "f31449f0a3db1dd542ac245736bd90acf24e5f74dc7fd38bee171316f8e31ab3",
-          "lastDeltaHash": "0b512a09d79890991223b1ab77b0954a751ef5ff01a1cfe8fe13cf4c3abc49e1",
+          "lastDeltaHash": "02bf811164ff02b390e9a6f95d4d35ba62f00399ddcad1a81f6e69a92ad94cd1",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -8464,7 +8464,7 @@
             "ev.adult.after-school",
             "ev.adult.first-job"
           ],
-          "selectionTrailDigest": "aba7a898945df2a5cb2d04ba87a29a061fc9fdf274c03ba14a02961a8ab7c014"
+          "selectionTrailDigest": "9d925bc3fef6379276fde35aeeda2d894c87c056a31362d50928c9a0423835b6"
         },
         {
           "id": "p3b-main-107-female",
@@ -8477,8 +8477,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "2eb7fc95de448863c18c68c03f958a9099c4da1236ef1fef28ca76c7680a0516",
-          "hashChain": "c3b1e78c0668f792b1777d990468260791adaebbb9eb097ac30a32e0980f5dd2",
+          "stateHash": "1e35d7d19964b9bb4e59e628806b7e50035396921c07f2b9f2803fa8b8c121e2",
+          "hashChain": "061e729b21d92f96a84a0ff27f97ec4e4e6099573cc51b4d82df756b79e87415",
           "commandCount": 16,
           "entries": 20,
           "snapshots": 20,
@@ -8518,7 +8518,7 @@
           ],
           "lastEntryHash": "f73311143b3d8cca2e295f4ef082f3f6553fc739dc3cc3ac5893c810e8dcbff3",
           "lastSnapshotHash": "f31449f0a3db1dd542ac245736bd90acf24e5f74dc7fd38bee171316f8e31ab3",
-          "lastDeltaHash": "6ed2dae6261528f0c42fbca4f2433c266870b5dbdf241a04cd10f3b0f6d8ffec",
+          "lastDeltaHash": "36e7695683486ae5083e6ebc5ced57552368b7d62fbb0f20a7e621f49800766f",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -8544,7 +8544,7 @@
             "ev.adult.after-school",
             "ev.adult.first-job"
           ],
-          "selectionTrailDigest": "bf119c5acf31e681a5eca6cf4caff07cab54aa593fabe7aff48340a0461c7662"
+          "selectionTrailDigest": "048a714bafaa7e0d3094e9d97be12f66393b349706a77e255535ce819b635d09"
         },
         {
           "id": "p3b-main-108-male",
@@ -8557,8 +8557,8 @@
           "birthYear": 2024,
           "age": 20,
           "phase": "pending_decision",
-          "stateHash": "a0e140ad38d910262c36fa9ad02cb7398a73339209eadc9e9872208db1079dee",
-          "hashChain": "2b5de9cd365a814e1d6f87421a0b4937e5b8ec59f9976d15a107918d46ae5340",
+          "stateHash": "05ef8b9802bab7c8ad9ef6aaf1d914681843d503f5635a991c09758c57bb20dd",
+          "hashChain": "d2bf7ce105ab7450c9ea7b4a02c126488136a562dec89c7fde3f9eca365a1932",
           "commandCount": 16,
           "entries": 20,
           "snapshots": 20,
@@ -8598,7 +8598,7 @@
           ],
           "lastEntryHash": "f73311143b3d8cca2e295f4ef082f3f6553fc739dc3cc3ac5893c810e8dcbff3",
           "lastSnapshotHash": "f31449f0a3db1dd542ac245736bd90acf24e5f74dc7fd38bee171316f8e31ab3",
-          "lastDeltaHash": "81c3924559cf4f80bc8c0850214e9d77d04375abe3414980f33eecf86f0f5230",
+          "lastDeltaHash": "6829702ea082dedc1bdbbd6e96202ade8e4d667f888188e245e286a733b4ac95",
           "cardsTotal": 20,
           "cardsSeen": 0,
           "playbackMode": "paused",
@@ -8624,7 +8624,7 @@
             "ev.adult.after-school",
             "ev.adult.first-job"
           ],
-          "selectionTrailDigest": "6671fa0163acee2ef1fd0f5c7a9f7e8b9386892749d17652d21e1cc6a89f17a4"
+          "selectionTrailDigest": "8e8d325e82f44b3672ac2c574e755958ef6eb973a815a55141da0c58543dc11b"
         }
       ]
     },

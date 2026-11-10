@@ -58,7 +58,7 @@ function sceneOf(input: Partial<SceneView> = {}): SceneView {
   };
 }
 
-/** 取出某個角色圖層的 SVG 片段（含所有巢狀 <g data-part> 與 <svg data-part>）。 */
+/** 取出某個角色圖層的 SVG 片段（0073 起人物與配件都 inline 在同一座標系的 <g data-part>）。 */
 function roleGroup(svg: string, role: "player" | "partner"): string {
   const start = svg.indexOf(`<g data-layer="${role}"`);
   expect(start).toBeGreaterThan(-1);
@@ -126,7 +126,7 @@ describe("GPT-0063-B 年齡專用全身人物：真實資產／部件 key 矩陣
           expect(fragment).toContain(`data-age="${scene.age}"`);
           expect(fragment).toContain(`data-age-stage="${scene.ageStage}"`);
           expect(fragment).toContain(`data-life-stage="${scene.lifeStage}"`);
-          expect(fragment).toContain("<svg data-part=");
+          expect(fragment).toContain(`<g data-part="${entry.asset}">`);
           checked += 1;
         }
       }

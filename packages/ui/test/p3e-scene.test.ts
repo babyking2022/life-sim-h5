@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   buildSceneSvg,
+  describeSceneGeometry,
   describeSceneLayers,
   describeSceneParts,
   ageStageOfAge,
@@ -13,6 +14,8 @@ import {
   PET_CENTER_X,
   PLAYER_CENTER_X,
   SCENE_SAFE_LEFT_X,
+  SCENE_SAFE_BOX,
+  SCENE_GROUND_Y,
   SCENE_VIEWBOX_HEIGHT,
   SCENE_VIEWBOX_WIDTH,
   type SceneAgeStage,
@@ -157,8 +160,8 @@ describe("GPT-0054-B 場景：完整狀態矩陣", () => {
     expect((OPEN_PEEPS_BY_SEX.female as readonly string[]).includes(femaleAsset)).toBe(true);
     expect((OPEN_PEEPS_BY_SEX.male as readonly string[]).includes(maleAsset)).toBe(true);
     expect(femaleAsset).not.toBe(maleAsset);
-    expect(femaleSvg).toContain("<svg data-part=\"openpeeps/");
-    expect(maleSvg).toContain("<svg data-part=\"openpeeps/");
+    expect(femaleSvg).toContain(`<g data-part="openpeeps/${femaleAsset}">`);
+    expect(maleSvg).toContain(`<g data-part="openpeeps/${maleAsset}">`);
   });
 
   it("伴侶與寵物不遮住玩家、也不遮左側狀態卡", () => {
@@ -270,21 +273,35 @@ describe("GPT-0054-B 場景：完整狀態矩陣", () => {
     }
   });
 
-  it("0063-B 所有年齡的人物都大且清楚，且不遮左側狀態卡", () => {
-    expect(SCENE_SAFE_LEFT_X).toBeGreaterThan(173);
+  it("0073-A 每個年齡的人物＋配件都完整落在安全區，腳底貼地、身高足夠", () => {
     for (const age of [0, 3, 6, 13, 18, 25, 45, 65]) {
       for (const playerSex of SEXES) {
-        const svg = buildSceneSvg(sceneOf({ age, playerSex, hasPartner: true, petKind: "dog" }), "seed-safe");
-        // 玩家／伴侶的 <svg data-part=...> 都必須排在狀態卡右側安全區。
-        const boxes = [...svg.matchAll(/<svg data-part="[^"]+" x="([\d.]+)" y="([\d.]+)" width="([\d.]+)" height="([\d.]+)"/g)];
-        expect(boxes.length).toBeGreaterThanOrEqual(1);
-        for (const box of boxes) {
-          const x = Number(box[1]);
-          const height = Number(box[4]);
-          expect(x).toBeGreaterThan(173);
-          expect(height).toBeGreaterThanOrEqual(100);
+        for (const hasPartner of HAS_PARTNER) {
+          const scene = sceneOf({ age, playerSex, hasPartner, petKind: "dog" });
+          const actors = describeSceneGeometry(scene, "seed-safe");
+          expect(actors.length).toBe(hasPartner ? 2 : 1);
+          for (const actor of actors) {
+            // 人物本體 + 眼鏡／圍巾／拐杖的總範圍，全部要在安全區內。
+            expect(actor.bounds.left).toBeGreaterThanOrEqual(SCENE_SAFE_BOX.left - 0.01);
+            expect(actor.bounds.right).toBeLessThanOrEqual(SCENE_SAFE_BOX.right + 0.01);
+            expect(actor.bounds.top).toBeGreaterThanOrEqual(SCENE_SAFE_BOX.top - 0.01);
+            expect(actor.bounds.bottom).toBeLessThanOrEqual(SCENE_SAFE_BOX.bottom + 0.01);
+            // 腳底貼齊地面（不可浮空、不可踩進地面以下）。
+            expect(actor.content.bottom).toBeGreaterThan(SCENE_GROUND_Y - 4);
+            expect(actor.content.bottom).toBeLessThanOrEqual(SCENE_GROUND_Y + 0.01);
+            // 「大且清楚」：玩家至少 95px、伴侶至少 85px（伴侶 slot 較窄，
+            // 嬰兒坐姿又特別寬，會被寬度夾住）。
+            const height = actor.content.bottom - actor.content.top;
+            expect(height).toBeGreaterThanOrEqual(actor.role === "player" ? 95 : 85);
+            // 不可超出場景 viewBox。
+            expect(actor.bounds.left).toBeGreaterThanOrEqual(0);
+            expect(actor.bounds.right).toBeLessThanOrEqual(SCENE_VIEWBOX_WIDTH);
+          }
+          // 兩人不可互相重疊（玩家在左、伴侶在右）。
+          if (hasPartner) {
+            expect(actors[0]!.content.right).toBeLessThanOrEqual(actors[1]!.content.left + 0.01);
+          }
         }
-        expect(svg).toContain(`data-age="${age}"`);
       }
     }
   });

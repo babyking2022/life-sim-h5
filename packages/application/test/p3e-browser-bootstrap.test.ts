@@ -384,25 +384,25 @@ describe("H5-CTO-186-A restoreP3EBrowserSession：正路", () => {
 
   it("official_51_export_restore_bit_exact_and_can_continue_or_death_is_stable", () => {
     const played = game();
-    expect(played.commands).toBe(106);
+    expect(played.commands).toBe(105);
 
     // 1. 官方 51 命令終局：export → restore 逐位元一致＋固定雜湊；death 狀態穩定。
     const finalPayload = exportP3EPlaySessionPayload({ session: played.finalSession });
     const restoredFinal = restoreP3EBrowserSession(restoreInput(prepareP3EBrowserWorld(rawPacks), finalPayload));
-    expect(restoredFinal.ledgerHistory.records.length).toBe(106);
+    expect(restoredFinal.ledgerHistory.records.length).toBe(105);
     expect(stable(restoredFinal.state)).toBe(stable(played.finalSession.state));
     expect(stable(restoredFinal.lastOutcome)).toBe(stable(played.finalSession.lastOutcome));
     expect(restoredFinal.state.stateHash).toBe(
-      "606ecda92505fab5ea8bf771a20f8638a7702282b08dd3f1d16cbb021404b8ca"
+      "4e7ad435cab0d5b759fc0e1c5820642cf63827f6153b300a968eaef8348f1d59"
     );
     expect(restoredFinal.state.commandLog.headHash).toBe(
-      "4307185bc61cc8144f8e3b31981318475032e6e7cd58e88b46233e21ae29a26a"
+      "efaeb1348e71d6705c8021b8a213c5fb0b1b5c189d7d3a52cf187807da8a2c1a"
     );
     expect(restoredFinal.state.heads.hashChain).toBe(
-      "42c60438615287f8fffbea8585070d7ee07d33aedf9967773d9b26919046eb78"
+      "5cece874eb591a32e77bf1005d1824e52f8766b35afd512b265565096fec2173"
     );
     expect(restoredFinal.state.heads.lastEntryHash).toBe(
-      "901d0e35a49683014e6772eebe9e775964592560662ae92f92a7661f762e82ce"
+      "ec694f811dd4ee5cb86f63279b60b11152bb3250c329858a82dc1d404fabf409"
     );
     expect(restoredFinal.view.controls).toEqual({
       canAdvanceYear: false,
@@ -513,7 +513,7 @@ describe("H5-CTO-186-A restoreP3EBrowserSession：拒絕", () => {
     );
 
     // 2. 壞 payload：codec 綁定失敗（錯誤原樣外拋）。
-    const tampered = payload.replace("606ecda9", "606ecdaa");
+    const tampered = payload.replace("4e7ad435", "4e7ad436");
     expect(tampered).not.toBe(payload);
     let tamperedError: unknown = null;
     try {

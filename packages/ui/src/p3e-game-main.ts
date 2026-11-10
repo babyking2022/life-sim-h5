@@ -2211,38 +2211,107 @@ function renderFocusSection(current: P3EPlaySession): HTMLElement | null {
 }
 
 /**
- * 死亡後的「重新開始」：清掉上一條命的 autosave，回到出生卡（新的隨機 seed）。
+ * 真正開始一段新人生（GPT-DEEPSEEK-0073-B）。
  *
- * 依訂單第 10 項：死亡後重新開始回出生卡；出生階段 clock 暫停，使用者按
- * 「開始人生」才建立新的 age 0 session（`startLifeFromCard`）。
- * `?seed=` 固定測試時仍沿用被釘住的 seed，維持可重播性。
+ * ## 清除（只清本局）
+ *
+ * - autosave（`life-sim:p3e:v6:autosave`）與 active seed（`life-sim:p3e:active-seed`）；
+ * - 記憶體 session、出生預覽、待決策、排程儲存、play intent／focus 提示、
+ *   clock（回到暫停）、busy／error 與本局 UI 狀態（選單開合）。
+ * - **保留**使用者偏好：語言（`p3e.locale.v1`）與自然音設定（`life-sim:p3e:v1:nature-sound`）。
+ *
+ * ## URL
+ *
+ * 公開玩家不應該因為網址上的 `?seed=` 回到同一個人：重開時用
+ * `history.replaceState` 移除 `seed` 與只服務測試的固定參數
+ * （`pinnedSeed`／`preview`／`fixture`），保留正常路徑，然後抽新的隨機 seed。
+ *
+ * ## 失敗處理
+ *
+ * 清除 storage 失敗時**不假裝成功**：顯示可重試訊息、保持舊資料不被部分覆寫、
+ * 停在目前畫面（死亡頁或遊戲中），session 不動。
  */
-function rebirth(): void {
-  if (busy) return;
+function restartLife(options: { readonly confirm: boolean } = { confirm: true }): boolean {
+  if (busy) return false;
+  if (options.confirm && session !== null && session.state.phase !== "death") {
+    const ok = window.confirm("要放棄這一局，重新開始一段新人生嗎？");
+    if (!ok) return false;
+  }
   busy = true;
   try {
     cancelScheduledSave();
-    if (storage !== null && persistenceEnabled) {
-      // 順序：先清掉上一條命的 autosave，再回出生卡；新命開始時才寫新存檔。
-      try {
+    // 1) 清除本局 storage；任何一步失敗都停在原狀，不做部分覆寫。
+    try {
+      if (storage !== null) {
         clearAutosave();
-      } catch (error) {
-        persistenceStatus = "save-error";
-        persistenceError = describeError(error);
-        return; // 清除失敗：留在目前死亡畫面，不動 session
+        storage.removeItem(ACTIVE_SEED_KEY);
+        if (storage.getItem(ACTIVE_SEED_KEY) !== null) throw new Error("active seed not cleared");
       }
+    } catch (error) {
+      persistenceStatus = "save-error";
+      persistenceError = describeError(error);
+      showAlert("無法清除本局存檔，請再試一次（舊資料尚未被覆寫）。");
+      render();
+      return false;
     }
+
+    // 2) 記憶體狀態：本局全部歸零，偏好不動。
     persistenceEnabled = true;
     recoveryNeeded = false;
     persistenceGeneration += 1;
     persistenceStatus = "cleared";
+    persistenceError = null;
     session = null;
-    showBirth(readPinnedSeed() ?? randomSeed());
+    birthPreview = null;
+    fullWorldError = null;
+    fullWorldPromise = null;
+    startPending = false;
+    retryStartIntent = false;
+    hudMenuOpen = false;
+    resetDecisionPlayIntent(null);
+    lifeClock.pause();
+
+    // 3) URL：移除 pinned／測試參數，公開玩家不會回到同一人。
+    stripPinnedSeedFromUrl();
+
+    // 4) 新 seed → 新出生卡（clock 暫停；按下「開始人生」才建立 session）。
+    showBirth(randomSeed());
+    return true;
   } catch (error) {
     showAlert(describeError(error));
     render();
+    return false;
   } finally {
     busy = false;
+  }
+}
+
+/** 保留死亡流程原本的呼叫點（死亡後不需要二次確認）。 */
+function rebirth(options: { readonly confirm: boolean } = { confirm: false }): void {
+  restartLife({ confirm: options.confirm });
+}
+
+/**
+ * 從網址移除 `seed` 與只服務測試的固定參數（用 `history.replaceState` 保留路徑）。
+ *
+ * 只動 query string，不新增歷史紀錄、不重新載入頁面。
+ */
+function stripPinnedSeedFromUrl(): void {
+  try {
+    const url = new URL(window.location.href);
+    let changed = false;
+    for (const key of ["seed", "pinnedSeed", "preview", "fixture"]) {
+      if (url.searchParams.has(key)) {
+        url.searchParams.delete(key);
+        changed = true;
+      }
+    }
+    if (changed) {
+      const search = url.searchParams.toString();
+      window.history.replaceState(null, "", url.pathname + (search.length > 0 ? `?${search}` : "") + url.hash);
+    }
+  } catch {
+    /* 沒有 history API（罕見）時忽略：新 seed 仍會產生新人物。 */
   }
 }
 
@@ -2446,9 +2515,25 @@ function render(): void {
   menuPanel.dataset["p3eSettingsTitle"] = "⚙ 設定與存檔";
   const menuTitle = element("h2", "p3e-menu-title", "⚙ 設定與存檔");
   menuTitle.dataset["p3eMenuTitle"] = "設定與存檔";
+  /*
+   * GPT-DEEPSEEK-0073-B：任何階段（包含卡在決策或存檔損壞）都能從選單重開。
+   * 進行中的新人生需要一次確認；死亡後不用確認（死亡頁自己也有醒目按鈕）。
+   */
+  const restartButton = element("button", "p3e-secondary p3e-menu-restart", "重新開始一段新人生");
+  restartButton.type = "button";
+  restartButton.dataset["action"] = "restart-life";
+  restartButton.dataset["p3eRestart"] = "menu";
+  restartButton.addEventListener("click", () => {
+    const ok = restartLife({ confirm: true });
+    if (ok) {
+      menu.open = false;
+      hudMenuOpen = false;
+    }
+  });
   menuPanel.append(
     menuTitle,
     element("p", "p3e-menu-note", "公開測試版 · 進度自動儲存在本機"),
+    restartButton,
     renderPersistence(),
     notice,
     technical
@@ -2735,7 +2820,7 @@ function renderLife(view: P3EPlaySession["view"], current: P3EPlaySession): HTML
   const sceneSeed = `${readSeed()}|partner-identity=${partnerName}`;
   const scene = element("section", `p3e-scene p3e-scene-${view.phase}`);
   scene.setAttribute("aria-label", `${view.currentYear} 年的生活場景`);
-  scene.dataset["p3eSceneFit"] = "cover";
+  scene.dataset["p3eSceneFit"] = "contain";
   scene.dataset["p3eSceneAsset"] = "generated-layered-svg";
   scene.dataset["p3eSceneResidence"] = sceneView.residenceKind;
   // 0063-B：精確年齡／生活階段直接來自正式 view.scene，讓 HUD 與人物畫面
@@ -2755,10 +2840,22 @@ function renderLife(view: P3EPlaySession["view"], current: P3EPlaySession): HTML
     .map((entry) => entry.asset)
     .join(",");
   scene.dataset["p3eSceneSignature"] = sceneSignature(sceneView, sceneSeed);
-  scene.style.backgroundImage = `url("${sceneSvgDataUri(sceneView, sceneSeed)}")`;
-  scene.style.backgroundSize = "cover";
-  scene.style.backgroundRepeat = "no-repeat";
-  scene.style.backgroundPosition = "center bottom";
+  // 0073-A：`cover` 會為了填滿容器而裁掉左右／上下，把站在安全區邊緣的人物與
+  // 拐杖切掉。改成 `contain`：整張場景等比縮到容器內、貼底對齊，人物與配件
+  // 永遠完整。`contain` 在極寬扁的容器（例如 320×568）會留左右縫隙，所以底下
+  // 再墊一層「天空 → 遠景 → 地面」的同色漸層，縫隙看起來是場景的延伸。
+  const dead = sceneView.phase === "dead";
+  const sky = dead ? "#c6b7a6" : "#f7dca9";
+  const ground = dead ? "#9c8f7c" : "#c9a978";
+  scene.style.backgroundColor = sky;
+  // 漸層只有「天空 → 地面」兩段，分界對齊 SVG 的地面線 196/220≈89%，
+  // 這樣左右縫隙的天地線和圖裡完全一致，不會出現浮在半空的色塊。
+  scene.style.backgroundImage =
+    `url("${sceneSvgDataUri(sceneView, sceneSeed)}"), ` +
+    `linear-gradient(180deg, ${sky} 0 89%, ${ground} 89% 100%)`;
+  scene.style.backgroundSize = "contain, cover";
+  scene.style.backgroundRepeat = "no-repeat, no-repeat";
+  scene.style.backgroundPosition = "center bottom, center bottom";
 
   // GPT-0040-B：狀態卡是 scene 的 overlay，但為了不讓 scene 多出子層
   // （破壞既有「場景只剩一張圖」的視覺與指標），改放在 scene-wrap 裡與 scene 疊合。
@@ -2784,6 +2881,16 @@ function renderLife(view: P3EPlaySession["view"], current: P3EPlaySession): HTML
   const last = current.lastOutcome;
   if (view.phase === "death") {
     const death = element("div", "p3e-death");
+    /*
+     * GPT-DEEPSEEK-0073-B：死亡摘要最前方就是「重新開始一段新人生」，
+     * 手機首屏不必尋找、不必捲動（死亡後不需要二次確認）。
+     */
+    const restartFirst = element("button", "p3e-primary p3e-restart-life", "重新開始一段新人生");
+    restartFirst.type = "button";
+    restartFirst.dataset["action"] = "rebirth";
+    restartFirst.dataset["p3eRestart"] = "death";
+    restartFirst.addEventListener("click", () => rebirth({ confirm: false }));
+    death.append(restartFirst);
     death.append(element("h3", undefined, "這段人生走到了終點"));
     const deathOutcome = last !== null && last.kind === "advance_year" ? last.death : null;
     const causeText =
@@ -2791,11 +2898,8 @@ function renderLife(view: P3EPlaySession["view"], current: P3EPlaySession): HTML
         ? ""
         : ` 原因：${friendlyDeathCause(deathOutcome.causeId)}`;
     death.append(element("p", undefined, `你活了 ${view.age} 年。${causeText}`));
-    const again = element("button", "p3e-primary", "重新開始");
-    again.type = "button";
-    again.dataset["action"] = "rebirth";
-    again.addEventListener("click", rebirth);
-    death.append(again);
+    // GPT-DEEPSEEK-0074-A：死亡摘要只有這一個主按鈕（最前方、免二次確認）；
+    // 第二個同功能按鈕已移除，死亡頁永遠只有一個 [data-action="rebirth"]。
     story.append(death);
   }
 

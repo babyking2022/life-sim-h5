@@ -4734,8 +4734,9 @@ body:has(:is(.p3e-game-shell, .p3e-birth-screen)) {
   background-color: #f7dca9;
   background-image: none;
   background-repeat: no-repeat;
+  /* 0073-A：`contain` 而不是 `cover` —— 人物與配件不可被容器裁掉。 */
   background-position: center bottom;
-  background-size: cover;
+  background-size: contain;
 }
 
 .p3e-game-shell .p3e-scene::after {

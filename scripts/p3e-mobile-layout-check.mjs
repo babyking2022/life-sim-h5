@@ -149,7 +149,8 @@ async function pageSnapshot() {
     const vbH = viewBox === null ? 0 : Number(viewBox[2]);
     const size = (style.backgroundSize.split(",")[0] ?? "").trim();
     const scale = vbW > 0 && vbH > 0
-      ? (size === "cover" ? Math.max(cw / vbW, ch / vbH) : cw / vbW)
+      ? (size === "contain" ? Math.min(cw / vbW, ch / vbH)
+        : (size === "cover" ? Math.max(cw / vbW, ch / vbH) : cw / vbW))
       : 0;
     const fullBleed = svg !== null && vbW > 0 &&
       new RegExp(`<rect x="0" y="0" width="${vbW}" height="${vbH}"`).test(svg);
@@ -781,9 +782,9 @@ function evaluate(label, phase, s) {
   // 不再驗證單張 landscape AVIF；改驗證 data URI、圖層與無外部素材。
   check(
     `${prefix}_scene_layered_svg_fills_width_without_overlay`,
-    c.sceneFit === "cover" &&
+    c.sceneFit === "contain" &&
       c.sceneAssetId === "generated-layered-svg" &&
-      (c.sceneBackgroundSize ?? "").split(",")[0].trim() === "cover" &&
+      (c.sceneBackgroundSize ?? "").split(",")[0].trim() === "contain" &&
       (c.sceneBackgroundRepeat ?? "").startsWith("no-repeat") &&
       c.sceneChildren === 0 && c.sceneText === "" && !c.sceneEmoji &&
       c.sceneAsset !== null && c.sceneAsset.loaded === true &&

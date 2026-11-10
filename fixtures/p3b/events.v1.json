@@ -1948,9 +1948,26 @@
     {
       "eventSpecVersion": "1.0.0",
       "contentPackVersion": "1.1.0",
-      "conditions": null,
+      "conditions": {
+        "op": "not",
+        "condition": {
+          "op": "any",
+          "conditions": [
+            {
+              "op": "flag",
+              "flag": "care:parents-live",
+              "present": true
+            },
+            {
+              "op": "flag",
+              "flag": "care:parents-arranged",
+              "present": true
+            }
+          ]
+        }
+      },
       "priority": 0,
-      "once": false,
+      "once": true,
       "cooldownYears": 6,
       "exclusiveGroup": null,
       "contentMode": "guardian",
@@ -1987,6 +2004,16 @@
                 "type": "money",
                 "field": "annualExpenseMicroUsd",
                 "deltaMicroUsd": "6000000000"
+              },
+              {
+                "type": "flag",
+                "flag": "care:parents-live",
+                "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "care:parents-arranged",
+                "action": "remove"
               }
             ]
           },
@@ -2008,6 +2035,16 @@
                 "type": "stat",
                 "stat": "health",
                 "delta": 1
+              },
+              {
+                "type": "flag",
+                "flag": "care:parents-arranged",
+                "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "care:parents-live",
+                "action": "remove"
               }
             ]
           },
@@ -2029,6 +2066,16 @@
                 "type": "stat",
                 "stat": "happiness",
                 "delta": 1
+              },
+              {
+                "type": "flag",
+                "flag": "care:parents-arranged",
+                "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "care:parents-live",
+                "action": "remove"
               }
             ]
           }
@@ -5825,9 +5872,26 @@
     {
       "eventSpecVersion": "1.0.0",
       "contentPackVersion": "1.1.0",
-      "conditions": null,
+      "conditions": {
+        "op": "not",
+        "condition": {
+          "op": "any",
+          "conditions": [
+            {
+              "op": "flag",
+              "flag": "care:parents-live",
+              "present": true
+            },
+            {
+              "op": "flag",
+              "flag": "care:parents-arranged",
+              "present": true
+            }
+          ]
+        }
+      },
       "priority": 0,
-      "once": false,
+      "once": true,
       "cooldownYears": 6,
       "exclusiveGroup": null,
       "contentMode": "guardian",
@@ -5859,6 +5923,16 @@
                 "type": "stat",
                 "stat": "happiness",
                 "delta": -1
+              },
+              {
+                "type": "flag",
+                "flag": "care:parents-live",
+                "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "care:parents-arranged",
+                "action": "remove"
               }
             ]
           },
@@ -5880,6 +5954,16 @@
                 "type": "stat",
                 "stat": "health",
                 "delta": 1
+              },
+              {
+                "type": "flag",
+                "flag": "care:parents-arranged",
+                "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "care:parents-live",
+                "action": "remove"
               }
             ]
           },
@@ -5901,6 +5985,16 @@
                 "type": "stat",
                 "stat": "happiness",
                 "delta": -2
+              },
+              {
+                "type": "flag",
+                "flag": "care:parents-arranged",
+                "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "care:parents-live",
+                "action": "remove"
               }
             ]
           }
@@ -6402,9 +6496,31 @@
     {
       "eventSpecVersion": "1.0.0",
       "contentPackVersion": "1.1.0",
-      "conditions": null,
+      "conditions": {
+        "op": "not",
+        "condition": {
+          "op": "any",
+          "conditions": [
+            {
+              "op": "flag",
+              "flag": "senior:care",
+              "present": true
+            },
+            {
+              "op": "flag",
+              "flag": "senior:family",
+              "present": true
+            },
+            {
+              "op": "flag",
+              "flag": "senior:alone",
+              "present": true
+            }
+          ]
+        }
+      },
       "priority": 0,
-      "once": false,
+      "once": true,
       "cooldownYears": 8,
       "exclusiveGroup": null,
       "contentMode": "guardian",
@@ -6441,6 +6557,16 @@
                 "type": "flag",
                 "flag": "senior:care",
                 "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "senior:family",
+                "action": "remove"
+              },
+              {
+                "type": "flag",
+                "flag": "senior:alone",
+                "action": "remove"
               }
             ]
           },
@@ -6462,6 +6588,16 @@
                 "type": "flag",
                 "flag": "senior:family",
                 "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "senior:care",
+                "action": "remove"
+              },
+              {
+                "type": "flag",
+                "flag": "senior:alone",
+                "action": "remove"
               }
             ]
           },
@@ -6483,6 +6619,21 @@
                 "type": "money",
                 "field": "balanceMicroUsd",
                 "deltaMicroUsd": "5000000000"
+              },
+              {
+                "type": "flag",
+                "flag": "senior:alone",
+                "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "senior:care",
+                "action": "remove"
+              },
+              {
+                "type": "flag",
+                "flag": "senior:family",
+                "action": "remove"
               }
             ]
           }
@@ -6695,9 +6846,31 @@
     {
       "eventSpecVersion": "1.0.0",
       "contentPackVersion": "1.1.0",
-      "conditions": null,
+      "conditions": {
+        "op": "not",
+        "condition": {
+          "op": "any",
+          "conditions": [
+            {
+              "op": "flag",
+              "flag": "retired",
+              "present": true
+            },
+            {
+              "op": "flag",
+              "flag": "working:senior",
+              "present": true
+            },
+            {
+              "op": "flag",
+              "flag": "retire:part",
+              "present": true
+            }
+          ]
+        }
+      },
       "priority": 0,
-      "once": false,
+      "once": true,
       "cooldownYears": 12,
       "exclusiveGroup": null,
       "contentMode": "guardian",
@@ -6734,6 +6907,16 @@
                 "type": "flag",
                 "flag": "retired",
                 "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "working:senior",
+                "action": "remove"
+              },
+              {
+                "type": "flag",
+                "flag": "retire:part",
+                "action": "remove"
               }
             ]
           },
@@ -6755,6 +6938,16 @@
                 "type": "flag",
                 "flag": "working:senior",
                 "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "retired",
+                "action": "remove"
+              },
+              {
+                "type": "flag",
+                "flag": "retire:part",
+                "action": "remove"
               }
             ]
           },
@@ -6776,6 +6969,21 @@
                 "type": "stat",
                 "stat": "health",
                 "delta": 1
+              },
+              {
+                "type": "flag",
+                "flag": "retire:part",
+                "action": "add"
+              },
+              {
+                "type": "flag",
+                "flag": "retired",
+                "action": "remove"
+              },
+              {
+                "type": "flag",
+                "flag": "working:senior",
+                "action": "remove"
               }
             ]
           }

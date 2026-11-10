@@ -69,9 +69,9 @@ const mime = {
   ".woff2": "font/woff2"
 };
 
-const EXPECTED_STATE_HASH = "606ecda92505fab5ea8bf771a20f8638a7702282b08dd3f1d16cbb021404b8ca";
-const EXPECTED_COMMAND_HEAD = "4307185bc61cc8144f8e3b31981318475032e6e7cd58e88b46233e21ae29a26a";
-const EXPECTED_COMMANDS = 106;
+const EXPECTED_STATE_HASH = "4e7ad435cab0d5b759fc0e1c5820642cf63827f6153b300a968eaef8348f1d59";
+const EXPECTED_COMMAND_HEAD = "efaeb1348e71d6705c8021b8a213c5fb0b1b5c189d7d3a52cf187807da8a2c1a";
+const EXPECTED_COMMANDS = 105;
 /**
  * GPT-0025-D：新增獨立的 307 條繁中字典資產（gzip ≈6.2KB）後，boot 必要資產
  * 從 511169 增加到約 518KB，已超過原本的 500KiB gate。這裡把 gate 調到
@@ -86,7 +86,7 @@ const BOOT_BUDGET_GZIP = 512 * 1024;
  */
 const GOLDEN_SEED = "p3e-166-playable-runtime-v4";
 /**
- * GPT-0036-B：官方 106 命令 golden 必須逐位元重播，不能被 UI 新加的
+ * GPT-0036-B：官方 105 命令 golden 必須逐位元重播，不能被 UI 新加的
  * 「首次必選重心」插入指令。這個參數只對自動化瀏覽器
  * （navigator.webdriver === true）生效，真人玩家無法用網址關掉必選暫停；
  * 另有一個完全不帶此參數的專章驗證 D 的強制暫停。
@@ -490,7 +490,7 @@ async function main() {
   });
 
   const bootStarted = Date.now();
-  // 主線要跑官方 golden（GPT-0043-A 之後是 106 命令）：明確釘住 seed，不受首次開頁隨機 seed 影響。
+  // 主線要跑官方 golden（GPT-0043-A 之後是 105 命令）：明確釘住 seed，不受首次開頁隨機 seed 影響。
   await page.goto(`${baseUrl}/${GOLDEN_QUERY}`, { waitUntil: "networkidle" });
   await page.waitForSelector("[data-p3e-live='true']", { timeout: 30000 });
   const bootMs = Date.now() - bootStarted;
@@ -1527,6 +1527,9 @@ async function main() {
   );
 
   // 7. 重生（若重生回到出生卡，先按開始再驗證 0 歲）
+  // GPT-DEEPSEEK-0074-A：死亡頁只能有一個重生入口（0073-B 的重複按鈕已移除）。
+  const rebirthButtons = await page.locator('[data-action="rebirth"]').count();
+  check("death_has_exactly_one_rebirth_button", rebirthButtons === 1, `count=${rebirthButtons}`);
   await page.locator('[data-action="rebirth"]').click();
   await page.waitForFunction(
     () =>
@@ -1607,7 +1610,7 @@ async function main() {
       sceneHeightOk &&
         sceneState.assetId === "generated-layered-svg" &&
         sceneState.url.includes("data:image/svg+xml,") &&
-        (sceneState.backgroundSize.split(",")[0] ?? "").trim() === "cover" &&
+        (sceneState.backgroundSize.split(",")[0] ?? "").trim() === "contain" &&
         sceneState.backgroundRepeat.startsWith("no-repeat") &&
         (sceneState.layers ?? "").includes("background") &&
         (sceneState.layers ?? "").includes("player") &&
@@ -2890,8 +2893,10 @@ async function main() {
       const vbW = viewBox === null ? 0 : Number(viewBox[1]);
       const vbH = viewBox === null ? 0 : Number(viewBox[2]);
       const size = (style.backgroundSize.split(",")[0] ?? "").trim();
+      // 0073-A：`contain` 取兩軸較小者，人物不會被容器裁掉。
       const scale = vbW > 0 && vbH > 0
-        ? (size === "cover" ? Math.max(cw / vbW, ch / vbH) : cw / vbW)
+        ? (size === "contain" ? Math.min(cw / vbW, ch / vbH)
+          : (size === "cover" ? Math.max(cw / vbW, ch / vbH) : cw / vbW))
         : 0;
       // background-position 為 "center bottom"：水平置中，故 offsetX 為負或 0。
       const offsetX = (cw - vbW * scale) / 2;
@@ -2939,9 +2944,9 @@ async function main() {
     });
     verify(
       "scene_layered_svg_fills_width_no_overlay",
-      scene !== null && scene.fit === "cover" &&
+      scene !== null && scene.fit === "contain" &&
         scene.assetId === "generated-layered-svg" &&
-        (scene.backgroundSize.split(",")[0] ?? "").trim() === "cover" &&
+        (scene.backgroundSize.split(",")[0] ?? "").trim() === "contain" &&
         scene.backgroundRepeat.startsWith("no-repeat") &&
         scene.children === 0 && scene.text === "" && !scene.emoji &&
         (scene.url ?? "").startsWith("data:image/svg+xml,") &&

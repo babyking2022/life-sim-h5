@@ -476,20 +476,20 @@ describe("H5-CTO-174-A Play Session：不可變性與錯誤", () => {
 describe("H5-CTO-174-A Play Session：完整生命週期與效能", () => {
   it("birth_to_death_session_loop：官方 51 命令路徑與 smoke 完全一致", () => {
     const played = game();
-    expect(played.commands).toBe(106);
+    expect(played.commands).toBe(105);
     expect(played.finalSession.state.age).toBe(67);
     expect(played.finalSession.state.phase).toBe("death");
     expect(played.finalSession.state.stateHash).toBe(
-      "606ecda92505fab5ea8bf771a20f8638a7702282b08dd3f1d16cbb021404b8ca"
+      "4e7ad435cab0d5b759fc0e1c5820642cf63827f6153b300a968eaef8348f1d59"
     );
     expect(played.finalSession.state.commandLog.headHash).toBe(
-      "4307185bc61cc8144f8e3b31981318475032e6e7cd58e88b46233e21ae29a26a"
+      "efaeb1348e71d6705c8021b8a213c5fb0b1b5c189d7d3a52cf187807da8a2c1a"
     );
     expect(played.finalSession.state.heads.hashChain).toBe(
-      "42c60438615287f8fffbea8585070d7ee07d33aedf9967773d9b26919046eb78"
+      "5cece874eb591a32e77bf1005d1824e52f8766b35afd512b265565096fec2173"
     );
     expect(played.finalSession.state.heads.lastEntryHash).toBe(
-      "901d0e35a49683014e6772eebe9e775964592560662ae92f92a7661f762e82ce"
+      "ec694f811dd4ee5cb86f63279b60b11152bb3250c329858a82dc1d404fabf409"
     );
   });
 
@@ -504,7 +504,7 @@ describe("H5-CTO-174-A Play Session：完整生命週期與效能", () => {
     const heapDelta = process.memoryUsage().heapUsed - beforeHeap;
     const avgMs = totalMs / played.commands;
     const cpuAvgMs = cpuMs / played.commands;
-    expect(played.commands).toBe(106);
+    expect(played.commands).toBe(105);
     // 平行全套執行時 wall／CPU 都會被同一個 worker 的其他重型測試污染，
     // 因此這裡只守反回歸（200ms）；<50ms 的目標以單檔隔離量測回報。
     expect(cpuAvgMs).toBeLessThan(200);
@@ -638,19 +638,19 @@ describe("H5-CTO-181-A Session Ledger History", () => {
 
   it("official_51_path_history_length_51_and_fixed_hashes", () => {
     const played = game();
-    expect(played.commands).toBe(106);
-    expect(played.finalSession.ledgerHistory.records.length).toBe(106);
+    expect(played.commands).toBe(105);
+    expect(played.finalSession.ledgerHistory.records.length).toBe(105);
     expect(played.finalSession.state.stateHash).toBe(
-      "606ecda92505fab5ea8bf771a20f8638a7702282b08dd3f1d16cbb021404b8ca"
+      "4e7ad435cab0d5b759fc0e1c5820642cf63827f6153b300a968eaef8348f1d59"
     );
     expect(played.finalSession.state.commandLog.headHash).toBe(
-      "4307185bc61cc8144f8e3b31981318475032e6e7cd58e88b46233e21ae29a26a"
+      "efaeb1348e71d6705c8021b8a213c5fb0b1b5c189d7d3a52cf187807da8a2c1a"
     );
     expect(played.finalSession.state.heads.hashChain).toBe(
-      "42c60438615287f8fffbea8585070d7ee07d33aedf9967773d9b26919046eb78"
+      "5cece874eb591a32e77bf1005d1824e52f8766b35afd512b265565096fec2173"
     );
     expect(played.finalSession.state.heads.lastEntryHash).toBe(
-      "901d0e35a49683014e6772eebe9e775964592560662ae92f92a7661f762e82ce"
+      "ec694f811dd4ee5cb86f63279b60b11152bb3250c329858a82dc1d404fabf409"
     );
   });
 
@@ -660,7 +660,7 @@ describe("H5-CTO-181-A Session Ledger History", () => {
       genesisInput: officialGenesisInput(),
       history: played.finalSession.ledgerHistory
     });
-    expect(replayed.commandsConsumed).toBe(106);
+    expect(replayed.commandsConsumed).toBe(105);
     expect(stable(replayed.state)).toBe(stable(played.finalSession.state));
   });
 
@@ -766,8 +766,8 @@ describe("H5-CTO-181-A Session Ledger History", () => {
     expect(callSites).toBeGreaterThanOrEqual(17);
     expect(viewports).toBeGreaterThanOrEqual(3);
     expect(callSites - 1 + viewports).toBeGreaterThanOrEqual(19);
-    expect(smoke).toContain("606ecda92505fab5ea8bf771a20f8638a7702282b08dd3f1d16cbb021404b8ca");
-    expect(smoke).toContain("4307185bc61cc8144f8e3b31981318475032e6e7cd58e88b46233e21ae29a26a");
+    expect(smoke).toContain("4e7ad435cab0d5b759fc0e1c5820642cf63827f6153b300a968eaef8348f1d59");
+    expect(smoke).toContain("efaeb1348e71d6705c8021b8a213c5fb0b1b5c189d7d3a52cf187807da8a2c1a");
     expect(smoke).toContain("run_to_death_with_51_commands");
   });
 
@@ -884,18 +884,18 @@ describe("H5-CTO-183-A Raw Session Persistence", () => {
     const final = game().finalSession;
     const payload = exportP3EPlaySessionPayload({ session: final });
     const restored = restoreP3EPlaySessionPayload(restoreInput(payload));
-    expect(restored.ledgerHistory.records.length).toBe(106);
+    expect(restored.ledgerHistory.records.length).toBe(105);
     expect(restored.state.stateHash).toBe(
-      "606ecda92505fab5ea8bf771a20f8638a7702282b08dd3f1d16cbb021404b8ca"
+      "4e7ad435cab0d5b759fc0e1c5820642cf63827f6153b300a968eaef8348f1d59"
     );
     expect(restored.state.commandLog.headHash).toBe(
-      "4307185bc61cc8144f8e3b31981318475032e6e7cd58e88b46233e21ae29a26a"
+      "efaeb1348e71d6705c8021b8a213c5fb0b1b5c189d7d3a52cf187807da8a2c1a"
     );
     expect(restored.state.heads.hashChain).toBe(
-      "42c60438615287f8fffbea8585070d7ee07d33aedf9967773d9b26919046eb78"
+      "5cece874eb591a32e77bf1005d1824e52f8766b35afd512b265565096fec2173"
     );
     expect(restored.state.heads.lastEntryHash).toBe(
-      "901d0e35a49683014e6772eebe9e775964592560662ae92f92a7661f762e82ce"
+      "ec694f811dd4ee5cb86f63279b60b11152bb3250c329858a82dc1d404fabf409"
     );
   });
 
@@ -955,7 +955,7 @@ describe("H5-CTO-183-A Raw Session Persistence", () => {
     expect(isP3EError(packError)).toBe(true);
 
     // 4. 篡改 payload：codec 綁定失敗。
-    const tampered = payload.replace("606ecda9", "606ecdaa");
+    const tampered = payload.replace("4e7ad435", "4e7ad436");
     expect(tampered).not.toBe(payload);
     let tamperedError: unknown;
     try {
@@ -980,7 +980,7 @@ describe("H5-CTO-183-A Raw Session Persistence", () => {
     const payload = exportP3EPlaySessionPayload({ session: game().finalSession });
     // codec 層面完全自洽：不需要 replay 就能 decode 成功。
     const decoded = simulation.decodeP3ESessionPayload(payload);
-    expect(decoded.history.records.length).toBe(106);
+    expect(decoded.history.records.length).toBe(105);
     expect(typeof decoded.masterSeed).toBe("string");
 
     // 但換一個 certificate（genesis 不同）後，權威路徑拒絕這個宣稱。
@@ -1087,7 +1087,7 @@ describe("H5-CTO-183-A Raw Session Persistence", () => {
     expect(callSites).toBeGreaterThanOrEqual(17);
     expect(viewports).toBeGreaterThanOrEqual(3);
     expect(callSites - 1 + viewports).toBeGreaterThanOrEqual(19);
-    expect(smoke).toContain("606ecda92505fab5ea8bf771a20f8638a7702282b08dd3f1d16cbb021404b8ca");
-    expect(smoke).toContain("4307185bc61cc8144f8e3b31981318475032e6e7cd58e88b46233e21ae29a26a");
+    expect(smoke).toContain("4e7ad435cab0d5b759fc0e1c5820642cf63827f6153b300a968eaef8348f1d59");
+    expect(smoke).toContain("efaeb1348e71d6705c8021b8a213c5fb0b1b5c189d7d3a52cf187807da8a2c1a");
   });
 });

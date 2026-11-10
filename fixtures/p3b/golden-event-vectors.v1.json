@@ -7,8 +7,8 @@
       "packId": "p3b-synthetic-events-v1",
       "manifestFile": "manifest.v1.json",
       "eventsFile": "events.v1.json",
-      "packChecksum": "f4b0eb579bde226c5b58f0f50cd4f267c29d0fdbc4372892d4d12294a4891e93",
-      "datasetChecksum": "17b4aca03b3701dc25519f6e18ddaf64aa4aefd7a45b53a1a2833448530c1441",
+      "packChecksum": "d3252ce65c01823b45f3e65924c069741b6e5c4b4fd5283e02f06e6e4d04092a",
+      "datasetChecksum": "1bdc7124270ddf23c54e6811a967daa7b8b476e40d3a4356dae9758b9beb628e",
       "cases": [
         {
           "id": "case-01-infant-standard",
@@ -55,7 +55,7 @@
             1029,
             25165824
           ],
-          "selectionHash": "ab32b291f16d90ac17c20d042f1a3a7d7192a35106949e13aa94d37579a32723"
+          "selectionHash": "8d627590faf8730f3fdc9ec9556c1fe98fd2fc78701176d92a5122c48da01d35"
         },
         {
           "id": "case-02-infant-guardian",
@@ -102,7 +102,7 @@
             1033,
             58728448
           ],
-          "selectionHash": "86b0928be60016454a27ff0af30e206a8ea1f30612034d8c54622ecf60512a05"
+          "selectionHash": "c2ca7ffd39b87099ceeea06542d1b1e2c95e22601e1b684c546ea91ce2fa5723"
         },
         {
           "id": "case-03-school-decision",
@@ -154,7 +154,7 @@
             1037,
             25182208
           ],
-          "selectionHash": "8a4fa6d607bcd63ecb1ab40729479ad34807439678026f4e3f38c0e8e27ac6a0"
+          "selectionHash": "75c26b7dd4590bfa5788f12d2b6f92a8d52d34c664a84abac36544660786cc2e"
         },
         {
           "id": "case-04-school-decision-guardian",
@@ -206,7 +206,7 @@
             1041,
             125853696
           ],
-          "selectionHash": "2e61b0cb8d2b979f48536e3f23a17a427fbe6d0bad64b74887023f33ef5d8976"
+          "selectionHash": "acdc913a2036d8aea189ef784d2e49fc36a0633d108d1c7066ce790e72dd1f4f"
         },
         {
           "id": "case-05-sibling-flag",
@@ -258,7 +258,7 @@
             1045,
             25198592
           ],
-          "selectionHash": "3a5706a2ff960ce190d35790935fe4214ad38fe957853838d75631b498779883"
+          "selectionHash": "20979410fbf03dac82088ad385cc06239579a08eb4237f62ba7e997b1f98686a"
         },
         {
           "id": "case-06-teen-standard",
@@ -307,7 +307,7 @@
             1049,
             58761216
           ],
-          "selectionHash": "2b7d3d36e0356d175992eb599e7f93c7c0ba4b343eb899003305fbcc36f439c9"
+          "selectionHash": "ca0742ef0ef168cbf9dc607f9f877e20375490d7a456260c96d85fe0b95ae7b1"
         },
         {
           "id": "case-07-teen-negative-balance",
@@ -363,7 +363,7 @@
             1053,
             25214976
           ],
-          "selectionHash": "3e2cddd1e77f900f4dfa0b4638e55d583e5695f82573e3117b3b2cc9445c1456"
+          "selectionHash": "8820751903e4f0c275f0fd427e338693911f8e4631b1f5eb999ff2c9eadee834"
         },
         {
           "id": "case-08-exams-year",
@@ -411,7 +411,7 @@
             1057,
             260104192
           ],
-          "selectionHash": "8a1f960fc09cc985c0c842c9844071e06a97a86f4f7aa85b838c2699287dc4bd"
+          "selectionHash": "8183a49a8ecc69c7bec4434c4b38226c3bb4e7ee7433ae42d6543a3da3e9b110"
         },
         {
           "id": "case-09-adult-employed",
@@ -472,7 +472,7 @@
             1061,
             25231360
           ],
-          "selectionHash": "2aded55242ffa51f3a1e26912837f92b6cbe136801c3d1cc34de7746d5b5e6df"
+          "selectionHash": "d6ae50584924563a36653fd8213802f4b24cc62141155f9d78fbb9f89fddcac5"
         },
         {
           "id": "case-10-adult-guardian",
@@ -528,7 +528,7 @@
             1065,
             58793984
           ],
-          "selectionHash": "5bd3a8d6e70382ca7a8b062494829586eda375831411c8c23dadded859fca470"
+          "selectionHash": "af1e71a57f4eb2468553e1b327b3a53a45db8bd58b808b701967f5240780bf9e"
         },
         {
           "id": "case-11-low-happiness",
@@ -583,7 +583,7 @@
             1069,
             25247744
           ],
-          "selectionHash": "cc20f3c7c9f7eb87570a6bc2b8f7015cdd3581089e2454f402451b782346338a"
+          "selectionHash": "305e25467256d647cea6686da49a0b5f817a4a5517c57cef7a213902d38fa9bc"
         },
         {
           "id": "case-12-promotion-cooldown",
@@ -642,7 +642,7 @@
             1073,
             125919232
           ],
-          "selectionHash": "4a2a2e50b112945493991ca69b18672f2a85afae1e1bfb1627f3308fb52b0f51"
+          "selectionHash": "9ed80c4aa8046dd49ec01af53e2ac735906c4c9e7e6d4b13f003a1a5e5c81375"
         },
         {
           "id": "case-13-community-flag",
@@ -696,7 +696,7 @@
             1077,
             25264128
           ],
-          "selectionHash": "df8b2bf1a14eb6fdaac3d2c41053e28c3fa2d642feccdb9cc074a0897325366b"
+          "selectionHash": "c92f7e9b24f8c3949f6887b4b3c4ad8442bd8991f1bb3c27805dc36e44d306a1"
         },
         {
           "id": "case-14-setback-cooldown",
@@ -757,7 +757,7 @@
             1081,
             58826752
           ],
-          "selectionHash": "2d883da84f282aa2e3eae89227b30d73aedc176f7f8a861fbb80c0a209c766a1"
+          "selectionHash": "64111c8c6dfbec1254dafa91c61b0606c3cfbd46a216fba72d864ed26674a49f"
         },
         {
           "id": "case-15-debt",
@@ -805,7 +805,7 @@
             1085,
             25280512
           ],
-          "selectionHash": "ffa245df51266aba2e32c0b5b386bea7b7c654dfb1f5903d60bb5fda33211990"
+          "selectionHash": "5977fc145a35712d43a7bf3f99b28282fbe2622b5c78012571ddf6ff86e87786"
         },
         {
           "id": "case-16-senior-standard",
@@ -859,7 +859,7 @@
             1089,
             528605184
           ],
-          "selectionHash": "33b01b7115b6801a768aa877b5be03c594de75a002bfc173b8a12cce8f363b22"
+          "selectionHash": "71f65d7adbae531a1d1eff57697ff864eb89c2410356d8f5fbe22aa08673ae7e"
         },
         {
           "id": "case-17-senior-guardian",
@@ -914,7 +914,7 @@
             1093,
             25296896
           ],
-          "selectionHash": "45ae2f0bf1a5c275df4e7d13448c3a92cb7ea26ba679f8aafc6e78f1d956d7ed"
+          "selectionHash": "ee5e9c80b60c45d97060173cf9deac09e05e1b2a67c16c49bc3888d5f0e9874e"
         },
         {
           "id": "case-18-late-life-100",
@@ -964,7 +964,7 @@
             1097,
             58859520
           ],
-          "selectionHash": "e077050d6b1ab82a8cfab425cad417803bedd496d43b0b5c8765371956b97257"
+          "selectionHash": "3bc8876455b6c8d90a3ab1043b1331f9fdd4b6ccaaf1b905ed4d8fd852e2f59e"
         },
         {
           "id": "case-19-exams-taken",
@@ -1018,7 +1018,7 @@
             1101,
             25313280
           ],
-          "selectionHash": "61b1dc863649ea8fcf7f58e02ca5e81e97c1f2cecf04d61e1278c70856dd56aa"
+          "selectionHash": "f31fbde9750e755eaabe8887328069d27d087cb0426d948a9af5ada841f78032"
         },
         {
           "id": "case-20-no-promotion-knowledge",
@@ -1073,7 +1073,7 @@
             1105,
             125984768
           ],
-          "selectionHash": "20570a624d0fdaeee4c5e339dd26ffa33edd35f52cfd39a28b3fc28bac4366b8"
+          "selectionHash": "202e6e43a4409f4c30c3eca13b6b0fff98799c3875b45a2eaa5d7f1cfd3688c0"
         },
         {
           "id": "case-21-all-zero-rng",
@@ -1124,7 +1124,7 @@
             3777114885,
             1407991002
           ],
-          "selectionHash": "9994af95a784fd01acf3b863173f4af990edc9084f8b7145798112ae9f2e148a"
+          "selectionHash": "6d7db31f0cc44f285826971b696dac5499979da249a40bc7da765f131639868b"
         },
         {
           "id": "case-22-high-happiness",
@@ -1181,7 +1181,7 @@
             1109,
             25329664
           ],
-          "selectionHash": "0b496551bb34e4708f89a875293ae088cc72275e86cc632383665fde1c83b137"
+          "selectionHash": "0add29da099d71a1007d7a9d9e59cd48825383e8b2b417f66fb220c15c03fb09"
         },
         {
           "id": "case-23-guardian-teen",
@@ -1235,7 +1235,7 @@
             1113,
             58892288
           ],
-          "selectionHash": "8a1fa98d5b018f9d6c5df0ec2a57b7bb0b79d3f6e6515f7514eab5825acb42d0"
+          "selectionHash": "8d79809f16434f0555a71875ca7e978cc7ce78d1c18ec5f206561cf918acf12f"
         },
         {
           "id": "case-24-tantrum-age",
@@ -1289,7 +1289,7 @@
             1117,
             25346048
           ],
-          "selectionHash": "c7e14791600ea05adf77b2ca8f923ee873cb3773ea7eb33b39ddd81d15056204"
+          "selectionHash": "dfba6dfae7922a4026fc9806df058566f4c2f4a124b0726aabedfc8afac8a8dd"
         }
       ]
     },
